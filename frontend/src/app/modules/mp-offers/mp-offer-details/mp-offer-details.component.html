@@ -1,0 +1,208 @@
+<form novalidate class="k-form" [formGroup]="form" *ngIf="mpOffer" (keydown.enter)="onKeypressEvent($event)">
+    <kendo-card class="offer_deatils_container">
+        <kendo-card-header class="k-hstack comp-header">
+            <kendo-gridlayout class="toolbar-whole-layout" [gap]="{ rows: 10, cols: 10 }"
+                [cols]="[{ width: '80%'} , { width: '20%' }]" [align]="{ horizontal: 'start', vertical: 'middle' }"
+                [ngStyle]="{ 'width': '100%' }">
+                <kendo-gridlayout-item class="toolbar-des-griditem" [row]="1" [col]="1"
+                    [ngStyle]="{ 'width': '100%', 'max-width': '1600px' }">
+                    <kendo-gridlayout class="toolbar-des-gridlayout"
+                        [align]="{ horizontal: 'start', vertical: 'middle' }" [gap]="{ rows: 10, cols: 10 }"
+                        [cols]="[{width:400},{width:550},{width:450}]">
+                        <kendo-gridlayout-item [row]="1" [col]="1"
+                            style="width:100%;display: flex;flex-direction: row;justify-content: flex-start; align-items:center;">
+                            <kendo-label class="k-text-inverse k-text-center header-lbl-format desc-units" i18n-text
+                                text="Offers" i18n style="padding-left: 10px;text-wrap: wrap;width: 50%;">
+                                <kendo-textbox #custom_id formControlName="custom_id" 
+                                    [(ngModel)]="mpOffer?.is_cloned && mpOfferSrv.clonetype == 'duplicate' ? mpOffer.parentOffer?.custom_id : mpOffer.custom_id"
+                                    i18n-placeholder placeholder="Offer" [readonly]="true"
+                                    style="width:90px;" class="custom_id_field" [disabled]="mpOffer.is_closed">
+                                </kendo-textbox> <!-- [readonly]="mpOffer.custom_id != null" -->
+                            </kendo-label>
+                            <kendo-label class="k-text-inverse k-text-center header-lbl-format desc-units" i18n-text
+                                text="Version" style="margin-left: 10px; text-align: right;text-wrap: wrap;width: 50%;"
+                                i18n>
+                                <kendo-textbox #version formControlName="version" [readonly]="true"
+                                    [(ngModel)]="mpOffer.version" i18n-placeholder placeholder="Offer"
+                                    style="width:70px;" [disabled]="mpOffer.is_closed" class="version-field">
+                                </kendo-textbox>
+                            </kendo-label>
+                        </kendo-gridlayout-item>
+                        <kendo-gridlayout-item [row]="1" [col]="2"
+                            style="width: 100%; display: flex;flex-direction: row;width: 100%; margin-left: 10px;">
+                            <label class="k-text-inverse k-text-center desc-units"
+                                style="width: 100%;display: flex;flex-direction: row;justify-content: flex-start;align-items: center;text-align: start;">
+                                <span class="tool-field-label"
+                                    style="margin-right: 5px; text-align: right; width: 20%; text-wrap: wrap;">
+                                    <span i18n>Tool</span><span class="k-text-error k-pl-1">*</span>
+                                </span>
+                                <kendo-textbox #name formControlName="name" [(ngModel)]="mpOffer.name" i18n-placeholder
+                                    placeholder="Name" [disabled]="mpOffer.is_closed" [clearButton]="true"
+                                    (valueChange)="onFormChange($event)" required
+                                    [class.formError]="form.get('name').invalid" style="width: 80%;">
+                                </kendo-textbox>
+                                <!-- <kendo-formerror *ngIf="form.controls.name.errors?.required" style="margin-left: 5px;">Required</kendo-formerror> -->
+                            </label>
+                        </kendo-gridlayout-item>
+                        <kendo-gridlayout-item [row]="1" [col]="3"
+                            style="width: 100%;display: flex;flex-direction: row;justify-content: flex-start; align-items:center;">
+                            <label class="k-text-inverse k-text-center desc-units"
+                                style="width: 50%;display: flex;flex-direction: row;justify-content: flex-start;align-items: center;text-align: start;">
+                                <span style="width: 110px; text-align: right;">
+                                    <span i18n>Type</span><span class="k-text-error k-pl-1">*</span>
+                                </span>
+                                <kendo-combobox class="mp-offer-type-field" #mp_offer_type
+                                    formControlName="mp_offer_type" [(ngModel)]="mpOffer.mp_offer_type"
+                                    style="width:180px;z-index:999999999; margin-left: 10px;" [data]="offerTypeDataSrc"
+                                    textField="text" valueField="value" [valuePrimitive]="true" [filterable]="true"
+                                    required (valueChange)="onFormChange($event)" (filterChange)="handleFilter($event)"
+                                    [disabled]="mpOffer.is_closed"
+                                    [class.formError]="form.get('mp_offer_type').invalid">
+                                </kendo-combobox>
+                                <!-- <kendo-formerror *ngIf="form.controls.mp_offer_type.errors?.required" style="margin-left: 5px;">Required</kendo-formerror> -->
+                            </label>
+                            <kendo-label class="k-text-inverse k-text-center header-lbl-format desc-units" i18n-text
+                                text="Date" style="margin-left: 20px;width: 50%; text-align: right;" i18n>
+                                <kendo-datepicker class="date-field" #date_offer formControlName="date_offer"
+                                    [(ngModel)]="mpOffer.date" (valueChange)="onFormChange($event)"
+                                    style="width: 130px;" [disabled]="mpOffer.is_closed">
+                                </kendo-datepicker>
+                            </kendo-label>
+                        </kendo-gridlayout-item>
+                    </kendo-gridlayout>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item class="toolbar-button-section" [row]="1" [col]="2"
+                    [ngStyle]="{'width': '100%', 'position': 'absolute','right': '10px', 'max-width': '400px'}">
+                    <kendo-gridlayout class="buttons-layout" [align]="{ horizontal: 'end', vertical: 'middle' }"
+                        [cols]="[]">
+                        <kendo-gridlayout-item class="buttons-layout-item" [row]="1" [col]="1">
+                            <button kendoButton themeColor="secondary" iconClass="k-icon icon-printer"
+                                (click)="printOfferDetails()" i18n>
+                                Print
+                            </button>
+                            <button kendoButton themeColor="secondary" iconClass="k-icon icon-close"
+                                (click)="closeOfferDetails(true)" style="margin-left: 5px;" i18n>
+                                Cancel
+                            </button>
+                            <button kendoButton themeColor="primary" iconClass="k-icon icon-save"
+                                (click)="checkOfferValidity()" style="margin-left: 5px;" i18n>
+                                Save
+                            </button>
+                        </kendo-gridlayout-item>
+                    </kendo-gridlayout>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </kendo-card-header>
+
+        <kendo-card-body style="background-color: #F9FAFB;">
+            <div class="offer-description-section">
+                <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }" [cols]="[{ width: '65%'} , { width: '35%' }]"
+                    [ngStyle]="{ width: '100%', 'height': '100%' }">
+                    <div class="expand-menu-section">
+                        <kendo-gridlayout-item [row]="1" [col]="1">
+                            <kendo-panelbar *ngFor="let item of panelBarDetails" (collapse)="panelEvt(item,'c')"
+                                (expand)="panelEvt(item,'x')" style="border-radius: 8px;">
+                                <kendo-panelbar-item [selected]="item.isSelected" [expanded]="item.isExpanded">
+                                    <ng-template kendoPanelBarItemTitle>
+                                        <span class="title-icon">
+                                            <i class="k-icon"
+                                                [ngClass]="item.isExpanded ? 'k-i-arrow-chevron-up' : 'k-i-arrow-chevron-down'"></i>
+                                        </span>
+                                        <span class="item-title">{{item.title}}</span>
+                                        <span *ngIf="item.hasSubtitle" class="item_second_title"
+                                            style="display: inline-flex;">
+                                            <div *ngIf="item.cstGrp == 'INTERNAL'"
+                                                style="width:90px; display: block; text-align: center">
+                                                {{mpOffer.getTotalSubGroupHours(item.cstSubGrp)}}
+                                            </div>
+
+                                            <div *ngIf="item.cstGrp == 'INTERNAL'"
+                                                style="width:90px; display: block; text-align: center">
+                                                {{mpOffer.getTotalPersonHours(item.cstSubGrp)}}
+                                            </div>
+                                            <div *ngIf="item.cstGrp == 'INTERNAL'"
+                                                style="width:90px; display: block; text-align: center;">
+                                                {{mpOffer.getTotalMachineHours(item.cstSubGrp)}}
+                                            </div>
+                                            <div *ngIf="item.cstGrp == 'INTERNAL'"
+                                                style="width:90px; display: block; text-align: center;" i18n>
+                                                {{ intl.formatNumber(mpOffer.getTotalPersonCosts(item.cstSubGrp),'c',
+                                                'it') }}
+                                            </div>
+                                            <div *ngIf="item.cstGrp == 'INTERNAL'"
+                                                style="width:90px; display: block; text-align: center;" i18n>
+                                                {{ intl.formatNumber(mpOffer.getTotalMachineCosts(item.cstSubGrp),'c',
+                                                'it') }}
+                                            </div>
+
+                                            <div class="total_sum_section" style="width:140px; text-align: right;" i18n>
+                                                {{intl.formatNumber(mpOffer.getTotalCostSubGroup(item.cstSubGrp),'c',
+                                                'it')}}
+                                            </div>
+                                        </span>
+                                    </ng-template>
+
+                                    <ng-template kendoPanelBarContent>
+                                        <div class="offerDetailsDiv">
+                                            <div *ngIf="item.content == 'root_item'">
+                                                <app-root-item [data]="mpOffer" [customers]="customers"
+                                                    (sendFormData)="getRootItemDataAndSave($event)"></app-root-item>
+                                            </div>
+                                            <div>
+                                                <app-sub-details
+                                                    *ngIf="isPosDataLoaded && item.content != 'root_item' && item.content != 'notes'"
+                                                    [data]="getMpOfferPosForSubGroup(item.cstSubGrp)"
+                                                    [base_data]="mpMaterials" [suppliers]="suppliers"
+                                                    [cost_sub_group]="item.cstSubGrp" [offer]="mpOffer"
+                                                    (sendFormData)="dataChangeEvt($event)"></app-sub-details>
+                                            </div>
+                                            <div *ngIf="item.content == 'notes'">
+                                                <app-notes [data]="mpOffer"></app-notes>
+                                            </div>
+                                        </div>
+                                    </ng-template>
+                                </kendo-panelbar-item>
+                            </kendo-panelbar>
+                        </kendo-gridlayout-item>
+                    </div>
+
+                    <div class="offer-details-section">
+                        <kendo-gridlayout-item [row]="1" [col]="2">
+                            <kendo-gridlayout [gap]="{ rows: 20 }" [rows]="[{ height: '50%'} , { height: '47%' }]"
+                                [cols]="[{ width: '99%' }]" [ngStyle]="{ width: '100%', 'height': '100%' }">
+                                <kendo-gridlayout-item [row]="1" [col]="1">
+                                    <div class="details-summary">
+                                        <app-summary [data]="mpOffer"></app-summary>
+                                    </div>
+                                </kendo-gridlayout-item>
+
+                                <kendo-gridlayout-item [row]="2" [col]="1">
+                                    <div class="part-image-slider">
+                                        <app-attachments [data]="mpOffer"
+                                            (mediaUpdate)="onChangeMedia()">
+                                        </app-attachments>
+                                    </div>
+                                </kendo-gridlayout-item>
+                            </kendo-gridlayout>
+                        </kendo-gridlayout-item>
+                    </div>
+                </kendo-gridlayout>
+            </div>
+        </kendo-card-body>
+    </kendo-card>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>
+<div kendoDialogContainer></div>
+
+<kendo-dialog i18n-title [title]="'Warning'" *ngIf="showCloneWarning" (close)="closeCloneWarningModal()" [width]="500"
+    [height]="190">
+    <kendo-card width="100%">
+        <kendo-card-body>
+            <div i18n>There are more rows than standard, so only first 3 rows are imported in material and external
+                sections.</div>
+        </kendo-card-body>
+    </kendo-card>
+    <kendo-dialog-actions class="clone-warning-modal-action" [layout]="end">
+        <button themeColor="primary" kendoButton (click)="closeCloneWarningModal()" i18n>OK</button>
+    </kendo-dialog-actions>
+</kendo-dialog>

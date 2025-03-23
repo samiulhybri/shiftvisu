@@ -1,0 +1,13 @@
+<app-grid-table headerTitle="Repair History" url="/ProdOrderPos" i18n-headerTitle [columns]="columns"
+	[showAction]="false" [limit]="1000" [showDownload]="false" [showNewButton]="false" [showSearch]="true" selectionMode="Single"
+	[isBaseVisu]="false" (processData)="processData($event)" [expandQuery]="extendQuery"
+	[enableServerSideFiltering]="false" #childComponentRef>
+</app-grid-table>
+
+<div *ngIf="isViewDialogOpen">
+	<app-repair-details [modalType]="'view'" [modalHeight]="'87%'" [selectedProdOrderPos]="selectedOrder"
+		[repairId]="itemId || 0" [isDialogOpen]="isViewDialogOpen" (isCloseClicked)="closeViewDialog()"
+		(isSaveClicked)="isSavedModal()"
+		#repairDetailsTable>
+	</app-repair-details>
+</div>

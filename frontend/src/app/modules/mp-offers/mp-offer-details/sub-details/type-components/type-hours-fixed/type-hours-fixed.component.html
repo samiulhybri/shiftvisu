@@ -1,0 +1,42 @@
+<div [formGroup]="form"
+    *ngIf="data != undefined && data.rowIsShow()">
+    <kendo-gridlayout [gap]="{ cols: 10 }"
+        [cols]="[{width: 300 },{width: 'auto' },{width: 90 },{width: 90 },{width: 90 },{width: 90 },{width: 150 }]">
+        <kendo-gridlayout-item class="label-format" [col]="1">
+            <label [textContent]="data.name"></label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [col]="2">
+            <kendo-combobox #mp_machine_id formControlName="mp_machine_id" [hidden]="dataSrcMachine.length <= 1"
+                [(ngModel)]="data.machine" [data]="dataSrcMachine" textField="name" valueField="id"
+                [disabled]="notSelectMachine || isFieldDisabled" [readonly]="notSelectMachine" [filterable]="true"
+                (filterChange)="handleFilter($event)">
+            </kendo-combobox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [col]="3">
+            <kendo-numerictextbox #personnel_quantity [(ngModel)]="data.personnel_quantity" class="number-right-align"
+                [spinners]="false" format="n" formControlName="personnel_quantity" [disabled]="isFieldDisabled">
+            </kendo-numerictextbox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [col]="4">
+            <kendo-numerictextbox #machine_quantity style="background-color: gainsboro;" [disabled]="true"
+                [readonly]="true" [spinners]="false" tabindex="-1" formControlName="machine_quantity">
+            </kendo-numerictextbox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [col]="5">
+            <kendo-numerictextbox #personnel_price [(ngModel)]="data.personnel_price" class="number-right-align"
+                formControlName="personnel_price" format="c2" [spinners]="false" [disabled]="true" tabindex="-1"
+                [readonly]="true"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [col]="6">
+            <kendo-numerictextbox #machine_price [(ngModel)]="data.machine_price" class="number-right-align"
+                formControlName="machine_price" format="c2" [spinners]="false" [disabled]="true" tabindex="-1"
+                [readonly]="true"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+
+        <kendo-gridlayout-item [col]="7" style="text-align: right;">
+            <kendo-numerictextbox #total placeholder="{{intl.formatNumber(data.getTotal(), 'c', 'it')}}"
+                class="number-right-align" tabindex="-1" formControlName="total" [spinners]="false" [disabled]="true"
+                format="c2" [style.width.px]="150" [readonly]="true"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>

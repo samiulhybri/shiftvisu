@@ -1,0 +1,106 @@
+<div style="width: calc(100% -5px);height: calc(100% - 20px);border-radius: 0px 0px 15px 15px;" class="p-2 overflow-hidden">
+	<app-grid-table
+		*ngIf="expandedQuery!=''"
+		headerTitle="Machine List"
+		url="/ProdOrderPosOperations"
+		[expandQuery]="expandedQuery"
+		i18n-headerTitle
+		[columns]="columns"
+		[showAction]="false"
+		[showSearch]="true"
+		[showDownload]="false"
+		addButtonText="Add Trip"
+		[model]="prodOrderPosOperation"
+		i18n-addButtonText="Add Trip"
+		[showNewButton]="true"
+		[showDownload]="true"
+		[showTripButtons]="true"
+		(newButtonClick)="handleNewButtonClick()"
+		(rowClick)="rowClick($event)"
+		[limit]="5000"
+		[additionalFilterQuery]="additionalFilterQuery"
+		(settingsButtonClick)="onClickSettingsButton()"
+		(downloadButtonClick)="download()"
+		(clearButtonClick)="clearButtonClick()"
+		(segmentButtonChange)="segmentButtonChange($event)"
+		[segmentButtonItems]="segmentButtonItems"
+		(columnReorder)="onColumnsReorder($event)"
+		#childComponentRef>
+	</app-grid-table>
+</div>
+	<ui5-dialog header-text="Add Furnace Trip" i18n-header-text="Add Furnac Trip" [open]="isDialogOpen">
+		<div slot="footer" style="display: flex;flex-direction: row;justify-content: end;align-items: center;width: 100%;">
+			<ui5-button design="Emphasized" i18n style="margin-right: 5px;" (click)="save()">Add Furnace Trip</ui5-button>
+			<ui5-button design="Transparent" (click)="closeDialog()">{{ localization.close }}</ui5-button>
+		</div>
+		<div class="div-row">
+			<div class="div-col">
+				<ui5-label show-colon i18n>Oven</ui5-label>
+				<ui5-combobox #ovenCombobox style="margin-right: 16px;" (selection-change)="changeMachine($event)">
+					<ui5-cb-item *ngFor="let machine of machines" [text]="machine.name" [id]="machine.id" ></ui5-cb-item>
+				</ui5-combobox>
+			</div>
+			<div class="div-col">
+				<ui5-label show-colon i18n>Furnace Trip</ui5-label>
+				<ui5-input style="margin-right: 16px;" [value]="prodLotCustomId" >
+				<ui5-icon slot="icon" name="value-help" (click)="tripDialog.openDialog();"></ui5-icon>
+				</ui5-input>
+			</div>
+			<div class="div-col">
+				<ui5-label show-colon i18n>Prod. Date & Time</ui5-label>
+				<ui5-datetime-picker #startDate style="margin-right: 16px;"  format-pattern="MMM dd, yyyy  hh:mm a" [(ngModel)]="selectedDateTime" >
+				</ui5-datetime-picker>
+			</div>
+			<div class="div-col">
+				<ui5-label show-colon i18n>Duration</ui5-label>
+				<div style="display: flex;flex-direction: row;align-items: center;">
+					<ui5-select style="width: 15px;margin-right: 2px;" [(ngModel)]="selectedHour">
+						<ui5-option *ngFor="let hour of hours">{{hour|number:'2.0-0'}}</ui5-option>
+					</ui5-select>
+					:
+					<ui5-select style="width: 15px;margin-left: 2px;" [(ngModel)]="selectedMinute">
+						<ui5-option *ngFor="let minute of minutes">{{minute|number:'2.0-0'}}</ui5-option>
+					</ui5-select>
+				</div>
+			</div>
+			<div class="div-col" style="margin-left: 15px;">
+				<ui5-label show-colon i18n>Note</ui5-label>
+				<ui5-input [(ngModel)]="note"></ui5-input>
+			</div>
+			<div class="div-col" style="margin-left: 15px;">
+				<ui5-label show-colon i18n>Temperature</ui5-label>
+				<ui5-input [(ngModel)]="temperature" type="Number" name="temperature"></ui5-input>
+			</div>
+			<div class="div-col" style="margin-left: 15px;">
+				<ui5-label show-colon i18n>Cooldown</ui5-label>
+				<ui5-checkbox [checked]="isCooldownNeeded" (change)="changeCooldown($event)"></ui5-checkbox>
+			</div>
+		</div>
+		<div style="color: red;">
+			{{errorMessage}}
+		</div>
+		<div *ngIf="!isNewTrip" style="color: orange;" i18n>
+            If you update anything it will update existing trip
+        </div>
+		<div  style="display: flex;flex-direction: row;justify-content: center;align-items: center;width: auto;align-content: center;">
+			<ui5-busy-indicator size="M" active *ngIf="isDialogBusy">
+			</ui5-busy-indicator>
+		</div>
+	</ui5-dialog>
+	<app-setting #settingsDialog [machines]="machines" [isViewSettingsOpen]="isViewSettingsOpen" [columns]="columns" (saveEvent)="settingsDialogSave($event)" [gridTable]="gridTable" [hallId]="hallId" [machineGroups]="machineGroups" [showOpenOrders]="showOpenOrders"></app-setting>
+
+	<app-trip #tripDialog [data]="tripData" (selectionChange)="tripChange($event)"></app-trip>
+	<ui5-busy-indicator size="M" [active]="isBusy" style="z-index: 10;align-self: center;position: absolute;top: 50%;left: 50%;"></ui5-busy-indicator>
+	<ui5-dialog [open]="showClearTripDialog" header-text="Warning"  header-text-i18n="Warning">
+		<ui5-text>
+			By pressing OK all the trip will be cleared.
+		</ui5-text>
+		<div slot="footer" style="display: flex;flex-direction: row;justify-content: end;align-items: center;width: 100%;">
+			<ui5-button design="Emphasized" style="margin-right: 5px;" (click)="saveCreatTripButton()">{{ localization.save }}</ui5-button>
+			<ui5-button design="Transparent" (click)="closeClearTripDialog()">{{ localization.close }}</ui5-button>
+		</div>
+	</ui5-dialog>
+
+<app-hwe-kalk-calculation-details (closeHweDialog)="closeHweDialog($event)" [calculationId]="calculationId" [openDialog]="openCalDetails"></app-hwe-kalk-calculation-details>
+
+<router-outlet></router-outlet>

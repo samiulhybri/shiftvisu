@@ -1,0 +1,47 @@
+.main-div {
+    margin-left: -14px;
+    margin-right: -14px;
+    height: 100%;
+}
+.order-card {
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--card-background-color);
+    height: 44px;
+    width: 200px;
+    gap: 8px;
+}
+
+.card-warning {
+    background: var(--sapField_WarningBackgroundStyle);
+    background-color: var(--sapField_WarningBackground);
+    border-color: var(--_ui5-v2-0-1_input_value_state_warning_border_color);
+    box-shadow: var(--sapField_WarningShadow);
+}
+
+.label-style {
+    font-size: var(--title-text-font-size);
+    color: var(--list-description-text-color);
+}
+
+.info-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 15px;
+    gap: 15px;
+    width: 100%;
+}
+
+.painting-line-h-6vh {
+    height: 60vh;
+}
+
+.painting-line-h-5vh {
+    height: 50vh;
+}

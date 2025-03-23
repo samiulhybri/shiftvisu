@@ -1,0 +1,124 @@
+<div class="flex justify-between items-center mt-[10px] mb-[10px] border-gray-500 ml-2">
+	<div class="w-[10%] flex justify-start items-center space-x-1">
+		@if (onBackButton) {
+		<ui5-button icon="nav-back" class="mr-1" design="Default" (click)="onBackButton()">
+		</ui5-button>
+		}
+	</div>
+
+	<div class="w-[90%] flex items-center justify-between pr-3 ml-2">
+		<div class="flex items-center w-full space-x-2">
+			<ui5-input [showClearIcon]="true" class="w-full" (ui5Input)="onTypeSearch()" [(ngModel)]="searchKeyword"
+				placeholder="search" i18n-placeholder>
+				<ui5-icon *ngIf="!searchKeyword" id="dialogSearchIcon" slot="icon" name="search"></ui5-icon>
+			</ui5-input>
+			<ui5-button class="w-[135px]" (click)="toggleExpandCollapse()" design="Emphasized">
+				{{ isExpanded ? "Collapse All" : "Expand All" }}
+			</ui5-button>
+		</div>
+	</div>	
+</div>
+
+@if (graph) {
+	<ui5-tree class="docVisuTable overflow-auto">
+		<ng-container *ngTemplateOutlet="treeView; context: { node: graph, treeIndex: '0' }"></ng-container>
+	</ui5-tree>
+}
+
+<ng-template #treeView let-node="node" let-treeIndex="treeIndex">
+	@if (node) {
+		<ui5-tree-item-custom class="folderCell" [expanded]="node.expanded" [selected]="selectedTreeIndex == treeIndex"
+			(click)="onClickTreeItem(treeIndex, node)" [icon]="node?.parent_type == null ? 'factory' : 'folder-blank'">
+			<div slot="content" class="flex items-center justify-between w-full">
+				<ui5-label [textContent]="node?.name" class="truncate-text" [attr.title]="node?.name"></ui5-label>
+				<div class="flex space-x-2">
+					@if (node?.parent_type != null) {
+						<ng-container *ngTemplateOutlet="actionButtons; context: { node: node, buttons: folderActionButtons, treeIndex: node.id + treeIndex}"></ng-container>
+					} @else if (node?.parent_type == null && processActionButtons.length) {
+						<ng-container *ngTemplateOutlet="actionButtons; context: { node: node, buttons: processActionButtons, treeIndex: node.id + treeIndex }"></ng-container>
+					}
+				</div>
+			</div>
+			@if (node.files && node.files.length > 0) {
+				<ng-container *ngTemplateOutlet="fileSection; context: { node, files: node.files, treeIndex: treeIndex + '.F' }"></ng-container>
+			}
+			@if (node.directories && node.directories.length > 0) {
+				@for (dir of node.directories; track $index) {
+					<ng-container *ngTemplateOutlet="treeView; context: { node: dir, treeIndex: treeIndex + '.D' + $index }"></ng-container>
+				}
+			}
+			@if (showLinks && node.linked) {
+				@if (node.linked.files && node.linked.files.length > 0) {
+					<ng-container *ngTemplateOutlet="fileSection;context: { node, files: node.linked.files, treeIndex: treeIndex + '.LF' }"></ng-container>
+				}
+				@if (node.linked.directories && node.linked.directories.length) {
+					@for (dir of node.linked.directories; track $index) {
+					<ng-container *ngTemplateOutlet="treeView; context: { node: dir, treeIndex: treeIndex + '.LD' + $index }"></ng-container>
+					}
+				}
+			}
+		</ui5-tree-item-custom>
+	}
+</ng-template>
+
+<ng-template #fileSection let-node="node" let-files="files" let-treeIndex="treeIndex">
+	@for (file of files; track $index) {
+		<ui5-tree-item-custom class="fileCell" [expanded]="file.expanded"
+			[selected]="selectedTreeIndex === (treeIndex + '.' + $index)"
+			 (click)="onClickTreeItem(treeIndex + '.' + $index, file)">
+			 <div slot="content" class="flex items-center justify-between w-full relative">
+				<!-- Left Section with Icons -->
+				<div class="flex items-center space-x-2 mr-[12px] relative">
+					<!-- Floating Link Icon (if LinkedDocVisuFile) -->
+					@if(file.type === 'LinkedDocVisuFile'){
+						<ui5-icon 
+							name="chain-link" 
+							class="text-white absolute top-[-4px] h-[10px] w-[10px] -right-2 z-10 bg-blue-500 rounded-full p-1 shadow-md">
+						</ui5-icon>
+					} @else {
+						<div></div>
+					}
+					<!-- Main File Icon -->
+					<ui5-icon [name]="file.icon" class="h-[2rem] w-[2rem]"  design="NonInteractive"></ui5-icon>
+				</div>
+			
+				<!-- File Details -->
+				<div class="grid grid-rows-2 gap-y-1 flex-1">
+					<ui5-title level="H5" class="truncate-text" [textContent]="file?.name" [attr.title]="file?.name"></ui5-title>
+					<ui5-label [textContent]="file.mimeType" class="truncate-text" [attr.title]="file.mimeType"></ui5-label>
+				</div>
+			
+				<!-- Action Buttons -->
+				<div class="flex space-x-2">
+					<ng-container *ngTemplateOutlet="actionButtons; context: { node: file, buttons: fileActionButtons, treeIndex: treeIndex + '.B' + $index}"></ng-container>
+				</div>
+			</div>
+			
+		</ui5-tree-item-custom>
+	}
+</ng-template>
+
+
+
+<ng-template #actionButtons let-node="node" let-buttons="buttons" let-treeIndex="treeIndex">
+	@if (needToShowActionButton) {
+		<div class="flex space-x-2">
+			@for (button of buttons; track $index) {
+				@if (button.type && button.type == "MenuButton") {
+					<ui5-button [id]="'menu-' + node.id + treeIndex" icon="overflow" [disabled]="button?.disable && button?.disable()"
+						design="Transparent" (click)="setMenuIsOpen(node.id + treeIndex)">
+					</ui5-button>
+					<ui5-menu [open]="menuIsOpen == node.id + treeIndex" [opener]="'menu-' + node.id + treeIndex">
+						@for (item of button.items; track $index) {
+							<ui5-menu-item [text]="item.name" [icon]="item.icon" [disabled]="item?.disable && item?.disable(node)"
+								(click)="item.onClick(node)"></ui5-menu-item>
+						}
+					</ui5-menu>
+				} @else {
+					<ui5-button [id]="button?.name" [icon]="button?.icon" [disabled]="button?.disable && button?.disable()"
+						(click)="button.onClick(node)" design="Transparent"></ui5-button>
+				}
+			}
+		</div>
+	}
+</ng-template>

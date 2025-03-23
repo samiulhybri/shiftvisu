@@ -1,0 +1,16 @@
+Add User:
+
+<kendo-textbox
+  (valueChange)="searchString = $event"
+  i18n-placeholder="Placeholder text in search box"
+  placeholder="Search User"
+>
+</kendo-textbox>
+<div class="users-container">
+  <app-user-chat-tile
+    *ngFor="let user of matchingUsers()"
+    [userOrChat]="user"
+    (selectUserOrChat)="selectUser(user)"
+  >
+  </app-user-chat-tile>
+</div>

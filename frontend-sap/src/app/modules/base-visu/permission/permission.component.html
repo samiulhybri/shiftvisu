@@ -1,0 +1,45 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Permissions"
+		url="/Permissions"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="false"
+		[showSearch]="true"
+		[showDownload]="false"
+		[model]="permission"
+		addButtonText="New"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		selectionMode="Single"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="false"
+		[isBaseVisu]="true"
+		[enableServerSideFiltering]="true"
+		selectionMode="None"
+		#childComponentRef>
+	</app-grid-table>
+</div>
+
+<ui5-dialog id="deleteDialog" header-text="Warning" state="Critical">
+    <p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isIndicator"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+    <div slot="footer" class="footer-style gap-8">
+        <ui5-button class="dialogSubmit" design="Emphasized" (click)="deleteSubmit()">{{ localization.ok }}</ui5-button>
+        <ui5-button (click)="closeDialogDelete()">{{ localization.close }}</ui5-button>
+    </div>
+</ui5-dialog>
+<ui5-toast id="deleteToast" placement="BottomCenter">{{ localization.recordDeleted }}</ui5-toast>
+
+<ng-template #dialogDynamic></ng-template>
+

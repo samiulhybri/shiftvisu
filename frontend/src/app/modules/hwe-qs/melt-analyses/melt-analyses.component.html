@@ -1,0 +1,34 @@
+<kendo-grid-component
+        [gridItems]="gridItems"
+        [columns]="columns"
+        [state]="state"
+        [isLoadedEnabled]="isLoadedEnabled"
+        [isSortable]="isSortable"
+        [isFilterable]="isFilterable"
+        [isGroupable]="isGroupable"
+        [isPageable]="isPageable"
+        [toolbarConfig]="toolbarConfig"
+        (emitState)="changeState($event)"
+        (emitData)="changeState($event)"
+        (gridRefersh)="sendRequest()"
+        (deleteDataItem)="deleteDataItem($event)"
+        [editView]="editView"
+        [addWindowEvent]="addWindowEvent"
+        (filterState)="changeGridFilter($event)"
+>
+    <ng-template #toolBarAfterSearchContent>
+        <button kendoButton [primary]="true"  [routerLink]="['/hwe-qs/melt-analyses/new']">
+            <span class="k-icon icon-add"></span> New
+        </button>
+    </ng-template>
+    <ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+		<ng-container *ngIf="column.name == 'radioactivity'">
+			<div>{{ getEnumTranslateGrid('radioactivity', dataItem.radioactivity) }}</div>
+		</ng-container>
+	</ng-template>
+    <ng-template #actionColumnContent let-dataItem>
+        <button kendoButton [primary]="false"  [routerLink]="['/hwe-qs/melt-analyses', dataItem.id, 'details']">
+            <span class="k-icon icon-edit"></span>
+        </button>
+    </ng-template>
+</kendo-grid-component>

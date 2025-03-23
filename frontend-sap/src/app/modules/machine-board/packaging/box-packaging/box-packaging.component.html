@@ -1,0 +1,140 @@
+<div class="w-full h-[680px] grid grid-cols-5 gap-2">
+	<ui5-card class="h-[680px] xl:col-span-1 lg:col-span-2 md:col-span-5 sm:col-span-5 w-full">
+		<ui5-card-header
+			slot="header"
+			title-text="Handling Unit"
+			i18n-title-text>
+			<ui5-button
+				design="Emphasized"
+				slot="action"
+				class="mt-[-12px] mb-[-8px] mr-2"
+				(click)="createHandlingUnit()"
+				i18n
+				>New HU</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				slot="action"
+				class="mt-[-12px] mb-[-8px]"
+				i18n
+				>Select HU</ui5-button
+			>
+		</ui5-card-header>
+		<div class="h-[680px]">
+			<div
+				class="grid xl:grid-cols-2 lg:grid-cols-1 gap-2 p-4 border-top"
+				id="orderCards">
+				<div class="order-card">
+					<ui5-title
+						level="H5"
+						id="operation"
+						>{{ selectedHandlingUnit.custom_id }}</ui5-title
+					>
+					<span
+						class="label-style"
+						i18n
+						>Handling Unit</span
+					>
+				</div>
+				<div class="order-card">
+					<ui5-title level="H5">{{ selectedHandlingUnit.item?.custom_id }}</ui5-title>
+					<span
+						class="label-style"
+						i18n
+						>Item Id</span
+					>
+				</div>
+			</div>
+		</div>
+	</ui5-card>
+	<ui5-card class="h-[680px] xl:col-span-2 lg:col-span-3 md:col-span-5 sm:col-span-5 w-full"
+		><ui5-card-header
+			slot="header"
+			title-text="Counter"
+			i18n-title-text>
+			<ui5-button
+				design="Negative"
+				slot="action"
+				class="mt-[-12px] mb-[-8px]"
+				i18n
+				>Reset</ui5-button
+			>
+		</ui5-card-header>
+		<div class="divider list-border-bottom"></div>
+		<div class="h-[680px]">
+			<div class="grid grid-cols-5 w-full gap-4">
+				<div class="col-span-2 flex justify-end items-center mt-4">
+					<ui5-label
+						for="quantityProduced"
+						show-colon
+						i18n
+						>Quantity Produced</ui5-label
+					>
+				</div>
+				<div class="col-span-3 mr-[16px] mt-4">
+					<ui5-input
+						id="quantityProducedInput"
+						[(ngModel)]="qualities.quantityProduced"
+						name="quantityProduced"
+						class="w-full"></ui5-input>
+				</div>
+
+				<div class="col-span-2 flex justify-end items-center">
+					<ui5-label
+						for="quantityProduced"
+						show-colon
+						i18n
+						>Quantity Packaged</ui5-label
+					>
+				</div>
+				<div class="col-span-3 mr-[16px]">
+					<ui5-input
+						id="quantityPackagedInput"
+						[(ngModel)]="qualities.quantityPackaged"
+						name="quantityPackaged"
+						class="w-full"></ui5-input>
+				</div>
+
+				<div class="col-span-2 flex justify-end items-center">
+					<ui5-label
+						for="quantityProduced"
+						show-colon
+						i18n
+						>Quantity VIP</ui5-label
+					>
+				</div>
+				<div class="col-span-3 mr-[16px]">
+					<ui5-input
+						id="quantityVIPInput"
+						[(ngModel)]="qualities.quantityVIP"
+						name="quantityVIP"
+						class="w-full"></ui5-input>
+				</div>
+
+				<div class="col-span-2 flex justify-end items-center">
+					<ui5-label
+						for="quantityProduced"
+						show-colon
+						i18n
+						>Counter</ui5-label
+					>
+				</div>
+				<div class="col-span-3 mr-[16px]">
+					<ui5-input
+						id="counterInput"
+						[(ngModel)]="qualities.counter"
+						name="counter"
+						class="w-full"></ui5-input>
+				</div>
+			</div>
+		</div>
+	</ui5-card>
+
+	<div class="h-[680px] xl:col-span-2 lg:col-span-5 md:col-span-5 sm:col-span-5 w-full">
+		<app-order-details
+			[currentMachine]="currentMachine"
+			[showPreviewButton]="true"
+			(handlePreviewClick)="handlePreviewClick($event)"
+			[prodOrderPosOperationsIds]="prodOrderPosOperations"></app-order-details>
+	</div>
+</div>

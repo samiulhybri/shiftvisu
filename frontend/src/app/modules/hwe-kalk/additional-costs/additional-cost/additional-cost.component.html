@@ -1,0 +1,79 @@
+<div novalidate class="k-form">
+  <kendo-stacklayout orientation="horizontal" [gap]="12">
+    <kendo-card [style.flex]="1">
+      <kendo-card-header i18n> Additional Cost </kendo-card-header>
+      <kendo-card-body class="additional-cost-details-body">
+        <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+          <kendo-label [for]="price" i18n i18n-text text="Price"
+            ><span class="k-text-error k-pl-1">*</span></kendo-label
+          >
+          <kendo-numerictextbox  #price name="price" [step]="1" [decimals]="0" format="#.##\ €" [(ngModel)]="additionalCost!.price"></kendo-numerictextbox>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+          <kendo-label [for]="hwe_cost_type" i18n i18n-text text="Cost Type">
+            <span class="k-text-error k-pl-1">*</span>
+          </kendo-label>
+          <div>
+            <kendo-textbox
+              #hwe_cost_type
+              name="hwe_cost_type"
+              [(ngModel)]="additionalCost!.hwe_cost_type"
+            >
+            </kendo-textbox>
+          </div>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+          <kendo-label
+            [for]="cost_calc_type"
+            i18n
+            i18n-text
+            text="Cost calc type"
+          >
+        </kendo-label>
+          <div>
+            <kendo-combobox
+              #cost_calc_type
+              [data]="costCalcTypeData"
+              textField="text"
+              valueField="value"
+              [valuePrimitive]="true"
+              name="cost_calc_type"
+              [(ngModel)]="additionalCost!.cost_calc_type"
+            >
+            </kendo-combobox>
+          </div>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+          <kendo-label [for]="Triggers" i18n i18n-text text="Triggers"></kendo-label>
+          <kendo-multiselect #Triggers
+              [(ngModel)]="additionalCost!.hweAdditionalCostTriggers"
+              [data]="hweAdditionalCostTriggerData" [filterable]="true" textField="text" valueField="value"
+              name="hweAdditionalCostTrigger" (filterChange)="handleFilter($event,'trigger')">
+          </kendo-multiselect>
+      </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="valid_from" i18n i18n-text text="Valid From"> </kendo-label>
+					<kendo-datepicker
+						[(ngModel)]="additionalCost!.valid_from" #valid_from>
+					</kendo-datepicker>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="valid_to" i18n i18n-text text="Valid To"> </kendo-label>
+					<kendo-datepicker
+						[(ngModel)]="additionalCost!.valid_to" #valid_to>
+					</kendo-datepicker>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout  class="input-field" orientation="horizontal" [gap]="9">
+          <kendo-label [for]="lead_time_days" i18n i18n-text text="Lead Time Days"></kendo-label>
+          <kendo-numerictextbox format="#.##\ t" #lead_time_days name="lead_time_days" [(ngModel)]="additionalCost!.lead_time_days" [step]="1"></kendo-numerictextbox>
+      </kendo-stacklayout>
+      </kendo-card-body>
+    </kendo-card>
+  </kendo-stacklayout>
+</div>

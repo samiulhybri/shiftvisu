@@ -1,0 +1,154 @@
+<ui5-dialog [open]="isViewSettingsOpen" style="width: 500px;height: 600px;">
+    <div style="display: flex;flex-direction: column;width: 100%;padding-top: 10px;" slot="header">
+        <div style="width: 100%;display: flex;flex-direction: row;justify-content: space-between;">
+            <ui5-title level="H5" i18n>View Settings</ui5-title>
+            <ui5-button i18n design="Transparent" (click)="reset()">Reset</ui5-button>
+        </div>
+        <ui5-tabcontainer collapsed="true" fixed="true" (tabSelect)="tabChange($event)">
+            <ui5-tab [id]="selectedTabs.Column" i18n-text="Columns" text="Columns" i18n-text="text" collapsed="true" [selected]="selectedTab==selectedTabs.Column">
+            </ui5-tab>
+            <!-- needed in future -->
+            <!-- <ui5-tab [id]="selectedTabs.Sort" i18n-text="Sort" text="Sort" collapsed="true"> </ui5-tab> -->
+            <ui5-tab [id]="selectedTabs.Filter" i18n-text="Filter" text="Filter" collapsed="true"> </ui5-tab>
+        </ui5-tabcontainer>
+    </div>
+    <div *ngIf="selectedTab==selectedTabs.Column && isViewSettingsOpen">
+        <ui5-list #list selectionMode="Multiple" (selectionChange)="selectionChange($event)" >
+
+            <ui5-li *ngFor="let column of columns;index as i" [selected]="column.isSelected"
+                [id]="i">{{column.Header}}</ui5-li>
+        </ui5-list>
+    </div>
+    <div *ngIf="selectedTab==selectedTabs.Sort && isViewSettingsOpen">
+    </div>
+    <div *ngIf="selectedTab==selectedTabs.Filter && isViewSettingsOpen">
+        <ui5-list>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Oven
+                    </ui5-label>
+                    <ui5-multi-combobox (selectionChange)="machineChange($event)">
+                        <ui5-mcb-item *ngFor="let machine of machines" text="{{machine.name}}" id="{{machine.id}}" [selected]="machine.isSelected"></ui5-mcb-item>
+                    </ui5-multi-combobox>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Oven Group
+                    </ui5-label>
+                    <ui5-multi-combobox (selectionChange)="machineGroupChange($event)">
+                        <ui5-mcb-item *ngFor="let machineGroup of machineGroups" text="{{machineGroup.name}}" id="{{machineGroup.id}}" [selected]="machineGroup.isSelected"></ui5-mcb-item>
+                    </ui5-multi-combobox>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n>
+                        Start Date SAP Until:
+                    </ui5-label>
+                    <ui5-date-picker style="width: 210px;" [(ngModel)]="startDateSap" format-pattern="MMM dd, YYYY">
+                    </ui5-date-picker>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Operation
+                    </ui5-label>
+                    <ui5-input [(ngModel)]="name">
+                        
+                    </ui5-input>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Product
+                    </ui5-label>
+                    <ui5-input [(ngModel)]="item">
+                        
+                    </ui5-input>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Product Type
+                    </ui5-label>
+                    <ui5-input [(ngModel)]="productType">
+                        
+                    </ui5-input>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Prod Order
+                    </ui5-label>
+                    <ui5-input [(ngModel)]="order">
+                        
+                    </ui5-input>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Prod. Date Until
+                    </ui5-label>
+                    <ui5-date-picker style="width: 210px;" [(ngModel)]="prodDate" format-pattern="MMM dd, YYYY">
+                    </ui5-date-picker>
+                </div>
+            </ui5-li>
+            
+            
+            
+
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Furnace Trip
+                    </ui5-label>
+                    <ui5-input [(ngModel)]="trip">
+                        
+                    </ui5-input>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Linked Orders
+                    </ui5-label>
+                    <ui5-input [(ngModel)]="linkedOrders">
+                        
+                    </ui5-input>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Material
+                    </ui5-label>
+                    <ui5-input [(ngModel)]="material">
+                        
+                    </ui5-input>
+                </div>
+            </ui5-li>
+            <ui5-li >
+                <div >
+                    <ui5-label i18n show-colon>
+                        Material Type
+                    </ui5-label>
+                    <ui5-input [(ngModel)]="materialType">
+                        
+                    </ui5-input>
+                </div>
+            </ui5-li>
+        </ui5-list>
+    </div>
+    <div style="display: flex;flex-direction: row;justify-content: end;width: 100%;padding-top: 10px;" slot="footer">
+        <ui5-button design="Emphasized" style="margin-right: 5px;" (click)="save()">{{ localization.ok }}</ui5-button>
+        <ui5-button design="Transparent" (click)="closeDialog()">{{ localization.cancel }}</ui5-button>
+    </div>
+</ui5-dialog>

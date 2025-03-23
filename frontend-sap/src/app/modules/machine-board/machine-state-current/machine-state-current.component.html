@@ -1,0 +1,120 @@
+<ui5-busy-indicator
+	[active]="isBusy"
+	class="busy-indicator-content">
+	<div
+		class="machine-state-current rounded-2xl p-3"
+		[style.backgroundColor]="
+			isBusy?'white':
+			isInProduction()
+				? 'var(--production-lite-color)'
+				: isInSetup()
+				? 'var(--setup-lite-color)'
+				: isOff()
+				? 'var(--sapBaseColor)'
+				: isReady()
+				? 'var(--ready-lite-color)'
+				: 'var(--standstill-lite-color)'
+		"
+		[style.border]="isOff() ? '1px solid var(--sapShell_TextColor)' : ''">
+		<div *ngIf="isBusy == false"
+			class="state-button rounded-xl div-row items-center"
+			[style.backgroundColor]="
+				isInProduction()
+					? 'var(--production-color)'
+					: isInSetup()
+					? 'var(--setup-color)'
+					: isOff()
+					? 'var(--sapBaseColor)'
+					: isReady()
+					? 'var(--ready-color)'
+					: 'var(--statnstill-color)'
+			"
+			[style.outline]="isOff() ? '1px solid var(--sapShell_TextColor)' : ''">
+			<ui5-icon
+				[name]="
+					isInProduction()
+						? 'media-play'
+						: isInSetup() || this.selectedMachine?.status == this.machineStateStateType.SETUP
+						? 'wrench'
+						: isOff()
+						? 'decline'
+						: isReady() || this.selectedMachine?.status == this.machineStateStateType.READY
+						? 'accept'
+						: 'media-pause'
+				"
+				[style.color]="isOff() ? 'var(--sapShell_TextColor)' : 'var(--sapBaseColor)'"
+				class="icon"></ui5-icon>
+			<ui5-title
+				level="H5"
+				[style.color]="isOff() ? 'var(--sapShell_TextColor)' : 'var(--sapBaseColor)'">
+				{{ selectedMachine?.machine_machine_state_time?.machineState?.name || noStateText }}
+			</ui5-title>
+		</div>
+		<div class="div-col justify-center h-36" *ngIf="isBusy == false">
+			<div class="div-row mt-3 items-center">
+				<ui5-icon
+					name="in-progress"
+					[style.color]="
+						isInProduction()
+							? 'var(--production-color)'
+							: isInSetup()
+							? 'var(--setup-color)'
+							: isOff()
+							? 'var(--sapShell_TextColor)'
+							: isReady()
+							? 'var(--ready-color)'
+							: 'var(--statnstill-color)'
+					"
+					class="time-icon"></ui5-icon>
+				<div class="div-col">
+					<ui5-text
+						>{{ showStartTimewithDate() ? "Start Date:" : "Start Time:" }}
+					</ui5-text>
+					<ui5-text class="font-semibold">{{ getCurrentStartTime() }}</ui5-text>
+				</div>
+			</div>
+			<div class="div-row mt-3 items-center">
+				<ui5-icon
+					name="fob-watch"
+					[style.color]="
+						isInProduction()
+							? 'var(--production-color)'
+							: isInSetup()
+							? 'var(--setup-color)'
+							: isOff()
+							? 'var(--sapShell_TextColor)'
+							: isReady()
+							? 'var(--ready-color)'
+							: 'var(--statnstill-color)'
+					"
+					class="time-icon"></ui5-icon>
+				<div class="div-col">
+					<ui5-text>Elapsed Time: </ui5-text>
+					<ui5-text class="font-semibold">{{ elapsedTime }}</ui5-text>
+				</div>
+			</div>
+			<div
+				class="div-row mt-3 items-center"
+				*ngIf="isInSetup()">
+				<ui5-icon
+					name="future"
+					[style.color]="
+						isInProduction()
+							? 'var(--production-color)'
+							: isInSetup()
+							? 'var(--setup-color)'
+							: isOff()
+							? 'var(--sapShell_TextColor)'
+							: isReady()
+							? 'var(--ready-color)'
+							: 'var(--statnstill-color)'
+					"
+					class="time-icon"></ui5-icon>
+				<div class="div-col">
+					<ui5-text i18n>Residual Time: </ui5-text>
+					<ui5-text class="font-semibold">{{ residualTime }}</ui5-text>
+				</div>
+			</div>
+		</div>
+	</div>
+</ui5-busy-indicator>

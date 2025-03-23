@@ -1,0 +1,195 @@
+<div class="grid grid-cols-7 pl-4 pr-4 pt-4 pb-4 gap-x-4">
+	<ui5-card
+		class="grid col-span-2 sm:h-[50vh] lg:h-[61vh] md:h-[60vh] xl:h-[65vh] 2xl:h-[75vh] xxl:h-[79vh]">
+		<div class="sm:h-[50vh] lg:h-[65vh] md:h-[60vh] xl:h-[65vh] 2xl:h-[75vh] xxl:h-[79vh]">
+			<app-grid-table
+				headerTitle="Structure List"
+				i18n-headerTitle
+				[showTableSettingBtn]="false"
+				[showDatePicker]="false"
+				[columns]="columns"
+				addButtonText="New"
+				[showAction]="false"
+				[showDownload]="false"
+				[showActiveButton]="false"
+				[showNewButton]="true"
+				[showSearch]="false"
+				selectionMode="Single"
+				(newButtonClick)="newButtonClick()"
+				(processData)="selectFirstRowIfNeeded()"
+				[customUrl]="apiUrl"
+				[useOdataStyles]="false"
+				(rowClick)="handleRowClick($event)"
+				#childComponentRef></app-grid-table>
+		</div>
+	</ui5-card>
+	<ui5-card
+		class="grid col-span-5 sm:h-[50vh] lg:h-[61vh] md:h-[60vh] xl:h-[65vh] 2xl:h-[75vh] xxl:h-[79vh]">
+		<div class="h-full w-full">
+			<div
+				slot="header"
+				class="header-flex">
+				<span
+					class="text-base font-bold"
+					i18n
+					>Structure</span
+				>
+			</div>
+			<ui5-busy-indicator [active]="isLoading" size="L" class="w-full">
+				<div class="h-full p-4 w-full">
+					<div class="">
+						<ui5-label show-colon>{{ localization.active }}</ui5-label>
+						<ui5-switch (change)="onIsActiveChange($event)" class="w-full" [(ngModel)]="isActive"
+							[disabled]="selectedStructureId === 0" id="isActiveSwitch"></ui5-switch>
+					</div>
+					<div class="pb-2">
+						<ui5-label show-colon i18n required>Structure Name</ui5-label>
+						<ui5-input [required]="true" [(ngModel)]="structureName" [valueState]="valueState"
+							(input)="onChangeStructureNameInput($event)" class="w-full" [disabled]="selectedStructureId === 0"></ui5-input>
+					</div>
+					<ui5-card>
+						<app-doc-visu-directory></app-doc-visu-directory>
+					</ui5-card>
+				</div>
+			</ui5-busy-indicator>
+			<div
+				slot="footer"
+				class="flex justify-end items-center space-x-4 h-[46px] pr-4 border border-solid border-t border-gray-300">
+				<ui5-button
+					design="Emphasized"
+					id="saveButtonUserGroup"
+					(click)="updateStructure()"
+					[disabled]="disableButtonDuringRequest || selectedStructureId === 0"
+					>{{ localization.save }}</ui5-button
+				>
+				<ui5-button
+					design="Negative"
+					class="ml-8"
+					id="deleteButtonUserGroup"
+					[disabled]="selectedStructureId == 0 || isLoading"
+					(click)="openDeleteStructureDialog()"
+					>{{ localization.delete }}</ui5-button
+				>
+			</div>
+		</div>
+	</ui5-card>
+</div>
+
+<ui5-dialog class="h-[170px] w-[450px]" header-text="Delete" #deleteStructureDialog i18n-header-text state="Critical">
+	<ui5-busy-indicator class="w-full" [active]="isLoading" size="M">
+		<div class="m-0">
+			<ui5-text>
+				<span i18n>All folders and files will be deleted from this structure. Do you really want to delete
+					this</span> <strong>&nbsp;“{{ folderName }}”&nbsp;</strong> <span i18n>structure?</span>
+			</ui5-text>
+		</div>
+	</ui5-busy-indicator>
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button design="Emphasized" [disabled]="isLoading" (click)="deleteStructure()" id="deleteButton">{{
+			localization.ok }}</ui5-button>
+		<ui5-button (click)="closeDialog()" [disabled]="isLoading" id="closeOverlapButton">{{ localization.close
+			}}</ui5-button>
+	</div>
+</ui5-dialog>
+
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isDialogOpen"
+	[title]="dialogTitle"
+	(onBeforeClose)="closeDialog()">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L">
+		<div class="form w-[418px] h-[160px]">
+			<form
+				(ngSubmit)="onSubmit(createOrUpdateForm)"
+				#createOrUpdateForm="ngForm">
+				<div class="flex">
+					<div class="flex flex-col">
+						<ui5-label show-colon>{{ localization.active }}</ui5-label>
+						<ui5-switch
+							(change)="onChangeIsActive($event)"
+							class="mb-1 w-full"
+							[checked]="selectedStructureList.is_active"
+							id="isActiveSwitch"></ui5-switch>
+					</div>
+				</div>
+				<div class="flex flex-col mt-1 w-full">
+					<div class="flex flex-col">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								#customId="ngModel"
+								class="w-full"
+								name="custom_id"
+								(input)="onChangeCustomId()"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || createOrUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								[(ngModel)]="selectedStructureList.custom_id"
+								id="customIdInput">
+								<div slot="valueStateMessage">
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+					<div class="flex flex-col">
+						<ui5-label
+							required
+							show-colon
+							class="mt-9"
+							i18n
+							>Structure Name</ui5-label
+						>
+						<ui5-input
+							[required]="true"
+							id="userNameInput"
+							class="w-full"
+							#nameInput="ngModel"
+							[valueState]="
+								nameInput.valid == false &&
+								(nameInput.touched || createOrUpdateForm.submitted)
+									? 'Negative'
+									: 'None'
+							"
+							[(ngModel)]="selectedStructureList.name"
+							name="name"></ui5-input>
+					</div>
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button
+			design="Emphasized"
+			id="saveButtonUserGroup"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="cancelButtonUserGroup"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>

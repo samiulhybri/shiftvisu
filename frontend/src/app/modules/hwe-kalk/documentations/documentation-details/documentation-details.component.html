@@ -1,0 +1,385 @@
+<form novalidate class="k-form" *ngIf="documentation">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="documentation-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                        <kendo-textbox #custom_id name="custom_id"
+                            [(ngModel)]="documentation.custom_id" [disabled]="isAllDisabled || disabledCustomId"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+                        <kendo-textbox #text name="name" [(ngModel)]="documentation.name" [disabled]="isAllDisabled"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="regulation" i18n i18n-text text="Regulation"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #regulation name="regulation" [(ngModel)]="documentation.regulation" [disabled]="isAllDisabled"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="issue_revision" i18n i18n-text text="Issue / Revision"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #issue_revision name="issue_revision"
+                        [(ngModel)]="documentation.issue_revision" [disabled]="isAllDisabled"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="marking" i18n i18n-text text="Marking"></kendo-label>
+                        <kendo-combobox #marking [disabled]="isAllDisabled"
+                            [(ngModel)]="documentation.marking" [data]="markingData" textField="text"
+                            [valuePrimitive]="true" name="marking" valueField="value">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="charge" i18n i18n-text text="Charge"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #charge name="charge" [(ngModel)]="documentation.charge" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="melting_process" i18n i18n-text text="Melting Process"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #melting_process name="melting_process"
+                            [(ngModel)]="documentation.melting_process" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="cleanliness_of_the_charge" i18n i18n-text
+                            text="Cleanliness of the charge"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #cleanliness_of_the_charge name="cleanliness_of_the_charge"
+                            [(ngModel)]="documentation.cleanliness_of_the_charge" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="cleanliness_of_the_component" i18n i18n-text
+                            text="Cleanliness of the component"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #cleanliness_of_the_component
+                            name="cleanliness_of_the_component"
+                            [(ngModel)]="documentation.cleanliness_of_the_component" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="grainsize_of_the_charge" i18n i18n-text
+                            text="Grainsize of the charge"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #grainsize_of_the_charge name="grainsize_of_the_charge"
+                            [(ngModel)]="documentation.grainsize_of_the_charge" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="grainsize_of_the_component" i18n i18n-text
+                            text="Grainsize of the component"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #grainsize_of_the_component
+                            name="grainsize_of_the_component" [(ngModel)]="documentation.grainsize_of_the_component" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="product_analysis" i18n i18n-text text="Product Analysis"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #product_analysis name="product_analysis"
+                            [(ngModel)]="documentation.product_analysis" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="jominy" i18n i18n-text text="Jominy"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #jominy name="jominy" [(ngModel)]="documentation.jominy" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="heattreamtment" i18n i18n-text text="Heattreamtment"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #heattreamtment name="heattreamtment"
+                            [(ngModel)]="documentation.heattreamtment" [disabled]="isAllDisabled"  />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="heattreamtment_with_diagram" i18n i18n-text
+                            text="Heattreamtment With Diagram"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #heattreamtment_with_diagram
+                            name="heattreamtment_with_diagram"
+                            [(ngModel)]="documentation.heattreamtment_with_diagram" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="deformation" i18n i18n-text text="Deformation"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #deformation name="deformation"
+                            [(ngModel)]="documentation.deformation" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="pmi" i18n i18n-text text="PMI"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #pmi name="pmi" [(ngModel)]="documentation.pmi" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="hardness_testing_hbw" i18n i18n-text
+                            text="Hardness Testing HBW"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #hardness_testing_hbw name="hardness_testing_hbw"
+                            [(ngModel)]="documentation.hardness_testing_hbw" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="hardness_testing_hbw_per_piece" i18n i18n-text
+                            text="Hardness Testing HBW Per Piece"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #hardness_testing_hbw_per_piece
+                            name="hardness Testing HBW Per Piece"
+                            [(ngModel)]="documentation.hardness_testing_hbw_per_piece" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="conversion_acc_iso_18265_table_a_1" i18n i18n-text
+                            text="Conversion Acc ISO 18265 Table A 1"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #conversion_acc_iso_18265_table_a_1
+                            name="conversion_acc_iso_18265_table_a_1"
+                            [(ngModel)]="documentation.conversion_acc_iso_18265_table_a_1" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="conversion_acc_iso_18265_table_b_2" i18n i18n-text
+                            text="Conversion Acc ISO 18265 Table B 2"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #conversion_acc_iso_18265_table_b_2
+                            name="conversion_acc_iso_18265_table_b_2"
+                            [(ngModel)]="documentation.conversion_acc_iso_18265_table_b_2" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="visual_inspection" i18n i18n-text text="Visual Inspection"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #visual_inspection name="visual_inspection"
+                            [(ngModel)]="documentation.visual_inspection" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="indication_of_the_surface_condition" i18n i18n-text
+                            text="Indication of the Surface Condition"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #indication_of_the_surface_condition
+                            name="indication_of_the_surface_condition"
+                            [(ngModel)]="documentation.indication_of_the_surface_condition" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+            </kendo-card-body>
+        </kendo-card>
+        <kendo-card [style.flex]="6">
+            <kendo-card-header>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="documentation-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="certificate" i18n i18n-text text="Certificate"></kendo-label>
+                        <kendo-multiselect
+                            #certificate
+                            [(ngModel)]="documentation.certificates" 
+                            [data]="certificateData"
+                            [filterable]="true"
+                            textField="text"
+                            valueField="value"
+                            name="certificate"
+                            (filterChange)="handleFilter($event,'certificate')"
+                            [disabled]="isAllDisabled"
+                        >
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+                
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="text" i18n i18n-text text="Text"></kendo-label>
+                        <kendo-textbox #text name="text" [(ngModel)]="documentation.text" [disabled]="isAllDisabled"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="fpp_nr" i18n i18n-text text="FPP Nr."></kendo-label>
+                        <kendo-textbox #fpp_nr name="fpp_nr" [(ngModel)]="documentation.fpp_nr" [disabled]="isAllDisabled"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="fpp_rev" i18n i18n-text text="FPP Rev."></kendo-label>
+                        <kendo-textbox #fpp_rev name="fpp_rev" [(ngModel)]="documentation.fpp_rev" [disabled]="isAllDisabled"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="process_route" i18n i18n-text text="Process route"></kendo-label>
+                        <kendo-textbox #process_route name="process_route" [(ngModel)]="documentation.process_route" [disabled]="isAllDisabled"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="dimension_control" i18n i18n-text text="Dimension Control"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #dimension_control name="dimension_control"
+                            [(ngModel)]="documentation.dimension_control" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="dimension_protocol" i18n i18n-text text="Dimension Protocol"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #dimension_protocol name="dimension_protocol"
+                            [(ngModel)]="documentation.dimension_protocol" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="residual_magnetic_field_strength" i18n i18n-text
+                            text="Residual Magnetic Field Strength"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #residual_magnetic_field_strength
+                            name="residual_magnetic_field_strength"
+                            [(ngModel)]="documentation.residual_magnetic_field_strength" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="radioactivity_freedom_confirmation" i18n i18n-text
+                            text="Radioactivity Freedom Confirmation"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #radioactivity_freedom_confirmation
+                            name="radioactivity_freedom_confirmation"
+                            [(ngModel)]="documentation.radioactivity_freedom_confirmation" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="confirmation_of_the_absence_of_flakes" i18n i18n-text
+                            text="Confirmation of the Absence of Flakes"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #confirmation_of_the_absence_of_flakes
+                            name="confirmation_of_the_absence_of_flakes"
+                            [(ngModel)]="documentation.confirmation_of_the_absence_of_flakes" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="create_forging_schedule" i18n i18n-text
+                            text="Create Forging Schedule"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #create_forging_schedule name="create_forging_schedule"
+                            [(ngModel)]="documentation.create_forging_schedule" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="create_specimen_plan" i18n i18n-text
+                            text="Create Specimen Plan"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #create_specimen_plan name="create_specimen_plan"
+                            [(ngModel)]="documentation.create_specimen_plan" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="create_us_test_instruction" i18n i18n-text
+                            text="Create US Test Instruction"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #create_us_test_instruction
+                            name="create_us_test_instruction" [(ngModel)]="documentation.create_us_test_instruction" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="create_mpe_test_instruction" i18n i18n-text
+                            text="Create MPE Test Instruction"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #create_mpe_test_instruction
+                            name="create_mpe_test_instruction"
+                            [(ngModel)]="documentation.create_mpe_test_instruction" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="create_fe_test_instruction" i18n i18n-text
+                            text="Create FE Test Instruction"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #create_fe_test_instruction
+                            name="create_fe_test_instruction" [(ngModel)]="documentation.create_fe_test_instruction" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="create_manufacturing_plan" i18n i18n-text
+                            text="Create Manufacturing Plan"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #create_manufacturing_plan name="create_manufacturing_plan"
+                            [(ngModel)]="documentation.create_manufacturing_plan" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="create_heat_treatment_plan" i18n i18n-text
+                            text="Create Heat Treatment Plan"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #create_heat_treatment_plan
+                            name="create_heat_treatment_plan" [(ngModel)]="documentation.create_heat_treatment_plan" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="test_sequence_plan" i18n i18n-text text="Test Sequence Plan"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #test_sequence_plan name="test_sequence_plan"
+                            [(ngModel)]="documentation.test_sequence_plan" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="get_approval_from_the_client" i18n i18n-text
+                            text="Get Approval From the Client"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #get_approval_from_the_client
+                            name="get_approval_from_the_client"
+                            [(ngModel)]="documentation.get_approval_from_the_client" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="initial_inspection" i18n i18n-text text="Initial Inspection"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #initial_inspection name="initial_inspection"
+                            [(ngModel)]="documentation.initial_inspection" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="concentricity_check" i18n i18n-text
+                            text="Concentricity Check"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #concentricity_check name="concentricity_check"
+                            [(ngModel)]="documentation.concentricity_check" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="check_machine_feasibility" i18n i18n-text text="Check machine feasibility"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #check_machine_feasibility name="check_machine_feasibility"
+                            [(ngModel)]="documentation.check_machine_feasibility" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="check_ik" i18n i18n-text
+                            text="Check ik"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #check_ik name="check_ik"
+                            [(ngModel)]="documentation.check_ik" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="create_furnace_position_plan" i18n i18n-text
+                            text="Create Furnace Position Plan"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #create_furnace_position_plan
+                            name="create_furnace_position_plan"
+                            [(ngModel)]="documentation.create_furnace_position_plan" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9"></kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="acceptance" i18n i18n-text
+                            text="Acceptance"></kendo-label>
+                        <input type="checkbox" kendoCheckBox #acceptance
+                            name="acceptance"
+                            [(ngModel)]="documentation.acceptance" [disabled]="isAllDisabled" />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9"></kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="offer_note" i18n i18n-text text="Offer note">
+					</kendo-label>
+					<kendo-textarea [disabled]="isAllDisabled" [(ngModel)]="documentation.offer_note" name="offer_note"> 
+
+					</kendo-textarea>
+				</kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

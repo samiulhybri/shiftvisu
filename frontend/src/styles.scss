@@ -1,0 +1,175 @@
+@import '../schertech-theme/dist/scss';
+
+* {
+    font-family: 'Poppins';
+}
+
+body {
+    background: $schertech-theme-bg;
+    padding: 0;
+    margin: 0;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+body>app-root>* {
+    display: flex;
+    flex-direction: column;
+    gap: $standard-item-gap;
+}
+
+body>app-root>*+*:not(app-home-page, kendo-popup, kendo-notification-container) {
+    padding: $schertech-body-padding;
+}
+
+.k-card {
+    box-shadow: $kendo-appbar-box-shadow;
+}
+
+.k-card-header {
+    height: $kendo-card-header-height;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.k-window-content {
+    background: $kendo-base-bg;
+}
+
+app-header+section {
+    height: $sidebar-height;
+}
+
+.k-notification-content {
+    font-size: 14px;
+}
+
+.k-notification-group {
+    z-index: 1000000;
+}
+
+.popup>.k-popup {
+    box-shadow: none;
+    border-width: 0;
+}
+
+.window-scroll-content {
+    height: calc(100vh - 216px);
+    overflow: hidden auto;
+}
+
+.k-tabstrip-content:focus,
+.k-tabstrip-content.k-focus,
+.k-tabstrip>.k-content:focus,
+.k-tabstrip>.k-content.k-focus {
+    outline: 0 !important;
+}
+
+.k-tabstrip-items-wrapper .k-item:focus,
+.k-tabstrip-items-wrapper .k-item.k-focus {
+    box-shadow: none !important;
+}
+
+.k-tabstrip.assessment-tabstrip>.k-content.k-active {
+    height: calc(100vh - 270px);
+    overflow: auto;
+}
+
+.k-checkbox:checked,
+.k-checkbox.k-checked,
+.k-radio:checked,
+.k-radio.k-checked,
+.k-switch-on .k-switch-track {
+    border-color: #FFA600;
+    color: #fff;
+    background-color: #FFA600;
+}
+
+.k-checkbox:checked:focus,
+.k-checkbox.k-checked.k-focus,
+.k-radio:checked:focus,
+.k-radio.k-checked.k-focus {
+    box-shadow: 0 0 0 2px #FFA600
+}
+
+.k-pager-md .k-pager-numbers-wrap .k-button.k-selected {
+    background: #005981 !important;
+}
+
+.k-pager-md .k-pager-numbers-wrap .k-button.k-selected .k-button-text {
+    color: #FFFFFF !important;
+}
+
+.k-pager-md .k-pager-numbers-wrap .k-button .k-button-text  {
+    color: #005981 !important;
+}
+
+.k-pager-nav .k-icon-wrapper-host .k-button-icon {
+    color: #005981 !important;
+}
+
+.k-card-header,
+.k-window-title {
+    font-size: 18px;
+}
+
+.k-grid td.k-selected, 
+.k-grid .k-table-row.k-selected>td, 
+.k-grid .k-table-td.k-selected, 
+.k-grid .k-table-row.k-selected>.k-table-td,
+.k-grid .k-selected.k-grid-content-sticky,
+.k-grid .k-table-row.k-selected .k-grid-content-sticky, 
+.k-grid .k-selected.k-grid-row-sticky td,
+.k-grid .k-grid-row-sticky td.k-selected, 
+.k-grid .k-selected.k-grid-row-sticky, 
+.k-grid .k-grid-row-sticky .k-table-td.k-selected {
+    background-color: #D0D7DD !important;
+}
+
+.k-grid .k-table .k-grid-header-sticky,
+.k-grid .k-table .k-grid-content-sticky {
+    border-inline-end-width: 0px;
+}
+
+.k-picker-md .k-input-inner {
+    padding-inline: 5px;
+}
+
+hr {
+    border-color: $kendo-table-border !important;
+}
+
+.enable-section {
+    opacity: 1;
+}
+
+.disable-section {
+    opacity: 0.6;
+    pointer-events: none;
+}
+.k-calendar-view {
+    width: $kendo-calendar-view-width !important;
+}
+.disabled{
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+@media screen and (min-width: 850px) and (max-width: 1400px) {
+    .window-scroll-content {
+        height: calc(100vh - 25px);
+    }
+
+    .k-card-header {
+        font-size: 14px;
+        height: 45px;
+    }
+}
+
+@media screen and (min-width: 1400px) and (max-width: 1800px) {
+    .window-scroll-content {
+        height: calc(100vh - 26px);
+    }
+}
+

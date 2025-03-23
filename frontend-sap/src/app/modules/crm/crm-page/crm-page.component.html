@@ -1,0 +1,164 @@
+<div class="grid grid-flow-col grid-cols-1 gap-x-2 h-full border-none default-bg">
+	<div class="h-full border border-solid border-gray-300 shadow-lg rounded-xl overflow-hidden">
+		<app-grid-table
+			#gridTable
+			headerTitle="Customers"
+			url="/Customers"
+			i18n-headerTitle
+			[showRowDataCount]="true"
+			[columns]="columns"
+			[showAction]="true"
+			[showSearch]="true"
+			[showDownload]="false"
+			keyForCacheCustomDataTableColumns="/CRM-Customers"
+			multiSelectOnePlaceholder="Select Responsible User"
+			i18n-multiSelectOnePlaceholder
+			(multiSelectOneSelectionChanged)="multiSelectOneSelectionChange($event)"
+			[multiSelectOneData]="responsible"
+			[isMultiSelectOneActive]="true"
+			multiSelectTwoPlaceholder="Select Employee Classification"
+			i18n-multiSelectTwoPlaceholder
+			(multiSelectTwoSelectionChanged)="multiSelectTwoSelectionChange($event)"
+			[multiSelectTwoData]="sizeOfCompany"
+			[isMultiSelectTwoActive]="true"
+			multiSelectThreePlaceholder="Select Country"
+			i18n-multiSelectThreePlaceholder
+			(multiSelectThreeSelectionChanged)="multiSelectThreeSelectionChange($event)"
+			[multiSelectThreeData]="countries"
+			[isMultiSelectThreeActive]="true"
+			multiSelectFourPlaceholder="Select Category"
+			i18n-multiSelectFourPlaceholder
+			(multiSelectFourSelectionChanged)="multiSelectFourSelectionChange($event)"
+			[multiSelectFourData]="categories"
+			[isMultiSelectFourActive]="true"
+			[showDatePicker]="true"
+			datePickerPlaceholder="Select last activity"
+			i18n-datePickerPlaceholder
+			(changeDatePicker)="onChangeDatePicker($event)"
+			[showActiveButton]="true"
+			button1Text="All"
+			button2Text="Inactive"
+			button3Text="Active"
+			addButtonText="New"
+			refButtonText="Refresh"
+			i18n-refButtonText
+			i18n-addButtonText
+			i18n-button1Text
+			i18n-button2Text
+			i18n-button3Text
+			[showNewButton]="true"
+			[showRefreshButton]="true"
+			[editPermission]="authService.isPermissionValid('CRM_CRM_PAGE_EDIT')"
+			[isBaseVisu]="true"
+			[filterQuery]="filterQuery || ''"
+			expandQuery="$expand=customerGroup,country,salesStatus,marketSegment,responsibleUser,revenueClassification,machineClassification,employeeClassification,potentialClassification,media,category"
+			(newButtonClick)="newButtonClick()"
+			(refreshButtonClick)="refreshButtonClick()"
+			(deleteClick)="deleteClick($event)"
+			(editClick)="editClick($event)"
+			(rowClick)="handleRowClick($event)"
+			[enableServerSideFiltering]="true"
+			selectionMode="Single"
+			sortBy="custom_id"
+			#childComponentRef>
+		</app-grid-table>
+	</div>
+	<ui5-dialog
+		id="deleteDialogCustomer"
+		[open]="deleteDialogCustomer"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button (click)="closeDialogDelete()">{{ localization.close }}</ui5-button>
+		</div>
+	</ui5-dialog>
+	<ui5-dialog
+		id="errorDialogCustomer"
+		header-text="Error"
+		[open]="errorDialogCustomer"
+		state="Negative">
+		<p>{{ localization.someThingWentWrong }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button (click)="closeErrorDialog()">{{ localization.close }}</ui5-button>
+		</div>
+	</ui5-dialog>
+</div>
+
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isPreviewDialogOpen"
+	title="Attachment"
+	title-i18n>
+	<div class="w-[80vw] ml-[-16px] mr-[-16px]">
+		<app-file-preview
+			[modelId]="selectedCustomer.id"
+			[model]="'Customer'"
+			[filesCount]="fileCount"></app-file-preview>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-32px]">
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeAttachmentDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<div *ngIf="isDialogOpen">
+	<app-details
+		[selectedCustomer]="selectedCustomer"
+		[isDialogOpen]="isDialogOpen"
+		[dialogTitle]="dialogTitle"
+		[customId]="customId || ''"
+		[customer]="selectedCustomer.id || 0"
+		[users]="users"
+		[revenueClassifications]="revenueClassifications || []"
+		[machineClassifications]="machineClassifications || []"
+		[employeeClassifications]="employeeClassifications || []"
+		[potentialClassifications]="potentialClassifications || []"
+		[marketSegments]="marketSegment || []"
+		[category]="category || []"
+		[country]="country || []"
+		[salesStatuses]="salesStatus"
+		(filterHandler)="filterHandler()"
+		(closeCRMDialog)="closeDialog()">
+	</app-details>
+</div>
+
+<ui5-dialog header-text="Note" class="h-[88vh] custom-width" [open]="isNoteDialogOpen" state="None"
+	i18n-header-text>
+	<div class="h-full">
+		<app-text-editor [notes]="customerNote" [isReadOnly]="false" class="h-full w-full">
+		</app-text-editor>
+	</div>
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button id="deleteCloseButton" (click)="closeNoteDialog()">{{ localization.close }}</ui5-button>
+	</div>
+</ui5-dialog>

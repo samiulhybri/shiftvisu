@@ -1,0 +1,15 @@
+<ui5-side-navigation
+    class="ml-3 rounded-lg"
+    [collapsed]="isSideNavCollapsed"
+    (selection-change)="sideNavigationSelectionChange($event)">
+    <ng-container *ngFor="let menu of sidebars">
+        <ui5-side-navigation-item
+            *ngIf="menu.show_condition"
+            [id]="menu.id"
+            [text]="menu.text"
+            [icon]="menu.icon"
+            [selected]="menu.selected_condition">
+        </ui5-side-navigation-item>
+    </ng-container>
+</ui5-side-navigation>
+  

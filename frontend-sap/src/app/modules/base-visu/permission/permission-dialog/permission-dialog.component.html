@@ -1,0 +1,23 @@
+<ui5-dialog id="permissionDialog" #modalRef [open]="true" [headerText]="permissionModel.id ? 'Update Permission' : 'Add Permission'">
+	<form #permissionForm="ngForm" (ngSubmit)="submitForm()">
+        <div class="input-group-control">
+            <div class="input-label-group">
+                <ui5-label for="type" [required]="true" [showColon]="true">Permission Name</ui5-label>
+                <ui5-input style="width: 100%;" id="type" name="type" [(ngModel)]="permissionModel.name" [required]="true" placeholder="Enter new permission name" value="{{permissionModel.name}}"></ui5-input>
+            </div>
+            <div class="flex flex-col-item">
+                <ui5-busy-indicator
+                    [active]="isIndicator"
+                    size="M">
+                </ui5-busy-indicator>
+            </div>
+        </div>
+        <br>
+        <div slot="footer">
+            <ui5-bar>
+                <ui5-button design="Positive" slot="endContent" [submits]="true" [disabled]="isIndicator || permissionForm.invalid === true">{{ permissionModel.id ? 'Update' : 'Add new' }}</ui5-button>
+                <ui5-button design="Transparent" slot="endContent" (click)="onCloseModal()">{{ localization.close }}</ui5-button>
+            </ui5-bar>
+        </div>
+    </form>
+</ui5-dialog>

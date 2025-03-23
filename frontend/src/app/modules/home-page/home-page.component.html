@@ -1,0 +1,33 @@
+<div class="background-image k-h-screen">
+  <div class="k-flex-layout k-justify-content-end k-mb-20">
+    <ul class="k-text-white k-flex-layout">
+      <li class="k-pr-6 custom-li">User Name</li>
+      <li class="k-pr-6 custom-li">Logout</li>
+      <li class="k-pr-6 custom-li">
+        <kendo-dropdownlist
+          class="custom-dropdown"
+          [data]="languageList"
+          [(value)]="selectedLanguage"
+        ></kendo-dropdownlist>
+      </li>
+    </ul>
+  </div>
+
+  <div class="k-flex-layout logo-section k-mb-15">
+    <img
+      class="k-mb-9 responsive-logo"
+      src="assets/images/png/schertech_logo_latest.png"
+      alt="Logo"
+    />
+    <hr />
+  </div>
+
+  <div class="grid-container">
+    <div class="box" *ngFor="let module of modules">
+      <a [routerLink]="module.routerLink">
+        <span class="k-text-white">{{ module.firstName }}</span>
+        <span class="k-text-warning">{{ module.secondName }}</span>
+      </a>
+    </div>
+  </div>
+</div>

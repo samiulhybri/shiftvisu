@@ -1,0 +1,102 @@
+<div
+	class="pt-0 pb-2 box-border grid gap-2 grid-rows-[auto,1fr] grid-cols-[auto,1fr] h-screen bg-custom-background">
+	<app-header-nav
+		class="col-span-2 row-start-1 row-end-2"
+		[isHomePage]="false"
+		title='CRM'
+		(logOutDialogEvent)="logoutDialogOpen()"
+		(isSidebarCollapse)="toggleSideNavCollpaseState()"></app-header-nav>
+	<ui5-side-navigation
+		[collapsed]="isSideNavCollapsed"
+		(selection-change)="sideNavigationSelectionChange($event)"
+		class="rounded-lg shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] h-full ml-[12px]">
+
+		@if (authService.isPermissionValid(PermissionEnum.CRM_VIEW)) {
+			<ui5-side-navigation-item
+				id="crm-page"
+				text="CRM"
+				*ngIf="authService.isPermissionValid(PermissionEnum.CRM_CRM_PAGE_VIEW)"
+				[selected]="router.url === '/crm/crm-page'"
+				i18n-text
+				selected
+				icon="business-suite/icon-undesirable-customer">
+			</ui5-side-navigation-item>
+			<ui5-side-navigation-item
+				id="sales-funnel"
+				text="Sales Funnel"
+				*ngIf="authService.isPermissionValid(PermissionEnum.CRM_SALES_FUNNEL_VIEW)"
+				[selected]="router.url === '/crm/sales-funnel'"
+				i18n-text
+				selected
+				icon="business-suite/icon-workbook-filter">
+			</ui5-side-navigation-item>
+			<ui5-side-navigation-item
+				id="kanban"
+				text="Kanban"
+				*ngIf="authService.isPermissionValid(PermissionEnum.CRM_KANBAN_VIEW)"
+				[selected]="router.url === '/crm/kanban'"
+				i18n-text
+				selected
+				icon="screen-split-three">
+			</ui5-side-navigation-item>
+			<ui5-side-navigation-item
+				id="activity"
+				text="Activities"
+				*ngIf="authService.isPermissionValid(PermissionEnum.CRM_ACTIVITY_VIEW)"
+				[selected]="router.url === '/crm/activity'"
+				i18n-text
+				selected
+				icon="bbyd-dashboard">
+			</ui5-side-navigation-item>
+			<ui5-side-navigation-item
+				id="action-report"
+				text="Action Report"
+				*ngIf="authService.isPermissionValid(PermissionEnum.CRM_ACTION_REPORT_VIEW)"
+				[selected]="router.url === '/crm/action-report'"
+				i18n-text
+				selected
+				icon="bbyd-dashboard">
+			</ui5-side-navigation-item>
+			<ui5-side-navigation-item
+				id="export-import"
+				text="Export/Import"
+				[selected]="router.url == '/crm/export-import'"
+				selected
+				icon="outbox"			
+				i18n-text>
+			</ui5-side-navigation-item>
+		}
+	</ui5-side-navigation>
+	<div class="content mr-3">
+		<router-outlet></router-outlet>
+	</div>
+</div>
+
+<ui5-dialog
+	header-text="Confirm"
+	[open]="isLogOutDialogOpen"
+	state="Critical"
+	(beforeClose)="closeDialog()">
+	<div class="logout-content">
+		<ui5-text i18n> Do you want to logout? </ui5-text>
+		<ui5-busy-indicator
+			size="M"
+			[active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		class="dialog-footer mr-[-24px]"
+		slot="footer">
+		<ui5-button
+			design="Emphasized"
+			class="mr-3"
+			i18n
+			(click)="logOut()"
+			>Confirm</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			i18n
+			>Cancel</ui5-button
+		>
+	</div>
+</ui5-dialog>

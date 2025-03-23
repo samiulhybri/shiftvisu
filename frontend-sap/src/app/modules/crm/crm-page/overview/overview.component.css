@@ -1,0 +1,43 @@
+.chat-body {
+	-webkit-box-shadow: -1px 1px 8px -2px gray;
+	-moz-box-shadow: -1px 1px 8px -2px gray;
+	box-shadow: -1px 1px 8px -2px gray;
+    border-radius: 10px;
+}
+
+.image-preview-container {
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	column-gap: 4px;
+}
+
+.preview-wrapper {
+	position: relative;
+	display: inline-block;
+}
+
+.preview-image {
+	max-width: 200px;
+	max-height: 200px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	object-fit: cover;
+}
+
+
+.remove-button {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	display: none;
+}
+
+.preview-wrapper:hover .remove-button {
+	display: flex;
+}
+
+
+  

@@ -1,0 +1,123 @@
+<div class="toolsDiv">
+	<ui5-bar
+		slot="header"
+		class="h-[44px] rounded-t-lg"
+		design="Header">
+		<ui5-title
+			level="H5"
+			slot="startContent"
+			i18n
+			>Closed Operations</ui5-title
+		>
+		<div slot="endContent">
+			<ui5-label
+				show-colon
+				i18n
+				required
+				class="pr-2"
+				>Production Order</ui5-label
+			>
+			<ui5-busy-indicator size="S">
+				<ui5-combobox
+					#prodOrderCombobox
+					id="itemCombobox"
+					[value]="selectedProdOrder.custom_id || ''"
+					filter="None"
+					(selection-change)="onChangeProdOrder($event)"
+					(change)="onAfterChangeProdOrder($event)"
+					(focus)="onProdOrderInputChange($event)"
+					name="itemCombobox"
+					[loading]="prodOrderComboboxLoading"
+					(input)="onProdOrderInputChange($event)"
+					class="w-full">
+					>
+					<ng-container *ngFor="let item of prodOrders">
+						<ui5-cb-item
+							id="{{ item.id }}"
+							text="{{ item.custom_id }}">
+						</ui5-cb-item
+					></ng-container>
+				</ui5-combobox>
+			</ui5-busy-indicator>
+		</div>
+
+		<ui5-input
+			slot="endContent"
+			[value]="globalSearchValue"
+			(change)="onGlobalSearch($event)">
+			<ui5-icon
+				id="valueHelpIcon"
+				slot="icon"
+				name="search"></ui5-icon>
+		</ui5-input>
+
+		@if (authService.isPermissionValid('CLOSED_OPERATIONS_EDIT')) {
+			<ui5-button
+				slot="endContent"
+				i18n
+				(ui5Click)="onSuspendClick()"
+				[disabled]="!selectedRows.length"
+				>Suspend</ui5-button
+			>
+		}
+
+		<ui5-button slot="endContent" icon="sap-icon://action-settings" design="Transparent" (ui5Click)="onSettingClick()"></ui5-button>
+	</ui5-bar>
+
+	<div [ngStyle]="{ height: 'calc(100% - 52px)' }">
+		<app-grid-table
+			headerTitle=""
+			i18n-headerTitle
+			url=""
+			[data]="processedData"
+			keyForCacheCustomDataTableColumns="closed-operations"
+			[columns]="columns"
+			[showAction]="false"
+			[showSearch]="false"
+			[isBaseVisu]="true"
+			[showDownload]="false"
+			addButtonText="Suspend"
+			i18n-addButtonText
+			[showNewButton]="true"
+			[isTreeTable]="true"
+			[customData]="true"
+			selectionMode="Multiple"
+			[editPermission]="authService.isPermissionValid('CLOSED_OPERATIONS_EDIT')"
+			[isBaseVisu]="true"
+			[showActiveButton]="false"
+			[enableServerSideFiltering]="false"
+			(rowClick)="onRowSelectionChange($event)"
+			(newButtonClick)="updateOperations()"
+			#childComponentRef>
+		</app-grid-table>
+	</div>
+</div>
+
+<ui5-dialog
+	id="deleteDialog"
+	header-text="Warning"
+	state="Critical">
+	<p i18n>Are you sure you want Suspend the Orders?</p>
+	<div class="flex flex-col gap-[5px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="updateOperations()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

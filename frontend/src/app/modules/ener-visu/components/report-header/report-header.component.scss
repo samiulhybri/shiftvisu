@@ -1,0 +1,9 @@
+@import '/schertech-theme/dist/scss/custom';
+
+:host {
+    width: 206px;
+	padding: 12px;
+	border-radius: 4px;
+	border: 1px solid $kendo-grid-border;
+	background: $kendo-grid-alt-bg;
+}

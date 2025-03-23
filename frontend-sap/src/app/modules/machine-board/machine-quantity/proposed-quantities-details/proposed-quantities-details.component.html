@@ -1,0 +1,41 @@
+<ui5-dialog
+	[open]="true"
+	(ui5Close)="closeEvent.emit()">
+	<ui5-table [loading]="isLoading">
+		<ui5-table-growing
+			type="Scroll"
+			slot="features"
+			(ui5LoadMore)="loadMore()"
+            [class]="hasMoreData ? 'visible' : 'hidden'"
+            ></ui5-table-growing>
+		<ui5-table-header-row slot="headerRow">
+			<ui5-table-header-cell i18n>Date</ui5-table-header-cell>
+			<ui5-table-header-cell i18n>Quantity</ui5-table-header-cell>
+			<ui5-table-header-cell i18n>Cavity</ui5-table-header-cell>
+			<ui5-table-header-cell i18n>Batch</ui5-table-header-cell>
+			<ui5-table-header-cell i18n>Serial</ui5-table-header-cell>
+		</ui5-table-header-row>
+		<ui5-table-row *ngFor="let record of data">
+			<ui5-table-cell
+				><ui5-label>{{
+					record.registered_datetime | date: "short"
+				}}</ui5-label></ui5-table-cell
+			>
+			<ui5-table-cell
+				><ui5-label>{{ record.quantity }}</ui5-label></ui5-table-cell
+			>
+			<ui5-table-cell
+				><ui5-label>{{ record.cavity }}</ui5-label></ui5-table-cell
+			>
+			<ui5-table-cell
+				><ui5-label>{{ record.batch }}</ui5-label></ui5-table-cell
+			>
+			<ui5-table-cell
+				><ui5-label>{{ record.serial }}</ui5-label></ui5-table-cell
+			>
+		</ui5-table-row>
+	</ui5-table>
+    <div slot="footer" class="footer-style gap-8">
+        <ui5-button i18n (click)="closeEvent.emit()">Close</ui5-button>
+    </div>
+</ui5-dialog>

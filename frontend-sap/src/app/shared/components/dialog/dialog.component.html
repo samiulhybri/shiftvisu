@@ -1,0 +1,9 @@
+<ui5-dialog
+	#dialog
+	[open]="isDialogOpen"
+	[headerText]="title"
+	i18n-headerText
+	(beforeClose)="beforeClosed($event)"
+	[state]="state">
+	<ng-content></ng-content>
+</ui5-dialog>

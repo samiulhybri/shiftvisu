@@ -1,0 +1,144 @@
+<app-grid-table
+	[headerTitle]="headerTitle"
+	[columns]="columns"
+	*ngIf="customUrl"
+	[showAction]="authService.isPermissionValid(permission.QUALIVISU_INSPECTION_POINT_EDIT) || authService.isPermissionValid(permission.MACHINEBOARD_QUALIVISU_EDIT) || authService.isPermissionValid(permission.MACHINEBOARD_QUALIVISU_EDIT_IF_QUALIFIED)"
+	[showSearch]="true"
+	[showDownload]="false"
+	addButtonText="Add"
+	[addButtonDisable]="isAddNewInspectionPointDisable"
+	(newButtonClick)="addInspectionPoint()"
+	[showNewButton]="authService.isPermissionValid(permission.QUALIVISU_INSPECTION_POINT_EDIT) || authService.isPermissionValid(permission.MACHINEBOARD_QUALIVISU_EDIT) || authService.isPermissionValid(permission.MACHINEBOARD_QUALIVISU_EDIT_IF_QUALIFIED)"
+	i18n-addButtonText
+	[limit]="200"
+	[enableServerSideFiltering]="true"
+	[editPermission]="authService.isPermissionValid(permission.QUALIVISU_INSPECTION_POINT_EDIT) || authService.isPermissionValid(permission.MACHINEBOARD_QUALIVISU_EDIT) || authService.isPermissionValid(permission.MACHINEBOARD_QUALIVISU_EDIT_IF_QUALIFIED)"
+	[isBaseVisu]="false"
+	expandQuery="$expand=creator"
+	selectionMode="None"
+	(editClick)="editClick($event)"
+	(deleteClick)="deleteClick($event)"
+	[isBusy]="childComponent?.isBusy || isGridLoader"
+	[useOdataStyles]="false"
+	[isCustomApiCall]="true"
+	[customUrl]="customUrl"
+	(onSearchForCustomAPI)="handleSearchFunctionality($event)"
+	(onLoadMoreForCustomAPI)="handlePaginationFunctionality()"
+	(processData)="processInspectionPoints($event)"
+	#childComponentRef>
+</app-grid-table>
+
+<ui5-dialog
+	*ngIf="isEditDialogOpen"
+	class="w-[calc(90vw-60px)]"
+	[open]="isEditDialogOpen"
+	(beforeClose)="closeDialog('edit')"
+	[headerText]="'Update'"
+	i18n-headerText>
+	<div class="h-[calc(90vh-135px)]">
+		<app-inspection-update-tab
+			#insertionTab
+			[selectedInspectionOperation]="selectedOperation"
+			[allInspectionPoints]="allInspectionPoints"
+			[userGroupsAvailable]="availableUserGroups"
+			[setInspectionPoint]="selectedInspectionPoint"
+			(allConfirmationsFilled)="isAllConfirmationsFilled($event)"
+			(allRequiredFieldNoteFilled)="isAllRequiredFieldNoteFilled($event)"
+			(allCharacteristicsValuesInRange)="isShowConfiramationPopUp($event)">
+		</app-inspection-update-tab>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			[disabled]="
+				!inspectionUpdateTab?.form?.valid ||
+				isLoading ||
+				isSaveAndNextDisable ||
+				inspectionUpdateTab?.isLoading ||
+				!isSaveEnabled || !isSaveEnabledForNotes
+			"
+			(click)="editInspectionPoint(true)"
+			>{{ saveAndOpenNextBtnLabel }}</ui5-button
+		>
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="editInspectionPoint(false)"
+			[disabled]="
+				!inspectionUpdateTab?.form?.valid || isLoading || inspectionUpdateTab?.isLoading || !isSaveEnabled || !isSaveEnabledForNotes
+			"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialog('edit')"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#deleteComponentDialog
+	i18n-header-text
+	[open]="isDeleteDialogOpen"
+	header-text="Warning"
+	state="Critical">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="M">
+		<p i18n>Do you really want to delete this item?</p>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteInspectionPoint()"
+			[disabled]="isLoading"
+			>{{ localization.yes }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			[disabled]="isLoading"
+			(click)="closeDialog('delete')"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#confirmationDialog
+	i18n-header-text
+	[open]="isConfirmationPopupOpen"
+	header-text="Warning"
+	state="Critical">
+	<p i18n>Values are not in tolerances. Do you want to proceed?</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="proceedWithSave(saveAndOpenNext)"
+			[disabled]="isLoading"
+			>{{ localization.yes }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			[disabled]="isLoading"
+			(click)="closeDialog('confirmation')"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-toast
+	#detailModalToast
+	id="detailModalToast"
+	placement="BottomCenter"
+	>{{ toastMessage }}</ui5-toast
+>

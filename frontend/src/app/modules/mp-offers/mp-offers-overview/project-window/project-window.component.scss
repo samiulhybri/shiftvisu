@@ -1,0 +1,24 @@
+@import '../../mp-offer-details/mp-offer-details.component.scss';
+
+.label-span{
+    padding-right: 8px;
+    padding-top: 4px;
+    width: 200px;
+}
+
+.modal-lbl-format > .k-label {
+    margin: 0;
+    padding-top: 4px;
+    padding-right: 8px;
+    
+    width: 200px;
+}
+
+.error-msg{
+    text-align: left;
+    font-size: 14px;
+    background: red;
+    border-radius: 4px;
+    padding: 5px;
+    color: white;
+}

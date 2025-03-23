@@ -1,0 +1,39 @@
+<div class="p-0 pb-2 box-border grid gap-2 grid-rows-[auto_1fr] grid-cols-[auto_1fr] h-full">
+	<app-header-nav
+		class="col-span-2 row-start-1 row-end-2"
+		[homeRouteLink]="dynamicHomeRouteLink"
+		title="PersonalVisu"
+		[showPlantSelector]="true"
+		(logOutDialogEvent)="logoutDialogOpen()"
+		(isSidebarCollapse)="toggleSideNavCollpaseState()">
+	</app-header-nav>
+
+	<ui5-side-navigation
+		[collapsed]="isSideNavCollapsed"
+		class="rounded-lg">
+
+		@for (item of navItems; track item) {
+			<ui5-side-navigation-item
+				text="{{ item.title }}"
+				[selected]="router.url == item.route || router.url.includes(item.route)"
+				[routerLink]="item.route"
+				[icon]="item.icon">
+			</ui5-side-navigation-item>
+		}
+
+		<ui5-side-navigation-item
+			i18n-text
+			slot="fixedItems"
+			text="Settings"
+			icon="action-settings"
+			[selected]="router.url.includes('personal-visu/settings')"
+			[routerLink]="'/personal-visu/settings'"></ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			slot="footer"
+			text="Settings">
+		</ui5-side-navigation-item>
+	</ui5-side-navigation>
+	<div class="content border h-full mr-3 sapBoxShadow sapHeaderBackground rounded-md">
+		<router-outlet></router-outlet>
+	</div>
+</div>

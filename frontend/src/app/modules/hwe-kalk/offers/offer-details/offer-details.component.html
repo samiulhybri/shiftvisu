@@ -1,0 +1,665 @@
+<form novalidate class="k-form" [formGroup]="form" *ngIf="offer">
+	<kendo-stacklayout orientation="horizontal" [gap]="12">
+		<kendo-card [style.flex]="3" class="window-scroll-content">
+			<kendo-card-header i18n>
+				Header
+			</kendo-card-header>
+			<kendo-card-body class="offer-details-body " [ngClass]="{'disabled': !offerPermission()}" >
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="offer" i18n i18n-text text="Offer">
+						<span class="k-text-error k-pl-1">*</span>
+					</kendo-label>
+					<div>
+						<kendo-textbox #custom_id
+							[(ngModel)]="offer.custom_id"
+							formControlName="custom_id"></kendo-textbox>
+						<div *ngIf="form.controls['custom_id'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+							Offer is required.
+						</div>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<div>
+					<kendo-label [for]="sales_opportunity_id" i18n i18n-text text="Sales Opportunity"><button kendoButton themeColor="info" class="crm-button" (click)="openCrmUrl()" *ngIf="offer.salesOpportunity?.crm_id">
+						<span class="k-icon icon-information-circle"></span>
+					</button></kendo-label>
+
+					</div>
+
+						<kendo-combobox
+							#sales_opportunity_id
+							[(ngModel)]="offer.salesOpportunity"
+							formControlName="sales_opportunity_id"
+							[data]="salesOpportunities"
+							textField="custom_id"
+							valueField="id"
+							[style.width]="'100%'"
+							[filterable]="true"
+							[ngClass]="{'disabled': true}"
+							(filterChange)="handleFilter($event,'sales_opportunity')"
+						>
+						</kendo-combobox>
+
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="customer_id" i18n i18n-text text="Customer">
+					</kendo-label>
+					<div>
+						
+						<kendo-combobox
+							#customer_id
+							[(ngModel)]="offer.customer"
+							formControlName="customer_id"
+							[data]="customers"
+							textField="name"
+							valueField="id"
+							[filterable]="true"
+							[ngClass]="{'disabled': true}"
+                       		(filterChange)="handleFilter($event,'customer')"
+							>
+						</kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="contact_person" i18n i18n-text text="Contact Person"> </kendo-label>
+					<kendo-textbox #contact_person
+						[(ngModel)]="offer.contact_person" [ngClass]="{'disabled': true}"
+						formControlName="contact_person">
+					</kendo-textbox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="sales_group_id" i18n i18n-text text="Sales Group">
+					</kendo-label>
+					<div>
+						<kendo-combobox
+								#customer_id
+								[(ngModel)]="offer.salesGroup"
+								formControlName="sales_group_id"
+								[data]="salesGroups"
+								textField="name"
+								[ngClass]="{'disabled': true}"
+								valueField="id"
+								[filterable]="true"
+								(filterChange)="handleFilter($event,'sales_group')"
+						>
+						</kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="sales_area_id" i18n i18n-text text="Sales Area">
+					</kendo-label>
+					<div>
+						<kendo-combobox
+								#customer_id
+								[(ngModel)]="offer.salesArea"
+								formControlName="sales_area_id"
+								[data]="salesAreas"
+								textField="name"
+								[ngClass]="{'disabled': true}"
+								valueField="id"
+								[filterable]="true"
+								(filterChange)="handleFilter($event,'sales_area')"
+						>
+						</kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="request_date" i18n i18n-text text="Request Date"> </kendo-label>
+					<kendo-datepicker
+						[(ngModel)]="offer.request_date" [ngClass]="{'disabled': true}"
+						formControlName="request_date" #request_date>
+					</kendo-datepicker>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="offer_until_date" i18n i18n-text text="Offer Until Date"> </kendo-label>
+					<kendo-datepicker
+						[(ngModel)]="offer.offer_until_date" [ngClass]="{'disabled': true}"
+						formControlName="offer_until_date" #offer_until_date>
+					</kendo-datepicker>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="customer_reference" i18n i18n-text text="Customer Reference"> </kendo-label>
+					<kendo-textbox #customer_reference
+						[(ngModel)]="offer.customer_reference" [ngClass]="{'disabled': true}"
+						formControlName="customer_reference">
+					</kendo-textbox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="type" i18n i18n-text text="Type"> </kendo-label>
+					<kendo-combobox #type
+						[(ngModel)]="offer.type" [ngClass]="{'disabled': true}"
+						formControlName="type" [data]="salesOpportunityType"
+						[valuePrimitive]="true" textField="text" valueField="value">
+					</kendo-combobox>
+				</kendo-stacklayout>
+
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="changes" i18n i18n-text text="Changes"> </kendo-label>
+					<kendo-textbox #changes
+						[(ngModel)]="offer.changes" [ngClass]="{'disabled': true}"
+						formControlName="changes">
+					</kendo-textbox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label  i18n i18n-text text="Version"> </kendo-label>
+					<kendo-label > {{offer.version}} </kendo-label>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="is_short_offer" i18n i18n-text text="Is Short Offer">
+					</kendo-label>
+					<div>
+						<input type="checkbox" kendoCheckBox
+							[(ngModel)]="offer.is_short_offer" [ngClass]="{'disabled': true}"
+							formControlName="is_short_offer" #is_short_offer />
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="is_specification_necessary" i18n i18n-text text="Is Specification Necessary">
+					</kendo-label>
+					<div>
+						<input type="checkbox" kendoCheckBox [ngClass]="{'disabled': true}"
+							[(ngModel)]="offer.is_specification_necessary"
+							formControlName="is_specification_necessary"
+							#is_specification_necessary />
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" *ngIf="offer.id">
+					<kendo-label  i18n i18n-text text="User">
+					</kendo-label>
+					<kendo-label>{{offer.user?.name ?? '' }}</kendo-label>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="is_package_price" i18n i18n-text text="Is package price">
+					</kendo-label>
+					<div>
+						<input type="checkbox" kendoCheckBox
+							[(ngModel)]="offer.is_package_price"
+							formControlName="is_package_price"
+							#is_package_price />
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="delivery_term_id" i18n i18n-text text="Delivery Term">
+					</kendo-label>
+					<div>
+						<kendo-combobox
+							#delivery_term_id
+							[(ngModel)]="offer.deliveryTerm"
+							formControlName="delivery_term_id"
+							[data]="deliveryTerms"
+							textField="name"
+							valueField="id"
+							[filterable]="true"
+							[ngClass]="{'disabled': true}"
+                       		(filterChange)="handleFilter($event,'delivery_term')"
+							>
+						</kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="country_id" i18n i18n-text text="Country">
+					</kendo-label>
+					<div>
+						<kendo-combobox
+							#country_id
+							[(ngModel)]="offer.country"
+							formControlName="country_id"
+							[data]="countries"
+							textField="name"
+							[ngClass]="{'disabled': true}"
+							valueField="id"
+							[filterable]="true"
+                       		(filterChange)="handleFilter($event,'country')"
+							>
+						</kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="status" i18n i18n-text text="Status">
+					</kendo-label>
+					<kendo-combobox
+						#status
+						[ngModelOptions]="{standalone: true}"
+						[(ngModel)]="offer.status"
+						[data]="offerStatus"
+						[valuePrimitive]="true"
+						textField="text"
+						[ngClass]="{'disabled': true}"
+						valueField="value"
+						>
+					</kendo-combobox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="phase" i18n i18n-text text="Phase">
+					</kendo-label>
+					<kendo-combobox
+						#phase
+						[ngModelOptions]="{standalone: true}"
+						[(ngModel)]="offer.phase"
+						[data]="offerPhases"
+						[valuePrimitive]="true"
+						[ngClass]="{'disabled': true}"
+						textField="text"
+						valueField="value"
+						(valueChange)="phaseChange($event)"
+						>
+					</kendo-combobox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="postal_code" i18n i18n-text text="Postal Code"> </kendo-label>
+					<kendo-textbox #changes
+						[(ngModel)]="offer.postal_code" [ngClass]="{'disabled': true}"
+						formControlName="postal_code">
+					</kendo-textbox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="destination" i18n i18n-text text="Destination"> </kendo-label>
+					<kendo-textbox #changes
+						[(ngModel)]="offer.destination" [ngClass]="{'disabled': true}"
+						formControlName="destination">
+					</kendo-textbox>
+				</kendo-stacklayout>
+			</kendo-card-body>
+		</kendo-card>
+		<kendo-card [style.flex]="9" class="window-scroll-content" *ngIf="isPermissionValidate(permissionEnum.HWEKALK_OFFER_POS_VIEW) || isPermissionValidate(permissionEnum.HWEKALK_SALES_VIEW)"  >
+			<kendo-tabstrip class="right-tab" (tabSelect)="tabSelectEvent($event)">
+				<kendo-tabstrip-tab   i18n-title title="Positions"  [selected]="isPermissionValidate(permissionEnum.HWEKALK_OFFER_POS_VIEW)" *ngIf="isPermissionValidate(permissionEnum.HWEKALK_OFFER_POS_VIEW)">
+					<ng-template  kendoTabContent>
+						<kendo-card class="card-style">
+							<kendo-card-header [style.height]="'36px'">
+								<span i18n></span>
+							 <kendo-grid-spacer></kendo-grid-spacer>
+							 <button kendoButton themeColor="primary" (click)="addOfferPos()" i18n  *ngIf="isPermissionValidate(permissionEnum.HWEKALK_OFFER_POS_CREATE)">
+								<span class="k-icon icon-add"></span> New
+							 </button>
+						 </kendo-card-header>
+
+
+							<kendo-card-body  class="!k-pr-0" class="card-body">
+								<table class="offer-pos sticky-last-column" *ngIf="offer?.offerPos?.length">
+									<thead>
+										<tr>
+											<th i18n>Pos <span class="k-text-error k-pl-1">*</span></th>
+											<th i18n>Is specification needed</th>
+											<th i18n>Customer Material Number</th>
+											<th i18n>Item Name </th>
+											<th i18n>Main Dimensions</th>
+											<th i18n [style.minWidth]="'85px'">Quantity <span class="k-text-error k-pl-1">*</span></th>
+											<th i18n [style.minWidth]="'180px'">Product Type <span class="k-text-error k-pl-1">*</span></th>
+											<th i18n  [style.minWidth]="'120px'">Heat Treatment type</th>
+											<th i18n [style.minWidth]="'130px'">Material</th>
+											<th i18n [style.minWidth]="'100px'">ALZ <span class="k-text-error k-pl-1">*</span></th>
+											<th i18n >Action</th>
+										</tr>
+									</thead>
+
+									<tbody >
+										<tr *ngFor="let data of offer.offerPos| orderByKey:'pos';let i=index" >
+											<td [style.minWidth]="'60px'">
+												<kendo-textbox
+													[ngModelOptions]="{standalone: true}"
+													[(ngModel)]="data.pos"
+													[disabled]="offerPosPermission(data)"
+												>
+												</kendo-textbox>
+											</td>
+											<td >
+												<div class="k-text-center">
+													<input type="checkbox" kendoCheckBox
+														[(ngModel)]="data.is_specification_needed"
+														   [disabled]="offerPosPermission(data)"
+														[ngModelOptions]="{standalone: true}" #is_specification_needed />
+												</div>
+											</td>
+											<td class="k-text-center">
+
+												<kendo-textbox #customer_material_number
+													[(ngModel)]="data.customer_material_number"
+													[ngModelOptions]="{standalone: true}"
+															   [disabled]="offerPosPermission(data)"
+												>
+											 </kendo-textbox>
+											</td>
+											<td>
+												<kendo-textbox
+													[(ngModel)]="data.item_name"
+													[ngModelOptions]="{standalone: true}"
+													[disabled]="offerPosPermission(data)"
+												>
+											</kendo-textbox>
+											</td>
+											<td>{{data.getFinalDimensionText()}}</td>
+											<td >
+												<kendo-numerictextbox
+													[ngModelOptions]="{standalone: true}"
+													[(ngModel)]="data.quantity"
+													format="#.##\ St" [step]="1"
+													[disabled]="offerPosPermission(data)"
+													[decimals]="0" [min]="1">
+												</kendo-numerictextbox>
+											</td>
+											<td >
+												<kendo-combobox
+													#product_type
+													[ngModelOptions]="{standalone: true}"
+													[(ngModel)]="data.product_type"
+													[data]="offerPosProductType"
+													[valuePrimitive]="true"
+													textField="text"
+													valueField="value"
+													[disabled]="offerPosPermission(data)"
+													>
+												</kendo-combobox>
+											</td>
+											<td>
+												<kendo-combobox
+													#product_type
+													[ngModelOptions]="{standalone: true}"
+													[(ngModel)]="data.calculation_heat_treatments_type"
+													[data]="heatTreatmentType"
+													[valuePrimitive]="true"
+													textField="text"
+													valueField="value"
+													(valueChange)="calculationHeatTreatmentsType($event,i)"
+													[disabled]="offerPosPermission(data)"
+													>
+												</kendo-combobox>
+											</td>
+											<td >
+												<kendo-combobox
+													#standard_item_id
+													[(ngModel)]="data.material"
+													[ngModelOptions]="{standalone: true}"
+													[data]="materials"
+													textField="custom_id" valueField="id"
+													[filterable]="true"
+													(filterChange)="handleFilter($event,'materials')"
+													[disabled]="offerPosPermission(data)"
+													>
+												</kendo-combobox>
+											</td>
+											<td>
+												<kendo-combobox
+													#delivery_state
+													[ngModelOptions]="{standalone: true}"
+													[(ngModel)]="data.delivery_state"
+													[data]="deliveryStates"
+													[valuePrimitive]="true"
+													textField="text"
+													valueField="value"
+													[disabled]="offerPosPermission(data)"
+													>
+												</kendo-combobox>
+											</td>
+											<td [style.minWidth]="'122px'">
+												<button  kendoButton *ngIf="isPermissionValidate(permissionEnum.HWEKALK_OFFER_POS_COPY) && isShowCopy(data)"
+													themeColor="primary" icon="copy" (click)="showMatchOfferPos(data, i)"></button>
+												<button *ngIf="!isNew && data.hasOwnProperty('id')" kendoButton
+													themeColor="primary" icon="edit" (click)="openModal(data,i, false)"></button>
+												<button  kendoButton *ngIf="isPermissionValidate(permissionEnum.HWEKALK_OFFER_POS_DELETE)"
+													themeColor="primary" icon="trash" (click)="removeOfferPos(data,i)"></button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+								<div *ngIf="submitted && !isValidate" class="k-text-error k-fs-sm" i18n>
+									Please select the required fields.
+								</div>
+
+							</kendo-card-body>
+						</kendo-card>
+
+					</ng-template>
+				</kendo-tabstrip-tab>
+				<kendo-tabstrip-tab  i18n-title title="Sales"  [selected]="isPermissionValidate(permissionEnum.HWEKALK_SALES_VIEW) && !isPermissionValidate(permissionEnum.HWEKALK_OFFER_POS_VIEW)" *ngIf="isPermissionValidate(permissionEnum.HWEKALK_SALES_VIEW)" >
+					<ng-template  kendoTabContent>
+						<kendo-card class="card-style">
+							<kendo-card-body [style.overflow]="'auto'" class="!k-pr-0 card-body" >
+								<table class="offer-pos sticky-last-column" *ngIf="offer?.offerPos?.length">
+									<thead>
+										<tr>
+
+											<th i18n>Pos.</th>
+											<th i18n>Quantity</th>
+											<th i18n>ALZ</th>
+											<th i18n [style.minWidth]="'120px'">Material</th>
+											<th i18n>Kd. Mat. Nr.</th>
+											<th i18n>Zg. Nr.</th>
+											<th i18n>Specification</th>
+											<th i18n>Main Dimensions</th>
+											<th i18n>Calc. Cost/pc.</th>
+											<th i18n>Price/pc.</th>
+											<th i18n>Lead time</th>
+											<th i18n>Delivery Time</th>
+											<th i18n>Internal info?</th>
+											<th i18n>Mechanical values</th>
+											<th i18n>Check Text?</th>
+											<th i18n>Price Note</th>
+											<th i18n>Reason for rejection</th>
+											<th i18n [style.maxWidth]="'85px'">Ablehnen</th>
+											
+											<th i18n [width]="'124px'">Action</th>
+										</tr>
+									</thead>
+
+									<tbody>
+										<tr *ngFor="let data of offer.offerPos| orderByKey:'pos';let i=index" >
+											<td class="k-text-center">{{data.pos}}</td>
+											<td class="k-text-center">{{data.quantity}}</td>
+											<td class="k-text-center" [style.width]="'70px'">{{data.delivery_state}}</td>
+											<td class="k-text-center" [style.width]="'150px'">{{data.material?.name}}</td>
+											<td class="k-text-center">{{data.customer_material_number}}</td>
+											<td class="k-text-center">{{data.drawing_id}}</td>
+											<td class="k-text-center">{{data.calculation?.specification?.name}}</td>
+											<td class="final-dimension-col">{{data.getFinalDimensionText()}}</td>
+											<td class="k-text-center">
+												{{data.getTotalOfferPosCosts() | addSuffixOnValue:'€'}} 
+											</td>
+											<td>
+												<kendo-numerictextbox
+													[(ngModel)]="data.calculation.price"
+													format="#.##\ €"
+													[ngModelOptions]="{standalone: true}"
+													[disabled]="offerSalesPermission()"
+													[changeValueOnScroll]="false"
+													[spinners]="false"
+													[style.width]="'150px'"
+													decimals="2"
+													>
+												</kendo-numerictextbox>
+											</td>
+											<td class="k-text-center">
+												{{data.getTotalLeadTime() | addSuffixOnValue:'T'}}
+											</td>
+											<td><kendo-numerictextbox
+												[(ngModel)]="data.calculation.delivery_interval"
+												format="#\ W"
+												[ngModelOptions]="{standalone: true}"
+												[disabled]="offerSalesPermission()"
+												[changeValueOnScroll]="false"
+												[spinners]="false"
+												>
+											</kendo-numerictextbox></td>
+											<td class="k-text-center">
+												<ng-container
+													*ngIf="data.calculation.internal_note; else noInternalNote"
+													i18n>Yes</ng-container>
+												<ng-template #noInternalNote i18n>No</ng-template>
+											</td>
+											<td>
+												<div class="k-text-center">
+													<input type="checkbox" kendoCheckBox
+														[(ngModel)]="data.show_mechanical_values"
+														[disabled]="offerSalesPermission()"
+														[ngModelOptions]="{standalone: true}" #show_mechanical_values />
+												</div>
+											</td>
+                                            <td>
+												<div class="k-text-center">
+													<input type="checkbox" kendoCheckBox
+														   [(ngModel)]="data.check_text"
+														   [disabled]="offerSalesPermission()"
+														   [ngModelOptions]="{standalone: true}" #check_text />
+										     	</div>
+                                            </td>
+											<td class="k-text-center min-width-col">
+												<kendo-combobox
+													#price_note
+													[ngModelOptions]="{standalone: true}"
+													[(ngModel)]="data.calculation.price_note"
+													[data]="priceNote"
+													[valuePrimitive]="true"
+													textField="text"
+													valueField="value"
+													[disabled]="offerSalesPermission()"
+													>
+												</kendo-combobox>
+											</td>
+											<td class="k-text-center final-dimension-col">
+												<kendo-combobox
+													#rejection_type
+													[ngModelOptions]="{standalone: true}"
+													[(ngModel)]="data.rejection_type"
+													[data]="rejectType"
+													[valuePrimitive]="true"
+													textField="text"
+													valueField="value"
+													[disabled]="offerSalesPermission()"
+													>
+												</kendo-combobox>
+											</td>
+											<td>
+												<div class="k-text-center">
+													<input type="checkbox" kendoCheckBox
+														   [(ngModel)]="data.is_rejected"
+														   [disabled]="offerSalesPermission()"
+														   [ngModelOptions]="{standalone: true}" #check_text_rejected />
+										     	</div>
+											</td>
+											<td [style.minWidth]="'122px'">
+												<button kendoButton icon="edit" (click)="openOfferPosCostModal(data, i)" *ngIf="isPermissionValidate(permissionEnum.HWEKALK_SALES_COSTS_VIEW)"></button>
+												<button kendoButton themeColor="info" *ngIf="isPermissionValidate(permissionEnum.HWEKALK_SUMMARY_VIEW)"   (click)="summaryModal(data)" [style.height.px]="30">
+													<span class="k-icon icon-pdf"></span>
+												</button>
+												<button themeColor="primary" *ngIf="!isNew && data.hasOwnProperty('id') && isPermissionValidate(permissionEnum.HWEKALK_OFFER_POS_EDIT)" kendoButton icon="eye" (click)="openModal(data,i, true)"></button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+							</kendo-card-body>
+						</kendo-card>
+
+					</ng-template>
+
+				</kendo-tabstrip-tab>
+			</kendo-tabstrip>
+			<kendo-card-footer>
+				<div class="text-area" *ngIf="showTextArea=='salesNote'">
+					<kendo-stacklayout class="label" orientation="horizontal" [gap]="9">
+						<kendo-label [for]="sales_note" i18n i18n-text text="Sales Note">
+						</kendo-label>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-textarea #sales_note [(ngModel)]="offer.sales_note" [ngModelOptions]="{standalone: true}">
+
+						</kendo-textarea>
+					</kendo-stacklayout>
+				</div>
+				<div class="text-area" *ngIf="showTextArea=='additionInfo'">
+					<kendo-stacklayout class="label" orientation="horizontal" [gap]="9">
+						<kendo-label [for]="additional_info" i18n i18n-text text="Additional Info"> </kendo-label>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-textarea #additional_info
+										[(ngModel)]="offer.additional_info"
+										[ngModelOptions]="{standalone: true}">
+						</kendo-textarea>
+					</kendo-stacklayout>
+				</div>
+
+			</kendo-card-footer>
+		</kendo-card>
+	</kendo-stacklayout>
+</form>
+
+<kendo-grid-edit-window [model]="formData" [isNew]="false" [width]="selectedWindowWidth" [isShowAction]="isShowAction" [showCloseButton]="false" [closeGridWindow]="false"
+	[isWindowLoaderEnabled]="isWindowLoaderEnabled" (cancel)="cancelHandler()" [detailsWindowCustomTitle]="detailsTitle"
+	(save)="updateCalculationHandler($event)">
+	<div #modalBody></div>
+</kendo-grid-edit-window>
+<app-loader *ngIf="isWindowLoaderEnabled"></app-loader>
+
+<kendo-dialog [width]="'20vw'" title="Phase Confirmation" *ngIf="isOpenedDialog" (close)="closeDialog(false)">
+	<kendo-stacklayout orientation="vertical" [gap]="12">
+		<kendo-stacklayout orientation="horizontal" [gap]="9">
+			<kendo-label i18n i18n-text text="User"></kendo-label>
+			<kendo-label> {{offer.user?.name ?? '' }}</kendo-label>
+		</kendo-stacklayout>
+		<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+			<kendo-label [for]="status" i18n i18n-text text="Status">
+			</kendo-label>
+			<kendo-combobox
+				#status
+				[ngModelOptions]="{standalone: true}"
+				[(ngModel)]="offer.status"
+				[data]="offerStatus"
+				[valuePrimitive]="true"
+				textField="text"
+				valueField="value"
+				>
+			</kendo-combobox>
+		</kendo-stacklayout>
+		<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+			<kendo-label [for]="phase" i18n i18n-text text="Phase">
+			</kendo-label>
+			<kendo-combobox
+				#phase
+				[ngModelOptions]="{standalone: true}"
+				[(ngModel)]="offer.phase"
+				[data]="offerPhases"
+				[valuePrimitive]="true"
+				textField="text"
+				valueField="value"
+				(valueChange)="phaseChange($event)"
+				>
+			</kendo-combobox>
+		</kendo-stacklayout>
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+			<label [for]="remark"> Changing remark</label>
+            <kendo-textarea #remark rows="3" [(ngModel)]="changing_remark" [ngModelOptions]="{standalone: true}">
+            </kendo-textarea>
+		</kendo-stacklayout>
+	</kendo-stacklayout>
+	<kendo-dialog-actions>
+	  <button kendoButton (click)="closeDialog(false)" i18n>No</button>
+	  <button kendoButton (click)="closeDialog(true)" themeColor="primary" i18n>Yes</button>
+	</kendo-dialog-actions>
+  </kendo-dialog>
+
+
+    <kendo-dialog
+      i18n-title
+      title="Offer Pos"
+      *ngIf="matchOfferPosPopUpShow"
+      (close)="close()"
+	  width="80%"
+    >
+    <!-- Display a list of logs -->
+    <div class="copy-page">
+		<app-offer-pos-copy-popup  (copyOfferPoseEmitter)="copyOfferPosData($event)"
+								   [fetchUrl]="offerPosFetchUrl"
+								   [payload]="copyOfferPosPayloadData"
+								   [offerPos]="offer.offerPos[selectedOfferPosIndex]"
+								   [customUrl] = true
+		>
+		</app-offer-pos-copy-popup>
+
+    </div>
+	<kendo-dialog-actions>
+	</kendo-dialog-actions>
+    </kendo-dialog>
+

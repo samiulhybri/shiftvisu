@@ -1,0 +1,149 @@
+<div
+	id="machine-status"
+	class="machine-status">
+	<ui5-title
+		class="w-36"
+		level="H5"
+		i18n
+		>Machine Status</ui5-title
+	>
+	<div class="div-row header-bar">
+		<ui5-label
+			i18n
+			show-colon="true"
+			class="mr-10"
+			>Select Halls</ui5-label
+		>
+		<ui5-multi-combobox
+			#hallRef
+			id="hallMultiComboBox"
+			(selectionChange)="hallSelectionChange($event)"
+			placeholder="Type your value"
+			i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item
+				*ngFor="let hall of halls"
+				text="{{ hall.custom_id }} - {{ hall.name }}"
+				[id]="hall.id"
+				[selected]="selectedHall.includes(hall.id!)">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+		<div class="hide-selectors">
+			<ui5-label
+				i18n
+				show-colon="true"
+				class="mr-10"
+				>Select Machine Group</ui5-label
+			>
+			<ui5-multi-combobox
+				#machineGroupRef
+				id="machineGroupMultiComboBox"
+				(selectionChange)="machineGroupSelectionChange($event)"
+				placeholder="Type your value"
+				i18n-placeholder
+				class="multi-combobox">
+				@for (machineGroup of machineGroups; track $index) {
+				<ui5-mcb-item
+					text="{{ machineGroup.custom_id }} - {{ machineGroup.name }}"
+					[id]="machineGroup.id"
+					[selected]="selectedMachineGroup.includes(machineGroup.id!)"
+					*ngIf="machineGroup.isMachineGroupVisible(halls) || selectedHall.length == 0"></ui5-mcb-item>
+				}
+			</ui5-multi-combobox>
+			<ui5-label
+				i18n
+				show-colon="true"
+				class="mr-10"
+				>Select Machines</ui5-label
+			>
+			<ui5-multi-combobox
+				#machineRef
+				id="machineMultiComboBox"
+				(selectionChange)="machineSelectionChange($event)"
+				placeholder="Type your value"
+				i18n-placeholder
+				class="multi-combobox">
+				@for (machine of machines; track $index) {
+				<ui5-mcb-item
+					text="{{ machine.custom_id }} - {{ machine.name }}"
+					[id]="machine.id"
+					[selected]="selectedMachine.includes(machine.id!)"
+					*ngIf="machine.isMachineVisible(machineGroups, halls,selectedHall,selectedMachineGroup)"></ui5-mcb-item>
+				}
+			</ui5-multi-combobox>
+		</div>
+		<div
+			class="toggle-selectors"
+			*ngIf="selectorsVisible">
+			<ui5-card>
+				<div style="padding: 10px 5px 10px 12px; display: flex; flex-direction: column;">
+					<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+						<ui5-label
+							i18n
+							show-colon="true"
+							class="mr-10"
+							>Select Machines</ui5-label
+						>
+						<ui5-multi-combobox
+							#machineRef
+							id="machineMultiComboBox"
+							(selectionChange)="machineSelectionChange($event)"
+							placeholder="Type your value"
+							i18n-placeholder
+							class="multi-combobox">
+							@for (machine of machines; track $index) {
+							<ui5-mcb-item
+								text="{{ machine.custom_id }} - {{ machine.name }}"
+								[id]="machine.id"
+								[selected]="selectedMachine.includes(machine.id!)"
+								*ngIf="
+									machine.isMachineVisible(machineGroups, halls,selectedHall,selectedMachineGroup)
+								"></ui5-mcb-item>
+							}
+						</ui5-multi-combobox>
+					</div>
+					<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+						<ui5-label
+							i18n
+							show-colon="true"
+							class="mr-10"
+							>Select Machine Group</ui5-label
+						>
+						<ui5-multi-combobox
+							#machineGroupRef
+							id="machineGroupMultiComboBox"
+							(selectionChange)="machineGroupSelectionChange($event)"
+							placeholder="Type your value"
+							i18n-placeholder
+							class="multi-combobox">
+							@for (machineGroup of machineGroups; track $index) {
+							<ui5-mcb-item
+								text="{{ machineGroup.custom_id }} - {{ machineGroup.name }}"
+								[id]="machineGroup.id"
+								[selected]="selectedMachineGroup.includes(machineGroup.id!)"
+								*ngIf="machineGroup.isMachineGroupVisible(halls)"></ui5-mcb-item>
+							}
+						</ui5-multi-combobox>
+					</div>
+				</div>
+			</ui5-card>
+		</div>
+		<ui5-segmented-button
+			id="viewChange"
+			(selectionChange)="selectionChangeCardViewMode($event)">
+			<ui5-segmented-button-item
+				id="standardCard"
+				icon="table-view"
+				pressed></ui5-segmented-button-item>
+			<ui5-segmented-button-item
+				id="compactCard"
+				icon="ui-notifications"></ui5-segmented-button-item>
+		</ui5-segmented-button>
+		<ui5-button
+			class="ml-1 show-selector-button"
+			design="Transparent"
+			icon="overflow"
+			(click)="toggleSelectors()">
+		</ui5-button>
+	</div>
+</div>

@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('prod_order_pos_operation_quantities', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id')->nullable()->nullOnDelete()->change();
+            $table->unsignedBigInteger('bad_part_reason_id')->nullable()->nullOnDelete()->change();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('prod_order_pos_operation_quantities', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id')->cascadeOnDelete()->change();
+            $table->unsignedBigInteger('bad_part_reason_id')->cascadeOnDelete()->change();
+        });
+    }
+};

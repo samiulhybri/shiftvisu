@@ -1,0 +1,78 @@
+<app-dialog id="addActiveDialog" [isDialogOpen]="isActiveRepairsDialogOpen" (onBeforeClose)="closeDialog()"
+	[title]="dialogTitle" class="w-full">
+	<ui5-busy-indicator [active]="isLoading" size="M" class="w-[80vw] busy-indicator">
+		<div slot="header" class="w-full">
+			<div>
+				<ui5-title class="pd-10" level="H5" i18n>{{ dialogTitle }}</ui5-title>
+			</div>
+		</div>
+
+		<div class="ml-[-16px] mr-[-16px] mb-[-8px]">
+			<div class="grid grid-cols-1 mb-10 gap-10 w-[80vw]">
+				<ui5-card class="repair-card w-full col-span-1">
+					<div class="repair-card-div w-full">
+						<app-grid-table *ngIf="!isRepairHistoryComponentShow" [headerTitle]="gridHeader"
+							i18n-headerTitle url="" [data]="preparedData" [customData]="true" [columns]="columns"
+							[showAction]="false" [showDownload]="false" [showNewButton]="false" [showSearch]="false"
+							[withRowHighlight]="true" selectionMode="None" [enableServerSideFiltering]="false"
+							[isBaseVisu]="false" [segmentButtonItems]="isShowFilterButton ? segmentButtonItems : []"
+							(segmentButtonChange)="segmentButtonChange($event)" #childComponentForActiveRef>
+						</app-grid-table>
+						<div *ngIf="isRepairHistoryComponentShow" style="height: 100%;">
+							<ui5-tabcontainer class="mt-[10px]" id="tabContainer" (tab-select)="tabNavChanged($event)"
+								fixed collapsed>
+								<ui5-tab #typeRepairTab required i18n-text text="Order History"
+									[selected]="selectedTab === 'active_order_tab'" id="active_order_tab"></ui5-tab>
+								<ui5-tab #otherRepairTab required i18n-text text="Repair History"
+									id="repair_history_tab" [selected]="selectedTab === 'repair_history_tab'"></ui5-tab>
+							</ui5-tabcontainer>
+							<div class="tab-details-section" *ngIf="selectedTab === 'active_order_tab'">
+								<app-grid-table [headerTitle]="gridHeader" i18n-headerTitle url="" [data]="preparedData"
+									[customData]="true" [columns]="columns" [showAction]="false" [showDownload]="false"
+									[showNewButton]="false" [showSearch]="false" [withRowHighlight]="true"
+									selectionMode="None" [enableServerSideFiltering]="false" [isBaseVisu]="false"
+									[segmentButtonItems]="isShowFilterButton ? segmentButtonItems : []"
+									(segmentButtonChange)="segmentButtonChange($event)"
+									#childComponentForActiveToolOverviewRef>
+								</app-grid-table>
+							</div>
+							<div class="tab-details-section h-[90%]" *ngIf="selectedTab === 'repair_history_tab'">
+								<app-repair-history [item]="itemForRepairFilter">
+								</app-repair-history>
+							</div>
+						</div>
+					</div>
+				</ui5-card>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+	<div slot="footer" class="dialog-footer w-full">
+		<ui5-button design="Transparent" id="cancelButtonId" class="ml-8" (click)="closeDialog()">
+			{{ localization.close }}</ui5-button>
+	</div>
+	
+	<ui5-toast #modalToast id="modalToast" placement="BottomCenter">{{ toastMessage }}</ui5-toast>
+</app-dialog>
+
+<div *ngIf="isViewDialogOpen">
+	<app-repair-details [modalType]="detailsModalType" [modalHeight]="'92%'" [repairId]="itemId || 0"
+		[selectedProdOrderPos]="selectedActiveRepair" [isDialogOpen]="isViewDialogOpen" [allUserList]="userList"
+		[allSupplierList]="supplierList"
+		[allRepairTypeList]="repairTypeList" (isCloseClicked)="closeViewDialog()" (isSaveClicked)="isSavedModal()"
+		(isShowMessage)="isShowMessage($event)" #repairDetailsTable>
+	</app-repair-details>
+</div>
+
+<div *ngIf="isPreviewDialogOpen">
+	<app-dialog id="addGroupDialog" [isDialogOpen]="isPreviewDialogOpen" [title]="previewDialogTitle" (onBeforeClose)="closeAttachmentDialog()">
+		<div class="w-[70vw] ml-[-16px] mr-[-16px]">
+			<app-file-preview [modelId]="selectedActiveRepair.id" [model]="'prodOrderPos'" [filesCount]="fileCount"
+				[filePreviewHeight]="filePreviewHeight"></app-file-preview>
+		</div>
+
+		<div slot="footer" class="dialog-footer">
+			<ui5-button class="ml-8" (click)="closeAttachmentDialog()">
+				{{ localization.cancel }}</ui5-button>
+		</div>
+	</app-dialog>
+</div>

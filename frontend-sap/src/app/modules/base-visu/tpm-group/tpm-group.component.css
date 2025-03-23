@@ -1,0 +1,23 @@
+.tpm-dialog-body{
+    width: 418px;
+	max-height: 190px;
+}
+
+.flex-row-item {
+	display: flex;
+	flex-direction: row;
+	gap: 5px;
+}
+
+.pd-header {
+	padding: 11px 0px 11px 0px;
+}
+
+.flex-col-item-tpm {
+	display: flex;
+	flex-direction: column;
+}
+
+.sapTextColor {
+	color: var(--sapTextColor);
+}

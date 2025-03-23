@@ -1,0 +1,29 @@
+<div class="toolsDiv">
+	<app-grid-table
+		headerTitle="Inspection Points"
+		url="/InspectionPoints"
+		i18n-headerTitle
+		[columns]="columns"
+		[showAction]="false"
+		[showSearch]="true"
+		[showDownload]="false"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="false"
+		[limit]="200"
+		[enableServerSideFiltering]="false"
+		[editPermission]="authService.isPermissionValid('QUALIVISU_INSPECTION_POINT_EDIT')"
+		[isBaseVisu]="false"
+		filterQuery="date_completed eq null"
+		expandQuery="$expand=machine,prodOrderPosOperation($expand=prodOrderPos($expand=prodOrder($select=custom_id),item($select=id,name,custom_id);$select=id);$select=id,name,pos)"
+		selectionMode="None"
+		sortBy="date_opened"
+		#childComponentRef>
+	</app-grid-table>
+</div>

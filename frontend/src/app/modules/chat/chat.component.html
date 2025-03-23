@@ -1,0 +1,6 @@
+<app-header [firstTitle]="'news'" [secondTitle]="'board'"></app-header>
+
+<app-sidebar
+  *ngIf="sidebar | async as sidebar"
+  [sidebarMenu]="sidebar"
+></app-sidebar>

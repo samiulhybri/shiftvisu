@@ -1,0 +1,81 @@
+<div class="h-full w-full">
+	<app-grid-table
+		headerTitle="Manage Maintenance"
+		i18n-headerTitle
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showRowDataCount]="true"
+		[showNewButton]="true"
+		[showSearch]="true"
+		url="/ProdOrderPos"
+		(newButtonClick)="addMaintenanceOrderButtonClick()"
+		(editClick)="onEditClick($event)"
+		(deleteClick)="deleteManageMaintenance($event)"
+		selectionMode="None"
+		[enableServerSideFiltering]="true"
+		addButtonText="Add Maintenance Order"
+		i18n-addButtonText
+		keyForCacheCustomDataTableColumns="ProdOrder"
+		sortBy="id"
+		[filterQuery]="query"
+		(processData)="processData($event)"
+		#childComponentRef>
+	</app-grid-table>
+</div>
+
+<app-maintenance-managing-dialog 
+	[isDialogOpen]="isDialogOpen" 
+	[clearDatePicker]="isDialogOpen"
+	[dialogTitle]="dialogTitle" 
+	[selectedProdOrderPos]="selectedProdOrderPos" 
+	[maintenancesFromApi]="maintenancesFromApi" 
+	[bomPosFromApi]="bomPosFromApi" 
+	[selectedMachineAfterSaving]="selectedMachineAfterSaving"
+	[selectedItemAfterSaving]="selectedItemAfterSaving" 
+	[prodOrderPos]="selectedProdOrderPos.id || 0"
+	[selectedMaintenanceAfterSaving]="selectedMaintenanceAfterSaving"
+	(changeIsDialogOpen)="closeDialog()"
+	(refreshTable)="refreshGridTable()"
+	[isUpdateMaintenance]="isUpdateMaintenance"
+	[bomPos]="bomPos">
+</app-maintenance-managing-dialog>
+
+// Delete dialog
+<app-dialog
+	[isDialogOpen]="isWarningDialog"
+	state="Critical">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="ml-[-10px]">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ localization.warning }}</ui5-title>
+		</div>
+	</div>
+	<div class="w-[95%]">
+		{{ localization.doYouWantToDeleteThisRecord }}</div>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			[disabled]="disableButtonDuringRequest"
+			(click)="deleteSubmit()">
+			{{ localization.yes }}</ui5-button>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="onCancel()">
+			{{ localization.cancel }}</ui5-button>
+	</div>
+</app-dialog>

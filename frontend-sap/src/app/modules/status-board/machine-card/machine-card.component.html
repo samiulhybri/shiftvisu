@@ -1,0 +1,17 @@
+<!-- View 1 -->
+<div *ngIf="statusBoardCardTypeClass.getStateValue(machine?.status_board_card_type) !== statusBoardCardType.VIEW_2">
+	<app-view-1
+		[cardType]="cardType"
+		[selectedCardView]="selectedCardView"
+		[machine]="machine"
+		[index]="index"></app-view-1>
+</div>
+
+<!-- View 2 -->
+<div *ngIf="statusBoardCardTypeClass.getStateValue(machine?.status_board_card_type)  === statusBoardCardType.VIEW_2">
+	<app-view-2
+		[cardType]="cardType"
+		[selectedCardView]="selectedCardView"
+		[machine]="machine"
+		[index]="index"></app-view-2>
+</div>

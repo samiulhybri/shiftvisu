@@ -1,0 +1,35 @@
+<app-grid-table
+	#gridTable
+	[headerTitle]="'Activity Log'"
+	[columns]="columns"
+	[showRowDataCount]="true"
+	[showDownload]="false"
+	[showActiveButton]="false"
+	button1Text="All"
+	button2Text="Inactive"
+	button3Text="Active"
+	addButtonText="New"
+	i18n-addButtonText
+	i18n-button1Text
+	i18n-button2Text
+	i18n-button3Text
+	[showNewButton]="false"
+	[isBaseVisu]="true"
+	[showSearch]="false"
+	[enableServerSideFiltering]="true"
+	[showAction]="false"
+	selectionMode="None"
+	url="/CustomerCrmActionLogs"
+	expandQuery="$expand=crmAction,user($select=id,username,name),customer($select=id,name,custom_id,sort_order,country_id;$expand=country)&$select=id,name,customer_id,crm_action_id,note,log_date,user_id&$orderby=log_date desc"
+	multiSelectOnePlaceholder="Select Responsible User"
+	i18n-multiSelectOnePlaceholder
+	[isMultiSelectOneActive]="true"
+	[multiSelectOneData]="responsible"
+	(multiSelectOneSelectionChanged)="multiSelectOneSelectionChange($event)"
+	multiSelectTwoPlaceholder="Select CRM Action"
+	i18n-multiSelectTwoPlaceholder
+	[isMultiSelectTwoActive]="true"
+	[multiSelectTwoData]="actions"
+	(multiSelectTwoSelectionChanged)="multiSelectActionSelectionChange($event)"
+	[filterQuery]="filterQuery">
+</app-grid-table>

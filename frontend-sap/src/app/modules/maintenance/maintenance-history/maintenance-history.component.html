@@ -1,0 +1,168 @@
+<div class="h-full w-full">
+	<app-grid-table
+		[headerTitle]="maintenanceHistoryTitle"
+		[columns]="columns"
+		[showAction]="false"
+		[showDownload]="false"
+		[showNewButton]="false"
+		[showEditButton]="false"
+		[showDeleteButton]="false"
+		[showRowDataCount]="true"
+		[showSearch]="true"
+		url="/ProdOrderPos"
+		selectionMode="None"
+		[enableServerSideFiltering]="true"
+		[filterQuery]="filterQuery"
+		[expandQuery]="expandQuery"
+		[isBaseVisu]="true"
+		(processData)="processData($event)"
+		(onSearchOnKeyUp)="onSearchOnChangeInput($event)"
+		#childComponentRef>
+	</app-grid-table>
+</div>
+<app-dialog [isDialogOpen]="isHistoryDialog">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="ml-[-10px]">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ maintenanceHistoryTitle }}
+			</ui5-title>
+		</div>
+	</div>
+
+	<div class="h-[635px] w-[1168px] mx-[-16px]">
+		<div class="w-full h-full flex flex-row gap-4">
+			<ui5-card class="h-[634px] w-[385px]">
+				<ui5-card-header
+					slot="header"
+					i18n-title-text
+					title-text="Maintenance Details">
+				</ui5-card-header>
+				<div class="divider"></div>
+
+				<div class="form m-4">
+					<form #createOrUpdateForm="ngForm">
+						<div class="flex-col-item w-full pb-[10px]">
+							<ui5-label showColon i18n>Maintenance Type</ui5-label>
+							<ui5-input
+								readonly
+								class="w-full"
+								[value]="selectedMaintenance?.prodOrder?.order_type ?? ''"
+								id="maintenanceTypeInput">
+							</ui5-input>
+						</div>
+						<div class="flex-col-item w-full pb-[10px]">
+							<ui5-label showColon i18n>Machine</ui5-label>
+							<ui5-input
+								readonly
+								class="w-full"
+								[value]="selectedMachine.name ?? ''"
+								id="machineInput">
+							</ui5-input>
+						</div>
+						<div class="flex-col-item w-full pb-[10px]">
+							<ui5-label showColon i18n>Item</ui5-label>
+							<ui5-input
+								readonly
+								class="w-full"
+								[value]="selectedMaintenance?.item?.name ?? ''"
+								id="itemInput">
+							</ui5-input>
+						</div>
+						<div class="flex-col-item w-full pb-[10px]">
+							<ui5-label showColon i18n>Order Id</ui5-label>
+							<ui5-input
+								readonly
+								class="w-full"
+								[value]="selectedMaintenance?.prodOrder?.custom_id ?? ''"
+								id="orderInput">
+							</ui5-input>
+						</div>
+						<div class="flex-col-item w-full pb-[10px]">
+							<ui5-label showColon i18n>Start Date</ui5-label>
+							<ui5-input
+								readonly
+								class="w-full"
+								format-pattern="dd.MM.yyyy"
+								[value]="formatedStartDate"
+								id="startDate">
+							</ui5-input>
+						</div>
+						<div class="flex-col-item w-full pb-[10px]">
+							<ui5-label showColon i18n>End Date</ui5-label>
+							<ui5-input
+								readonly
+								class="w-full"
+								format-pattern="dd.MM.yyyy"
+								[value]="formatedEndDate"
+								id="endDate">
+							</ui5-input>
+						</div>
+					</form>
+				</div>
+			</ui5-card>
+			<ui5-card class="h-[634px] w-[770px]">
+				<ui5-card-header
+					slot="header"
+					i18n
+					title-text="Details">
+				</ui5-card-header>
+				<div class="divider"></div>
+				<div class="flex flex-col h-[590px] w-[740px] justify-between p-4">
+					<ui5-card class="pb-3">
+						<div class="h-[270px]">
+							<app-grid-table
+								#maintenanceTable
+								headerTitle="Maintenance"
+								i18n-headerTitle
+								[columns]="maintenanceColumns"
+								[showAction]="false"
+								[showDownload]="false"
+								[showActiveButton]="false"
+								[showNewButton]="false"
+								[showSearch]="false"
+								selectionMode="None"
+								[enableServerSideFiltering]="false"
+								[customData]="true"
+								[data]="prodOrderPosOperation"
+								>
+							</app-grid-table>
+						</div>
+					</ui5-card>
+					<ui5-card>
+						<div class="h-[270px]">
+							<app-grid-table
+								headerTitle="BOM"
+								i18n-headerTitle
+								[columns]="bomColumns"
+								[showAction]="false"
+								[showDownload]="false"
+								[showNewButton]="false"
+								[showSearch]="false"
+								selectionMode="None"
+								[enableServerSideFiltering]="false"
+								[customData]="true"
+								[data]="prodOrderPosBomPos"
+								#bomTable
+								>
+							</app-grid-table>
+						</div>
+					</ui5-card>
+				</div>
+			</ui5-card>
+		</div>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="closeHistoryButton()"
+			>
+			{{localization.close}}</ui5-button>
+	</div>
+</app-dialog>

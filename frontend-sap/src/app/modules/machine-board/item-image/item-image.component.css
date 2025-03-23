@@ -1,0 +1,49 @@
+
+.main-image-card {
+    width: inherit;
+    min-height: inherit;
+    margin-top: 5px;
+}
+
+.item-card-body,
+.no-image-section,
+.image-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.item-card-body {
+    width: 100%;
+    padding: 16px;
+    border-top: var(--card-border-color);
+    box-sizing: border-box;
+}
+
+.image-section {
+    width: inherit;
+    height: 100%;
+    text-align: center;
+}
+
+.image-section img {
+    max-width: 100%;
+    width: auto;
+    height: inherit;
+    border-radius: var(--list-border-radius);
+}
+
+.no-image-section {
+    width: inherit;
+}
+
+.no-card-image-container {
+    width: inherit;
+    height: inherit;
+    margin-top: 5px;
+    background-color: var(--color-white);
+    border: var(--card-border-color);
+    box-sizing: border-box;
+    border-radius: var(--list-border-radius);
+}

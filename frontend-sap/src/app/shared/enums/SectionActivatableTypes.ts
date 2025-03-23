@@ -1,0 +1,6 @@
+export enum SectionActivatableTypes {
+	STATUSBOARD = "STATUSBOARD",
+	SHOPFLOOR = "SHOPFLOOR",
+	PLANVISU = "PLANVISU",
+	TPMVISU = "TPMVISU",
+}

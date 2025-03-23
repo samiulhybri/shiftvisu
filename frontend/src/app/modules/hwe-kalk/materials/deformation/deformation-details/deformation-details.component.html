@@ -1,0 +1,103 @@
+<form class="k-form"  *ngIf="calDeformation">
+	<kendo-stacklayout orientation="horizontal" [gap]="12">
+		<kendo-card [style.flex]="6">
+			<kendo-card-header i18n>
+			  Deformation Data
+			</kendo-card-header>
+			<kendo-card-body class="chem-details-body">
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="custom_id" i18n i18n-text text="Name"> <span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+						<kendo-textbox #custom_id
+							name="custom_id"
+							[(ngModel)]="calDeformation.custom_id"
+							[disabled]="isAllDisabled || disabledCustomId"
+						>
+						</kendo-textbox>
+						<div *ngIf="!calDeformation.custom_id && submitted" class="k-text-error k-fs-sm" i18n>
+							DIN Norm  is required.
+						</div>
+					</div>
+				</kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="continuous_casting" i18n i18n-text text="Continues Casting"></kendo-label>
+					<div>
+						<kendo-combobox
+							#continuous_casting
+							[(ngModel)]="calDeformation.continuous_casting"
+							[data]="continuousCastingData"
+							textField="text"
+							valueField="value"
+                            [valuePrimitive]="true"
+							name="continuous_casting"
+                            [ngModelOptions]="{standalone: true}"
+							[disabled]="isAllDisabled"
+						>
+					   </kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="ingot_casting" i18n i18n-text text="Ingot Casting"></kendo-label>
+					<div>
+						<kendo-combobox
+							#ingot_casting
+							[(ngModel)]="calDeformation.ingot_casting"
+							[data]="ingotCastingData"
+							textField="text"
+							valueField="value"
+                            [valuePrimitive]="true"
+							name="ingot_casting"
+                            [ngModelOptions]="{standalone: true}"
+							[disabled]="isAllDisabled"
+						>
+					   </kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+                 <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+					<kendo-label [for]="deformation" i18n i18n-text text="Deformation  "></kendo-label>
+					<div>
+						<kendo-numerictextbox
+							#deformation
+							[(ngModel)]="calDeformation.deformation"
+                            [ngModelOptions]="{standalone: true}"
+                            [autoCorrect]="true" [step]="0.1"
+							[disabled]="isAllDisabled"
+						>
+					   </kendo-numerictextbox>
+					</div>
+				</kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="stretch_forging_degree" i18n i18n-text text="Stretch Forging Degree"></kendo-label>
+					<div>
+						<kendo-combobox
+							#stretch_forging_degree
+							[(ngModel)]="calDeformation.stretch_forging_degree"
+							[data]="stretchForgingDegreeData"
+							textField="text"
+							valueField="value"
+                            [valuePrimitive]="true"
+                            [ngModelOptions]="{standalone: true}"
+							name="stretch_forging_degree"
+							[disabled]="isAllDisabled"
+						>
+					   </kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="note" i18n i18n-text text="Note"></kendo-label>
+					<kendo-textarea #note
+						name="note"
+						[style.width]="'50%'"
+						[(ngModel)]="calDeformation.note"
+						[disabled]="isAllDisabled" 
+					>
+					</kendo-textarea>
+				</kendo-stacklayout>		
+			</kendo-card-body>	
+		</kendo-card>
+    </kendo-stacklayout>
+</form>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

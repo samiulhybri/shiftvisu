@@ -1,0 +1,38 @@
+<app-dialog
+	id="associateDialog"
+	[isDialogOpen]="isPreviewDialogOpen"
+	(onBeforeClose)="closeAssociateDialog()"
+	[title]="title">
+	<div class="xl:h-[62vh] lg:h-[290px] md:h-[200px] sm:h-[180px] lg:w-[868px] md:w-[568px] sm:w-[468px]">
+        <div class=" w-full h-full border border-solid border-gray-300 rounded-lg shadow-md">
+            <div class="h-[99%]">
+				<app-grid-table
+					[headerTitle]="title"
+					[columns]="columns"
+					[data]="data"
+					[showDeleteButton]="false"
+					[showEditButton]="false"
+					[showActiveButton]="false"
+					[customData]="true"
+					[showSearch]="true"
+					[showAction]="false"
+					[showDownload]="false"
+					[showNewButton]="false"
+					selectionMode="None"
+					#associateComponentRef>
+				</app-grid-table>
+			</div>
+		</div>
+	</div>
+
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-32px]">
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeAssociateDialog()"
+			i18n>
+			Close</ui5-button>
+	</div>
+</app-dialog>

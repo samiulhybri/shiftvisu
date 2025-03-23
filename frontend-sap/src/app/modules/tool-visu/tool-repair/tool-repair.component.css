@@ -1,0 +1,57 @@
+.order-buttons-wrapper {
+	border-top: var(--card-border-color);
+	height: Hug (52px) px;
+}
+
+.order-card {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+	border-radius: 0.5rem;
+	background-color: var(--card-background-color);
+	height: 44px;
+	gap: 8px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 1rem;
+	border-radius: 0.5rem;
+	background-color: var(--card-background-color);
+	height: 44px;
+	gap: 8px;
+}
+
+.label-style {
+	font-size: var(--title-text-font-size);
+	color: var(--list-description-text-color);
+}
+
+.min-height-order-details {
+	min-height: 500px;
+	border-top: var(--card-border-color);
+}
+
+.border-top {
+	border-top: var(--card-border-color);
+}
+
+#tabContainer::part(content) {
+	background-color: #FFFFFF;
+}
+
+.tableStandard_repair {
+	background: var(--sapBackgroundColor);
+	border-radius: 0.5rem 0.5rem 0.5rem 0.5rem;
+	height: 99.6%;
+	border: 1px solid #d1d5db;
+
+}
+
+.tab-details-section {
+	padding: 20px;
+}
+
+.status-button {
+	display: flex;
+	justify-content: flex-start;
+}

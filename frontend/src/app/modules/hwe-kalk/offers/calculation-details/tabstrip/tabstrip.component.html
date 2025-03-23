@@ -1,0 +1,464 @@
+<kendo-tabstrip class="assessment-tabstrip" *ngIf="calculation">
+    <kendo-tabstrip-tab [selected]="true" i18n-title title="Assessment" *ngIf="permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)
+    || permission(permissionEnum.HWEKALK_ASSESSMENT_READ_ONLY) && calculation">
+        <ng-template kendoTabContent>
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="specification" text="specification" i18n>Specification Id: </label>
+				<div>
+
+					<kendo-combobox #specification [(ngModel)]="calculation.specification" name="specification"
+									[data]="filteredSpecifications" textField="custom_id" valueField="id" [style.width]="'84%'"
+									[filterable]="true" (filterChange)="handleFilter($event, 'specification')"
+									(valueChange)="specificationValueChange($event)" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+					</kendo-combobox>
+					<button kendoButton themeColor="info" (click)="openInfoPopup('specification')" class="k-ml-2"
+							[style.maxWidth.px]="30" *ngIf="!!calculation.specification?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+						<span class="k-icon icon-information-circle"></span>
+					</button>
+				</div>
+
+
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="documentation_id" text="documentation_id" i18n>Documentation Id: </label>
+				<div class="item-show">
+					<kendo-combobox #documentation_id [(ngModel)]="calculation.documentation" name="documentation"
+                                    [data]="documentations" textField="custom_id" valueField="id" [style.width]="'84%'"
+                                    [filterable]="true" (filterChange)="handleFilter($event, 'documentation')"
+                                    (valueChange)="documentationChange($event)" [disabled]="!!calculation.specification?.id" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+					</kendo-combobox>
+					<button kendoButton themeColor="info" (click)="openInfoPopup('documentation')" class="k-ml-2"
+							[style.maxWidth.px]="30" *ngIf="calculation.documentation?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+						<span class="k-icon icon-information-circle"></span>
+					</button>
+					<button kendoButton themeColor="primary" (click)="openInfoPopup('documentation', false)"
+							class="k-ml-2" [style.maxWidth.px]="30" *ngIf="calculation?.calculationDocumentation?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_CHANGE_BUTTON_VIEW)">
+						<span class="k-icon icon-edit"></span>
+					</button>
+				</div>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="calculation-tab">
+                <label [for]="metallography" text="metallography" i18n>Metallography Id: </label>
+				<div class="item-show">
+
+					<kendo-combobox #metallography [(ngModel)]="calculation.metallography" name="metallography"
+                                    [data]="metallographies" textField="custom_id" valueField="id" [style.width]="'84%'"
+                                    [filterable]="true" (filterChange)="handleFilter($event,'metallography')"
+                                    (valueChange)="metallographyChange($event)" [disabled]="!!calculation.specification?.id" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+					</kendo-combobox>
+					<button kendoButton themeColor="info" (click)="openInfoPopup('metallography')" class="k-ml-2"
+							[style.maxWidth.px]="30" *ngIf="calculation.metallography?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+						<span class="k-icon icon-information-circle"></span>
+					</button>
+					<button kendoButton themeColor="primary" (click)="openInfoPopup('metallography', false)"
+							class="k-ml-2" [style.maxWidth.px]="30" *ngIf="calculation.calculationMetallography?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_CHANGE_BUTTON_VIEW)">
+						<span class="k-icon icon-edit"></span>
+					</button>
+				</div>
+
+
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="testingScope" text="testingScope" i18n>Testing Scope Id: </label>
+               <div class="item-show">
+				   <kendo-combobox #testingScope [(ngModel)]="calculation.testingScope" name="testingScope"
+                                   [data]="testingScopes" textField="custom_id" valueField="id" [style.width]="'84%'"
+                                   [filterable]="true" (filterChange)="handleFilter($event, 'testing_scope')"
+                                   (valueChange)="testingScopeChange($event)" [disabled]="!!calculation.specification?.id" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+				   </kendo-combobox>
+				   <button kendoButton themeColor="info" (click)="openInfoPopup('testingScope')" class="k-ml-2"
+						   [style.maxWidth.px]="30" *ngIf="calculation.testingScope?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+					   <span class="k-icon icon-information-circle"></span>
+				   </button>
+				   <button kendoButton themeColor="primary" (click)="openInfoPopup('testingScope', false)" class="k-ml-2"
+						   [style.maxWidth.px]="30" *ngIf="calculation.calculationTestingScope?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_CHANGE_BUTTON_VIEW)">
+					   <span class="k-icon icon-edit"></span>
+				   </button>
+			   </div>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="nonDestructiveTesting" text="nonDestructiveTesting" i18n>Non Destructive Testing Id:
+                </label>
+                <div class="item-show">
+					<kendo-combobox #nonDestructiveTesting [(ngModel)]="calculation.nonDestructiveTesting"
+									name="nonDestructiveTesting" [data]="nonDestructiveTestings" textField="custom_id" valueField="id"
+									[style.width]="'84%'" [filterable]="true"
+									(filterChange)="handleFilter($event, 'non_destructive_testing')"
+									(valueChange)="nonDestructiveTestingChange($event)"   [disabled]="!!calculation.specification?.id" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+					</kendo-combobox>
+					<button kendoButton themeColor="info" (click)="openInfoPopup('nonDestructiveTesting')" class="k-ml-2"
+							[style.maxWidth.px]="30" *ngIf="calculation.nonDestructiveTesting?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+						<span class="k-icon icon-information-circle"></span>
+					</button>
+					<button kendoButton themeColor="primary" (click)="openInfoPopup('nonDestructiveTesting', false,'calNonTesting')"
+							class="k-ml-2" [style.maxWidth.px]="30" *ngIf="calculation.calculationNonDestructiveTesting?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_CHANGE_BUTTON_VIEW)">
+						<span class="k-icon icon-edit"></span>
+					</button>
+				</div>
+
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="hardenability_range_id" i18n>Hardenability Range Id: </label>
+                <div class="item-show">
+					<kendo-combobox #hardenability_range_id name="hardenability_range_id"  [(ngModel)]="calculation.hardenabilityRange" [data]="hardenabilityRanges"
+									textField="custom_id" valueField="id" [filterable]="true" [style.width]="'84%'"
+                                    (valueChange)="hardenabilityRangeTestingChange($event)"
+									(filterChange)="handleFilter($event, 'hardenability_range')"   [disabled]="!!calculation.specification?.id" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+					</kendo-combobox>
+					<button kendoButton themeColor="info" (click)="openInfoPopup('hardenabilityRange')" class="k-ml-2"
+							[style.maxWidth.px]="30" *ngIf="calculation.hardenabilityRange?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+						<span class="k-icon icon-information-circle"></span>
+					</button>
+                    <button kendoButton themeColor="primary" (click)="openInfoPopup('hardenabilityRange', false)"
+                            class="k-ml-2" [style.maxWidth.px]="30" *ngIf="calculation.calculationHardenabilityRange?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_CHANGE_BUTTON_VIEW)">
+						<span class="k-icon icon-edit"></span>
+					</button>
+				</div>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="material_analysis_id" i18n>Material Chemical Analysis Id: </label>
+                <div class="item-show">
+					<kendo-combobox #material_analysis_id name="material_analysis_id" [(ngModel)]="calculation.materialAnalysis" [data]="materialAnalyses"
+									textField="custom_id" valueField="id" [filterable]="true" [style.width]="'84%'"  (valueChange)="materialAnalysisChange($event)"
+									(filterChange)="handleFilter($event, 'material_analysis')"   [disabled]="!!calculation.specification?.id" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+					</kendo-combobox>
+					<button kendoButton themeColor="info" (click)="openInfoPopup('materialAnalysis')" class="k-ml-2"
+							[style.maxWidth.px]="30" *ngIf="calculation.materialAnalysis?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+						<span class="k-icon icon-information-circle"></span>
+					</button>
+                    <button kendoButton themeColor="primary" (click)="openInfoPopup('materialAnalysis', false)"
+                            class="k-ml-2" [style.maxWidth.px]="30" *ngIf="calculation.calculationMaterialAnalysis?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_CHANGE_BUTTON_VIEW)">
+						<span class="k-icon icon-edit"></span>
+					</button>
+				</div>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="deformation_id" i18n>Deformation Id: </label>
+                 <div class="item-show">
+					 <kendo-combobox #deformation_id name="deformation_id" [(ngModel)]="calculation.deformation" [data]="deformations"
+									 textField="custom_id" valueField="id" [filterable]="true" [style.width]="'84%'" (valueChange)="deformation($event)"
+									 (filterChange)="handleFilter($event, 'deformation')"   [disabled]="!!calculation.specification?.id" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+					 </kendo-combobox>
+					 <button kendoButton themeColor="info" (click)="openInfoPopup('deformation')" class="k-ml-2"
+							 [style.maxWidth.px]="30" *ngIf="calculation.deformation?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+						 <span class="k-icon icon-information-circle"></span>
+					 </button>
+                      <button kendoButton themeColor="primary" (click)="openInfoPopup('deformation', false)"
+                              class="k-ml-2" [style.maxWidth.px]="30" *ngIf="calculation.calculationDeformation?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_CHANGE_BUTTON_VIEW)">
+						<span class="k-icon icon-edit"></span>
+					</button>
+				 </div>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="residual_material_id" text="residual_material_id" i18n>Residual Material Id: </label>
+                <div class="item-show">
+					<kendo-combobox #residual_material_id [(ngModel)]="calculation.residualMaterial" name="residualMaterial"
+									[data]="residualMaterials" textField="custom_id" valueField="id" [style.width]="'84%'"
+									[filterable]="true" (filterChange)="handleFilter($event, 'residual_material')"
+									(valueChange)="residualMaterialChange($event)"   [disabled]="!!calculation.specification?.id" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+					</kendo-combobox>
+					<button kendoButton themeColor="info" (click)="openInfoPopup('residualMaterial')" class="k-ml-2"
+							[style.maxWidth.px]="30" *ngIf="calculation.residualMaterial?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+						<span class="k-icon icon-information-circle"></span>
+					</button>
+					<button kendoButton themeColor="primary" (click)="openInfoPopup('residualMaterial', false)"
+							class="k-ml-2" [style.maxWidth.px]="30" *ngIf="calculation.calculationResidualMaterial?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_CHANGE_BUTTON_VIEW)">
+						<span class="k-icon icon-edit"></span>
+					</button>
+				</div>
+
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="residual_material_id" text="residual_material_id" i18n>Hwe Work Plan Id: </label>
+                <div class="item-show">
+					<kendo-combobox #residual_material_id [(ngModel)]="calculation.hweWorkPlan" name="hweWorkPlan"
+									[data]="hweWorkPlans" textField="custom_id" valueField="id" [style.width]="'84%'"
+									[filterable]="true" (filterChange)="handleFilter($event, 'hwe_work_plan')"
+									(valueChange)="hweWorkPlanValueChange($event)"
+									  [disabled]="!!calculation.specification?.id" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs || !permission(permissionEnum.HWEKALK_ASSESSMENT_EDIT_VIEW)}">
+					</kendo-combobox>
+					<button kendoButton themeColor="info" (click)="openInfoPopup('hweWorkPlan')" class="k-ml-2"
+							[style.maxWidth.px]="30" *ngIf="calculation.hweWorkPlan?.id && permission(permissionEnum.HWEKALK_ASSESSMENT_INFO_BUTTON_VIEW)">
+						<span class="k-icon icon-information-circle"></span>
+					</button>
+				</div>
+            </kendo-stacklayout>
+            <br>
+            <hr>
+			<div class="additional_info_section">
+				<kendo-stacklayout class="label" orientation="horizontal" [gap]="9">
+					<kendo-label [for]="" i18n i18n-text text="Additional Info:">
+					</kendo-label>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" >
+					<span [innerHTML]="additionalText"></span>
+				</kendo-stacklayout>
+			</div>
+
+            <!-- <app-individual-assessment [calculation]="calculation"
+                [hidden]="isIndividualAssessmentHidden()"></app-individual-assessment> -->
+        </ng-template>
+    </kendo-tabstrip-tab>
+    <kendo-tabstrip-tab *ngIf="!isIndividualAssessmentHidden() &&(permission(permissionEnum.HWEKALK_INDIVIDUAL_ASSESSMENT_READ_ONLY)
+                        || permission(permissionEnum.HWEKALK_INDIVIDUAL_ASSESSMENT_EDIT))" i18n-title title="Individual Assessment">
+        <ng-template kendoTabContent>
+            <app-individual-assessment [calculation]="calculation"
+                [indIeformations]="deformations"
+                [indNonDestructiveTestings]="nonDestructiveTestings"
+                >
+            </app-individual-assessment>
+        </ng-template>
+    </kendo-tabstrip-tab>
+    <kendo-tabstrip-tab i18n-title title="Heat Treatment"
+						*ngIf="permission(permissionEnum.HWEKALK_HEAT_TREATMENT_EDIT)
+                        || permission(permissionEnum.HWEKALK_HEAT_TREATMENT_READ_ONLY)">
+        <ng-template kendoTabContent>
+            <kendo-stacklayout orientation="vertical" [gap]="12">
+                <kendo-card class="heat-treatment">
+                    <kendo-card-header i18n>Heat Treatment</kendo-card-header>
+                    <kendo-card-body>
+                        <app-heat-treatments [offerPos]="offerPos" [heatTreatments]="calculationHeatTreatments"
+                            [hasValidationErrorHeatTreatment]="hasValidationErrorHeatTreatment"></app-heat-treatments>
+                    </kendo-card-body>
+                </kendo-card>
+                <kendo-card class="heat-treatment">
+                    <kendo-card-header i18n>Additional measures</kendo-card-header>
+                    <kendo-card-body>
+                        <app-heat-additional-treatments [heatAdditionalTreatments]="calculationAdditionalHeatTreatments"
+                            [hasValidationErrorAdditionalHeatTreatment]="hasValidationErrorAdditionalHeatTreatment"></app-heat-additional-treatments>
+                    </kendo-card-body>
+                </kendo-card>
+            </kendo-stacklayout>
+        </ng-template>
+    </kendo-tabstrip-tab>
+    <kendo-tabstrip-tab i18n-title title="Customer request" *ngIf="permission(permissionEnum.HWEKALK_CUSTOMER_REQUEST_EDIT)
+                        || permission(permissionEnum.HWEKALK_CUSTOMER_REQUEST_READ_ONLY)">
+        <ng-template kendoTabContent>
+            <app-mechanical-processing [submitted]="submitted" [offerPos]="offerPos"
+                [isForm]="true"></app-mechanical-processing>
+        </ng-template>
+    </kendo-tabstrip-tab>
+    <kendo-tabstrip-tab i18n-title title="Dimensions/Material Usage" *ngIf="permission(permissionEnum.HWEKALK_DIMENSION_EDIT)
+                        || permission(permissionEnum.HWEKALK_DIMENSION_READ_ONLY)">
+        <ng-template kendoTabContent>
+            <app-material-dimension [hasValidationErrorShaftUpsetPart]="hasValidationErrorShaftUpsetPart" 
+                 [machines]="machines"
+                [submitted]="submitted" [offerPos]="offerPos" [isForm]="true"></app-material-dimension>
+        </ng-template>
+    </kendo-tabstrip-tab>
+    <kendo-tabstrip-tab i18n-title title="Work Plan" *ngIf="permission(permissionEnum.HWEKALK_WORK_PLAN_EDIT)
+                        || permission(permissionEnum.HWEKALK_WORK_PLAN_READ_ONLY)">
+
+        <ng-template kendoTabContent >
+            <div class="work-plan"  [ngClass]="{'disabled': (!isPermissionValidate()|| !hweKalkService.fromCalDetail ||  hweKalkService.disableTabs)}">
+                <div class="buttons k-w-full k-d-flex">
+                    <button kendoButton themeColor="error" *ngIf="hasWorkPlanDeletePermission" [disabled]="!opPlanPos.length" (click)="deleteValues()" i18n>
+                        <span class="k-icon icon-trash"></span> Delete all
+                    </button>
+                    <kendo-grid-spacer></kendo-grid-spacer>
+                    
+                    <button kendoButton class="k-mr-1" themeColor="primary" *ngIf="hasWorkPlanGeneratePermission" [disabled]="opPlanPos.length"
+                        (click)="generateOpPlanPos()" i18n>
+                        <span class="k-icon icon-globe"></span> Generate
+                    </button>
+                    <button class="right" kendoButton themeColor="primary" *ngIf="hasWorkPlanNewPermission" (click)="addOpperations()" i18n>
+                        <span class="k-icon icon-add"></span> New
+                    </button>
+                </div>
+                <form *ngIf="opPlanPos.length" class="k-w-full">
+                    <table class="offer-pos k-w-full">
+                        <thead>
+                            <tr>
+                                <th i18n [width]="'10%'">Pos <span class="k-text-error k-pl-1">*</span></th>
+                                <th i18n [width]="'20%'">Work plan Name</th>
+                                <th i18n [width]="'20%'">Machine</th>
+                                <th i18n>Unit</th>
+                                <th i18n>Processing Time</th>
+                                <th i18n>Setup Time</th>
+                                <th i18n>Is Warm in Warm</th>
+                                <th i18n [width]="'10%'">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let data of opPlanPos | orderByKey:'pos';let i = index">
+                                <td>
+                                    <kendo-textbox [ngModelOptions]="{standalone: true}" [(ngModel)]="data.pos">
+                                    </kendo-textbox>
+                                </td>
+                                <td>
+                                    <kendo-combobox [ngModelOptions]="{standalone: true}" [(ngModel)]="data.name"
+                                        [data]="workPlanNames" [valuePrimitive]="true" textField="text"
+                                        valueField="value" [filterable]="true"
+                                        (filterChange)="handleFilter($event,'workPlan')">
+                                    </kendo-combobox>
+                                </td>
+                                <td>
+                                    <kendo-combobox #machine_id [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="data.machine" [data]="machines" textField="custom_id"
+                                        valueField="id" [filterable]="true"
+                                        (filterChange)="handleFilter($event,'machine')">
+                                    </kendo-combobox>
+                                </td>
+                                <td>
+                                    <kendo-combobox [ngModelOptions]="{standalone: true}" [(ngModel)]="data.unit"
+                                        [data]="workPlanUnits" [valuePrimitive]="true" textField="text"
+                                        valueField="value" [filterable]="true"
+                                        (filterChange)="handleFilter($event,'unit')">
+                                    </kendo-combobox>
+                                </td>
+                                <td>
+                                    <kendo-numerictextbox [ngModelOptions]="{standalone: true}" [(ngModel)]="data.te"
+                                        format="n2" [step]="0.1" [min]="0">
+                                    </kendo-numerictextbox>
+                                </td>
+                                <td>
+                                    <kendo-numerictextbox [ngModelOptions]="{standalone: true}" [(ngModel)]="data.tr"
+                                        format="n2" [step]="0.1" [min]="0">
+                                    </kendo-numerictextbox>
+                                </td>
+                                <td>
+                                    <div class="k-text-center">
+                                        <input type="checkbox" [ngModelOptions]="{standalone: true}" kendoCheckBox [(ngModel)]="data.is_warm_in_warm" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <button kendoButton themeColor="primary" *ngIf="hasWorkPlanGridDeletePermission"
+                                        (click)="removeOperations(data, i, 'single')">
+                                        <span class="k-icon icon-trash"></span>
+                                    </button>
+									<button kendoButton themeColor="secondary" *ngIf="data.id"
+                                        (click)="openAttachment(data)">
+                                        <span class="k-icon icon-attachment"></span>
+                                    </button>
+                                    <button kendoButton themeColor="info" (click)="openOpPlanPosHeatTreatmentModal(data,i)"
+                                        class="k-ml-2" [style.maxWidth.px]="30" *ngIf="checkWorkPlanMatch(data.name)">
+                                        <span class="k-icon icon-information-circle"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="opPlanPos.length && isValid && submitted" class="k-text-error k-fs-sm" i18n>
+                        Pos is required.
+                    </div>
+                </form>
+            </div>
+        </ng-template>
+    </kendo-tabstrip-tab>
+    <kendo-tabstrip-tab i18n-title title="Attachments"  *ngIf="offerPos?.is_commission">
+        <ng-template kendoTabContent>
+            <kendo-upload #myUpload="kendoUpload" [autoUpload]="true" [(ngModel)]="filesArr" [saveUrl]="uploadSaveUrl"
+                (upload)="upload($event)" (remove)="remove($event)" [removeUrl]="uploadRemoveUrl" [disabled]="!hweKalkService.fromCalDetail || hweKalkService.disableTabs" >
+                <ng-template kendoUploadFileTemplate let-files let-state="state">
+                    <div class="file-item-container" (click)="show(files)">
+                        <div class="file-image">
+                            <img style="height: 32px;" [src]="getIconForFile(files)" alt="File Icon"
+                                class="file-icon" />
+                        </div>
+                        <div class="file-details">
+                            <div>{{ files[0]?.name }}</div>
+                            <div i18n>{{ convertFileSize(files[0]?.size) }}</div>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <kendo-button
+                            *ngIf=" files[0]?.original_url && (files[0]?.mime_type?.includes('image') || files[0]?.mime_type?.includes('pdf'))"
+                            (click)="show(files)" iconClass='k-icon icon-preveiw-on'>
+                        </kendo-button>
+                        <kendo-button
+                            *ngIf=" files[0]?.original_url && !files[0]?.mime_type?.includes('image') && !files[0]?.mime_type?.includes('pdf');"
+                            (click)="show(files)" iconClass='k-icon icon-download'>
+                        </kendo-button>
+                        <kendo-button (click)="remove(files)" iconClass='k-icon icon-trash'>
+                        </kendo-button>
+                    </div>
+                </ng-template>
+            </kendo-upload>
+        </ng-template>
+    </kendo-tabstrip-tab>
+    <kendo-tabstrip-tab i18n-title title="Summary/Prices Incl. Delivery Times">
+        <ng-template kendoTabContent>
+            <app-summary [calculation]="calculation"
+            [opPlanPos]="opPlanPos"
+            [offerPos]="offerPos"
+            [submitted]="submitted"
+            [hasValidationErrorShaftUpsetPart]="hasValidationErrorShaftUpsetPart"
+            >
+           </app-summary>
+
+        </ng-template>
+    </kendo-tabstrip-tab>
+</kendo-tabstrip>
+
+<kendo-grid-edit-window [isNew]="false" [model]="infoPopupModel" [width]="infoPopupWidth" [showCloseButton]="false"
+    [closeGridWindow]="isInfoPopupClosed" [isWindowLoaderEnabled]="isWindowLoaderEnabled" [hideSaveOrUpdateBtn]="true"
+    (cancel)="onInfoPopupCancel()">
+
+    <ng-container [ngSwitch]="selectedAssessmentType">
+        <app-specification-details  [data]="calculation.specification" *ngSwitchCase="'specification'" [isAllDisabled]="true"></app-specification-details>
+        <app-documentation-details [fromCalculationDocumentation]="!isAllDisabled" [data]="isAllDisabled ? calculation.documentation : calculation.calculationDocumentation" *ngSwitchCase="'documentation'" [isAllDisabled]="isAllDisabled" ></app-documentation-details>
+        <app-metallography-details [fromCalculationMetallography]="!isAllDisabled" [data]="isAllDisabled ? calculation.metallography : calculation.calculationMetallography" *ngSwitchCase="'metallography'" [isAllDisabled]="isAllDisabled" ></app-metallography-details>
+        <app-testing-scope-details  [fromCalculation]="!isAllDisabled" [data]="isAllDisabled ? calculation.testingScope : calculation.calculationTestingScope" *ngSwitchCase="'testingScope'" [isAllDisabled]="isAllDisabled"></app-testing-scope-details>
+        <app-non-destructive-testing-details [fromCalculationNonDestructiveTesting]="!isAllDisabled" [data]="isAllDisabled ? calculation.nonDestructiveTesting : calculation.calculationNonDestructiveTesting" *ngSwitchCase="'nonDestructiveTesting'" [isAllDisabled]="isAllDisabled" ></app-non-destructive-testing-details>
+        <app-residual-material-details [fromCalculationResidualMaterial]="!isAllDisabled" [data]="isAllDisabled ? calculation.residualMaterial :calculation.calculationResidualMaterial" *ngSwitchCase="'residualMaterial'" [isAllDisabled]="isAllDisabled" ></app-residual-material-details>
+
+        <app-material-details [data]="offerPos.material" *ngSwitchCase="'material'" [isAllDisabled]="true"></app-material-details>
+        <app-hardenability-range-details [fromCalculationRange]="!isAllDisabled" [data]="isAllDisabled ? calculation.hardenabilityRange : calculation.calculationHardenabilityRange"  *ngSwitchCase="'hardenabilityRange'" [isAllDisabled]="isAllDisabled" ></app-hardenability-range-details>
+        <app-deformation-details [fromCalculation]="!isAllDisabled" [data]="isAllDisabled ? calculation.deformation : calculation.calculationDeformation" *ngSwitchCase="'deformation'" [isAllDisabled]="isAllDisabled" ></app-deformation-details>
+        <app-chemical-analysis-details [fromCalculation]="!isAllDisabled" [data]="isAllDisabled ? calculation.materialAnalysis : calculation.calculationMaterialAnalysis" *ngSwitchCase="'materialAnalysis'" [isAllDisabled]="isAllDisabled" ></app-chemical-analysis-details>
+        <app-hwe-work-plan-details [data]="calculation.hweWorkPlan" *ngSwitchCase="'hweWorkPlan'" [isAllDisabled]="true"></app-hwe-work-plan-details>
+    </ng-container>
+</kendo-grid-edit-window>
+
+<div class="example-wrapper">
+    <kendo-dialog style="z-index: 99999999" i18n-title title="Preview" *ngIf="previewDialogOpened" (close)="close('dialog')" [width]="'75vw'" [height]="'80vh'">
+        <!-- Image Preview Content -->
+        <div class="image-preview">
+            <div [innerHTML]="previewHtml">
+            </div>
+        </div>
+    </kendo-dialog>
+</div>
+<kendo-dialog i18n-title title="Preview" *ngIf="selectedOperationPlanPos" (close)="selectedOperationPlanPos=undefined;operationsFilesArr = [] " [width]="'75vw'" [height]="'80vh'">
+	<kendo-upload #myUpload="kendoUpload" [autoUpload]="true" [(ngModel)]="operationsFilesArr" [saveUrl]="uploadSaveUrl"
+				  (upload)="uploadWorkPlan($event)" (remove)="remove($event)" [removeUrl]="uploadRemoveUrl" [disabled]="false">
+	<ng-template kendoUploadFileTemplate let-files let-state="state">
+		<div class="file-item-container" (click)="show(files)">
+			<div class="file-image">
+				<img style="height: 32px;" [src]="getIconForFile(files)" alt="File Icon"
+					 class="file-icon" />
+			</div>
+			<div class="file-details">
+				<div>{{ files[0]?.name }}</div>
+				<div i18n>{{ convertFileSize(files[0]?.size) }}</div>
+			</div>
+		</div>
+		<div class="file-actions">
+			<kendo-button
+				*ngIf=" files[0]?.original_url && (files[0]?.mime_type?.includes('image') || files[0]?.mime_type?.includes('pdf'))"
+				(click)="show(files)" iconClass='k-icon icon-preveiw-on'>
+			</kendo-button>
+			<kendo-button
+				*ngIf=" files[0]?.original_url && !files[0]?.mime_type?.includes('image') && !files[0]?.mime_type?.includes('pdf');"
+				(click)="show(files)" iconClass='k-icon icon-download'>
+			</kendo-button>
+			<kendo-button (click)="remove(files)" iconClass='k-icon icon-trash'>
+			</kendo-button>
+		</div>
+	</ng-template>
+	</kendo-upload>
+	<app-loader *ngIf="isShowAttachmentLoader && selectedOperationPlanPos"> </app-loader>
+</kendo-dialog>
+<kendo-grid-edit-window [model]="formData" [hideSaveOrUpdateBtn]="true"  [width]="selectedWindowWidth" [showCloseButton]="false" [closeGridWindow]="false" (cancel)="cancelHandler($event)"
+	>
+	<div #modalBody></div>
+</kendo-grid-edit-window>
+<app-loader *ngIf="isShowAttachmentLoader && !selectedOperationPlanPos"> </app-loader>

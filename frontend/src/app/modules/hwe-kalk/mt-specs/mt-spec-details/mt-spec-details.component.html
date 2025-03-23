@@ -1,0 +1,371 @@
+<form novalidate class="k-form" *ngIf="mtSpec">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="mt-spec-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"></kendo-label>
+                    <kendo-textbox #custom_id name="custom_id" [(ngModel)]="mtSpec.custom_id"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+                    <kendo-textbox #name name="name" [(ngModel)]="mtSpec.name"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="reh_min" i18n i18n-text text="Reh Min"></kendo-label>
+                        <kendo-numerictextbox #reh_min name="reh_min" [(ngModel)]="mtSpec.reh_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="reh_max" i18n i18n-text text="Reh Max"></kendo-label>
+                        <kendo-numerictextbox #reh_max name="reh_max" [(ngModel)]="mtSpec.reh_max"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rp_min" i18n i18n-text text="RP Min"></kendo-label>
+                        <kendo-numerictextbox #rp_min name="rp_min" [(ngModel)]="mtSpec.rp_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rp_max" i18n i18n-text text="RP Max"></kendo-label>
+                        <kendo-numerictextbox #rp_max name="rp_max" [(ngModel)]="mtSpec.rp_max"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rm_min" i18n i18n-text text="RM Min"></kendo-label>
+                        <kendo-numerictextbox #rm_min name="rm_min" [(ngModel)]="mtSpec.rm_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rm_max" i18n i18n-text text="RM Max"></kendo-label>
+                        <kendo-numerictextbox #rm_max name="rm_max" [(ngModel)]="mtSpec.rm_max"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="a5_min" i18n i18n-text text="A5 Min"></kendo-label>
+                        <kendo-numerictextbox #a5_min name="a5_min" [(ngModel)]="mtSpec.a5_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="a_min_warm" i18n i18n-text text="A min[%]"></kendo-label>
+                        <kendo-numerictextbox #a_min_warm name="a_min_warm" [(ngModel)]="mtSpec.a_min_warm"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="a4_min" i18n i18n-text text="A4 Min"></kendo-label>
+                        <kendo-numerictextbox #a4_min name="a4_min" [(ngModel)]="mtSpec.a4_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="z_min_warm" i18n i18n-text text="Z min[%]"></kendo-label>
+                        <kendo-numerictextbox #z_min_warm name="z_min_warm" [(ngModel)]="mtSpec.z_min_warm"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="z_min" i18n i18n-text text="Z Min"></kendo-label>
+                        <kendo-numerictextbox #z_min name="z_min" [(ngModel)]="mtSpec.z_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rp_rm_ratio" i18n i18n-text text="Rp/Rm-Ratio"></kendo-label>
+                        <kendo-numerictextbox #rp_rm_ratio name="rp_rm_ratio" [(ngModel)]="mtSpec.rp_rm_ratio"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rp_min_warm" i18n i18n-text text="RP Min Warm"></kendo-label>
+                        <kendo-numerictextbox #rp_min_warm name="rp_min_warm" [(ngModel)]="mtSpec.rp_min_warm"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rm_min_warm" i18n i18n-text text="RM Min Warm"></kendo-label>
+                        <kendo-numerictextbox #rm_min_warm name="rm_min_warm" [(ngModel)]="mtSpec.rm_min_warm"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="temperature" i18n i18n-text text="Temperature"></kendo-label>
+                    <kendo-numerictextbox #temperature name="temperature" [(ngModel)]="mtSpec.temperature"
+                        [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="text_tensile_test" i18n i18n-text text="Text Tensile Test"></kendo-label>
+                    <kendo-textbox #text_tensile_test name="text_tensile_test"
+                        [(ngModel)]="mtSpec.text_tensile_test"></kendo-textbox>
+                </kendo-stacklayout>
+                
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="tensile_test_rt" i18n i18n-text text="Tensile Test RT"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="tensile_test_rt" [(ngModel)]="mtSpec.tensile_test_rt"
+                            #tensile_test_rt />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="tensile_test_warm" i18n i18n-text text="Tensile Test Warm"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="tensile_test_warm"
+                            [(ngModel)]="mtSpec.tensile_test_warm" #tensile_test_warm />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="impact_test" i18n i18n-text text="Impact Test"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="impact_test" [(ngModel)]="mtSpec.impact_test"
+                            #impact_test />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="jominy_test" i18n i18n-text text="Jominy Test"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="jominy_test" [(ngModel)]="mtSpec.jominy_test"
+                            #jominy_test />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="impact_test_type" i18n i18n-text text="Impact Test Type"></kendo-label>
+                    <kendo-combobox #impact_test_type name="impact_test_type" [(ngModel)]="mtSpec.impact_test_type"
+                        [data]="impactTestTypeDataSource" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+        <kendo-card [style.flex]="6">
+            <kendo-card-header>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="mt-spec-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="impact_temperature_1" i18n i18n-text
+                            text="Impact Temperature 1"></kendo-label>
+                        <kendo-numerictextbox #impact_temperature_1 name="impact_temperature_1"
+                            [(ngModel)]="mtSpec.impact_temperature_1" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="impact_single_1" i18n i18n-text text="Impact Single 1"></kendo-label>
+                        <kendo-numerictextbox #impact_single_1 name="impact_single_1"
+                            [(ngModel)]="mtSpec.impact_single_1" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="impact_temperature_2" i18n i18n-text
+                            text="Impact Temperature 2"></kendo-label>
+                        <kendo-numerictextbox #impact_temperature_2 name="impact_temperature_2"
+                            [(ngModel)]="mtSpec.impact_temperature_2" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="impact_single_2" i18n i18n-text text="Impact Single 2"></kendo-label>
+                        <kendo-numerictextbox #impact_single_2 name="impact_single_2"
+                            [(ngModel)]="mtSpec.impact_single_2" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="impact_avg_1" i18n i18n-text text="Impact Avg 1"></kendo-label>
+                        <kendo-numerictextbox #impact_avg_1 name="impact_avg_1" [(ngModel)]="mtSpec.impact_avg_1"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="impact_avg_2" i18n i18n-text text="Impact Avg 2"></kendo-label>
+                        <kendo-numerictextbox #impact_avg_2 name="impact_avg_2" [(ngModel)]="mtSpec.impact_avg_2"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="hardness_test" i18n i18n-text text="Hardness Test"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="hardness_test" [(ngModel)]="mtSpec.hardness_test"
+                            #hardness_test />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="bending_test" i18n i18n-text text="Bending Test"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="bending_test" [(ngModel)]="mtSpec.bending_test"
+                            #bending_test />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="hardness_test_type" i18n i18n-text text="Hardness Test Type"></kendo-label>
+                    <kendo-combobox #hardness_test_type name="hardness_test_type"
+                        [(ngModel)]="mtSpec.hardness_test_type" [data]="hardnessTestTypeDataSource"
+                        [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="hardness_conversion" i18n i18n-text text="Hardness Conversion"></kendo-label>
+                    <kendo-combobox #hardness_conversion name="hardness_conversion"
+                        [(ngModel)]="mtSpec.hardness_conversion" [data]="hardnessConversionDataSource"
+                        [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="hardness_localisation" i18n i18n-text
+                        text="Hardness Localisation"></kendo-label>
+                    <kendo-textbox #hardness_localisation name="hardness_localisation"
+                        [(ngModel)]="mtSpec.hardness_localisation"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="hardness_min" i18n i18n-text text="Hardness Min"></kendo-label>
+                        <kendo-numerictextbox #hardness_min name="hardness_min" [(ngModel)]="mtSpec.hardness_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="hardness_max" i18n i18n-text text="Hardness Max"></kendo-label>
+                        <kendo-numerictextbox #hardness_max name="hardness_max" [(ngModel)]="mtSpec.hardness_max"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="hbw_min" i18n i18n-text text="HBW Min"></kendo-label>
+                        <kendo-numerictextbox #hbw_min name="hbw_min" [(ngModel)]="mtSpec.hbw_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="hbw_max" i18n i18n-text text="HBW Max"></kendo-label>
+                        <kendo-numerictextbox #hbw_max name="hbw_max" [(ngModel)]="mtSpec.hbw_max"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="mpa_min_piece" i18n i18n-text text="MPA Min Piece"></kendo-label>
+                        <kendo-numerictextbox #mpa_min_piece name="mpa_min_piece" [(ngModel)]="mtSpec.mpa_min_piece"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="mpa_max_piece" i18n i18n-text text="MPA Max Piece"></kendo-label>
+                        <kendo-numerictextbox #mpa_max_piece name="mpa_max_piece" [(ngModel)]="mtSpec.mpa_max_piece"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="mpa_min_specimen" i18n i18n-text text="MPA Min Specimen"></kendo-label>
+                        <kendo-numerictextbox #mpa_min_specimen name="mpa_min_specimen"
+                            [(ngModel)]="mtSpec.mpa_min_specimen" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="mpa_max_specimen" i18n i18n-text text="MPA Max Specimen"></kendo-label>
+                        <kendo-numerictextbox #mpa_max_specimen name="mpa_max_specimen"
+                            [(ngModel)]="mtSpec.mpa_max_specimen" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="jominy_specification" i18n i18n-text text="Jominy Specification"></kendo-label>
+                    <kendo-textbox #jominy_specification name="jominy_specification"
+                        [(ngModel)]="mtSpec.jominy_specification"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="astm_a370" i18n i18n-text text="ASTM A370"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="astm_a370" [(ngModel)]="mtSpec.astm_a370"
+                            #astm_a370 />
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="iso_7438" i18n i18n-text text="ISO 7438"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="iso_7438" [(ngModel)]="mtSpec.iso_7438" #iso_7438 />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+
+    <kendo-card style="width: 100%; margin-top: 12px">
+        <kendo-card-body class="j-min-max">
+            <kendo-stacklayout orientation="vertical" [gap]="9">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <div i18n style="text-align: left;">mm</div>
+                    <div i18n>1,5</div>
+                    <div>3</div>
+                    <div>5</div>
+                    <div>7</div>
+                    <div>9</div>
+                    <div>10</div>
+                    <div>11</div>
+                    <div>13</div>
+                    <div>15</div>
+                    <div>20</div>
+                    <div>25</div>
+                    <div>30</div>
+                    <div>35</div>
+                    <div>40</div>
+                    <div>45</div>
+                    <div>50</div>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <div i18n style="text-align: left;">HRC min</div>
+                    <kendo-numerictextbox [step]="0.1" #j_1_5_min name="j_1_5_min" [(ngModel)]="mtSpec.j_1_5_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_3_min name="j_3_min" [(ngModel)]="mtSpec.j_3_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_5_min name="j_5_min" [(ngModel)]="mtSpec.j_5_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_7_min name="j_7_min" [(ngModel)]="mtSpec.j_7_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_9_min name="j_9_min" [(ngModel)]="mtSpec.j_9_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_10_min name="j_10_min" [(ngModel)]="mtSpec.j_10_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_11_min name="j_11_min" [(ngModel)]="mtSpec.j_11_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_13_min name="j_13_min" [(ngModel)]="mtSpec.j_13_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_15_min name="j_15_min" [(ngModel)]="mtSpec.j_15_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_20_min name="j_20_min" [(ngModel)]="mtSpec.j_20_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_25_min name="j_25_min" [(ngModel)]="mtSpec.j_25_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_30_min name="j_30_min" [(ngModel)]="mtSpec.j_30_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_35_min name="j_35_min" [(ngModel)]="mtSpec.j_35_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_40_min name="j_40_min" [(ngModel)]="mtSpec.j_40_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_45_min name="j_45_min" [(ngModel)]="mtSpec.j_45_min"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_50_min name="j_50_min" [(ngModel)]="mtSpec.j_50_min"></kendo-numerictextbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <div i18n style="text-align: left;">HRC max</div>
+                    <kendo-numerictextbox [step]="0.1" #j_1_5_max name="j_1_5_max" [(ngModel)]="mtSpec.j_1_5_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_3_max name="j_3_max" [(ngModel)]="mtSpec.j_3_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_5_max name="j_5_max" [(ngModel)]="mtSpec.j_5_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_7_max name="j_7_max" [(ngModel)]="mtSpec.j_7_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_9_max name="j_9_max" [(ngModel)]="mtSpec.j_9_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_10_max name="j_10_max" [(ngModel)]="mtSpec.j_10_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_11_max name="j_11_max" [(ngModel)]="mtSpec.j_11_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_13_max name="j_13_max" [(ngModel)]="mtSpec.j_13_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_15_max name="j_15_max" [(ngModel)]="mtSpec.j_15_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_20_max name="j_20_max" [(ngModel)]="mtSpec.j_20_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_25_max name="j_25_max" [(ngModel)]="mtSpec.j_25_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_30_max name="j_30_max" [(ngModel)]="mtSpec.j_30_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_35_max name="j_35_max" [(ngModel)]="mtSpec.j_35_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_40_max name="j_40_max" [(ngModel)]="mtSpec.j_40_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_45_max name="j_45_max" [(ngModel)]="mtSpec.j_45_max"></kendo-numerictextbox>
+                    <kendo-numerictextbox [step]="0.1" #j_50_max name="j_50_max" [(ngModel)]="mtSpec.j_50_max"></kendo-numerictextbox>
+                </kendo-stacklayout>
+            </kendo-stacklayout>
+        </kendo-card-body>
+    </kendo-card>
+
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

@@ -1,0 +1,1113 @@
+<app-dialog
+	*ngIf="!showLoadingPage"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<ui5-bar
+		slot="header"
+		design="Header">
+		<ui5-title
+			level="H5"
+			slot="startContent">
+			{{ dialogTitle }}
+		</ui5-title>
+		<ui5-label
+			level="H5"
+			slot="endContent"
+			class="font-semibold">
+			<ng-container *ngIf="!isBusy; else showBusyIndicator">
+				<span i18n>User:</span>
+				{{ loggedInUser?.name }}
+			</ng-container>
+		</ui5-label>
+	</ui5-bar>
+	<div class="h-[65vh] w-[80vw]">
+		<div class="flex flex-row gap-4 h-full">
+			<!-- Add Parts -->
+			<ui5-card class="flex-1 min-w-0 h-full">
+				<div class="container h-[62vh] overflow-y-auto">
+					<ui5-card-header
+						slot="header"
+						title-text="Add Parts"
+						i18n-title-text>
+					</ui5-card-header>
+					<div class="divider"></div>
+					<div>
+						<ng-container *ngIf="!isBusy; else showBusyIndicator">
+							<div class="flex flex-col m-4 gap-4">
+								<div class="flex flex-col">
+									<ui5-label
+										showColon
+										i18n
+										>Order</ui5-label
+									>
+									<ui5-input
+										slot="endContent"
+										class="w-full cursor-pointer"
+										[value]="selectedProdOrderCustomId"
+										placeholder="Select Order"
+										(focus)="openDropdown()"
+										i18n-placeholder>
+										<ui5-icon
+											id="valueHelpIcon"
+											slot="icon"
+											name="value-help"
+											(click)="openDropdown()"></ui5-icon>
+									</ui5-input>
+									<ui5-popover
+										id="OrderListPopover"
+										opener="valueHelpIcon"
+										class="w-[400px]"
+										placement="Bottom"
+										[open]="isValueHelpDialog"
+										(before-close)="closeDropdown()">
+										<ui5-input
+											class="w-full cursor-pointer"
+											[value]="searchText"
+											placeholder="Search Order"
+											i18n-placeholder
+											(input)="onSearch($event)"></ui5-input>
+
+										<ui5-list
+											id="OrderList"
+											class="h-[200px]"
+											mode="SingleSelect"
+											[growing]="'Scroll'"
+											[loading]="isLoading"
+											(item-click)="onChangeOrder($event)">
+											<ng-container *ngFor="let order of filteredOrders">
+												<ui5-li
+													id="{{
+														order.prod_order_pos_operation_id.toString()
+													}}"
+													[selected]="order == selectedOrder"
+													[additionalText]="
+														quantityType == QuantityType.TYPE_1
+															? order.prod_order_pos_operation_pos
+															: order?.item?.custom_id
+													">
+													{{ order.order_custom_id }}
+												</ui5-li>
+											</ng-container>
+										</ui5-list>
+									</ui5-popover>
+								</div>
+								<div class="flex flex-col">
+									<ui5-label
+										show-colon
+										i18n
+										>Item State</ui5-label
+									>
+									<ui5-segmented-button
+										class="w-full"
+										(selection-change)="onItemStateTypeSelected($event)">
+										@for (
+											type of getAvailableItemStateTypes();
+											track type.value
+										) {
+											<ui5-segmented-button-item
+												[selected]="
+													this.selectedItemStateType ==
+													type.value
+												"
+												[ngClass]="type.value == itemStateType.GOOD ? 'goodPartColor' : type.value == itemStateType.SCRAP ? 'badPartColor' : 'reworkPartColor'"
+												[attr.value]="type.value">
+												{{ type.text }}
+											</ui5-segmented-button-item>
+										}
+									</ui5-segmented-button>
+								</div>
+								<ui5-select
+									class="w-full"
+									(change)="onItemStateSelected($event)">
+									@for (
+										itemState of getItemStatesForSelectedType();
+										track itemState.id
+									) {
+										<ui5-option
+											[value]="itemState.id.toString()"
+											[selected]="itemState == selectedItemState"
+											>{{ itemState.name }}
+										</ui5-option>
+									}
+								</ui5-select>
+								@if (
+									selectedOrder?.quantity_input_method == "QUANTITY_WITH_BATCH"
+								) {
+									<div class="flex flex-col">
+										<ui5-label
+											show-colon
+											i18n
+											>Batch Number</ui5-label
+										>
+										<ui5-input
+											class="w-full"
+											name="batchNumber"
+											[(ngModel)]="batchNumber"
+											[disabled]="true"
+											(input)="validateInput()"
+											i18n
+											placeholder="Enter Batch Number">
+										</ui5-input>
+									</div>
+								} @else if (
+									selectedOrder?.quantity_input_method === "SERIAL_MULTI" ||
+									selectedOrder?.quantity_input_method === "SERIAL_SINGLE"
+								) {
+									<div class="flex flex-col">
+										@if (
+											selectedOrder?.quantity_input_method === "SERIAL_MULTI"
+										) {
+											<ui5-message-strip
+												class="mb-4"
+												hide-close-button
+												><ui5-label
+													i18n
+													show-colon
+													>Number of selected serials</ui5-label
+												>
+												<span class="font-semibold">
+													{{ serialNumbers.length || 0 }}</span
+												></ui5-message-strip
+											>
+											<ui5-label
+												show-colon
+												i18n
+												>Serial Numbers</ui5-label
+											>
+										} @else {
+											<ui5-label
+												show-colon
+												i18n
+												>Serial Number</ui5-label
+											>
+										}
+										<div class="flex flex-col w-full gap-2 items-center">
+											<div class="flex w-full">
+												<ui5-multi-input
+													#serialMultiInput
+													class="w-full"
+													[showSuggestions]="true"
+													(focus)="onSerialMultiInputFocus()"
+													(ui5TokenDelete)="
+														updateSelectedSerialsFromTokenDeleted(
+															$event
+														)
+													"
+													(ui5Change)="
+														updateSelectedSerialsFromMultiInput()
+													">
+													@for (serial of serialNumbers; track serial) {
+														<ui5-token
+															slot="tokens"
+															[text]="serial"></ui5-token>
+													}
+
+													@if (
+														selectedOrder?.quantity_input_method ===
+														"SERIAL_MULTI"
+													) {
+														<ui5-suggestion-item
+															[text]="selectAllText"
+															id="SELECT_ALL"
+															(click)="onSelectAll()"
+															*ngIf="
+																remainingSerialsToPropose().length
+															">
+														</ui5-suggestion-item>
+														<ui5-suggestion-item
+															[text]="deselectAllText"
+															id="DESELECT_ALL"
+															(click)="onDeselectAll()"
+															*ngIf="
+																!remainingSerialsToPropose()
+																	?.length &&
+																serialNumbers?.length
+															">
+														</ui5-suggestion-item>
+													}
+
+													@for (
+														serial of remainingSerialsToPropose();
+														track serial
+													) {
+														<ui5-suggestion-item [text]="serial">
+														</ui5-suggestion-item>
+													}
+												</ui5-multi-input>
+
+												<ui5-button
+													design="Transparent"
+													class="mt-1 ml-1"
+													i18n
+													(click)="onSortChange()"
+													icon="{{
+														isASC ? 'arrow-bottom' : 'arrow-top'
+													}}"></ui5-button>
+											</div>
+
+											@if (lastProposedId()) {
+												<ui5-button
+													design="Transparent"
+													i18n
+													class="w-full"
+													(ui5Click)="resetProposedQuantities()"
+													>Reset</ui5-button
+												>
+											}
+
+											@if (canProposeQuantityFromHu()) {
+												<ui5-button
+													design="Transparent"
+													i18n
+													class="w-full"
+													(ui5Click)="proposeQuantityFromHu()"
+													>Propose from Handling Unit</ui5-button
+												>
+											}
+											@if (
+												selectedOrder?.quantity_input_method ===
+													"SERIAL_MULTI" ||
+												selectedOrder?.quantity_input_method ===
+													"SERIAL_SINGLE"
+											) {
+												<ui5-button
+													i18n
+													class="w-full"
+													[disabled]="!serialNumbers.length"
+													(ui5Click)="onSuspendSelectedSerialsClick()"
+													>Suspend Selected Serials</ui5-button
+												>
+											}
+										</div>
+										@if (reusedSerialsToWarnAbout().length) {
+											<ui5-text
+												class="w-full"
+												i18n
+												>Warning: Serial numbers
+												{{ reusedSerialsToWarnAbout().join(", ") }}
+												have already been used.</ui5-text
+											>
+										}
+									</div>
+								}
+								@if (
+									selectedOrder?.quantity_input_method == "QUANTITY" ||
+									selectedOrder?.quantity_input_method == "QUANTITY_WITH_BATCH"
+								) {
+									<div class="flex flex-col w-full">
+										<ui5-label
+											show-colon
+											i18n
+											>Quantity</ui5-label
+										>
+										<div class="flex flex-row items-center gap-2">
+											<ui5-input
+												class="flex-1"
+												(ui5Input)="onProposeConsumption()"
+												[(ngModel)]="selectedQuantity"
+												[valueState]="
+													!selectedQuantity ||
+													validateAmount(selectedQuantity)
+														? 'None'
+														: 'Negative'
+												">
+											</ui5-input>
+											@if (lastProposedId() && selectedQuantity) {
+												<ui5-button
+													design="Transparent"
+													i18n
+													(ui5Click)="resetProposedQuantities()"
+													>Reset</ui5-button
+												>
+											}
+										</div>
+									</div>
+								}
+
+								<ui5-message-strip hide-close-button
+									><ui5-label
+										i18n
+										show-colon
+										>Remaining Quantity</ui5-label
+									>
+									<span class="font-semibold">
+										{{ remainingQuantity }}</span
+									></ui5-message-strip
+								>
+
+								<ui5-checkbox
+									id="final-quantity"
+									*ngIf="this.quantityType != QuantityType.TYPE_2"
+									[(ngModel)]="isFinalQuantity"
+									text="Final Quantity?"
+									i18n-text>
+								</ui5-checkbox>
+							</div>
+						</ng-container>
+					</div>
+				</div>
+			</ui5-card>
+
+			<!-- Consumption and Quantity Recording Table -->
+			<div class="flex flex-col flex-[2_2_0%] min-w-0 gap-4 h-full">
+				<ui5-card
+					class="h-full"
+					*ngIf="this.quantityType != QuantityType.TYPE_2">
+					<div slot="header">
+						<ui5-tabcontainer
+							fixed
+							collapsed
+							(tab-select)="handleTabChange($event)">
+							<ui5-tab
+								#assembly
+								i18n-text
+								text="Assembly"
+								[selected]="selectedTab == 0"
+								id="assembly"></ui5-tab>
+							<ui5-tab
+								#handlingUnits
+								i18n-text
+								text="Handling Units"
+								[selected]="selectedTab == 1"
+								id="handling-unit"></ui5-tab>
+							<ui5-tab
+								#handlingUnits
+								i18n-text
+								text="Batches"
+								[selected]="selectedTab == 2"
+								id="batches"></ui5-tab>
+						</ui5-tabcontainer>
+					</div>
+					<ui5-card
+						class="p-2 card-width-adjustment"
+						*ngIf="selectedTab == 0">
+						<div class="h-[58vh]">
+							<ui5-bar
+								slot="header"
+								design="Header">
+								<ui5-title
+									level="H5"
+									slot="startContent"
+									i18n
+									>Assembly
+								</ui5-title>
+								<ui5-label
+									level="H5"
+									slot="endContent">
+									<ui5-button
+										id="label-preview-btn"
+										class="mr-1"
+										design="Emphasized"
+										(click)="onProposeConsumption()"
+										[disabled]="!enableProposeAssemblyButton()"
+										i18n
+										>Propose Assembly</ui5-button
+									>
+								</ui5-label>
+							</ui5-bar>
+							<div class="w-full h-[55vh]">
+								<app-grid-table
+									headerTitle=""
+									[columns]="consumptionColumn"
+									i18n-headerTitle
+									[showAction]="false"
+									[showSearch]="false"
+									[showDownload]="false"
+									[showActiveButton]="false"
+									selectionMode="None"
+									[showNewButton]="false"
+									[enableServerSideFiltering]="false"
+									[data]="consumptionData"
+									[customData]="true"
+									[isBusy]="isBusyConsumption"
+									#consumptionChildComponentRef>
+								</app-grid-table>
+							</div>
+						</div>
+					</ui5-card>
+					<ui5-card
+						class="p-2 card-width-adjustment"
+						*ngIf="selectedTab == 1">
+						<div class="h-[58vh]">
+							<ui5-bar
+								slot="header"
+								design="Header">
+								<ui5-title
+									level="H5"
+									slot="startContent"
+									i18n
+									>Handling Units</ui5-title
+								>
+								<ui5-label
+									level="H5"
+									slot="endContent">
+									<ui5-button
+										id="add-row-btn"
+										design="Transparent"
+										(click)="onAddHU()"
+										i18n>
+										Add Row
+									</ui5-button>
+								</ui5-label>
+							</ui5-bar>
+							<div class="w-full h-[55vh]">
+								<app-grid-table
+									url=""
+									headerTitle=""
+									[columns]="handlingUnitColumn"
+									i18n-headerTitle
+									[showAction]="false"
+									[showSearch]="false"
+									[showDownload]="false"
+									[showActiveButton]="false"
+									selectionMode="None"
+									[showNewButton]="false"
+									[enableServerSideFiltering]="false"
+									[data]="handlingUnitsData"
+									[customData]="true"
+									[isBusy]="loadingHandlingUnits"
+									#handlingUnitChildComponentRef>
+								</app-grid-table>
+							</div>
+						</div>
+					</ui5-card>
+					<ui5-card
+						class="p-2 card-width-adjustment"
+						*ngIf="selectedTab == 2">
+						<div class="h-[58vh]">
+							<ui5-bar
+								slot="header"
+								design="Header">
+								<ui5-title
+									level="H5"
+									slot="startContent"
+									i18n
+									>Batches
+								</ui5-title>
+								<ui5-label
+									level="H5"
+									slot="endContent">
+									<ui5-button
+										id="add-row-btn"
+										design="Transparent"
+										(click)="onAddBatchRow()"
+										i18n>
+										Add Row
+									</ui5-button>
+								</ui5-label>
+								<ui5-label
+									level="H5"
+									slot="endContent">
+									<ui5-button
+										id="add-row-btn"
+										icon="save"
+										design="Emphasized"
+										[disabled]="isSaveBatchDisabled()"
+										(click)="saveBatch()"
+										i18n>
+										Save
+									</ui5-button>
+								</ui5-label>
+							</ui5-bar>
+
+							<div class="w-full h-[55vh]">
+								<app-grid-table
+									headerTitle=""
+									[columns]="batchesColumn"
+									i18n-headerTitle
+									[showAction]="false"
+									[showSearch]="false"
+									[showDownload]="false"
+									[showActiveButton]="false"
+									selectionMode="None"
+									[showNewButton]="false"
+									[enableServerSideFiltering]="false"
+									[data]="batchData"
+									[customData]="true"
+									[isBusy]="loadingBatches"
+									#batchesChildComponentRef>
+								</app-grid-table>
+							</div>
+						</div>
+					</ui5-card>
+				</ui5-card>
+
+				<ui5-card
+					class="h-full"
+					*ngIf="this.quantityType == QuantityType.TYPE_2">
+					<div class="h-[40vh] p-2 card-width-adjustment">
+						<app-staging-area
+							#stagingAreaForUpperTable
+							[showScanButton]="true"
+							[tableHeader]="tableHeaderEntry"
+							[operation]="selectedOrder"
+							[machineId]="machine_id"
+							[selectedOrderInDetailsId]="selectedOrderId"
+							[filterQuery]="filterQueryForUpperTable"
+							[isQuantityEntry]="true"
+							keyForCacheCustomDataTableColumns="productionSupplyAreasEntry"
+							(clickOnScanButton)="clickOnScanButton()"
+							(generateFilterQuery)="generateFilterQuery()"
+							(clickOnUnlinkEntryButton)="clickOnUnlinkEntryButton($event)"
+							(clickTransportOrderFromEntry)="clickTransportOrderFromEntry($event)"
+							[isFromQuantity]="true"></app-staging-area>
+					</div>
+
+					<div class="p-2 card-width-adjustment h-[23vh]">
+						<app-staging-area
+							#stagingAreaForLowerTable
+							[tableHeader]="tableHeaderExit"
+							[filterQuery]="filterQueryForLowerTable"
+							(clickOnScanButton)="clickOnExitScanButton()"
+							(generateFilterQuery)="generateFilterQuery()"
+							keyForCacheCustomDataTableColumns="productionSupplyAreasExit"
+							(clickOnUnlinkEntryButton)="clickOnUnlinkExitButton($event)"
+							(clickTransportOrderFromExit)="clickTransportOrderFromExit($event)"
+							[operation]="selectedOrder"
+							[isQuantityExit]="true"
+							[showScanButton]="true"
+							[isFromQuantity]="true">
+						</app-staging-area>
+					</div>
+				</ui5-card>
+			</div>
+		</div>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style rounded-es-xl rounded-ee-xl">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				id="close-dialog"
+				design="Transparent"
+				(click)="closeDialog()"
+				i18n
+				>Close
+			</ui5-button>
+			<ui5-button
+				id="on-save-close"
+				class="mr-1"
+				design="Emphasized"
+				[disabled]="
+					!validateAllInputs() ||
+					isEmptySerial ||
+					isInvalidQuantity ||
+					isLoading ||
+					isBusy
+				"
+				(click)="onSaveQuantity(true)"
+				i18n
+				>Save and Close
+			</ui5-button>
+			<ui5-button
+				id="on-save"
+				class="mr-1"
+				design="Emphasized"
+				[disabled]="
+					!validateAllInputs() ||
+					isEmptySerial ||
+					isInvalidQuantity ||
+					isLoading ||
+					isBusy
+				"
+				(click)="onSaveQuantity(false)"
+				i18n>
+				Save
+			</ui5-button>
+		</div>
+		<ng-template #showBusyIndicator>
+			<ui5-busy-indicator
+				[active]="isBusy"
+				class="w-full h-full flex justify-center items-center">
+			</ui5-busy-indicator>
+		</ng-template>
+	</div>
+	<ui5-toast
+		#statusToastTools
+		id="statusToastTools"
+		placement="BottomCenter"
+		>{{ toasterStatus }}
+	</ui5-toast>
+</app-dialog>
+<app-dialog
+	[isDialogOpen]="showLoadingPage"
+	title="Loading">
+	<div class="h-[60vh] w-[60vw]">
+		<ui5-busy-indicator
+			class="w-full h-full flex justify-center items-center"
+			active="true">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style rounded-es-xl rounded-ee-xl">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				id="close-dialog"
+				design="Transparent"
+				(click)="closeLoadingDialog()"
+				i18n
+				>Close
+			</ui5-button>
+		</div>
+	</div>
+</app-dialog>
+<ui5-dialog
+	id="dialog"
+	state="Critical"
+	[open]="isDeleteDialog"
+	header-text="Warning"
+	i18n-header-text>
+	<p>{{ doYouWantToDeleteThisRecord }}</p>
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-end">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				design="Transparent"
+				(click)="closeDeleteDialog()"
+				i18n
+				>Close
+			</ui5-button>
+			<ui5-button
+				[disabled]="!validateEditInputs()"
+				class="mr-1 mb-1"
+				design="Emphasized"
+				(click)="deleteRecord()"
+				i18n
+				>Yes
+			</ui5-button>
+		</div>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	*ngIf="isEditQuantityRecording"
+	class="w-[27vw] h-[43vh]"
+	[open]="isEditQuantityRecording">
+	<ui5-bar
+		slot="header"
+		design="Header">
+		<ui5-title
+			level="H5"
+			slot="startContent"
+			i18n
+			>Edit Quantity
+		</ui5-title>
+	</ui5-bar>
+	<div>
+		<div class="flex flex-col justify-center items-center">
+			<div class="grid grid-cols-1 mr-[17.375rem]">
+				<ui5-checkbox
+					id="final-quantity"
+					[(ngModel)]="editDialogIsFinalQuantity"
+					text="Final Quantity?"
+					i18n-text></ui5-checkbox>
+			</div>
+			<div class="w-11/12">
+				<ui5-title
+					class="mb-2"
+					level="H5"
+					i18n
+					>Current Value
+				</ui5-title>
+				<div class="grid grid-cols-2">
+					<ui5-label
+						class="items-center"
+						i18n
+						show-colon
+						>Item State
+					</ui5-label>
+					<ui5-input
+						class="w-full"
+						[readonly]="true"
+						[value]="
+							selectedProdOrderPosOperationQuantity?.itemState?.name ?? ''
+						"></ui5-input>
+				</div>
+				<div class="grid grid-cols-2">
+					<ui5-label
+						class="items-center"
+						i18n
+						>Quantity:
+					</ui5-label>
+					<ui5-input
+						class="w-full"
+						[readonly]="true"
+						[value]="
+							selectedProdOrderPosOperationQuantity?.quantity?.toString() ?? '0'
+						"></ui5-input>
+				</div>
+			</div>
+			<div class="mt-2.5 w-11/12">
+				<ui5-title
+					class="mt-2 mb-2"
+					level="H5"
+					i18n
+					>Correction
+				</ui5-title>
+				<div class="grid grid-cols-2">
+					<ui5-label
+						class="items-center"
+						i18n
+						show-colon
+						>Item State
+					</ui5-label>
+					<ui5-combobox
+						class="w-full"
+						[value]="selectedProdOrderPosOperationQuantity?.itemState?.name ?? ''"
+						id="edited-good-part-id"
+						(selection-change)="onEditDialogItemStateChange($event)">
+						<ui5-cb-item
+							*ngFor="let reason of itemStates"
+							[id]="reason.id"
+							[text]="reason.name"></ui5-cb-item>
+					</ui5-combobox>
+				</div>
+				<div class="grid grid-cols-2">
+					<ui5-label
+						class="items-center"
+						i18n
+						>Quantity:
+					</ui5-label>
+					<ui5-input
+						class="w-full"
+						id="edited-good-part-amount"
+						name="editedGoodPartAmount"
+						#editedGoodPartAmountModel="ngModel"
+						[(ngModel)]="editDialogSelectedQuantity"
+						(blur)="validateEditInputs()"
+						[valueState]="validateEditInputs() ? 'None' : 'Negative'"></ui5-input>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style rounded-es-xl rounded-ee-xl">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				design="Transparent"
+				id="close-edit-dialog"
+				(click)="closeEditDialog()"
+				i18n
+				>Close
+			</ui5-button>
+			<ui5-button
+				[disabled]="!validateEditInputs()"
+				id="save-edit"
+				class="mr-1"
+				design="Emphasized"
+				(click)="saveEdit()"
+				i18n
+				>Save
+			</ui5-button>
+		</div>
+	</div>
+</ui5-dialog>
+<ui5-dialog
+	id="dialog"
+	state="Negative"
+	header-text="Error"
+	[open]="isErrorDialog">
+	<p>{{ errorStatus }}</p>
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-center">
+		<ui5-button
+			class="dialogCloser"
+			id="close-error-dialog"
+			(click)="closeErrorDialog()"
+			i18n
+			>Close
+		</ui5-button>
+	</div>
+</ui5-dialog>
+<app-entity-selection-dialog
+	[entity]="entitySelectionDialogProps?.entity ?? null"
+	[handlingUnit]="handlingUnitsData"
+	[inputReference]="entitySelectionDialogProps?.inputReference"
+	[title]="entitySelectionDialogProps?.title ?? undefined"
+	[searchKey]="entitySelectionDialogProps?.searchKey ?? null"
+	[searchQuery]="entitySelectionDialogProps?.searchQuery ?? ''"
+	[toggleAction]="toggleValue"
+	[staticData]="entitySelectionDialogProps?.staticData"
+	(entitySelected)="
+		entitySelectionDialogProps?.entitySelected($event)
+	"></app-entity-selection-dialog>
+
+<ui5-dialog
+	id="deleteDialog"
+	header-text="Associate"
+	i18n-header-text
+	[open]="isDialogOpenForScan">
+	<div class="p-11">
+		<div class="flex-col flex gap-[5px] mt-2">
+			<ui5-label
+				show-colon
+				required
+				i18n
+				>Associate</ui5-label
+			>
+			<ui5-multi-input
+					id="multi-input"
+					#scanMultiInput
+					class="w-[650px] cursor-pointer"
+					(ui5Change)="updateSelectedScannedTextFromMultiInput()"
+					(ui5TokenDelete)="updateSelectedTextFromTokenDeleted($event)">
+					@for (text of scannedToken; track text) {
+						<ui5-token
+							slot="tokens"
+							[text]="text"></ui5-token>
+					}
+					<div
+						slot="icon"
+						class="flex">
+						<ui5-icon
+							name="qr-code"
+							class="icon"
+							(click)="openCodeScannerDialog()"></ui5-icon>
+					</div>
+				</ui5-multi-input>
+		</div>
+	</div>
+
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Emphasized"
+			(click)="saveAndCloseScanDialog()"
+			i18n
+			[disabled]="!scannedToken.length || disableYesButton"
+			>Save</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="clickOnScanButtonClose()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#codeScannerDialog
+	id="codeScannerClockDialog"
+	header-text="Scan barcode"
+	state="None"
+	i18n-header-text>
+	<video
+		#videoElement
+		style="width: 100%; max-height: 60vh"></video>
+	<div class="scanner-overlay"></div>
+	<p
+		i18n
+		*ngIf="!videoInputDevices.length"
+		>Video loading</p
+	>
+	<div
+		slot="footer"
+		class="left-component-footer">
+		<ui5-button
+			design="Transparent"
+			i18n
+			(click)="closeCodeScannerDialog()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="dialog"
+	state="Critical"
+	[open]="isWarningQuantityOpen"
+	header-text="Warning"
+	i18n-header-text>
+	<span i18n
+		>You are trying to confirm a quantity greater then the registered quantity for the
+		operation</span
+	>
+	{{ quantityWarningOperation?.pos }}.
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-end">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				design="Transparent"
+				(click)="closeQuantityWaringDialog()"
+				i18n
+				>Close
+			</ui5-button>
+			<ui5-button
+				class="mr-1 mb-1"
+				design="Emphasized"
+				(click)="onSave()"
+				[disabled]="isLoading"
+				i18n
+				>Yes
+			</ui5-button>
+		</div>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="dialog"
+	state="Critical"
+	[open]="isUnlinkEntryOpen"
+	header-text="Warning"
+	i18n-header-text>
+	<span i18n>Are you sure you want to Unlink?</span>
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-end">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				design="Transparent"
+				(click)="closeUnlinkPSAWaringDialog()"
+				i18n
+				>Close</ui5-button
+			>
+			<ui5-button
+				class="mr-1 mb-1"
+				design="Emphasized"
+				(click)="isUnlinkFromEntry ? onUnlinkPSAFromEntry() : onUnlinkPSAFromExit()"
+				[disabled]="disableYesButton"
+				i18n
+				>Yes</ui5-button
+			>
+		</div>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="maximum-wanting-modal"
+	header-text="Warning"
+	state="Negative"
+	class="max-w-[492px] w-[80vh]">
+	<div class="flex justify-start flex-wrap gap-1">
+		<span i18n>Quantity exceeds HU target quantity</span>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="maximumQuantityOk()"
+			i18n
+			>OK</ui5-button
+		>
+		<ui5-button
+			(click)="maximumQuantityClosed()"
+			i18n
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="dialog"
+	state="Critical"
+	[open]="isSuspendDialogOpen"
+	header-text="Warning"
+	i18n-header-text>
+	<span i18n>Are you sure you want to Suspend selected serials?</span>
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-end">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				design="Transparent"
+				(click)="closeSuspendDialog()"
+				i18n
+				>Close</ui5-button
+			>
+			<ui5-button
+				class="mr-1 mb-1"
+				design="Emphasized"
+				(click)="suspendSelectedSerials()"
+				[disabled]="isLoading"
+				i18n
+				>Yes</ui5-button
+			>
+		</div>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="dialog"
+	state="Critical"
+	[open]="isWarningDialogOpenForEntry"
+	header-text="Warning"
+	i18n-header-text>
+	<span i18n>Scanned info could not be found in operations that are in production.</span>
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-end">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				design="Transparent"
+				(click)="closeIsWarningDialogOpenForEntry()"
+				i18n
+				>Close</ui5-button
+			>
+		</div>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#errorDialogTPMSubGroups
+	id="errorDialogTPMSubGroups"
+	[open]="isErrorDialogOpen"
+	header-text="Error"
+	state="Negative">
+	<p>{{ errorMessage }}</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeHUErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#clockedInUsersDialog
+	id="clockedInUsers"
+	[open]="isClockedDialogOpen"
+	header-text="Information"
+	i18n-header-text
+	state="Information">
+	<p i18n>Please select a clocked In User</p>
+	<div class="grid grid-cols-3 gap-4 w-full">
+		<ng-container *ngFor="let clockedInUser of clockedInUsers">
+			<ui5-radio-button
+				[checked]="selectedClockedInUser?.user_id === clockedInUser?.user_id"
+				(click)="selectedClockedInUser = clockedInUser"
+				name="checkStateStatus"
+				[text]="clockedInUser?.user?.name || ''">
+			</ui5-radio-button>
+		</ng-container>
+	</div>
+	
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			id="add-row-btn"
+			icon="save"
+			design="Emphasized"
+			[disabled]="!selectedClockedInUser"
+			(click)="onSaveQuantity(closeDialogAfterSave)"
+			i18n>
+			Save
+		</ui5-button>
+		<ui5-button
+			design="Transparent"
+			(click)="isClockedDialogOpen = false"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

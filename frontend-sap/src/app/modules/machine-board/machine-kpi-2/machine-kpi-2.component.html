@@ -1,0 +1,69 @@
+<ui5-card>
+	<div
+		slot="header"
+		class="header-flex">
+		<span
+			class="header-title"
+			i18n
+			>KPI</span
+		>
+		<span
+			class="header-subtitle"
+			i18n
+			>Time Period: Last {{ machine?.kpiTimePeriod }} Hours</span
+		>
+	</div>
+	<div
+		class="kpi-container gap-8 flex p-4"
+		[ngClass]="{ 'small-container': el.nativeElement.offsetWidth < 810 }">
+		<div style="width: 33.33%">
+			<div class="kpi-box important">
+				<div class="kpi-box-container oee">
+					<span
+						class="kpi-label font-size-32"
+						style="font-size: 32px"
+						i18n
+						>OEE</span
+					>
+					<span
+						class="kpi-value"
+						style="font-size: 64px"
+						>{{ machine?.oee | percent: '1.0-1' }}</span
+					>
+				</div>
+			</div>
+		</div>
+		<div class="second-box-div w-66-percent flex gap-8">
+			<div class="kpi-box">
+				<div class="kpi-box-container">
+					<span class="kpi-value">{{ machine?.machineUsage | percent: '1.0-1' }}</span>
+					<span
+						class="kpi-label"
+						i18n
+						>Machine Usage</span
+					>
+				</div>
+			</div>
+			<div class="kpi-box">
+				<div class="kpi-box-container">
+					<span class="kpi-value">{{ machine?.machinePerformance | percent: '1.0-1' }}</span>
+					<span
+						class="kpi-label"
+						i18n
+						>Performance</span
+					>
+				</div>
+			</div>
+			<div class="kpi-box">
+				<div class="kpi-box-container">
+					 <span class="kpi-value kpi-scrap">{{ machine?.machineQuality | percent: '1.0-1' }}</span>
+					<span
+						class="kpi-label"
+						i18n
+						>Quality</span
+					>
+				</div>
+			</div>
+		</div>
+	</div>
+</ui5-card>

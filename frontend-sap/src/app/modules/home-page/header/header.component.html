@@ -1,0 +1,66 @@
+<ui5-bar design="Header">
+	<ui5-button class="ml-[10px]"
+		*ngIf="!isHomePage" 
+		slot="startContent" 
+		icon="menu2" 
+		design="Transparent"
+		style="color: black;"
+		(click)="onClickSidebarChange()">
+    </ui5-button>
+
+	<a
+		[href]="homeRouteLink"
+		slot="startContent">
+		<img
+			id="schertech_logo"
+			[src]="logoSrc"
+			alt="" 
+			[ngStyle]="{'margin-left': isHomePage ? '36px' : '15px'}"/>
+	</a>
+	<div
+		id="header-user-part"
+		slot="endContent">
+		<ui5-combobox
+			*ngIf="showHallCombobox"
+			class="w-36 mr-3"
+			placeholder="Select Hall"
+			[value]="selectedHallValue"
+			(selection-change)="selectHall($event)">
+			<ui5-cb-item
+				*ngFor="let hall of halls"
+				[id]="hall.id"
+				[text]="hall.name"></ui5-cb-item>
+		</ui5-combobox>
+		<ng-container *ngIf="showDateTime">
+			<ui5-icon
+				name="date-time"
+				design="Information"></ui5-icon>
+			<ui5-text class="header-user-part-components"
+				>{{ date | date: "dd.MM.yyyy, HH:mm" }}
+			</ui5-text>
+			<div
+				style="
+					height: 30px;
+					width: 2px;
+					background-color: #a8b3bd;
+					margin-right: 16px;
+				"></div>
+		</ng-container>
+		<app-plant-selector
+			class="px-5"
+			*ngIf="showPlantSelector"></app-plant-selector>
+		<ui5-label class="header-user-part-components">{{
+			authService.loggedInUser.name
+		}}</ui5-label>
+		<ui5-button
+			[hidden]="isLogoutHide"
+			i18n
+			design="Transparent"
+			class="header-user-part-components"
+			(click)="logoutDialogOpen()"
+			>Logout</ui5-button
+		>
+		<app-translation></app-translation>
+	</div>
+	<ui5-title level="H4">{{ title }}</ui5-title>
+</ui5-bar>

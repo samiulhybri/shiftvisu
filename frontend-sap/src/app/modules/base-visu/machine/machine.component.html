@@ -1,0 +1,717 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Machines"
+		url="/Machines"
+		[showRowDataCount]="true"
+		i18n-headerTitle
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[model]="machine"
+		[editPermission]="authService.isPermissionValid('BASEVISU_MACHINES_EDIT')"
+		addButtonText="New"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		(newButtonClick)="newButtonClick()"
+		(editClick)="editClick($event)"
+		[expandQuery]="expandedQuery"
+		[plantId]="plantId"
+		(deleteClick)="deleteClick($event)"
+		[enableServerSideFiltering]="true"
+		[showSearch]="true"
+		sortBy="custom_id"
+		selectionMode="Single"		
+		#childComponentRef>
+	</app-grid-table>
+
+	<ui5-dialog
+		id="deleteDialog"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+
+	<ui5-dialog
+		#deleteErrorDialogMachine
+		id="deleteErrorDialogMachine"
+		state="Negative"
+		header-text="Error">
+		<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+		<div
+			slot="footer"
+			class="deleteErrorDialogFooter">
+			<ui5-button
+				class="dialogCloser"
+				design="Transparent"
+				(click)="closeDeleteErrorDialog()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+<ui5-dialog 
+    class="w-[1632px]"
+	id="machineDialog"
+	[open]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="ml-[-24px]">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ dialogTitle }}
+			</ui5-title>
+		</div>
+		<div class="flex justify-start">
+			<ui5-tabcontainer
+				class="ml-[-46px]"
+				(tab-select)="tabNavChanged($event)"
+				fixed
+				collapsed>
+				<ui5-tab
+					#itemDetailsTab
+					i18n-text
+					text="Core Data"
+					[selected]="selectedTab === 'core_data'"
+					id="core_data"></ui5-tab>
+				<ui5-tab
+					#itemAttachmentsTab
+					i18n-text
+					text="Item States"
+					[selected]="selectedTab === 'item_states'"
+					id="item_states"></ui5-tab>
+				<ui5-tab
+					#itemDetailsTab
+					i18n-text
+					text="Machine States"
+					[selected]="selectedTab === 'machine_states'"
+					id="machine_states"></ui5-tab>
+				<ui5-tab
+					#itemDetailsTab
+					i18n-text
+					text="Modules"
+					[selected]="selectedTab === 'modules'"
+					id="modules"></ui5-tab>
+			</ui5-tabcontainer>
+		</div>
+	</div>
+	<div class="2xl:h-[710px] xl:h-[510px] lg:h-[325px] h-[250px] w-full max-w-[1632px]">
+		<div [ngStyle]="{ display: selectedTab != 'core_data' ? 'none' : '' }">
+			<form (ngSubmit)="onSubmit(createOrUpdateForm)" *ngIf="isDialogOpen" #createOrUpdateForm="ngForm">
+				<ui5-busy-indicator [active]="isLoading" class="ml-[-10px]" size="L">
+					<div class="flex flex-col mb-3">
+						<div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 xxl:grid-cols-7 gap-2 max-h-[305px]">
+							<div class="flex flex-col">
+								<ui5-label show-colon>{{ localization.active }}</ui5-label>
+								<ui5-switch id="activeSwitch" name="is_active" [checked]="selectedMachine.is_active"
+									[(ngModel)]="selectedMachine.is_active" [disabled]="shouldBeDisabled('is_active')">
+								</ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Casting Machine</ui5-label>
+								<ui5-switch #castingMachineSwitch id="castingMachineSwitch" name="is_casting_machine"
+									[checked]="selectedMachine.is_casting_machine"
+									[(ngModel)]="selectedMachine.is_casting_machine"
+									[disabled]="shouldBeDisabled('is_casting_machine')"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Furnace</ui5-label>
+								<ui5-switch #furnaceSwitch id="furnaceSwitch" name="is_furnace"
+									[checked]="selectedMachine.is_furnace" [(ngModel)]="selectedMachine.is_furnace"
+									[disabled]="shouldBeDisabled('is_furnace')"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Operation Pool</ui5-label>
+								<ui5-switch #operationPoolSwitch id="operationPoolSwitch" name="has_operation_pool"
+									[checked]="selectedMachine.has_operation_pool"
+									[(ngModel)]="selectedMachine.has_operation_pool"
+									[disabled]="shouldBeDisabled('has_operation_pool')">
+								</ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Auto Post Goods Receipt</ui5-label>
+								<ui5-switch #auto_post_goods_receipt id="autoPostGoodsReceiptSwitch"
+									name="auto_post_goods_receipt" [checked]="selectedMachine.auto_post_goods_receipt"
+									[(ngModel)]="selectedMachine.auto_post_goods_receipt"
+									[disabled]="shouldBeDisabled('auto_post_goods_receipt')"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Auto Packaging</ui5-label>
+								<ui5-switch #autoPackagingSwitch id="autoPackagingSwitch" name="auto_packaging"
+									[checked]="selectedMachine.auto_packaging" [(ngModel)]="selectedMachine.auto_packaging"
+									[disabled]="shouldBeDisabled('auto_packaging')"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Supports Parallel Operations</ui5-label>
+								<ui5-switch #supports_parallel_operations id="supportsParallelOperationsSwitch"
+									name="supports_parallel_operations"
+									[checked]="selectedMachine.supports_parallel_operations"
+									[(ngModel)]="selectedMachine.supports_parallel_operations" [disabled]="
+									shouldBeDisabled('supports_parallel_operations')
+								"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Requires Batch Management Middle</ui5-label>
+								<ui5-switch #requires_batch_management_middle_switch
+									id="requiresBatchManagementMiddleSwitch" name="requires_batch_management_middle"
+									[checked]="selectedMachine.requires_batch_management_middle"
+									[(ngModel)]="selectedMachine.requires_batch_management_middle" [disabled]="
+									shouldBeDisabled('requires_batch_management_middle')
+								"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Requires Batch Management Last</ui5-label>
+								<ui5-switch #requires_batch_management_middle_switch id="requiresBatchManagementLastSwitch"
+									name="requires_batch_management_last"
+									[checked]="selectedMachine.requires_batch_management_last"
+									[(ngModel)]="selectedMachine.requires_batch_management_last" [disabled]="
+									shouldBeDisabled('requires_batch_management_last')
+								"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Limit Quantity to Packaging Target</ui5-label>
+								<ui5-switch #limit_quantity_to_packaging_target id="limitQuantityToPackagingTargetSwitch"
+									name="limit_quantity_to_packaging_target"
+									[checked]="selectedMachine.limit_quantity_to_packaging_target"
+									[(ngModel)]="selectedMachine.limit_quantity_to_packaging_target" [disabled]="
+									shouldBeDisabled('limit_quantity_to_packaging_target')
+								"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Auto Close Operation</ui5-label>
+								<ui5-switch #auto_close_operation id="autoCloseOperationSwitch" name="auto_close_operation"
+									[checked]="selectedMachine.auto_close_operation"
+									[(ngModel)]="selectedMachine.auto_close_operation"
+									[disabled]="shouldBeDisabled('auto_close_operation')"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Auto Print Middle Operation</ui5-label>
+								<ui5-switch #auto_print_middle_operation id="autoPrintMiiddleOperationSwitch" name="auto_print_middle_operation"
+									[checked]="selectedMachine.auto_print_middle_operation"
+									[(ngModel)]="selectedMachine.auto_print_middle_operation"
+									[disabled]="shouldBeDisabled('auto_print_middle_operation')"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Needs Operator For Production</ui5-label>
+								<ui5-switch #needs_operator_for_production id="needsOperatorForProductionSwitch" name="needs_operator_for_production"
+									[checked]="selectedMachine.needs_operator_for_production"
+									[(ngModel)]="selectedMachine.needs_operator_for_production"
+									[disabled]="shouldBeDisabled('needs_operator_for_production')"></ui5-switch>
+							</div>
+						</div>
+
+						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 xxl:grid-cols-5 gap-2 mt-3 sm:mt-[6rem] md:mt-3 xl:mt-3 xxl:mt-3">
+							<div class="flex-column">
+								<ui5-label show-colon required>{{ localization.id }}</ui5-label>
+								<ui5-busy-indicator [active]="isLoadingCustomId" size="S">
+									<ui5-input #customId="ngModel" [valueState]="
+										customId.valid == false &&
+										(customId.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: customIdState
+									" [(ngModel)]="selectedMachine.custom_id" name="custom_id" style="width: 100%" (input)="onChangeCustomId()"
+										[disabled]="shouldBeDisabled('custom_id')" [required]="true" id="customId">
+										<div *ngIf="customIdValueStateText" slot="valueStateMessage">
+											{{ customIdValueStateText }}
+										</div>
+									</ui5-input>
+								</ui5-busy-indicator>
+							</div>
+							<div class="flex-column">
+								<ui5-label show-colon i18n>Machine Group</ui5-label>
+								<ui5-busy-indicator [active]="isLoadingCustomId" size="S">
+									<ui5-combobox id="machineGroupComboBox" class="w-100" #machineGroupComboBox
+										[disabled]="shouldBeDisabled('machine_group')"
+										[value]="selectedMachine.machineGroup?.name || ''"
+										(selection-change)="onChangeMachineGroup($event)"
+										(input)="onMachineGroupInputChange($event)" (change)="
+										inputInvalidEntryRestrict(
+											$event,
+											selectedMachine.machineGroup?.name
+										)
+									">
+										<ng-container *ngFor="let machineGroup of machineGroups">
+											<ui5-cb-item *ngIf="machineGroup.is_active" id="{{ machineGroup.id }}"
+												[additionalText]="machineGroup.custom_id"
+												text="{{ machineGroup.name }}"></ui5-cb-item>
+										</ng-container>
+									</ui5-combobox>
+								</ui5-busy-indicator>
+							</div>												
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Hall</ui5-label>
+								<ui5-combobox #hallComboBox id="hallComboBox" class="w-100"
+									[value]="selectedMachine.hall?.name || ''" [disabled]="shouldBeDisabled('hall')"
+									(change)="inputInvalidEntryRestrict($event, selectedMachine.hall?.name)"
+									(selection-change)="onChangeHall($event)" (input)="onHallInputChange($event)">
+									<ng-container *ngFor="let hall of halls">
+										<ui5-cb-item *ngIf="hall.is_active" id="{{ hall.id }}"
+											[additionalText]="hall.custom_id" text="{{ hall.name }}">
+										</ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label show-colon required>{{ localization.name }}</ui5-label>
+								<ui5-input id="name" class="w-100" #nameInput="ngModel" [required]="true"
+									[disabled]="shouldBeDisabled('name')" [(ngModel)]="selectedMachine.name" [valueState]="
+									nameInput.valid == false &&
+									(nameInput.touched || createOrUpdateForm.submitted)
+										? 'Negative'
+										: 'None'
+								" (change)="onChangeName($event)" [disabled]="shouldBeDisabled('name')" name="name">
+								</ui5-input>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Usage Factor</ui5-label>
+								<ui5-input id="usageFactor" class="w-100" #usageFactorInput="ngModel"
+									[disabled]="shouldBeDisabled('usage_factor')" [(ngModel)]="selectedMachine.usage_factor"
+									(change)="onChangeUsageFactor($event)" name="usage_factor">
+								</ui5-input>
+							</div>
+							<div class="flex-column ">
+								<ui5-label i18n show-colon>Default Setup Time(m)</ui5-label>
+								<ui5-input id="defaultSetupTime" class="w-100" #defaultSetupTime="ngModel"
+									[disabled]="shouldBeDisabled('tr')" [(ngModel)]="selectedMachine.tr"
+									(change)="onChangeDefaultSetupTime($event)" name="tr">
+								</ui5-input>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Price</ui5-label>
+								<ui5-input #priceInput="ngModel" [(ngModel)]="selectedMachine.price"
+									(change)="onChangePrice($event)" [disabled]="shouldBeDisabled('price')" name="price"
+									class="w-100" id="priceInput">
+								</ui5-input>
+							</div>						
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Default Shift Model</ui5-label>
+								<ui5-combobox #shiftModelComboBox class="w-100"
+									[value]="selectedMachine.shiftModel?.custom_id || ''"
+									[disabled]="shouldBeDisabled('shiftModel')"
+									(selection-change)="onChangeShiftModel($event)">
+									<ng-container *ngFor="let shiftModel of shiftModels">
+										<ui5-cb-item [text]="shiftModel.custom_id"> </ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Machines State Id Default Production</ui5-label>
+								<ui5-combobox #machineStateDefaultProductionComboBox class="w-100"
+									[value]="selectedMachine.machineStateProduction?.name || ''"
+									(selection-change)="onChangeMachineStateDefaultProduction($event)"
+									[disabled]="shouldBeDisabled('machine_state_id_default_production')"
+									(input)="onMachineStateDefaultProductionInputChange($event)">
+									<ng-container *ngFor="let machineState of machineStates">
+										<ui5-cb-item *ngIf="machineState.is_active" id="{{ machineState.id }}"
+											[additionalText]="machineState.custom_id"
+											text="{{ machineState.name }}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Machines State Id Default Off</ui5-label>
+								<ui5-combobox #machineStateDefaultOffComboBox class="w-100"
+									[value]="selectedMachine.machineStateOff?.name || ''"
+									(input)="onMachineStateDefaultOffInputChange($event)"
+									(selection-change)="onChangeMachineStateDefaultOff($event)"
+									[disabled]="shouldBeDisabled('machine_state_id_default_off')">
+									<ng-container *ngFor="let machineState of machineStates">
+										<ui5-cb-item *ngIf="machineState.is_active" id="{{ machineState.id }}"
+											[additionalText]="machineState.custom_id"
+											text="{{ machineState.name }}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Host Iot Gateway</ui5-label>
+								<ui5-input class="w-100" id="host_iot_gateway" name="host_iot_gateway"
+									#hostIotGatewayInput="ngModel" [(ngModel)]="selectedMachine.host_iot_gateway">
+								</ui5-input>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Host Node Red</ui5-label>
+								<ui5-input id="host_node_red" class="w-100" #hostNodeRedInput="ngModel"
+									[disabled]="shouldBeDisabled('host_node_red')"
+									[(ngModel)]="selectedMachine.host_node_red" [valueState]="
+									hostNodeRedInput.valid == false &&
+									(hostNodeRedInput.touched || createOrUpdateForm.submitted)
+										? 'Negative'
+										: 'None'
+								" (change)="onChangeHostNodeRed($event)" name="host_node_red">
+								</ui5-input>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Printer Name</ui5-label>
+								<ui5-input id="printer_name" class="w-100" #printerNameInput="ngModel"
+									[disabled]="shouldBeDisabled('printer_name')" [(ngModel)]="selectedMachine.printer_name"
+									name="printer_name">
+								</ui5-input>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Sort Order</ui5-label>
+								<ui5-input id="sort_order" class="w-100" #sortOrderInput="ngModel"
+									pattern="^[0-9]*$"
+									type="Number"
+									[disabled]="shouldBeDisabled('sort_order')" [(ngModel)]="selectedMachine.sort_order"
+									name="sort_order">
+								</ui5-input>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon required>Statusboard Card Type</ui5-label>
+								<ui5-combobox id="statusBoardCardTypeCombobox" class="w-100" #status_board_card_type
+									[value]="selectedMachine.status_board_card_type" (change)="
+									inputValueRestrict($event, selectedMachine.status_board_card_type)
+								" name="status_board_card_type" (selection-change)="onChangeStatusBoardCardType($event)"
+									[disabled]="shouldBeDisabled('status_board_card_type')">
+									<ui5-cb-item *ngFor="let item of statusBoardCardTypeItems"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+	                        <div class="flex-column ">
+								<ui5-label i18n show-colon required>Machineboard Type</ui5-label>
+								<ui5-combobox id="machineBoardTypeCombobox" class="w-100" #machine_board_type
+									[value]="selectedMachine.machine_board_type"
+									(selection-change)="onChangeMachineBoardType($event)"
+									[disabled]="shouldBeDisabled('machine_board_type')" (change)="
+									inputValueRestrict($event, selectedMachine.machine_board_type)
+								">
+									<ui5-cb-item *ngFor="let item of machineBoardTypeItems"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon required>Production Plan Type</ui5-label>
+								<ui5-combobox #production_plan_type id="productionPlanTypeCombobox" class="w-100"
+									[value]="selectedMachine.production_plan_type || ''" (change)="
+									inputValueRestrict($event, selectedMachine.production_plan_type)
+								" (selection-change)="onChangeProductionPlan($event)" [disabled]="shouldBeDisabled('production_plan_type')">
+									<ui5-cb-item *ngFor="let item of productionPlanTypeItems"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon required>Machine State Type
+								</ui5-label>
+								<ui5-combobox #machine_state_type id="machineStateTypeCombobox" class="w-100"
+									[value]="selectedMachine.machine_state_type"
+									[disabled]="shouldBeDisabled('machine_state_type')" (change)="
+									inputValueRestrict($event, selectedMachine.machine_state_type)
+								" (selection-change)="onChangeMachineState($event)">
+									<ui5-cb-item *ngFor="let item of machineStateTypeItems"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon required>Confirmation Type</ui5-label>
+								<ui5-combobox #confirmation_type id="confirmationTypeCombobox" class="w-100"
+									[value]="selectedMachine.confirmation_type"
+									(change)="inputValueRestrict($event, selectedMachine.confirmation_type)"
+									(selection-change)="onChangeMachineConfirmation($event)"
+									[disabled]="shouldBeDisabled('confirmation_type')" name="confirmation_type">
+									<ui5-cb-item *ngFor="let item of machineConfirmationTypeItems"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Standard Value Key</ui5-label>
+								<ui5-combobox #standardValueKeyComboBox id="standardValueKeyComboBox" class="w-100"
+									[value]="selectedMachine.standardValueKey?.custom_id || ''"
+									[disabled]="shouldBeDisabled('standardValueKey')"
+									(input)="onStandardValueKeyInputChange($event)" (change)="
+									inputInvalidEntryRestrict(
+										$event,
+										selectedMachine.standardValueKey?.custom_id
+									)
+								" (selection-change)="onChangeStandardValueKey($event)">
+									<ng-container *ngFor="let standardValueKey of standardValueKeys">
+										<ui5-cb-item *ngIf="standardValueKey.is_active" id="{{ standardValueKey.id }}"
+											text="{{ standardValueKey.custom_id }}">
+										</ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Machineboard Hours</ui5-label>
+								<ui5-input #machineBoardHoursInput="ngModel"
+									[(ngModel)]="selectedMachine.machine_board_hours" pattern="^[0-9]*$"
+									(change)="onChangeMachineHours($event)"
+									[disabled]="shouldBeDisabled('machine_board_hours')" name="machine_board_hours"
+									class="w-100" id="machineBoardHoursInput">
+								</ui5-input>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Machine Component Serial Number Profile</ui5-label>
+								<ui5-multi-combobox #typeRef (ui5SelectionChange)="onSerialNumberProfileChange()"
+									i18n-placeholder class="w-full">
+									<ui5-mcb-item *ngFor="let serialNumberProfile of serialNumberProfiles"
+										id="{{ serialNumberProfile.id }}" [selected]="
+										selectedSerialNumberProfile.includes(serialNumberProfile.id)
+									" text="{{ serialNumberProfile.custom_id }}"></ui5-mcb-item>
+								</ui5-multi-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Machine Middle Serial Number Profile</ui5-label>
+								<ui5-multi-combobox #machineMiddleSerialNumberProfileref
+									(ui5SelectionChange)="onMachineMiddleSerialNumberProfileChange()" i18n-placeholder
+									class="w-full">
+									<ui5-mcb-item *ngFor="let serialNumberProfile of serialNumberProfiles"
+										id="{{ serialNumberProfile.id }}" [selected]="
+										selectedMiddleSerialNumberProfile.includes(
+											serialNumberProfile.id
+										)
+									" text="{{ serialNumberProfile.custom_id }}"></ui5-mcb-item>
+								</ui5-multi-combobox>
+							</div>
+							<div class="flex-column ">
+								<ui5-label i18n show-colon>Machine Last Serial Number Profile</ui5-label>
+								<ui5-multi-combobox #machineLastSerialNumberProfileref
+									(ui5SelectionChange)="onMachineLastSerialNumberProfileChange()" i18n-placeholder
+									class="w-full">
+									<ui5-mcb-item *ngFor="let serialNumberProfile of serialNumberProfiles"
+										id="{{ serialNumberProfile.id }}" [selected]="
+										selectedLastSerialNumberProfile.includes(serialNumberProfile.id)
+									" text="{{ serialNumberProfile.custom_id }}"></ui5-mcb-item>
+								</ui5-multi-combobox>
+							</div>						
+							<div class="flex-column">
+								<ui5-label i18n show-colon required>Constraint Type</ui5-label>
+								<ui5-combobox #constraint_type id="constraintTypeCombobox" class="w-100"
+									[value]="selectedMachine.constraint_type!"
+									[disabled]="shouldBeDisabled('constraint_type')" (change)="
+									inputValueRestrict($event, selectedMachine.constraint_type)
+								" (selection-change)="onChangeMachineConstraint($event)">
+									<ui5-cb-item *ngFor="let item of machineConstraints"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column ">
+								<ui5-label i18n show-colon required>Quantity Type</ui5-label>
+								<ui5-combobox #quantity_type id="quantityTypeCombobox" class="w-100"
+									[value]="selectedMachine.quantity_type" [disabled]="shouldBeDisabled('quantity_type')"
+									(change)="inputValueRestrict($event, selectedMachine.quantity_type)"
+									(selection-change)="onChangeQuantityType($event)">
+									<ui5-cb-item *ngFor="let item of quantityTypeItems"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon required>Machine Board State Type</ui5-label>
+								<ui5-combobox #machine_board_state_type id="machineBoardStateTypeCombobox" class="w-100"
+									[value]="selectedMachine.machine_board_state_type"
+									[disabled]="shouldBeDisabled('machine_board_state_type')" (change)="
+									inputValueRestrict($event, selectedMachine.machine_board_state_type)
+								" (selection-change)="onChangeMachineBoardState($event)">
+									<ui5-cb-item *ngFor="let item of machineBoardStateTypeItems"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+					</div>
+					</div>
+				</ui5-busy-indicator>
+			</form>
+		</div>
+		<div [ngStyle]="{ display: selectedTab != 'machine_states' ? 'none' : '' }">
+			<ui5-card class="">
+				<div class="2xl:h-[652px] xl:h-[552px] lg:h-[325px] h-[250px] ">
+					<app-associate-table [headerTitle]="machineStateTableTitle" [buttonText]="associateButtonText"
+						[columns]="machineStatesColumns" [data]="associateData"
+						(buttonClick)="onClickAssociateButton('machine_states')" (searchInput)="machineStateSearch($event)"
+						[loading]="isLoadingBatchCall">
+					</app-associate-table>
+				</div>
+			</ui5-card>
+		</div>
+		<div class="" [ngStyle]="{ display: selectedTab != 'item_states' ? 'none' : '' }">
+			<ui5-card class="">
+				<div class="2xl:h-[652px] xl:h-[552px] lg:h-[325px] h-[250px]">
+					<app-associate-table [headerTitle]="itemStateTableTitle" [buttonText]="associateButtonText"
+						[columns]="itemStateColumns" [data]="associateData"
+						(buttonClick)="onClickAssociateButton('item_states')" (searchInput)="itemStateSearch($event)"
+						[loading]="isLoadingBatchCall">
+					</app-associate-table>
+				</div>
+			</ui5-card>
+		</div>
+		<div class="" [ngStyle]="{ display: selectedTab != 'modules' ? 'none' : '' }">
+			<div class="flex flex-row 2xl:h-[652px] lg:h-[325px] h-[250px]">
+				<div>
+					<ui5-label show-colon i18n>Statusboard</ui5-label>
+					<ui5-switch [checked]="showStatusBoard" id="statusBoardSwitch"
+						(change)="onStatusBoardSwitchChange($event)" class="w-100">
+					</ui5-switch>
+				</div>
+				<div>
+					<ui5-label show-colon i18n>PlanVisu</ui5-label>
+					<ui5-switch id="planVisuSwitch" [checked]="showPlanVisu" (change)="onPlanVisuSwitchChange($event)"
+						class="w-100">
+					</ui5-switch>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			id="cancelButton"
+			design="Transparent"
+			class="ml-8 border-none"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+<!-- item state associate dialog  -->
+<app-dialog [isDialogOpen]="isAssociateDialogOpen">
+	<div
+		slot="header"
+		class="w-full">
+		<div class="flex flex-row justify-between">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ associateDialogTitle }} ({{ selectedTab === 'item_states' ? filteredItemState.length : filteredMachineState.length }})
+			</ui5-title>
+			<app-associate-selector
+				(selectionEvent)="selectAllAssociate($event)"
+				[enableSelection]="isDeselectEnable"></app-associate-selector>
+		</div>
+		<ui5-input
+			id="searchInput"
+			class="w-full"
+			slot="searchField"
+			[(ngModel)]="searchedValue"
+			(input)="onSearchAssocitesInput($event)">
+			<ui5-icon
+				name="search"
+				slot="icon"
+				ui5-icon=""></ui5-icon>
+		</ui5-input>
+	</div>
+	<div class="h-[556px] w-[518px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="S">
+			<ui5-list
+				*ngIf="selectedTab === 'item_states'"
+				selectionMode="Multiple"
+				class="w-[518px]"
+				(selectionChange)="selectionChangeForItemState($event)">
+				<ui5-li
+					class="w-100"
+					*ngFor="let itemState of filteredItemState"
+					[selected]="itemState.isSelected"
+					[id]="itemState.id">
+					{{ itemState.custom_id }} | {{ itemState.name }}
+				</ui5-li>
+			</ui5-list>
+			<ui5-list
+				*ngIf="selectedTab === 'machine_states'"
+				selectionMode="Multiple"
+				class="w-[518px]"
+				(selectionChange)="selectionChangeForMachineState($event)">
+				<ui5-li
+					class="w-100"
+					*ngFor="let machineState of filteredMachineState"
+					[selected]="machineState.isSelected"
+					[id]="machineState.id">
+					{{ machineState.custom_id }} | {{ machineState.name }}
+				</ui5-li>
+			</ui5-list>
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			*ngIf="selectedTab === 'item_states'"
+			design="Emphasized"
+			id="saveButtonMachineState"
+			(click)="onSaveItemStateAssociate()"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			*ngIf="selectedTab === 'machine_states'"
+			design="Emphasized"
+			id="saveButtonMachineState"
+			(click)="onSaveMachineStateAssociate()"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			design="Transparent"
+			id="cancelButtonMachineState"
+			(click)="cancelDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<app-associate-preview-dialog
+	[isPreviewDialogOpen]="isPreviewDialogOpen"
+	[title]="associateDialogTitle"
+	[columns]="associateColumns"
+	[data]="associateData"
+	(closeAssociate)="closeAssociateDialog()"></app-associate-preview-dialog>
+
+<ui5-dialog
+	#errorDialogMachines
+	id="errorDialogMachines"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

@@ -1,0 +1,238 @@
+
+<div class="w-100 flex justify-center" style="display: none;">
+	<ui5-bar class="mt-[10px] w-[99%]">
+		<ui5-multi-combobox
+			#hallRef
+			id="hallMultiComboBox"
+			(selectionChange)="selectHall($event)"
+			placeholder="Select Hall"
+			i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item
+				*ngFor="let hall of halls"
+				text="{{ hall.custom_id }} - {{ hall.name }}"
+				[id]="hall.id">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+
+		<ui5-daterange-picker
+			(change)="changeDate($event)"
+			placeholder="Pick Date Range"
+			i18n-placeholder
+			[value]="
+				momentInstance.utc(start).local().format('DD/MM/YYYY') +
+				' - ' +
+				momentInstance.utc(end).local().format('DD/MM/YYYY')
+			"
+			formatPattern="dd/MM/YYYY">
+		</ui5-daterange-picker>
+		<ui5-button
+			class=""
+			design="Emphasized"
+			(click)="onGo()"
+			i18n
+			[disabled]="isBusy"
+			>Go</ui5-button
+		>
+		<ui5-button
+			class=""
+			design="Emphasized"
+			(click)="onReset()"
+			i18n
+			[disabled]="isBusy"
+			>Reset</ui5-button
+		>
+	</ui5-bar>
+</div>
+
+	<div class="box1 mr-[10px]">
+		<app-gantt #gantt [viewPresetfromUserScheduler]="getPrest" (dataFilterEmmiter)="getDataFilter($event)"></app-gantt>
+	</div>
+	<div
+	class="ml-[10px] mb-[15px] app-scheduler-two box2">
+	<bryntum-scheduler-pro-project-model
+		#project
+		[autoLoad]="projectProps.autoLoad!"
+		[loadUrl]="projectProps.loadUrl!"
+		[resourceStore]="projectProps.resourceStore!"
+		[eventStore]="projectProps.eventStore!"
+		[validateResponse]="projectProps.validateResponse!">
+	</bryntum-scheduler-pro-project-model>
+
+	<div
+		id="content"
+		class="b-side-by-side relative"
+		(touchstart)="touchStart($event)">
+		<ui5-busy-indicator
+			class="h-full w-full"
+			[active]="!isEverythingLoaded || isBusy">
+			<bryntum-scheduler-pro
+				#schedulerPro
+				[project]="project"
+				[startDate]="schedulerProProps.startDate!"
+				[rowHeight]="30"
+				[barMargin]="2"
+				[endDate]="schedulerProProps.endDate!"
+				[viewPreset]="schedulerProProps.viewPreset!"
+				[columns]="schedulerProProps.columns!"
+				[allowOverlap]="true"
+				[tbar]="schedulerProProps.tbar!"
+				eventStyle="border"
+				[useInitialAnimation]="schedulerProProps.useInitialAnimation!"
+				[stripeFeature]="true"
+				[columnLinesFeature]="schedulerProProps.columnLinesFeature!"
+				[filterBarFeature]="schedulerProProps.filterBarFeature!"
+				[calendarHighlightFeature]="schedulerProProps.calendarHighlightFeature!"
+				[eventDragFeature]="schedulerProProps.eventDragFeature!"
+				[taskEditFeature]="false"
+				[allowCreate]="false"
+				(onEventClick)="onEventClick($event)"
+				[eventTooltipFeature]="false"
+				[scheduleTooltipFeature]="false"
+				[createEventOnDblClick]="false"
+				[sortFeature]="true"
+				[presets]="presets"
+				[eventTooltipFeature]="false"
+				[scheduleTooltipFeature]="false"
+				[allowCreate]="false"
+				(onEventDrag)="eventDrag($event)"
+				[eventDragCreateFeature]="false"
+				[scheduleMenuFeature]="false"
+				(onTimeAxisChange)="timeAxisChange$.next($event)"
+				[timeRangesFeature]="{ showCurrentTimeLine: true }"
+				[eventMenuFeature]="eventMenuFeature!"
+				[timeSpanHighlightFeature]="true"
+				[dependenciesFeature]="dependenciesFeatures"
+				[createEventOnDblClick]="false"
+				[eventDragCreateFeature]="false">
+			</bryntum-scheduler-pro>
+      <bryntum-splitter></bryntum-splitter>
+
+			<div
+				id="unplannedgrid"
+				class="hidden h-full mr-[10px]">
+				<bryntum-grid
+					#grid
+					cls="b-unplannedgrid"
+					[selectionMode]="gridProps.selectionMode!"
+					[rowHeight]="30"
+					[columns]="gridProps.columns!"
+					[tbar]="gridProps.tbar!"
+					[sortFeature]="gridProps.sortFeature!"
+					[stripeFeature]="gridProps.stripeFeature!"
+					[disableGridRowModelWarning]="gridProps.disableGridRowModelWarning!"
+					(onSelectionChange)="onGridSelectionChange()!"
+					[cellMenuFeature]="false"
+					[minWidth]="400">
+				</bryntum-grid>
+			</div>
+		</ui5-busy-indicator>
+	</div>
+</div>
+
+<ui5-dialog id="timeSplitModal" class="w-[40vw] bg-gray-100  max-h-[400px]">
+    <ui5-bar slot="header" class="h-[44px]" design="Header">
+		<ui5-title level="H5" slot="startContent" i18n>Split time</ui5-title>
+		<ui5-button slot="endContent" design="Emphasized" [disabled]="isLoading" (click)="addSplit()" id="createOrder" i18n>Add Split</ui5-button>
+	</ui5-bar>
+	<div >
+		@if(selectCapacity && !isLoading){
+			<p>
+				User Capacity date time : <b>	{{this.selectStartTime }} </b> to <b>{{this.selectEntTime}}</b>
+			</p>
+		}
+		<ui5-busy-indicator [active]="isLoading"
+			class="rounded-md shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] w-full h-full">
+			<ui5-table id="table" class="h-full w-full">
+				<ui5-table-header-row class="list-table" slot="headerRow" >
+					<ui5-table-header-cell class="overflow-hidden w-[15%]" id="orderNumber" i18n>Machine</ui5-table-header-cell>
+					<ui5-table-header-cell class="overflow-hidden w-[24%]" id="startTime" i18n>Start Time</ui5-table-header-cell>
+					<ui5-table-header-cell class="overflow-hidden w-[24%]" id="endTime" i18n>End Time</ui5-table-header-cell>
+					<ui5-table-header-cell class="overflow-hidden w-[24%]" id="endTime" i18n>Action</ui5-table-header-cell>
+				</ui5-table-header-row>
+				@for (data of machineUserPlanTimes; track $index) {
+					<ui5-table-row class="list-table-item" >
+						<ui5-table-cell><ui5-label>{{ data?.machine?.custom_id}} - {{data?.machine?.name}}</ui5-label></ui5-table-cell>
+						<ui5-table-cell>
+							<ui5-datetime-picker  [ngModel]="data.start_time | date: 'YYYY-MM-dd HH:mm'"
+								(ngModelChange)="onChangeStartTime($event,$index)" formatPattern="YYYY-MM-dd HH:mm"></ui5-datetime-picker>
+							</ui5-table-cell>
+							<ui5-table-cell>
+								<ui5-datetime-picker  [ngModel]="data.end_time | date: 'YYYY-MM-dd HH:mm'"
+								(ngModelChange)="onChangeEndTime($event,$index)" formatPattern="YYYY-MM-dd HH:mm"></ui5-datetime-picker>
+							</ui5-table-cell>
+							<ui5-table-cell>
+								<ui5-button
+								design="Emphasized"
+								icon="delete"
+								[disabled]="$index == 0"
+								(click)="deletePlan(data,$index)"
+								i18n></ui5-button>
+							</ui5-table-cell>
+					</ui5-table-row>
+				}
+			</ui5-table>
+		</ui5-busy-indicator>
+	</div>
+  <div
+      slot="footer"
+      class="footer-style rounded-es-xl rounded-ee-xl">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+                design="Transparent"
+                (click)="closeModal('timeSplitModal')"
+                i18n>Close</ui5-button>
+			<ui5-button
+                design="Emphasized"
+                (click)="updateSplitTime()"
+                i18n>Update</ui5-button>
+	
+		</div>
+	</div>
+
+</ui5-dialog>
+
+<ui5-dialog id="capacityWarning" state="Information"  class="w-[25vw] bg-gray-100  max-h-[400px]">
+    <ui5-bar slot="header" class="h-[44px]" design="Header">
+		<ui5-title level="H5" slot="startContent" i18n>Warning</ui5-title>
+	</ui5-bar>
+	<div>
+		<p i18n>This machine does not have any capacity within the time period.</p>
+	</div>
+  <div
+      slot="footer"
+      class="footer-style rounded-es-xl rounded-ee-xl">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+                design="Default"
+                (click)="closeModal('capacityWarning', 'capacityWarning')"
+                i18n>Ok</ui5-button>
+			<ui5-button
+                design="Transparent"
+                (click)="closeModal('capacityWarning', 'capacityWarning')"
+                i18n>Close</ui5-button>
+		</div>
+	</div>
+
+</ui5-dialog>
+<ui5-dialog id="hallWarning" state="Negative"  class="w-[25vw] bg-gray-100  max-h-[400px]">
+    <ui5-bar slot="header" class="h-[44px]" design="Header">
+		<ui5-title level="H5" slot="startContent" i18n>Warning</ui5-title>
+	</ui5-bar>
+	<div>
+		<p i18n>User and Machine are not in same hall.</p>
+	</div>
+  <div
+      slot="footer"
+      class="footer-style rounded-es-xl rounded-ee-xl">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+                design="Transparent"
+                (click)="closeModal('hallWarning', 'hallWarning')"
+                i18n>Close</ui5-button>
+		</div>
+	</div>
+
+</ui5-dialog>
+	
+

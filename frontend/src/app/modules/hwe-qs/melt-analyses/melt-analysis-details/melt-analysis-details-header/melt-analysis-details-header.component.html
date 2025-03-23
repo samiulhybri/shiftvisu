@@ -1,0 +1,114 @@
+<kendo-card width="100" *ngIf="meltAnalysis">
+    <kendo-card-header class="k-hstack" i18n>
+        Melt Analysis
+    </kendo-card-header>
+    <kendo-card-body>
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="custom_id" i18n i18n-text text="Melting number:"><span
+                        class="k-text-error k-pl-1">*</span></kendo-label>
+                <kendo-textbox #custom_id name="custom_id" [(ngModel)]="meltAnalysis.custom_id"></kendo-textbox>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="Giesstyp" i18n i18n-text text="Casting Type:"> </kendo-label>
+                <kendo-textbox #Giesstyp disabled="disabled" [ngModel]="selectedItem?.hwe_cast_type"></kendo-textbox>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="material_analysis" i18n i18n-text text="Material Analysis:"> </kendo-label>
+                <kendo-combobox #material_analysis [(ngModel)]="meltAnalysis.materialAnalysis" name="material_analysis"
+                    [data]="materialAnalysisList" textField="custom_id" valueField="id" [style.width]="'50%'"
+                    [filterable]="true" (filterChange)="handleFilter($event, 'material_analysis')">
+                </kendo-combobox>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="hwe_block_geometry" i18n i18n-text text="Blockformat:"> </kendo-label>
+                <kendo-textbox #hwe_block_geometry disabled="disabled"
+                    [ngModel]="selectedItem?.hwe_block_geometry"></kendo-textbox>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="supplier_name" i18n i18n-text text="Supplier Name:"> </kendo-label>
+                <kendo-textbox #supplier_name disabled="disabled" [ngModel]="selectedItem?.hwe_supplier_name"></kendo-textbox>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="delivery_specification" i18n i18n-text text="Delivery specification:"></kendo-label>
+                <kendo-textbox name="delivery_specification" [(ngModel)]="meltAnalysis.delivery_specification"
+                    #delivery_specification></kendo-textbox>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="item" i18n i18n-text text="Item Number:"> </kendo-label>
+                <kendo-combobox #item [(ngModel)]="meltAnalysis.item" name="item" [data]="items" textField="custom_id"
+                    valueField="id" [style.width]="'50%'" [filterable]="true" (valueChange)="onValueChange($event, 'item')"
+                    (filterChange)="handleFilter($event, 'item')">
+                </kendo-combobox>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="year" i18n i18n-text text="Year:"></kendo-label>
+                <kendo-datepicker [format]="'yyyy'" activeView="decade" bottomView="decade"
+                    [(ngModel)]="meltAnalysis.year" #year></kendo-datepicker>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="material_number" i18n i18n-text text="Material Number:"> </kendo-label>
+                <kendo-textbox #material_number disabled="disabled"
+                    [ngModel]="selectedItem?.hwe_supplier_no"></kendo-textbox>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="melting_type" i18n i18n-text text="Melting type:"></kendo-label>
+                <kendo-combobox #melting_type [(ngModel)]="meltAnalysis.melting_type" name="melting_type" [data]="hweMeltTypes"
+                    textField="text" valueField="value" [valuePrimitive]="true" [style.width]="'50%'" [filterable]="true"
+                    (filterChange)="handleFilter($event, 'melting_type')">
+                </kendo-combobox>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="material_name" i18n i18n-text text="Material Name:"> </kendo-label>
+                <kendo-textbox #material_name disabled="disabled"
+                    [ngModel]="selectedItem?.hwe_material_name"></kendo-textbox>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="radioactivity" i18n i18n-text text="Radioactivity:"></kendo-label>
+                <kendo-combobox #radioactivity [(ngModel)]="meltAnalysis.radioactivity" name="radioactivity"
+                    [data]="hweRadioactivityTypes" textField="text" [valuePrimitive]="true" valueField="value" [style.width]="'50%'"
+                    [filterable]="true" (filterChange)="handleFilter($event, 'radioactivity')">
+                </kendo-combobox>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="quality" i18n i18n-text text="Purchase Order"> </kendo-label>
+                <kendo-textbox #purchase_order
+                    [(ngModel)]="meltAnalysis.purchase_order"></kendo-textbox>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="quality" i18n i18n-text text="Purchase Order Pos"> </kendo-label>
+                <kendo-textbox #purchase_order_pos
+                    [(ngModel)]="meltAnalysis.purchase_order_pos"></kendo-textbox>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-label [for]="quality" i18n i18n-text text="Quality"> </kendo-label>
+                <kendo-combobox #quality [(ngModel)]="meltAnalysis.quality_6336_5" name="quality"
+                    [data]="hweMeltQualityTypes" [valuePrimitive]="true" textField="text" valueField="value" [style.width]="'50%'"
+                    [filterable]="true" (filterChange)="handleFilter($event, 'quality')">
+                </kendo-combobox>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+    </kendo-card-body>
+</kendo-card>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

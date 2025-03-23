@@ -1,0 +1,187 @@
+<div [formGroup]="form" style="height: 100%;">
+    <kendo-card class="summery-container" *ngIf="data != undefined">
+        <kendo-card-header class="k-hstack" style="width: 100%;">
+            <kendo-gridlayout class="summery-header-layout" [gap]="{ rows: 10, cols: 10 }" style="width: 100%;" [cols]="[{width: 150 },{width: 'auto' }]"
+                [align]="{ horizontal: 'start', vertical: 'middle' }">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="k-text-inverse" i18n="Summary Header">Summary</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="2" style="width: 100%;">
+                    <label class="k-text-inverse" style="display: inline-flex; float: right;">
+                        <span class="label-inline" style="font-weight: 600;" i18n>Closed</span>
+                        <kendo-combobox formControlName="is_closed" [(ngModel)]="data.is_closed"
+                            [data]="yesNoTypeDS"  [valuePrimitive]="true" textField="text" valueField="value"
+                            [filterable]="true" (filterChange)="handleFilter($event)" style="width: 120px;"
+                            [class.formError]="form.get('is_closed').invalid" required  [clearButton]="false">
+                        </kendo-combobox>
+                    </label>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </kendo-card-header>
+        <kendo-card-body class="summary_table_body">
+            <div class="summary-table">
+                <kendo-listview [data]="summaryData" style="border-radius: 8px; height: 100%;">
+                    <ng-template kendoListViewItemTemplate let-dataItem="dataItem">
+                        <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }" [cols]="[{width: 200 },{width: 'auto' },{width: 100 }]" [rowClass]="rowCallBack">
+                            <kendo-gridlayout-item [row]="1" [col]="1">
+                                <div class="k-text-inverse k-font-weight-bold" i18n="Summary Table Header">Areas</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="1" [col]="2">
+                                <div class="k-text-inverse k-font-weight-bold" style=" text-align: center;" i18n="Summary Table Header">Costs</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="1" [col]="3">
+                                <div class="k-text-inverse k-font-weight-bold" style=" text-align: center;" i18n="Summary Table Header">Surplus</div>
+                            </kendo-gridlayout-item>
+
+                            <kendo-gridlayout-item [row]="2" [col]="1">
+                                <div class="k-text-inverse" i18n="Summary Values">Material</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="2" [col]="2">
+                                <kendo-numerictextbox formControlName="total_material" class="number-right-align"
+                                    tabindex="-1"
+                                    placeholder="{{intl.formatNumber(data.getTotalCostGroup(costGroup.MATERIAL), 'c', 'it')}}"
+                                    format="c2" [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="2" [col]="3">
+                                <kendo-numerictextbox [(ngModel)]="data.surplus_material" class="number-right-align"
+                                    [spinners]="false" formControlName="surplus_material"
+                                    format="#.##\%" [disabled]="data.is_closed" [min]="0" [max]="999"
+                                    (valueChange)="onChange($event, 'material')" (keydown.enter)="onBlur()" (blur)="onBlur()">
+                                </kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="3" [col]="1">
+                                <div class="k-text-inverse" i18n="Summary Values">External</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="3" [col]="2">
+                                <kendo-numerictextbox formControlName="total_external" class="number-right-align"
+                                    tabindex="-1"
+                                    placeholder="{{intl.formatNumber(data.getTotalCostGroup(costGroup.EXTERNAL), 'c', 'it')}}"
+                                    format="c2" [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="3" [col]="3">
+                                <kendo-numerictextbox [(ngModel)]="data.surplus_external" class="number-right-align"
+                                    [spinners]="false" formControlName="surplus_external"  [min]="0" [max]="999"
+                                    format="#.##\%" [disabled]="data.is_closed" 
+                                    (valueChange)="onChange($event, 'external')" (keydown.enter)="onBlur()" (blur)="onBlur()">
+                                </kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="4" [col]="1">
+                                <div class="k-text-inverse" i18n="Summary Values">Internal Personnel</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="4" [col]="2" style="display: inline-flex;"> 
+                                <kendo-numerictextbox formControlName="total_personnel_hours" class="number-right-align"
+                                    tabindex="-1" style="width: 100px; margin-right: 5px;"
+                                    placeholder="{{data.getTotalInternalHours('personnel')}} h"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                                <kendo-numerictextbox formControlName="total_internal_personnel" class="number-right-align"
+                                    tabindex="-1"
+                                    placeholder="{{intl.formatNumber(data.getTotalInternal('personnel'), 'c', 'it')}}"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="4" [col]="3">
+                                <kendo-numerictextbox [(ngModel)]="data.surplus_internal_personnel" class="number-right-align"
+                                    [spinners]="false" formControlName="surplus_internal_personnel"  [min]="0" [max]="999"
+                                    format="#.##\%" [disabled]="data.is_closed" 
+                                    (valueChange)="onChange($event, 'internal_personnel')" (keydown.enter)="onBlur()" (blur)="onBlur()">
+                                </kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="5" [col]="1">
+                                <div class="k-text-inverse" i18n="Summary Values">Internal Machine</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="5" [col]="2" style="display: inline-flex;"> 
+                                <kendo-numerictextbox formControlName="total_machine_hours" class="number-right-align"
+                                    tabindex="-1" style="width: 100px; margin-right: 5px;"
+                                    placeholder="{{data.getTotalInternalHours('machine')}} h"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                                <kendo-numerictextbox formControlName="total_internal_machine" class="number-right-align"
+                                    tabindex="-1"
+                                    placeholder="{{intl.formatNumber(data.getTotalInternal('machine'), 'c', 'it')}}"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="5" [col]="3">
+                                <kendo-numerictextbox [(ngModel)]="data.surplus_internal_machine" class="number-right-align"
+                                    [spinners]="false" formControlName="surplus_internal_machine" [min]="0" [max]="999"
+                                    format="#.##\%" [disabled]="data.is_closed" 
+                                    (valueChange)="onChange($event, 'internal_machine')" (keydown.enter)="onBlur()" (blur)="onBlur()">
+                                </kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <!-- <kendo-gridlayout-item [row]="6" [col]="1" [hidden]="true">
+                                <div class="k-text-inverse" i18n="Summary Values">Internal</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="6" [col]="2" style="display: inline-flex;" [hidden]="true"> 
+                                <kendo-numerictextbox formControlName="total_hours" class="number-right-align"
+                                    tabindex="-1" style="width: 100px; margin-right: 5px;"
+                                    placeholder="{{data.getTotalInternalHours()}} h"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                                <kendo-numerictextbox formControlName="total_internal" class="number-right-align"
+                                    tabindex="-1"
+                                    placeholder="{{intl.formatNumber(data.getTotalCostGroup(costGroup.INTERNAL), 'c', 'it')}}"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="6" [col]="3" [hidden]="true">
+                                <kendo-numerictextbox [(ngModel)]="data.surplus_internal" class="number-right-align"
+                                    [spinners]="false" formControlName="surplus_internal" [min]="0" [max]="999"
+                                    format="#.##\%" [readonly]="true"
+                                    (valueChange)="onChange($event, 'internal')" (keydown.enter)="onBlur()" (blur)="onBlur()">
+                                </kendo-numerictextbox>
+                            </kendo-gridlayout-item> -->
+                            <kendo-gridlayout-item [row]="6" [col]="1">
+                                <div class="k-text-inverse" i18n="Summary Values">Total</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="6" [col]="2">
+                                <kendo-textbox placeholder="{{intl.formatNumber(data.getTotal(), 'c', 'it')}}"
+                                    class="number-right-align" tabindex="-1" formControlName="total" [spinners]="false"
+                                    [readonly]="true"></kendo-textbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="6" [col]="3">
+                                <kendo-numerictextbox placeholder="{{data.getTotalSurplusPercentage()}}%"
+                                    class="number-right-align" tabindex="-1" formControlName="total_margin_per" format="p"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="7" [col]="1">
+                                <div class="k-text-inverse" i18n="Summary Values">Price with surplus</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="7" [col]="2">
+                                <kendo-numerictextbox placeholder="{{intl.formatNumber(data.getTotalSurplus(), 'c', 'it')}}"
+                                    tabindex="-1" class="number-right-align" formControlName="total_surplus"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="7" [col]="3">
+                                <kendo-numerictextbox [(ngModel)]="data.surplus_total" class="number-right-align"
+                                    [spinners]="false" formControlName="surplus_total"  [min]="0" [max]="999"
+                                    format="#.##\%" [disabled]="data.is_closed" 
+                                    (valueChange)="onChange($event, 'total')" (keydown.enter)="onBlur()" (blur)="onBlur()">
+                                </kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+    
+                            <kendo-gridlayout-item [row]="8" [col]="1">
+                                <div class="k-text-inverse k-font-weight-bold" i18n="Summary Values">Margin</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="8" [col]="2">
+                                <kendo-numerictextbox placeholder="{{intl.formatNumber(data.getMargin(), 'c', 'it')}}"
+                                    class="number-right-align" tabindex="-1" formControlName="total_margin" format="c2"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="8" [col]="3">
+                                <kendo-numerictextbox placeholder="{{data.getMarginPercentage()}}%"
+                                    class="number-right-align" tabindex="-1"
+                                    [ngStyle]="getBackgroundLogicColor(data.getMarginPercentage())"
+                                    formControlName="total_sales_margin" format="p" [spinners]="false"
+                                    [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="9" [col]="1">
+                                <div class="k-text-inverse k-font-weight-bold" i18n="Summary Values">Sales Price</div>
+                            </kendo-gridlayout-item>
+                            <kendo-gridlayout-item [row]="9" [col]="2">
+                                <kendo-numerictextbox
+                                    placeholder="{{intl.formatNumber(data.getTotalSalesPrice(), 'c', 'it')}}"
+                                    class="number-right-align" tabindex="-1" formControlName="total_sales" format="c2"
+                                    [spinners]="false" [readonly]="true"></kendo-numerictextbox>
+                            </kendo-gridlayout-item>
+                        </kendo-gridlayout>
+                    </ng-template>
+                </kendo-listview>
+            </div>
+        </kendo-card-body>
+    </kendo-card>
+</div>

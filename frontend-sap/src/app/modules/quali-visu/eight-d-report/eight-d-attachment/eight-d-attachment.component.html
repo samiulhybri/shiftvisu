@@ -1,0 +1,22 @@
+<ui5-busy-indicator
+	[active]="isSaving"
+	class="w-full">
+	<div class="h-[calc(100vh-375px)] w-full flex justify-center items-center">
+		<app-attachment-upload
+			class="h-full w-full"
+			#eightDAttachment
+			[model]="'eightDReport'"
+			[uploadedFiles]="tempFiles"
+			[deletedFiles]="deletedSavedFiles"
+			[modelId]="eightDReportId"
+			[checkNewFiles]="checkForNewAttachments"
+			[fileCount]="attachmentCount"
+			[modalType]="!eightDReportId ? 'view' : ''"
+			[isShowStandard]="false"
+			[updatedStandardFile]="selectedStandardFile"
+			(tempFilesChanged)="onAttachmentChanges($event, 'onUpload')"
+			(deletedFilesChanged)="onAttachmentChanges($event, 'onDelete')"
+			(standardFileSelected)="onAttachmentChanges($event, 'onStandardSelect')"
+			(newFilesCount)="onAttachmentChanges($event, 'fileCount')"></app-attachment-upload>
+	</div>
+</ui5-busy-indicator>

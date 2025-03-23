@@ -1,0 +1,17 @@
+<div [formGroup]="form" *ngIf="data != undefined">
+    <kendo-gridlayout [gap]="{ cols: 10 }" [cols]="[{width: 267 }, {width: 'auto'}, {width: 322}, {width: 150}]">
+        <kendo-gridlayout-item class="label-format" [col]="1">
+            <label [textContent]="data.name"></label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item  [col]="2">
+            <kendo-combobox #pf_pm_type formControlName="pf_pm_type" [(ngModel)]="data.pf_pm_type" [data]="PfPmDataSrc"
+                textField="text" valueField="value" [valuePrimitive]="true" 
+                [filterable]="true" (filterChange)="handleFilter($event)" [disabled]="isFieldDisabled"></kendo-combobox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item  [col]="3"></kendo-gridlayout-item>
+        <kendo-gridlayout-item [col]="4" style="text-align: right;">
+            <kendo-numerictextbox #total [(ngModel)]="data.total" class="number-right-align" 
+                formControlName="total" [style.width.px]="150" format="c2" [spinners]="false" [disabled]="isFieldDisabled"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>

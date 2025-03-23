@@ -1,0 +1,375 @@
+<div class="offer-pos customer-request" *ngIf="isForm"  [ngClass]="{'disabled': !isPermissionValidate() ||!hweKalkService.fromCalDetail || hweKalkService.disableTabs}">
+    <span class="dimension-header" i18n>Finished dimensions/delivery dimensions</span>
+    <br>
+    <div class="table-view">
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+            <label> </label>
+            <label id="label_diameter" i18n>Diameter</label>
+            <label id="label_min_allowance_diameter" i18n>Min Allowance Diameter</label>
+            <label id="label_max_allowance_diameter" i18n>Max Allowance Diameter</label>
+            <label id="label_outer_tolerance" i18n>Outer Tolerance</label>
+            <label id="label_outer_diameter_surface" i18n>Outer Diameter Surface</label>
+        </kendo-stacklayout>
+        <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('outer_diameter_final')">
+            <label id="label_outer_diameter" [for]="outer_diameter_final"  i18n>Outer Diameter Final </label>
+            <kendo-numerictextbox  #outer_diameter_final name="outer_diameter_final" [decimals]="1" format="#.##\ mm" [(ngModel)]="offerPos.outer_diameter_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #min_allowance_outer_diameter_final name="min_allowance_outer_diameter_final" format="#.##\ mm" decimals="4" [(ngModel)]="offerPos.min_allowance_outer_diameter_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #max_allowance_outer_diameter_final name="max_allowance_outer_diameter_final" format="#.##\ mm" [decimals]="4" [(ngModel)]="offerPos.max_allowance_outer_diameter_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-combobox
+                #outer_tolerance
+                name="outer_tolerance"
+                [(ngModel)]="offerPos.outer_tolerance"
+                [data]="tolerances"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="setToleranceFinal($event)"
+                >
+            </kendo-combobox>
+            <kendo-combobox
+            *ngIf="isShow('outer_diameter_surface_final')"
+                #outer_diameter_surface_final
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="offerPos.outer_diameter_surface_final"
+                [data]="dimensionSurfaces"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="surfaceFinal($event, 'outer_diameter_surface_final')"
+                >
+            </kendo-combobox>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('inner_diameter_final')">
+            <label id="label_inner_diameter" [for]="inner_diameter_final"  i18n>Inner Diameter Final </label>
+            <kendo-numerictextbox #inner_diameter_final name="inner_diameter_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.inner_diameter_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #min_allowance_inner_diameter_final name="min_allowance_inner_diameter_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_inner_diameter_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #max_allowance_inner_diameter_final name="max_allowance_inner_diameter_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_inner_diameter_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-combobox
+                #inner_tolerance
+                name="inner_tolerance"
+                [(ngModel)]="offerPos.inner_tolerance"
+                [data]="tolerances"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="setToleranceFinal($event)"
+                >
+            </kendo-combobox>
+            <kendo-combobox
+                #inner_diameter_surface_final
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="offerPos.inner_diameter_surface_final"
+                [data]="dimensionSurfaces"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="surfaceFinal($event)"
+                >
+            </kendo-combobox>
+        </kendo-stacklayout>
+        <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('side_a_final')">
+            <label [for]="side_a_final"  i18n>Side A Final </label>
+            <kendo-numerictextbox #side_a_final name="side_a_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.side_a_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #min_allowance_side_a_final name="min_allowance_side_a_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_side_a_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #max_allowance_side_a_final name="max_allowance_side_a_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_side_a_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-combobox
+                #side_a_tolerance
+                name="side_a_tolerance"
+                [(ngModel)]="offerPos.side_a_tolerance"
+                [data]="tolerances"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="setToleranceFinal($event)"
+                >
+            </kendo-combobox>
+            <kendo-combobox
+            *ngIf="isShow('side_a_surface_final')"
+                #side_a_surface_final
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="offerPos.side_a_surface_final"
+                [data]="dimensionSurfaces"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="surfaceFinal($event, 'side_a_surface_final')"
+                >
+            </kendo-combobox>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('side_b_final')">
+            <label [for]="side_b_final"  i18n>Side B Final </label>
+            <kendo-numerictextbox #side_b_final name="side_b_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.side_b_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #min_allowance_side_b_final name="min_allowance_side_b_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_side_b_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #max_allowance_side_b_final name="max_allowance_side_b_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_side_b_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-combobox
+                #side_b_tolerance
+                name="side_b_tolerance"
+                [(ngModel)]="offerPos.side_b_tolerance"
+                [data]="tolerances"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="setToleranceFinal($event)"
+                >
+            </kendo-combobox>
+            <kendo-combobox
+            *ngIf="isShow('side_b_surface_final')"
+                #side_b_surface_final
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="offerPos.side_b_surface_final"
+                [data]="dimensionSurfaces"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="surfaceFinal($event)"
+                >
+            </kendo-combobox>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('height_final')">
+            <label [for]="height_final"  i18n>Height Final </label>
+            <kendo-numerictextbox #height_final name="height_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.height_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #min_allowance_height_final name="min_allowance_height_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_height_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #max_allowance_height_final name="max_allowance_height_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_height_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-combobox
+                #height_tolerance
+                name="height_tolerance"
+                [(ngModel)]="offerPos.height_tolerance"
+                [data]="tolerances"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="setToleranceFinal($event)"
+                >
+            </kendo-combobox>
+            <kendo-combobox
+            *ngIf="isShow('height_surface_final')"
+                #height_surface_final
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="offerPos.height_surface_final"
+                [data]="dimensionSurfaces"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="surfaceFinal($event)"
+                >
+            </kendo-combobox>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('length_final')">
+            <label [for]="length_final"  i18n>Length Final </label>
+            <kendo-numerictextbox #length_final name="length_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.length_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #min_allowance_length_final name="min_allowance_length_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_length_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-numerictextbox #max_allowance_length_final name="max_allowance_length_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_length_final" (valueChange)="calcDimensions()">
+            </kendo-numerictextbox>
+            <kendo-combobox
+                #length_tolerance
+                name="length_tolerance"
+                [(ngModel)]="offerPos.length_tolerance"
+                [data]="tolerances"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="setToleranceFinal($event)"
+                >
+            </kendo-combobox>
+            <kendo-combobox
+            *ngIf="isShow('length_surface_final')"
+                #length_surface_final
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="offerPos.length_surface_final"
+                [data]="dimensionSurfaces"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                (valueChange)="surfaceFinal($event)"
+                >
+            </kendo-combobox>
+        </kendo-stacklayout>
+
+        <ng-container *ngIf="isShow('shaft') || isShow('upset_part')">
+
+            <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                <label [for]="max_outer_diameter"  i18n>Outer Diameter </label>
+                <kendo-numerictextbox #max_outer_diameter name="max_outer_diameter" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_outer_diameter" (valueChange)="calcDimensions()">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_outer_diameter_final name="min_allowance_outer_diameter_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_outer_diameter_final" (valueChange)="calcDimensions()">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_outer_diameter_final name="max_allowance_outer_diameter_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_outer_diameter_final" (valueChange)="calcDimensions()">
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #outer_tolerance
+                    name="outer_tolerance"
+                    [(ngModel)]="offerPos.outer_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                    >
+                </kendo-combobox>
+                <kendo-combobox
+                    #outer_diameter_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="offerPos.outer_diameter_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event, 'outer_diameter_surface_final')"
+                >
+                </kendo-combobox>
+            </kendo-stacklayout>
+            <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                <label [for]="max_outer_diameter"  i18n>Inner Diameter </label>
+                <kendo-numerictextbox #max_inner_diameter name="max_inner_diameter" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_inner_diameter" (valueChange)="calcDimensions()">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_inner_diameter_final name="min_allowance_inner_diameter_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_inner_diameter_final" (valueChange)="calcDimensions()">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_inner_diameter_final name="max_allowance_inner_diameter_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_inner_diameter_final" (valueChange)="calcDimensions()">
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #outer_tolerance
+                    name="outer_tolerance"
+                    [(ngModel)]="offerPos.inner_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                >
+                </kendo-combobox>
+                <kendo-combobox
+                    #outer_diameter_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="offerPos.inner_diameter_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event, 'outer_diameter_surface_final')"
+                >
+                </kendo-combobox>
+            </kendo-stacklayout>
+            <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                <label [for]="total_length"  i18n>Total Length </label>
+                <kendo-numerictextbox #total_length name="total_length" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.total_length" (valueChange)="calcDimensions()">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_length_final name="min_allowance_length_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_length_final" (valueChange)="calcDimensions()">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_length_final name="max_allowance_length_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_length_final" (valueChange)="calcDimensions()">
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #length_tolerance
+                    name="length_tolerance"
+                    [(ngModel)]="offerPos.length_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    >
+                </kendo-combobox>
+                <kendo-combobox
+                    #length_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="offerPos.length_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event)"
+                    >
+                </kendo-combobox>
+            </kendo-stacklayout>
+        </ng-container>
+
+        <kendo-stacklayout orientation="horizontal">
+            <label [for]="rust_protection_type" [style.flex]="1" i18n>Rust Protection Type</label>
+            <kendo-combobox
+                #rust_protection_type
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="offerPos.rust_protection_type"
+                [data]="rustProtectionTypes"
+                [valuePrimitive]="true"
+                textField="text"
+                valueField="value"
+                [style.flex]="5"
+            >
+            </kendo-combobox>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal">
+            <kendo-label [for]="has_no_contour" [style.flex]="1" i18n i18n-text text="No Contour"></kendo-label>
+            <section [style.flex]="5">
+                <input type="checkbox" kendoCheckBox [(ngModel)]="offerPos.has_no_contour" #has_no_contour />
+            </section>
+        </kendo-stacklayout>
+    </div>
+    <ng-container *ngIf="!offerPos.has_no_contour">
+        <span class="raw-header">
+            <h3 i18n>Customer measurements</h3>
+        </span>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="dimension-section-width input-field">
+            <label [for]="section" i18n>Section </label>
+            <kendo-numerictextbox #section name="section"  [min]="1" [max]="20" format="0" (keyup.enter)="changeSection()" [(ngModel)]="sections">
+            </kendo-numerictextbox>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="mt-15 ">
+            <span></span>
+            <span id="customer_measurement_outer_diameter" i18n>Outer Diameter</span>
+            <span i18n>Side</span>
+            <span i18n>Length</span>
+            <span i18n>Radius</span>
+            <span></span>
+            <span id="customer_measurement_inner_diameter" i18n>Inner diameter</span>
+            <span id="customer_measurement_inner_length" i18n>Inner length</span>
+            <span id="customer_measurement_inner_radius" i18n>Inner radius</span>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="input-field" *ngFor="let data of offerPos.mechanicalProcesses;let i=index" [style.width]="'100%'">
+            <label>{{ i + 1 }}</label>
+            <kendo-numerictextbox #outer_diameter name="outer_diameter" format="#.##\ mm"  [decimals]="2" [(ngModel)]="data.outer_diameter"></kendo-numerictextbox>
+            <kendo-numerictextbox #side name="side" [decimals]="2"  format="#.##\ mm" [(ngModel)]="data.side"></kendo-numerictextbox>
+            <kendo-numerictextbox #length name="length" [decimals]="2" format="#.##\ mm" [(ngModel)]="data.length"></kendo-numerictextbox>
+            <kendo-numerictextbox #radius name="radius" [decimals]="2" format="#.##\ mm" [(ngModel)]="data.radius"></kendo-numerictextbox>
+            <span></span>
+            <kendo-numerictextbox #inner_diameter name="inner_diameter" format="#.##\ mm" [decimals]="2" [(ngModel)]="data.inner_diameter"></kendo-numerictextbox>
+            <kendo-numerictextbox #inner_length name="inner_length" format="#.##\ mm" [decimals]="2" [(ngModel)]="data.inner_length"></kendo-numerictextbox>
+            <kendo-numerictextbox #inner_radius name="inner_radius" format="#.##\ mm" [decimals]="2" [(ngModel)]="data.inner_radius"></kendo-numerictextbox>
+        </kendo-stacklayout>
+
+        <hr *ngIf="offerPos.mechanicalProcesses.length">
+
+        <kendo-stacklayout orientation="horizontal" class="k-w-full" *ngIf="offerPos.mechanicalProcesses.length">
+            <label class="total-column" i18n>Total</label>
+            <label class="sum-column" [innerHTML]="offerPos.getTotalMechanicalProcessesLength()"></label>
+            <label [style.flex]="3"></label>
+            <label class="sum-column" [innerHTML]="offerPos.getTotalMechanicalProcessesInnerLength()"></label>
+            <label [style.flex]="1"></label>
+        </kendo-stacklayout>
+    </ng-container>
+</div>
+
+
+

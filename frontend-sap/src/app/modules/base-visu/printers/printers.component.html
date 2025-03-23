@@ -1,0 +1,341 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Printers"
+		url="/Printers"
+		[model]="printerModel"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[editPermission]="authService.isPermissionValid('BASEVISU_PRINTERS_EDIT')"
+		[showAction]="true"
+		[showDownload]="false"
+		addButtonText="New"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		[showSearch]="true"
+		selectionMode="Single"
+		#childComponentRef>
+	</app-grid-table>
+</div>
+
+<ui5-dialog
+	id="deleteDialogPrinter"
+	header-text="Warning"
+	i18n-header-text
+	state="Critical">
+	<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteSubmit()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<app-dialog
+	id="printerDialog"
+	[isDialogOpen]="isDialogOpen">
+	<div
+		slot="header"
+		class="w-100 h-[40px]">
+		<div class="ml-[-24px]">
+			<ui5-title
+				class="p-10"
+				level="H5"
+				>{{ dialogTitle }}
+			</ui5-title>
+		</div>
+	</div>
+
+	<div class="ml-[-15px] mr-[-15px]">
+		<ui5-busy-indicator
+			size="L"
+			[active]="isLoading"
+			*ngIf="isDialogOpen">
+			<div class="printer-dialog-body form h-[229px] w-[646px]">
+				<form
+					(ngSubmit)="onSubmit(createOrUpdateForm)"
+					#createOrUpdateForm="ngForm">
+					<div class="grid grid-cols-2 gap-y-2.5 gap-x-2.5">
+						<div class="grid">
+							<div>
+								<ui5-label
+									show-colon
+									required
+									>{{ localization.name }}</ui5-label
+								>
+							</div>
+							<div>
+								<ui5-input
+									id="name"
+									#nameInput="ngModel"
+									[required]="true"
+									[valueState]="
+										nameInput.valid == false &&
+										(nameInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									[(ngModel)]="selectedRowValue.name"
+									name="name"
+									class="w-[319px]"
+									><div
+										slot="valueStateMessage"
+										i18n>
+										Field is empty
+									</div>
+								</ui5-input>
+							</div>
+						</div>
+						<div class="grid">
+							<div>
+								<ui5-label
+									show-colon
+									i18n
+									>Brand</ui5-label
+								>
+							</div>
+							<div>
+								<ui5-input
+									id="brand"
+									#brandInput="ngModel"
+									[(ngModel)]="selectedRowValue.brand"
+									class="w-[319px]"
+									name="brand">
+								</ui5-input>
+							</div>
+						</div>
+						<div class="grid">
+							<div>
+								<ui5-label
+									show-colon
+									i18n
+									>Model</ui5-label
+								>
+							</div>
+							<div>
+								<ui5-input
+									id="model"
+									#modelInput="ngModel"
+									[(ngModel)]="selectedRowValue.model"
+									class="w-[319px]"
+									name="model"></ui5-input>
+							</div>
+						</div>
+						<div class="grid">
+							<div>
+								<ui5-label
+									show-colon
+									required
+									i18n
+									>IP Address</ui5-label
+								>
+							</div>
+							<div>
+								<ui5-input
+									id="ipAddress"
+									#ipAddressInput="ngModel"
+									[required]="true"
+									[valueState]="
+										ipAddressInput.invalid &&
+										(ipAddressInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									[(ngModel)]="selectedRowValue.ip_address"
+									name="ip_address"
+									class="w-[319px]"
+									(input)="onIpInputChange($event)">
+									<div
+										slot="valueStateMessage"
+										i18n>
+										 Enter a valid IP address
+									</div>
+								</ui5-input>
+							</div>
+						</div>
+						<div class="grid">
+							<div>
+								<ui5-label
+									show-colon
+									required
+									i18n
+									>Port</ui5-label
+								>
+							</div>
+							<div>
+								<ui5-input
+									id="port"
+									#portInput="ngModel"
+									[required]="true"
+									[valueState]="
+										portInput.invalid &&
+										(portInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									[(ngModel)]="selectedRowValue.port"
+									name="port"
+									type="Number"
+									class="w-[319px]"
+									(input)="onPortInputChange($event)">
+									<div
+										slot="valueStateMessage"
+										i18n>
+										Enter a valid port
+									</div>
+								</ui5-input>
+							</div>
+						</div>
+						<div class="">
+							<div class="grid">
+								<ui5-label
+									show-colon
+									i18n
+									>Request Type</ui5-label
+								>
+							</div>
+							<div>
+								<ui5-combobox
+									id="requestTypeComponent"
+									#requestTypeCombobox
+									class="w-[319px]"
+									[value]="selectedRowValue.request_type"
+									(change)="
+										inputInvalidEntryRestrict(
+											$event,
+											selectedRowValue.request_type
+										)
+									"
+									(input)="onRequestTypeInputChange($event)"
+									(selection-change)="onChangeRequestTypes($event)">
+									<ng-container *ngFor="let item of requestTypeItems">
+										<ui5-cb-item
+											id="{{ item.value }}"
+											text="{{ item.text }}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+						</div>
+						<div class="">
+							<div class="grid">
+								<ui5-label
+									show-colon
+									i18n
+									>Protocol</ui5-label
+								>
+							</div>
+							<div>
+								<ui5-combobox
+									id="protocolCombobox"
+									#protocolCombobox
+									class="w-[319px]"
+									[value]="selectedRowValue.protocol"
+									(change)="
+										inputInvalidEntryRestrict($event, selectedRowValue.protocol)
+									"
+									(input)="onProtocolInputChange($event)"
+									(selection-change)="onChangeProtocol($event)">
+									<ui5-cb-item
+										*ngFor="let item of protocolItems"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+						</div>
+						<div class="">
+							<div class="grid">
+								<ui5-label
+									show-colon
+									i18n
+									>Printer Language</ui5-label
+								>
+							</div>
+							<div>
+								<ui5-combobox
+									id="printerLanguageCombobox"
+									#printerLanguageCombobox
+									class="w-[319px]"
+									[value]="selectedRowValue.language"
+									(change)="
+										inputInvalidEntryRestrict($event, selectedRowValue.language)
+									"
+									(input)="onPrinterLanguageInputChange($event)"
+									(selection-change)="onChangePrinterLanguage($event)">
+									<ui5-cb-item
+										*ngFor="let PrinterLanguageType of PrinterLanguageTypes"
+										text="{{ PrinterLanguageType.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			id="closeButton"
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogPrinters
+	id="errorDialogPrinters"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

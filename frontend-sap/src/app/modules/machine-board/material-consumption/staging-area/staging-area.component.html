@@ -1,0 +1,164 @@
+<div
+	class="staging-area-wraper w-full h-[60vh] max-h-[850px]"
+	[ngClass]="{
+		'h-[calc(42vh-30px)] max-h-[800px] pr-2': isQuantityEntry,
+		'h-[calc(25vh-30px)] max-h-[800px] pr-2': isQuantityExit,
+		'h-[60vh]': !isFromQuantity,
+	}">
+	<ui5-card class="w-full h-full">
+		<ui5-bar
+			slot="header"
+			design="Header">
+			<ui5-title
+				level="H5"
+				slot="startContent"
+				i18n
+				>{{ tableHeader }}</ui5-title
+			>
+			<ui5-button
+				level="H5"
+				slot="endContent"
+				*ngIf="showScanButton"
+				[disabled] = "!operation?.prod_order_pos_operation_id"
+				(click)="onScanButtonClicked()"
+				i18n
+				>Associate</ui5-button
+			>
+		</ui5-bar>
+		<div
+			[ngClass]="{
+				'h-[calc(40vh-50px)] max-h-[800px] pr-2': isQuantityEntry,
+				'h-[calc(23vh-50px)] max-h-[800px] pr-2': isQuantityExit,
+				'h-[calc(60vh-50px)] max-h-[800px] pr-2': !isFromQuantity,
+			}">
+			<app-grid-table
+				headerTitle=""
+				[customUrl]="stockCustomUrl"
+				[columns]="columns"
+				i18n-headerTitle
+				[showSearch]="false"
+				[showDownload]="false"
+				[editPermission]="true"
+				[isTreeTable]="true"
+				selectionMode="None"
+				(onLoadMoreForCustomAPI)="onLoadMoreForPSA()"
+				(processData)="onProcessData($event)"
+				[showAction]="false"
+				[keyForCacheCustomDataTableColumns]="keyForCacheCustomDataTableColumns"
+				[showActiveButton]="false"
+				[customData]="false"
+				[useOdataStyles]="false"
+				#stagingAreaTable>
+			</app-grid-table>
+		</div>
+	</ui5-card>
+</div>
+
+<ui5-dialog
+	id="deleteDialog"
+	header-text="Warning"
+	[open]="isDeleteDialogOpen"
+	i18n-header-text
+	state="Critical">
+	<p i18n>Scrap remaining quantity!</p>
+	<div class="flex flex-col gap-[5px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteScrapComponentSubmit()"
+			[disabled]="isLoading"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-toast
+	#deleteToast
+	id="deleteToast"
+	placement="BottomCenter"
+	>{{ toastMessage }}</ui5-toast
+>
+
+<ui5-dialog
+	id="editQuantityDialog"
+	header-text="Edit"
+	[open]="isEditDialogOpen"
+	i18n-header-text>
+	<ui5-label
+		show-colon
+		required
+		i18n
+		>Quantity to Scrap</ui5-label
+	>
+	<ui5-input
+		class="w-full cursor-pointer"
+		type="Number"
+		[(ngModel)]="qtyToScrap"
+		[valueState]="
+			qtyToScrap <= 0 || selectedRow?.quantity < qtyToScrap
+				? 'Negative'
+				: 'None'
+		"
+		i18n-placeholder>
+	</ui5-input>
+	<div class="flex flex-col gap-[5px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="editScrapComponentSubmit()"
+			[disabled]="
+				isLoading || qtyToScrap <= 0 || selectedRow?.quantity < qtyToScrap
+			"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#errorDialog
+	id="errorDialog"
+	header-text="Error"
+	state="Negative">
+	<p>{{errorMessage || localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

@@ -1,0 +1,247 @@
+<div class="p-4 h-[65vh] max-h-[850px] overflow-x-auto">
+	<div
+		class="h-full grid gap-3"
+		[ngClass]="fromProductionPlan ? 'grid-cols-4' : 'grid-cols-7'">
+		<div
+			class="!h-[60vh] max-h-[850px] flex flex-col justify-between gap-4 md:max-lg:col-span-7 col-span-3"
+			*ngIf="!fromProductionPlan">
+			<ui5-card class="flex-grow">
+				<div class="h-[calc(45vh-70px)] maxh900:h-[calc(45vh-110px)]">
+					<ui5-bar
+						slot="header"
+						design="Header">
+						<ui5-title
+							level="H5"
+							slot="startContent"
+							i18n
+							>Operations</ui5-title
+						>
+					</ui5-bar>
+					<app-grid-table
+						headerTitle=""
+						[columns]="operationsColumns"
+						i18n-headerTitle
+						[showAction]="false"
+						[showSearch]="false"
+						[showDownload]="false"
+						[showActiveButton]="false"
+						selectionMode="Single"
+						keyForCacheCustomDataTableColumns="BOM-OoperationsColumns"
+						[showNewButton]="false"
+						[enableServerSideFiltering]="false"
+						[data]="operationsData"
+						(rowClick)="operationRowClick($event)"
+						[isBusy]="isBusy"
+						[customData]="true"
+						[isBusy]="true"
+						#childComponentOperationRef>
+					</app-grid-table>
+				</div>
+				<div slot="footer"></div>
+			</ui5-card>
+			<ui5-card class="h-[12vh] min-h-[130px]">
+				<ui5-card-header
+					slot="header"
+					title-text="Item Details"
+					i18n-title-text>
+				</ui5-card-header>
+				<div class="divider"></div>
+				<div
+					class="below-table h-[calc(12vh-65px)] min-h-[70px] grid grid-cols-2 gap-4 p-2">
+					<div class="bg-gray-100 p-3 rounded-lg">
+						<div
+							class="text-base font-semibold text-black overflow-hidden h-min text-nowrap text-ellipsis">
+							<ng-container *ngIf="!isBusy; else showBusyIndicator">
+								{{ filteredOperationData[0]?.prodOrderPos.item.name }}
+							</ng-container>
+						</div>
+						<ui5-label
+							class="text-base font-normal text-grey"
+							show-colon
+							i18n
+							>Item Name</ui5-label
+						>
+					</div>
+					<div class="bg-gray-100 p-3 rounded-lg">
+						<div class="text-base font-semibold text-black">
+							<ng-container *ngIf="!isBusy; else showBusyIndicator">
+								{{ filteredOperationData[0]?.prodOrderPos.item.custom_id }}
+							</ng-container>
+						</div>
+						<ui5-label
+							class="text-base font-normal text-grey"
+							show-colon
+							i18n
+							>Item Id</ui5-label
+						>
+					</div>
+				</div>
+			</ui5-card>
+		</div>
+		<ui5-card
+			class="h-[60vh] max-h-[850px]"
+			[ngClass]="
+				fromProductionPlan
+					? 'md:max-lg:col-span-5 col-span-4'
+					: 'md:max-lg:col-span-7 col-span-4'
+			">
+			<div class="h-[calc(60vh-70px)] max-h-[800px]">
+				<ui5-bar
+					slot="header"
+					design="Header">
+					<ui5-title
+						level="H5"
+						slot="startContent"
+						i18n
+						>Bill Of Material</ui5-title
+					>
+					<ui5-label
+						level="H5"
+						slot="endContent">
+						<ui5-button
+							id="Create Multiple"
+							design="Emphasized"
+							[disabled]="isBomBusy"
+							(click)="createMultipleOrder()"
+							i18n>
+							Transport Orders
+						</ui5-button>
+					</ui5-label>
+				</ui5-bar>
+				<app-grid-table
+					class="h-full"
+					headerTitle=""
+					[columns]="billOfMaterialColumns"
+					i18n-headerTitle
+					[showAction]="false"
+					[showSearch]="false"
+					[showDownload]="false"
+					[showActiveButton]="false"
+					selectionMode="Multiple"
+					keyForCacheCustomDataTableColumns="BOM-billOfMaterialColumns"
+					[showNewButton]="false"
+					[enableServerSideFiltering]="false"
+					(rowClick)="multipleRowSelect($event)"
+					[data]="bomData"
+					[isBusy]="isBomBusy"
+					[customData]="true"
+					[isBusy]="true"
+					#childComponentRef>
+				</app-grid-table>
+			</div>
+		</ui5-card>
+	</div>
+</div>
+
+<ng-template #showBusyIndicator>
+	<ui5-busy-indicator
+		[active]="true"
+		class="w-full h-full flex justify-start items-start"></ui5-busy-indicator>
+</ng-template>
+
+<ui5-dialog
+	id="errorDialogTPMSubGroups"
+	header-text="Warning"
+	[open]="showWarningForItemType"
+	(beforeClose)="closeAndRemoveBomPos()"
+	i18n-header-text
+	state="Critical">
+	<div *ngIf="bomSelectedRows[selectedBomPosIndex]?.original?.item_type == bomPosItemTypes.PCSO">
+		<span i18n>Component</span>
+		{{ bomSelectedRows[selectedBomPosIndex]?.original?.item?.custom_id }}
+		<span i18n
+			>is single order staged, are you sure that you want to proceed with manual call off
+			?</span
+		>
+	</div>
+	<div *ngIf="bomSelectedRows[selectedBomPosIndex]?.original?.item_type != bomPosItemTypes.PCSO">
+		<span i18n>Call off for Component</span>
+		{{ bomSelectedRows[selectedBomPosIndex]?.original?.item?.custom_id }}
+		<span i18n>not possible.</span>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			*ngIf="
+				bomSelectedRows[selectedBomPosIndex]?.original?.item_type == bomPosItemTypes.PCSO
+			"
+			i18n
+			(click)="closeAndSave()"
+			>Yes</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			i18n
+			*ngIf="
+				bomSelectedRows[selectedBomPosIndex]?.original?.item_type == bomPosItemTypes.PCSO
+			"
+			(click)="closeAndRemoveBomPos()"
+			>No</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			i18n
+			*ngIf="
+				bomSelectedRows[selectedBomPosIndex]?.original?.item_type != bomPosItemTypes.PCSO
+			"
+			(click)="closeAndRemoveBomPos()"
+			>OK</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="stocksDialogId"
+	header-text="Stocks"
+	[open]="isShowStockDialogOpen"
+	(beforeClose)="closeAndRemoveBomPos()"
+	class="w-[95vw]"
+	i18n-header-text>
+	<div class="flex h-[65vh]">
+		<ui5-card class="h-[65vh] max-h-[850px] md:max-lg:col-span-7 col-span-4">
+			<div class="h-[calc(60vh)] max-h-[800px]">
+				<ui5-bar
+					slot="header"
+					design="Header">
+					<ui5-title
+						level="H5"
+						slot="startContent"
+						i18n
+						>Stocks</ui5-title
+					>
+				</ui5-bar>
+				<app-grid-table
+					class="h-full"
+					headerTitle=""
+					[columns]="stockForItemPlantColumns"
+					i18n-headerTitle
+					[showAction]="false"
+					[showSearch]="false"
+					[showDownload]="false"
+					[showActiveButton]="false"
+					selectionMode="Multiple"
+					keyForCacheCustomDataTableColumns="BOM-stocks"
+					[showNewButton]="false"
+					[enableServerSideFiltering]="false"
+					[data]="stocksForItemPlant"
+					[isBusy]="isItemPlantBusy"
+					[customData]="true"
+					[isBusy]="true"
+					#childComponentRef>
+				</app-grid-table>
+			</div>
+		</ui5-card>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			i18n
+			(click)="isShowStockDialogOpen = false"
+			>Close</ui5-button
+		></div
+	>
+</ui5-dialog>

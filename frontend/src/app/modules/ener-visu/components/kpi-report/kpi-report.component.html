@@ -1,0 +1,92 @@
+<kendo-card [width]="'inherit'" [style.height]="'inherit'">
+    <kendo-card-header>
+        KPI Natural Gas/Kg Alu
+        <kendo-grid-spacer></kendo-grid-spacer>
+        <kendo-label [for]="startDate" i18n i18n-text [text]="startDate"></kendo-label>
+        <kendo-grid-spacer width="8px"></kendo-grid-spacer>
+        <kendo-datepicker #startDate [style.width.px]="180"></kendo-datepicker>
+        <kendo-grid-spacer width="8px"></kendo-grid-spacer>
+        <kendo-label [for]="endDate"  i18n i18n-text [text]="endDate"></kendo-label>
+        <kendo-grid-spacer width="8px"></kendo-grid-spacer>
+        <kendo-datepicker #endDate [style.width.px]="180"></kendo-datepicker>
+        <kendo-grid-spacer width="8px"></kendo-grid-spacer>
+        <kendo-buttongroup selection="single">
+            <button kendoButton [toggleable]="true" i18n>hour</button>
+            <button kendoButton [toggleable]="true" i18n>shift</button>
+            <button kendoButton [toggleable]="true" i18n>day</button>
+            <button kendoButton [toggleable]="true" i18n>week</button>
+            <button kendoButton [toggleable]="true" i18n>month</button>
+            <button kendoButton [toggleable]="true" i18n>year</button>
+        </kendo-buttongroup>
+        <kendo-grid-spacer width="8px"></kendo-grid-spacer>
+        <kendo-button icon="refresh" i18n i18n-title title="refresh"></kendo-button>
+    </kendo-card-header>
+    <kendo-card-body>
+        <kendo-stacklayout orientation="horizontal" [gap]="12" style="height: calc(100vh - 165px); overflow: auto;">
+            <div style="flex: 2;">
+                <h3  i18n>
+                    Chart 1
+                </h3>
+            </div>
+            <kendo-stacklayout orientation="vertical" [gap]="12" style="flex: 8;">
+                <div>
+                    <h3  i18n>
+                        Chart 2
+                    </h3>
+                </div>
+                <kendo-stacklayout orientation="horizontal" [gap]="12" style="height: 70%;">
+                    <kendo-grid-component 
+                        [gridItems]="gridItems"
+                        [columns]="columns"
+                        [state]="state"
+                        [isLoadedEnabled]="isLoadedEnabled"
+                        [isSortable]="isSortable"
+                        [isFilterable]="isFilterable"
+                        [isGroupable]="isGroupable"
+                        [isPageable]="isPageable"
+                        (emitState)="changeState($event)"
+                        [editView]="editView"
+                        (gridRefersh)="sendRequest()"
+                        (emitAllFiledSearch)="sendRequest()"
+                        [style.height]="'100%'"
+                    >
+                    </kendo-grid-component>
+                    <kendo-stacklayout orientation="vertical" [gap]="12">
+                        <kendo-grid-component 
+                            [gridItems]="gridItems"
+                            [columns]="columns"
+                            [state]="state"
+                            [isLoadedEnabled]="isLoadedEnabled"
+                            [isSortable]="isSortable"
+                            [isFilterable]="isFilterable"
+                            [isGroupable]="isGroupable"
+                            [isPageable]="isPageable"
+                            (emitState)="changeState($event)"
+                            [editView]="editView"
+                            (gridRefersh)="sendRequest()"
+                            (emitAllFiledSearch)="sendRequest()"
+                            [style.height]="'48%'"
+                        >
+                        </kendo-grid-component>
+                        <kendo-grid-component 
+                            [gridItems]="gridItems"
+                            [columns]="columns"
+                            [state]="state"
+                            [isLoadedEnabled]="isLoadedEnabled"
+                            [isSortable]="isSortable"
+                            [isFilterable]="isFilterable"
+                            [isGroupable]="isGroupable"
+                            [isPageable]="isPageable"
+                            (emitState)="changeState($event)"
+                            [editView]="editView"
+                            (gridRefersh)="sendRequest()"
+                            (emitAllFiledSearch)="sendRequest()"
+                            [style.height]="'48%'"
+                        >
+                        </kendo-grid-component>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+    </kendo-card-body>
+</kendo-card>

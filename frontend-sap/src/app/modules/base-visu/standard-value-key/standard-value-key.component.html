@@ -1,0 +1,294 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Standard Value Keys"
+		url="/StandardValueKeys"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_STANDARD_VALUE_KEY_EDIT')"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		expandQuery="$expand=standardValueKeyActivityTypes($expand=standardValueKey)"
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"		
+		[showSearch]="true"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+</div>
+<app-dialog
+	id="SVKDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="pd-header ml-[-12px]">
+			<ui5-title
+				level="H5"
+				>{{ dialogTitle }}</ui5-title
+			>
+			<ui5-tabcontainer
+				class="mt-[9px] ml-[-32px]"
+				(tab-select)="tabNavChanged($event)"
+				fixed
+				collapsed>
+				<ui5-tab
+					#generalTab
+					i18n-text
+					text="Core"
+					[selected]="selectedTab === 'generalTab'"
+					id="generalTab"
+					[disabled]="disableButtonDuringRequest"></ui5-tab>
+				<ui5-tab
+					#standardValueKeyActivityTypesTab
+					i18n-text
+					text="Standard Value Key Activity Types"
+					id="standardValueKeyActivityTypesTab"
+					[selected]="selectedTab === 'standardValueKeyActivityTypesTab'"
+					[disabled]="disableButtonDuringRequest"></ui5-tab>
+			</ui5-tabcontainer>
+		</div>
+	</div>
+	<div class="mx-[-16px] my-0">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			*ngIf="standardValueKey"
+			size="L">
+			<div class="w-[80vw] h-[65vh] form">
+				<div [hidden]="selectedTab !== 'generalTab'" class="h-[62vh]">
+					<div class="flex flex-row mb-[5px] gap-4">
+						<div class="flex flex-col">
+							<ui5-label show-colon>{{ localization.active }}</ui5-label>
+							<ui5-switch
+								name="is_active"
+								id="isActiveSwitch"
+								[(ngModel)]="standardValueKey.is_active">
+							</ui5-switch>
+						</div>
+						<div class="flex mb-10 gap-2.5 w-full">
+							<div class="flex flex-col w-full max-w-[250px]">
+								<ui5-label show-colon required>{{ localization.id }}</ui5-label>
+								<ui5-busy-indicator [active]="isLoadingCustomId" size="S">
+									<ui5-input [required]="true" class="w-full" [valueState]="customIdState"
+										[(ngModel)]="standardValueKey.custom_id" (input)="onChangeCustomId()" name="custom_id" class="w-full"
+										id="customIdInput">
+										<div slot="valueStateMessage">
+											{{ customIdValueStateText }}
+										</div>
+									</ui5-input>
+								</ui5-busy-indicator>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="h-full"
+					[hidden]="selectedTab !== 'standardValueKeyActivityTypesTab'">
+					<ui5-card>
+						<div class="h-[62vh]">
+							<app-grid-table
+								headerTitle="Standard Value Key Activity Types"
+								i18n-headerTitle
+								[showAction]="true"
+								[showDownload]="false"
+								[showRowDataCount]="true"
+								[showActiveButton]="false"
+								addButtonText="New"
+								i18n-addButtonText
+								[columns]="standardValueKeyActivityTypeColumns"
+								selectionMode="Single"
+								(newButtonClick)="associateButtonClick()"
+								(deleteClick)="deleteActivityTypes($event)"
+								(editClick)="editActivityTypes($event)"							
+								[data]="standardValueKeyActivityTypes"
+								[customData]="true"
+								[showSearch]="true"
+								(onSearchOnKeyUp)="onSearchOnChangeInput($event)"
+								#SVKActivityTypesChildComponentRef>
+							</app-grid-table>
+						</div>
+					</ui5-card>
+				</div>
+			</div>
+		</ui5-busy-indicator>
+	</div>
+
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-24px]">
+		<ui5-button
+			id="saveButtonSVK"
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-1"
+			id="cancelButtonSVK"
+			design="Transparent"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogSVK
+	id="errorDialogSVK"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#deleteDialogSVK
+	id="deleteDialogSVK"
+	header-text="Warning"
+	i18n-header-text
+	state="Critical">
+	<ui5-label class="sapTextColor">{{ localization.doYouWantToDeleteThisRecord }}</ui5-label>
+	<div
+		class="flex flex-col-item"
+		*ngIf="isLoading">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			[disabled]="disableButtonDuringRequest"
+			(click)="deleteSubmit()"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<app-dialog [isDialogOpen]="isAssociateDialogOpen">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="flex flex-row justify-between">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ associateDialogTitle }}</ui5-title
+			>
+		</div>
+	</div>
+	<div class="h-[545px] w-[545px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="L"
+			class="w-full"
+			*ngIf="standardValueKey">
+			<div class="flex flex-col">
+				<div class="flex flex-row gap-[5rem] w-[545px] mt-1">
+					<div class="flex flex-col">
+						<ui5-label show-colon>{{ localization.active }}</ui5-label>
+						<ui5-switch
+							#is_active
+							id="isActive"
+							name="isActive"
+							[checked]="standardValueKeyActivityType.is_active"
+							[(ngModel)]="standardValueKeyActivityType.is_active"></ui5-switch>
+					</div>
+					<div class="flex flex-col w-full">
+						<ui5-label
+							show-colon
+							i18n
+							>Clock in enabled</ui5-label
+						>
+						<ui5-switch
+							#is_clockin_enabled
+							id="isClockedInEnabled"
+							name="is_clockin_enabled"
+							[checked]="standardValueKeyActivityType.is_clockin_enabled"
+							[(ngModel)]="
+								standardValueKeyActivityType.is_clockin_enabled
+							"></ui5-switch>
+					</div>
+				</div>
+
+				<div class="flex flex-row w-full gap-2 mt-3">
+					<div class="flex-column w-full">
+						<ui5-label
+							show-colon
+							required
+							i18n
+							>Pos</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								[(ngModel)]="standardValueKeyActivityType.pos"
+								name="pos"
+								style="width: 100%"
+								[required]="true"
+								id="posInput">
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+				</div>
+			</div>
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			id="saveButtonMachineState"
+			(click)="onSVKActiveTypeSave()"
+			[disabled]="disableButtonDuringRequest || !standardValueKeyActivityType.pos"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			class="ml-8"
+			id="cancelButtonMachineState"
+			(click)="cancelDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>

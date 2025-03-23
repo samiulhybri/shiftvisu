@@ -1,0 +1,12 @@
+.dialog-width{
+    width: 35.5vw;
+}
+.custom-width{
+    width: 62.5vw;
+}
+.tableStandard_repair {
+	background: var(--sapBackgroundColor);
+	border-radius: 0.5rem 0.5rem 0.5rem 0.5rem;
+	border: 1px solid #d1d5db;
+    margin-top: 10px;
+}

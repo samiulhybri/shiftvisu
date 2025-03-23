@@ -1,0 +1,39 @@
+<div class="w-100 flex justify-start align-center">
+	<ui5-bar class="mt-[10px]">
+		<ui5-title level="H4" size="H4" i18n slot="startContent">Report</ui5-title>
+		<ui5-daterange-picker
+			#daterangePicker
+			slot="endContent"
+			(change)="onSelectionChange($event, 'dates')"
+			placeholder="Pick Date Range"
+			i18n-placeholder
+			[value]="dateRangeValue"
+			[valueState]="calenderValueState"
+			formatPattern="dd/MM/YYYY">
+		</ui5-daterange-picker>
+        <ui5-combobox
+			slot="endContent"
+            *ngIf="reportType == 'employee'"
+            id="employeeCombobox"
+            class="w-60"
+            name="employee_report" show-clear-icon i18n-placeholder placeholder="Select Employee"
+            (input)="onUpdateValue($event, 'employee_report')"
+            (change)="onSelectionChange($event, 'employee_report')">
+            <ui5-cb-item *ngFor="let emp of allEmployeeList" id="{{ emp.id }}"
+                text="{{ emp.name }}">
+            </ui5-cb-item>
+        </ui5-combobox>
+		<ui5-button
+			slot="endContent"
+			class="go-btn"
+			design="Emphasized"
+			(click)="createReport()"
+			i18n
+			[disabled]="isBusy || isDisabledGoBtn">Go</ui5-button>
+	</ui5-bar>
+</div>
+
+<div class="report-content w-100 flex justify-center">
+	<ui5-busy-indicator *ngIf="isBusy" [active]="isBusy" size="M"></ui5-busy-indicator>
+	<iframe *ngIf="pdfSrc && !isBusy" [src]="pdfSrc" width="90%" height="100%"></iframe>
+</div>

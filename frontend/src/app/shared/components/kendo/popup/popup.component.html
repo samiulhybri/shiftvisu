@@ -1,0 +1,19 @@
+<kendo-button
+    #anchor
+    [themeColor]="'primary'"
+    (click)="onToggle()"
+    [iconClass]="'k-icon icon-' + icon"
+>
+    {{ buttonText }}
+</kendo-button>
+
+<kendo-popup 
+    #popup 
+    [anchor]="anchor.element"
+    [anchorAlign]="anchorAlign"
+    [popupAlign]="popupAlign"
+    (anchorViewportLeave)="hide = true"
+    [hidden]="hide" class="popup"
+>
+    <ng-container [ngTemplateOutlet]="content" class="popup"></ng-container>
+</kendo-popup>

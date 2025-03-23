@@ -1,0 +1,226 @@
+<form novalidate class="k-form" *ngIf="nonDestructiveTesting">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n class="k-font-bold">
+                Ultrasound testing
+            </kendo-card-header>
+            <kendo-card-body class="non-destructive-testing-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #custom_id name="custom_id"
+                        [disabled]="isAllDisabled || disabledCustomId" [(ngModel)]="nonDestructiveTesting.custom_id"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+                    <kendo-textbox #name name="name" [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.name"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="non_destructive_testing" i18n i18n-text
+                        text="Non destructive testing"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-combobox #non_destructive_testing name="non_destructive_testing"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.non_destructive_testing"
+                        [data]="nonDestructiveTestingData" [valuePrimitive]="true" textField="text"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="attestation_entity" i18n i18n-text text="Attestation Entity"></kendo-label>
+                        <kendo-multiselect
+                            #attestation_entity
+                            [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.attestationEntities" 
+                            [data]="attestationEntityData"
+                            [filterable]="true"
+                            textField="text"
+                            valueField="value"
+                            name="attestation_entity"
+                            (filterChange)="handleFilter($event,'attestation_entity')"
+                        >
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal"  class="calculation-tab" [gap]="9">
+					<label [for]="material"  i18n>Us Norm: </label>
+					
+					<div>
+						<kendo-combobox 
+						#material 
+						[(ngModel)]="nonDestructiveTesting.usNorm"
+						name="us_norm"
+						[data]="usNorms"
+						textField="custom_id" 
+						valueField="id"
+						[style.width]="'100%'"
+						[filterable]="true"
+						(filterChange)="handleFilter($event, 'us_norm')"
+                        [disabled]="isAllDisabled" 
+					>
+				   </kendo-combobox>
+					
+					</div>
+				</kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="ultrasound_output" i18n i18n-text text="Ultrasound Output"></kendo-label>
+                    <kendo-textbox #ultrasound_output name="ultrasound_output"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.ultrasound_output"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="ultrasound_test_scope" i18n i18n-text
+                        text="Ultrasound Test Scope"></kendo-label>
+                    <kendo-textbox #ultrasound_test_scope name="ultrasound_test_scope"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.ultrasound_test_scope"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="ultrasound_test_range" i18n i18n-text
+                        text="Ultrasound Test Range"></kendo-label>
+                    <kendo-textbox #ultrasound_test_range name="ultrasound_test_range"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.ultrasound_test_range"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="ultrasound_efg_max" i18n i18n-text text="Ultrasound EFG max"></kendo-label>
+                        <kendo-numerictextbox #ultrasound_efg_max name="ultrasound_efg_max"
+                            [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.ultrasound_efg_max" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="max_residual_field_strength" i18n i18n-text
+                            text="Max residual field strength"></kendo-label>
+                        <kendo-numerictextbox #max_residual_field_strength name="max_residual_field_strength"
+                            [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.max_residual_field_strength" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="ultrasound_attenuation" i18n i18n-text
+                            text="Ultrasound Attenuation"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="ultrasound_attenuation"
+                            [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.ultrasound_attenuation" #ultrasound_attenuation />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="ultrasound_details" i18n i18n-text text="Ultrasound Details"></kendo-label>
+                    <kendo-textbox #ultrasound_details name="ultrasound_details"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.ultrasound_details"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="max_residual_field_strength_unit" i18n i18n-text
+                        text="Max residual field strength unit"></kendo-label>
+                    <kendo-combobox #max_residual_field_strength_unit name="max_residual_field_strength_unit"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.max_residual_field_strength_unit"
+                        [data]="maxResidualFieldStrengthUnitData" [valuePrimitive]="true" textField="text"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+            </kendo-card-body>
+        </kendo-card>
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n class="k-font-bold">
+                Surface crack testing
+            </kendo-card-header>
+            <kendo-card-body class="non-destructive-testing-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="surface_crack_test_method" i18n i18n-text
+                        text="Surface Crack Test Method"></kendo-label>
+                    <kendo-combobox #surface_crack_test_method name="surface_crack_test_method"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.surface_crack_test_method" [data]="surfaceCrackTestMethodData"
+                        [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" *ngIf="nonDestructiveTesting.surface_crack_test_method == surfaceCrackTestMethod.PT"  class="calculation-tab" [gap]="9">
+					<label [for]="material"  i18n>Pt Norm: </label>
+					
+					<div>
+						<kendo-combobox 
+						#material 
+						[(ngModel)]="nonDestructiveTesting.ptNorm"
+						name="ptNorms"
+						[data]="ptNorms"
+						textField="custom_id" 
+						valueField="id"
+						[style.width]="'100%'"
+						[filterable]="true"
+						(filterChange)="handleFilter($event, 'pt_norm')"
+                        [disabled]="isAllDisabled" 
+					>
+				   </kendo-combobox>
+					
+					</div>
+				</kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal"  *ngIf="nonDestructiveTesting.surface_crack_test_method == surfaceCrackTestMethod.VT" class="calculation-tab" [gap]="9">
+					<label [for]="material"  i18n>Vt Norm: </label>
+					
+					<div>
+						<kendo-combobox 
+						#material 
+						[(ngModel)]="nonDestructiveTesting.vtNorm"
+						name="vtNorms"
+						[data]="vtNorms"
+						textField="custom_id" 
+						valueField="id"
+						[style.width]="'100%'"
+						[filterable]="true"
+						(filterChange)="handleFilter($event, 'vt_norm')"
+                        [disabled]="isAllDisabled" 
+					>
+				   </kendo-combobox>
+					
+					</div>
+				</kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal"  *ngIf="nonDestructiveTesting.surface_crack_test_method == surfaceCrackTestMethod.MT"  class="calculation-tab" [gap]="9">
+					<label [for]="material"  i18n>Mt Norm: </label>
+					
+					<div>
+						<kendo-combobox 
+						#material 
+						[(ngModel)]="nonDestructiveTesting.mtNorm"
+						name="mtNorms"
+						[data]="mtNorms"
+						textField="custom_id" 
+						valueField="id"
+						[style.width]="'100%'"
+						[filterable]="true"
+						(filterChange)="handleFilter($event, 'mt_norm')"
+                        [disabled]="isAllDisabled" 
+					>
+				   </kendo-combobox>
+					
+					</div>
+				</kendo-stacklayout>
+                
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="surface_crack_output" i18n i18n-text text="Surface Crack Output"></kendo-label>
+                    <kendo-textbox #surface_crack_output name="surface_crack_output"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.surface_crack_output"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="surface_crack_test_criteria" i18n i18n-text
+                        text="Surface Crack Test Criteria"></kendo-label>
+                    <kendo-textbox #surface_crack_test_criteria name="surface_crack_test_criteria"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.surface_crack_test_criteria"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="surface_crack_audit_scope" i18n i18n-text
+                        text="Surface Crack Audit Scope"></kendo-label>
+                    <kendo-textbox #surface_crack_audit_scope name="surface_crack_audit_scope"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.surface_crack_audit_scope"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="surface_crack_details" i18n i18n-text
+                        text="Surface Crack Details"></kendo-label>
+                    <kendo-textbox #surface_crack_details name="surface_crack_details"
+                        [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.surface_crack_details"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="offer_note" i18n i18n-text text="Offer note">
+					</kendo-label>
+					<kendo-textarea [disabled]="isAllDisabled" [(ngModel)]="nonDestructiveTesting.offer_note" name="offer_note"> 
+
+					</kendo-textarea>
+				</kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

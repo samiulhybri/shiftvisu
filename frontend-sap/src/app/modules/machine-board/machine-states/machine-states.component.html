@@ -1,0 +1,75 @@
+<ui5-dialog
+	[open]="isDialogOpen"
+	[headerText]="dialogTitle"
+	class="manual-dialog"  
+	(beforeClose)="closeDialog()">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L"
+		class="w-full self-start" > 
+		<div class=" h-full w-full">
+			<div class="flex flex-grow justify-center" *ngIf="noState">
+				<ui5-title
+					level="H5"
+					i18n
+					>No State Assigned.</ui5-title
+				>
+			</div>
+			<div
+				class="state-list"
+				*ngFor="let state of machineStates">
+				<ui5-button
+					id="stateSelectionButton"
+					class="list-button"
+					[ngClass]="{ selected: state.isSelected }"
+					(click)="itemClick(state)"
+					>
+					{{ state.name }}
+				</ui5-button>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="stateDialogSaveBtn"
+			design="Emphasized"
+			(click)="saveDialog()"
+			*ngIf="
+				authService.isPermissionValid('MACHINEBOARD_MACHINE_STATE_CHANGE_EDIT') ||
+				isAuthorized
+			"
+			disabled="true"
+			i18n>
+			{{ localization.save }}</ui5-button>
+		<ui5-button
+			id="stateDialogClsoeBtn"
+			class="ml-8"
+			(click)="closeDialog()"
+			>
+			{{ localization.close }}</ui5-button>
+	</div>
+</ui5-dialog>
+<ui5-dialog
+	#errorDialogMachineStates
+	id="errorDialogMachineStates"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

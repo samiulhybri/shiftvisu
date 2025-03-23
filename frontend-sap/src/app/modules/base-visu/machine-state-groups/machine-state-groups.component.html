@@ -1,0 +1,306 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Machine State Groups"
+		url="/MachineStateGroups"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_MACHINE_STATE_GROUPS_EDIT')"
+		addButtonText="New"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		(deleteClick)="deleteClick($event)"
+		(newButtonClick)="newButtonClick()"
+		(editClick)="editClick($event)"
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		[columns]="columns"
+		[enableServerSideFiltering]="true"
+		[showSearch]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+	<ui5-dialog
+		#deleteDialogMachineStateGroup
+		id="deleteDialogMachineStateGroup"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+	
+	<ui5-dialog
+		#deleteErrorDialogMachineStateGroup
+		id="deleteErrorDialogMachineStateGroup"
+		state="Negative"
+		header-text="Error">
+		<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+		<div
+			slot="footer"
+			class="deleteErrorDialogFooter">
+			<ui5-button
+				class="dialogCloser"
+				design="Transparent"
+				(click)="closeDeleteErrorDialog()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div>
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ isUpdate ? localization.edit : localization.add }}
+			</ui5-title>
+		</div>
+	</div>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L">
+		<div class="w-96 p-2.5 form">
+			<form
+				(ngSubmit)="onSubmit(createOrUpdateForm)"
+				#createOrUpdateForm="ngForm">
+				<div class="flex flex-space-between mb-10">
+					<div class="flex-col-item">
+						<ui5-label
+							show-colon
+							class="ml-8"
+							>{{ localization.active }}</ui5-label
+						>
+						<ui5-switch
+							(change)="onChangeIsActive($event)"
+							[checked]="selectedMachineStateGroup.is_active"
+							[disabled]="shouldBeDisabled('is_active')"
+							id="machineStateGroupActiveSwitch"
+							#activeSwitch></ui5-switch>
+					</div>
+					<div class="flex-col-item">
+						<ui5-label
+							show-colon
+							class="ml-8"
+							i18n
+							>Production Relevant</ui5-label
+						>
+						<ui5-switch
+							id="machineStateGroupisProductiveSwitch"
+							(change)="onChangeIsProductive($event)"
+							[checked]="selectedMachineStateGroup.is_productive"
+							[disabled]="shouldBeDisabled('is_productive')"
+							#productiveSwitch></ui5-switch>
+					</div>
+					<div class="flex-col-item">
+						<ui5-label
+							show-colon
+							class="ml-8"
+							i18n
+							>Capacity Relevant</ui5-label
+							>
+						<ui5-switch
+							#capacitySwitch
+							id="machineStateGroupCapacitySwitch"
+							[disabled]="shouldBeDisabled('has_capacity')"
+							(change)="onChangeIsCapacity($event)"
+							[checked]="selectedMachineStateGroup.has_capacity"></ui5-switch>
+					</div>
+				</div>
+				<div class="flex-space-between mb-10 w-full">
+					<div class="flex-col-item mb-10">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							id="machineStateGroupCustomIDBusyIndicator"
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								#customId="ngModel"
+								class="w-full"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || createOrUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								[(ngModel)]="selectedMachineStateGroup.custom_id"
+								[disabled]="shouldBeDisabled('custom_id')"
+								name="custom_id"
+								(input)="onChangeCustomId()"
+								[required]="true"
+								id="customId">
+								<div
+									slot="valueStateMessage"
+									>
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+					<div class="flex-col-item">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.name }}</ui5-label
+						>
+						<ui5-input
+							id="name"
+							class="w-full"
+							#nameInput="ngModel"
+							[required]="true"
+							[valueState]="
+								nameInput.valid == false &&
+								(nameInput.touched || createOrUpdateForm.submitted)
+									? 'Negative'
+									: 'None'
+							"
+							[(ngModel)]="selectedMachineStateGroup.name"
+							[disabled]="shouldBeDisabled('name')"
+							(change)="onChangeName($event)"
+							name="name"></ui5-input>
+					</div>
+				</div>
+				<div class="flex-space-between mb-10">
+					<div class="flex-col-item">
+						<ui5-label
+							show-colon
+							i18n
+							required
+							>Color Picker</ui5-label
+							>
+						<div class="flex gap-1">
+							<div
+								[style.background-color]="'#' + selectedMachineStateGroup.color"
+								class="h-6 w-6 mt-1 rounded"
+								id="colorPalette"
+								(click)="color()"></div>
+							<ui5-input
+								id="valueHelpInput"
+								class="w-full sapHoverColor"
+								#colorInput="ngModel"
+								[required]="true"
+								[readonly]="true"
+								[disabled]="shouldBeDisabled('color')"
+								[valueState]="
+									colorInput.valid == false &&
+									(colorInput.touched || createOrUpdateForm.submitted)
+										? 'Negative'
+										: 'None'
+								"
+								placeholder="Enter Color"
+								[(ngModel)]="selectedMachineStateGroup.color"
+								name="color">
+							</ui5-input>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="create-dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			id="saveButtonMachineStateGroup"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			id="cancelButtonMachineStateGroup"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-responsive-popover
+	opener="colorPalette"
+	id="popover"
+	header-text="Default Color"
+	placement-type="Top"
+	hide-arrow="true"
+	#popover
+	i18n-header-text>
+	<div>
+		<ng-container *ngFor="let color of colorPaletteKeys">
+			<ui5-color-palette-item
+				[value]="'#' + color"
+				#colorItem
+				(click)="itemclicked(color)"></ui5-color-palette-item>
+		</ng-container>
+	</div>
+	<div
+		slot="footer"
+		class="responsive-dialog-footer">
+		<ui5-button
+			id="closeButton"
+			class="ml-8 border-none"
+			(click)="closeResponsiveDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-responsive-popover>
+<ui5-dialog
+	#errorDialogMachineStateGroups
+	id="errorDialogMachineStateGroups"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

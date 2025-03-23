@@ -1,0 +1,20 @@
+<div class="card div-col">
+	<div class="header">
+		<div class="flex flex-row items-center justify-between w-full">
+			<ui5-busy-indicator [active]="isBusy">
+				<ui5-title level="H5">{{ machine?.custom_id }} {{ machine?.name }}  ({{currentState?.machineState?.name || noStateText}})</ui5-title>
+			</ui5-busy-indicator>
+				<ui5-button i18n class="mr-3" (click)="openMachineSwithPopUp()">Switch Machine</ui5-button>
+			</div>
+	</div>
+	<div class="middle-content">
+		<app-machine-state-chart
+			class="machine-board-chart"
+			[machineBoardHours]="machine?.machine_board_hours!" [isBusy]="isChartBusy" [machineStateTimes]="machineStateTimes"></app-machine-state-chart>
+	</div>
+	<div class="bottom-content overflow-y-auto">
+		<app-machine-state-list [machine]="machine" class="busy-indicator" [machineStateTimes]="machineStateTimes" [machineBoardHours]="machine?.machine_board_hours!"></app-machine-state-list>
+	</div>
+</div>
+
+<app-switch-machine [isDialogOpen]="isDialogOpen" (close)="closeSwitchButton()"></app-switch-machine>

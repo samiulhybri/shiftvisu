@@ -1,0 +1,272 @@
+<ui5-busy-indicator
+	[active]="isSaving"
+	class="!h-[calc(100vh-320px)] w-full">
+	<div class="min-h-[650px] w-full flex flex-col gap-[10%]">
+		<form
+			#generalForm="ngForm"
+			class="h-[calc(30%-25px)] grid grid-cols-4 gap-[10px]">
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					required
+					>Concern Title</ui5-label
+				>
+				<ui5-input
+					#title="ngModel"
+					class="w-full"
+					name="title"
+					i18n-placeholder
+					placeholder="Write a title"
+					sanitize-input
+					required
+					[(ngModel)]="eightDReport.title"
+					[valueState]="title.touched && !title.valid ? 'Negative' : 'None'">
+					<div
+						slot="valueStateMessage"
+						i18n
+						>Concern Title is required.</div
+					>
+				</ui5-input>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Complaint No</ui5-label
+				>
+				<ui5-input
+					class="w-full"
+					i18n-placeholder
+					placeholder="Complaint no."
+					sanitize-input
+					[(ngModel)]="eightDReport.complaint_no"
+					[ngModelOptions]="{ standalone: true }">
+				</ui5-input>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Supplier</ui5-label
+				>
+
+				<ui5-combobox
+					class="w-full"
+					i18n-placeholder
+					placeholder="Select Supplier"
+					[(ngModel)]="supplierValue"
+					[loading]="isBatchCallRunning"
+					showClearIcon
+					noTypeahead
+					(ui5SelectionChange)="setSupplierValue($event)"
+					(blur)="checkSupplierValue()"
+					[ngModelOptions]="{ standalone: true }">
+					@for (supplier of suppliers; track $index) {
+						<ui5-mcb-item
+							[text]="supplier.name"
+							[additionalText]="supplier.custom_id"
+							[id]="supplier.id"></ui5-mcb-item>
+					}
+				</ui5-combobox>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Production Site</ui5-label
+				>
+				<ui5-combobox
+					class="w-full"
+					i18n-placeholder
+					placeholder="Select production site"
+					showClearIcon>
+				</ui5-combobox>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Drawing No</ui5-label
+				>
+				<ui5-input
+					class="w-full"
+					i18n-placeholder
+					placeholder="Write a number"
+					[(ngModel)]="eightDReport.drawing_no"
+					[ngModelOptions]="{ standalone: true }"
+					type="Number">
+				</ui5-input>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Drawing Revision</ui5-label
+				>
+				<ui5-input
+					class="w-full"
+					i18n-placeholder
+					placeholder="Write a value"
+					[(ngModel)]="eightDReport.drawing_revision"
+					sanitize-input
+					[ngModelOptions]="{ standalone: true }">
+				</ui5-input>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Plants</ui5-label
+				>
+
+				<ui5-combobox
+					class="w-full"
+					i18n-placeholder
+					[(ngModel)]="plantValue"
+					placeholder="Select Plant"
+					[loading]="isBatchCallRunning"
+					showClearIcon
+					noTypeahead
+					[ngModelOptions]="{ standalone: true }"
+					(ui5SelectionChange)="setPlantValue($event)"
+					(blur)="checkPlantValue()">
+					@for (plant of plants; track $index) {
+						<ui5-mcb-item
+							[text]="plant.name"
+							[additionalText]="plant.custom_id"
+							[id]="plant.id"></ui5-mcb-item>
+					}
+				</ui5-combobox>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Quantity Delivered</ui5-label
+				>
+				<ui5-input
+					class="w-full"
+					i18n-placeholder
+					placeholder="Write a number"
+					[(ngModel)]="eightDReport.quantity_delivered"
+					[ngModelOptions]="{ standalone: true }"
+					type="Number">
+				</ui5-input>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Part Name</ui5-label
+				>
+				<ui5-input
+					class="w-full"
+					i18n-placeholder
+					placeholder="Write text"
+					sanitize-input
+					[(ngModel)]="eightDReport.part_name"
+					[ngModelOptions]="{ standalone: true }">
+				</ui5-input>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Complaint Opening Date</ui5-label
+				>
+				<ui5-date-picker
+					class="w-full"
+					#complaintOpeningDate="ngModel"
+					formatPattern="dd.MM.yyyy"
+					name="complaint_opening_date"
+					[(ngModel)]="eightDReport.complaint_opening_date"
+					[ngModelOptions]="{ standalone: true }">
+				</ui5-date-picker>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Revision</ui5-label
+				>
+				<ui5-input
+					class="w-full"
+					i18n-placeholder
+					placeholder="Write a number"
+					[(ngModel)]="eightDReport.revision"
+					[ngModelOptions]="{ standalone: true }"
+					type="Number">
+				</ui5-input>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Revision Date</ui5-label
+				>
+				<ui5-date-picker
+					class="w-full"
+					#revisionDate="ngModel"
+					formatPattern="dd.MM.yyyy"
+					name="revision_date"
+					[(ngModel)]="eightDReport.revision_date"
+					[ngModelOptions]="{ standalone: true }">
+				</ui5-date-picker>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Quantity Claimed</ui5-label
+				>
+				<ui5-input
+					class="w-full"
+					i18n-placeholder
+					placeholder="Write a number"
+					type="Number"
+					sanitize-input
+					[(ngModel)]="eightDReport.quantity_claimed"
+					[ngModelOptions]="{ standalone: true }">
+				</ui5-input>
+			</div>
+		</form>
+
+		<ui5-card class="h-[calc(60%-25px)]">
+			<div class="h-[calc(60vh-225px)] min-h-[355px]">
+				<app-grid-table
+					headerTitle="Team"
+					i18n-headerTitle
+					[customData]="true"
+					[data]="data"
+					[columns]="columns"
+					[showAction]="true"
+					[showSearch]="false"
+					[showActiveButton]="false"
+					[showTableSettingBtn]="false"
+					i18n-addButtonText
+					[showNewButton]="false"
+					[showDownload]="false"
+					[selectionMode]="'None'"
+					[isBaseVisu]="false"
+					[isBusy]="isBatchCallRunning"
+					[enableServerSideFiltering]="true"
+					[customActionButtons]="customButtons"
+					keyForCacheCustomDataTableColumns="generalGrid"
+					#generalRef></app-grid-table>
+			</div>
+		</ui5-card>
+	</div>
+</ui5-busy-indicator>

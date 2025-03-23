@@ -1,0 +1,50 @@
+:host {
+    width: 100%;
+    height: 100%;
+}
+.block-header-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.block-card-body {
+    height: 41.8vh;
+}
+.pos-block-grid-layout {
+    height: 40vh;
+}
+
+.formError {
+    border: 1px solid red;
+}
+.block-form-body {
+    .form-sections {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 10px;
+        .label-input-section {
+            width: 49%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .custom_id_field {
+            width: 100% !important;
+        }
+    }
+}
+.block-modal-action {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    .block-modal-action-btn {
+        align-self: flex-end;
+    }
+}

@@ -1,0 +1,39 @@
+<div class="bg-white flex items-center justify-center h-screen">
+	<div class="flex items-center justify-between gap-24 grid grid-cols-3">
+		<div class="flex items-center col-span-2">
+			<img
+				id="forbidden_logo"
+				src="./assets/images/403.svg"
+				alt="Logo"
+				class="max-w-3xl" />
+		</div>
+		<div class="flex flex-col items-start col-span-1">
+			<ui5-title
+				level="H1"
+				size="H1"
+				i18n
+				class="sapField_placeholdertextColor opacity-50 text-[88px]"
+				>Oops!</ui5-title>
+			<ui5-label
+				level="H6"
+				i18n
+				class="text-2xl sapField_placeholdertextColor mt-4"
+				>Permission Denied.</ui5-label>
+			<ui5-text class="sapShell_InteractiveBorderColor" i18n> 
+				Forbidden. You don't have permission to access this machine.</ui5-text>
+			<div class="flex items-center mt-[72px] space-x-4">
+				<ui5-label
+					showColon
+					i18n
+					class="sapShell_InteractiveBorderColor text-2xl">
+					Go Back To</ui5-label>
+				<ui5-button
+					[disabled]="isLoading"
+					design="Emphasized"
+					(click)="navigateToHomePage()"
+					i18n
+					>Dashboard</ui5-button>
+			</div>
+		</div>
+	</div>
+</div>

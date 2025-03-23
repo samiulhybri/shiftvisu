@@ -1,0 +1,55 @@
+.machine-status {
+  height: 44px;
+  padding: 0px 16px 0px 16px;
+  gap: 12px;
+  border-radius: var(--cardBorderRadius);
+  border: 0px 0px 1px 0px;
+  background: var(--sapList_HeaderBackground);
+  box-shadow: var(--_ui5-v1-20-1_side_navigation_box_shadow);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.multi-combobox {
+  width: 220px;
+  margin-right: 8px;
+}
+
+.header-bar {
+  width: 100%;
+  justify-content: end;
+  align-items: center
+}
+
+@media (max-width: 1600px) {
+  .hide-selectors {
+    display: none;
+  }
+
+  .show-selector-button {
+    display: flex;
+  }
+}
+
+@media (min-width: 1600px) {
+  .hide-selectors {
+    display: block;
+  }
+
+  .show-selector-button {
+    display: none;
+  }
+}
+
+.toggle-selectors {
+  position: absolute;
+  top: 100px;
+  /* Adjust based on your layout */
+  right: 20px;
+  /* Adjust based on your layout */
+  padding: 10px;
+  z-index: 100;
+  padding: 8px;
+}

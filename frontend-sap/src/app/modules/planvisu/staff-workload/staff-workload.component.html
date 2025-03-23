@@ -1,0 +1,47 @@
+<div class="content">
+	<div
+		class="workload-container p-4"
+		style="height: calc(100% - 49px)">
+		<div style="height: 33%; margin-bottom: 10px">
+			<app-grid-workload
+				[demandsData]="demandsData"
+				[capacityData]="capacityData"
+				[capacitySettings]="capacitySettings"
+				[startDate]="startDate"
+				[endDate]="endDate"
+				[reportType]="ReportType.WORK_LOAD"
+				[gridTitle]="'Workload'"
+				[dataField]="'hall'"
+				[accessorKey]="accessorKey"
+				[valueFormatType]="ReportValueEnum.PERCENT_VALUE">
+			</app-grid-workload>
+		</div>
+		<div style="height: 33%; margin-bottom: 10px">
+			<app-grid-workload
+				[demandsData]="demandsData"
+				[capacityData]="capacityData"
+				[capacitySettings]="capacitySettings"
+				[gridTitle]="'Staff Workload'"
+				[dataField]="'hall'"
+				[reportType]="ReportType.STAFF_WORKLOAD"
+				[startDate]="startDate"
+				[endDate]="endDate"
+				[accessorKey]="accessorKey"
+				[valueFormatType]="ReportValueEnum.RAW_VALUE">
+			</app-grid-workload>
+		</div>
+		<div style="height: 33%; margin-bottom: 10px">
+			<app-grid-workload
+				[demandsData]="demandsData"
+				[capacitySettings]="capacitySettings"
+				[gridTitle]="'Staff Needed'"
+				[dataField]="'hall'"
+				[reportType]="ReportType.STAFF_NEEDED"
+				[startDate]="startDate"
+				[endDate]="endDate"
+				[accessorKey]="accessorKey"
+				[valueFormatType]="ReportValueEnum.RAW_VALUE">
+			</app-grid-workload>
+		</div>
+	</div>
+</div>

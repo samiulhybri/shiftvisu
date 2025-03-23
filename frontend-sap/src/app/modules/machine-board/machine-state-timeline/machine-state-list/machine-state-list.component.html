@@ -1,0 +1,15 @@
+<ui5-busy-indicator [active]="isBusy" class="busy-indicator-design">
+	<div class="machine-state-list">
+		<div
+			class="tile"
+			[style.background]="state.color | hexToRgbaByOpacity"
+			*ngFor="let state of machineStates">
+			<ui5-text
+				[style.color]="'#' + state?.color"
+				class="state-text"
+				>{{ state.name }}</ui5-text
+			>
+			<ui5-text class="state-text">{{getStateTotalTime(state?.id)}}</ui5-text>
+		</div>
+	</div>
+</ui5-busy-indicator>

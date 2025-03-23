@@ -1,0 +1,40 @@
+<ui5-dialog
+	[open]="isDialogOpen"
+	[headerText]="dialogTitle"
+	class="iiot-dialog"
+	(beforeClose)="closeDialog()">
+	<ui5-card class="h-[calc(100%-10px)]">
+		<div>
+			<app-machine-state-history-table
+				class="h-full"
+				[headerTitle]="tableTitle"
+				i18n-headerTitle
+				[columns]="columns"
+				[dateValue]="dateValue"
+				selectionMode="None"
+				[data]="stateHistoryData"
+				[loading]="isLoading"
+				(changeRangeDatePicker)="changeRangeDatePicker($event)">
+			</app-machine-state-history-table>
+		</div>
+	</ui5-card>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="machineStateHistoryCloseBtn"
+			class="ml-8"
+			(click)="closeDialog()"
+			i18n>
+			Close
+		</ui5-button>
+	</div>
+</ui5-dialog>
+<app-states
+	*ngIf="stateDialogOpen"
+	[isFromHistory]="isFromHistory"
+	[stateData]="state"
+	(closeStateDialog)="closeStateDialog()"
+	(refreshHistoy)="refreshHistoy()">
+</app-states>

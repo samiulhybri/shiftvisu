@@ -1,0 +1,81 @@
+<app-grid-table
+	[data]="gridData"
+	[customData]="true"
+	[columns]="Columns"
+	[showDownload]="false"
+	[showActiveButton]="false"
+	button1Text="All"
+	button2Text="Inactive"
+	button3Text="Active"
+	addButtonText="New"
+	i18n-addButtonText
+	i18n-button1Text
+	i18n-button2Text
+	i18n-button3Text
+	[showNewButton]="false"
+	[isBaseVisu]="false"
+	[showSearch]="true"
+	[enableServerSideFiltering]="false"
+	[showAction]="false"
+	selectionMode="Single"
+	[showSearch]="false"
+	#gridTable>
+</app-grid-table>
+
+<ui5-popover [open]="showPopOver" [opener]="opener" (after-close)="close()">
+    <div class="p-3 min-w-[300px]">
+        <!-- Demand Before Calculation -->
+        <div class="flex justify-between items-center" *ngIf="selectedDetails?.demand_without_calculation !== undefined">
+            <ui5-label show-colon>Demand (Before Calculation)</ui5-label>
+            <ui5-text>{{ selectedDetails?.demand_without_calculation }} hr.</ui5-text>
+        </div>
+
+        <!-- Demand After Calculation -->
+        <div class="flex justify-between items-center" *ngIf="selectedDetails?.demand_after_calculation !== undefined">
+            <ui5-label show-colon>Demand (After Calculation)</ui5-label>
+            <ui5-text>{{ selectedDetails?.demand_after_calculation }} hr.</ui5-text>
+        </div>
+
+        <!-- Capacity Before Calculation -->
+        <div class="flex justify-between items-center" *ngIf="selectedDetails?.capacity_without_calculation !== undefined">
+            <ui5-label show-colon>Capacity (Before Calculation)</ui5-label>
+            <ui5-text>{{ selectedDetails?.capacity_without_calculation }} hr.</ui5-text>
+        </div>
+
+        <!-- Capacity After Calculation -->
+        <div class="flex justify-between items-center" *ngIf="selectedDetails?.capacity_after_calculation !== undefined">
+            <ui5-label show-colon>Capacity (After Calculation)</ui5-label>
+            <ui5-text>{{ selectedDetails?.capacity_after_calculation }} hr.</ui5-text>
+        </div>
+
+        <!-- Machine Usage -->
+        <div class="flex justify-between items-center" *ngIf="selectedDetails?.machine_usage !== undefined">
+            <ui5-label show-colon>Machine Usage</ui5-label>
+            <ui5-text>{{ selectedDetails?.machine_usage }} %</ui5-text>
+        </div>
+
+        <!-- Employee Usage -->
+        <div class="flex justify-between items-center" *ngIf="selectedDetails?.employee_usage !== undefined">
+            <ui5-label show-colon>Employee Usage</ui5-label>
+            <ui5-text>{{ selectedDetails?.employee_usage }} %</ui5-text>
+        </div>
+
+        <!-- Overtime Factor -->
+        <div class="flex justify-between items-center" *ngIf="selectedDetails?.overtime_factor !== undefined">
+            <ui5-label show-colon>Overtime Factor</ui5-label>
+            <ui5-text>{{ selectedDetails?.overtime_factor }} %</ui5-text>
+        </div>
+
+        <!-- Distribution Factor -->
+        <div class="flex justify-between items-center" *ngIf="selectedDetails?.distribution_factor !== undefined">
+            <ui5-label show-colon>Distribution Factor</ui5-label>
+            <ui5-text>{{ selectedDetails?.distribution_factor }} %</ui5-text>
+        </div>
+
+        <!-- Additional Hours -->
+        <div class="flex justify-between items-center" *ngIf="selectedDetails?.additional_hours !== undefined">
+            <ui5-label show-colon>Additional Hours</ui5-label>
+            <ui5-text>{{ selectedDetails?.additional_hours }} hr.</ui5-text>
+        </div>
+    </div>
+</ui5-popover>

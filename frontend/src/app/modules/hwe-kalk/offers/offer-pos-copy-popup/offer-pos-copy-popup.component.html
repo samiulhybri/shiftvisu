@@ -1,0 +1,77 @@
+<kendo-grid
+        [kendoGridBinding]="gridView"
+        [pageSize]="10000"
+        [pageable]="false"
+        [sortable]="true"
+        [groupable]="false"
+        [reorderable]="true"
+        [resizable]="true"
+        [columnMenu]="{ filter: true }"
+        [rowClass]="rowCallback"
+>
+<ng-template kendoGridToolbarTemplate>
+    <kendo-label text=""></kendo-label>
+   <kendo-grid-spacer></kendo-grid-spacer>
+   <kendo-textbox
+           [style.width.px]="191"
+           i18n
+           i18n-placeholder
+           placeholder="Search All Column"
+           [(ngModel)]="searchValue"
+           (keyup)="onPageFilter($event)"
+           [clearButton]="true">
+   </kendo-textbox>
+</ng-template>
+<kendo-grid-column
+        kendoGridCellTemplate
+        *ngFor="let column of columns"
+        [field]="column.name"
+        [title]="column.title"
+        [filterable]="column.filterable ?? true"
+        [sortable]="column.sortable ?? true"
+        [width]="column.width ?? null"
+        [style]="{ 'text-align': column.textAlign ?? null }"
+        [headerClass]="column.textAlign ?? null"
+        [columnMenu]="!column.hideColumnMenu">
+<ng-container *ngIf="column.booleanValue">
+   <ng-template
+           kendoGridCellTemplate
+           let-dataItem>
+      <input
+              type="checkbox"
+              readonly="true"
+              disabled="true"
+              [checked]="dataItem[column.name]"
+              kendoCheckBox/>
+   </ng-template>
+</ng-container>
+<ng-container *ngIf="column.name == 'product_type'">
+   <ng-template
+           kendoGridCellTemplate
+           let-dataItem>
+      <div>{{ getEnumTranslateGrid('product_type', dataItem.product_type) }}</div>
+   </ng-template>
+</ng-container>
+<ng-container *ngIf="column.name == 'type'">
+   <ng-template
+           kendoGridCellTemplate
+           let-dataItem>
+      <div>{{ getEnumTranslateGrid('heat_treatment', dataItem.type) }}</div>
+   </ng-template>
+</ng-container>
+</kendo-grid-column>
+<kendo-grid-command-column
+        [columnMenu]="false"
+        [reorderable]="false"
+        i18n
+        i18n-title
+        title="Action">
+<ng-template
+        kendoGridCellTemplate
+        let-dataItem>
+   <button kendoButton icon="copy" [primary]="true" (click)="copyOfferPosData(dataItem)">
+   </button>
+</ng-template>
+</kendo-grid-command-column>
+</kendo-grid>
+<app-loader *ngIf="isLoadedEnabled"></app-loader>

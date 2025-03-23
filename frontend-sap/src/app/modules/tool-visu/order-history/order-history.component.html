@@ -1,0 +1,42 @@
+<div class="toolsDiv h-full">
+	<app-grid-table #historyGrid headerTitle="Order History" url="/ProdOrderPos" i18n-headerTitle [columns]="columns"
+		[showAction]="false" [showDownload]="false" [showNewButton]="false" [showSearch]="true" selectionMode="Single"
+		[isBaseVisu]="true" [segmentButtonItems]="segmentButtonItems"
+		(segmentButtonChange)="segmentButtonChange($event)" [filterQuery]="filterQuery" [expandQuery]="expandQuery"
+		[showTableSettingBtn]="false" [onDoubleClick]="handleRowDoubleClick"
+		[enableServerSideFiltering]="true" #childComponentRef>
+	</app-grid-table>
+</div>
+
+<ui5-dialog id="viewDialog" class="w-full" [open]="isAttachmentDialogOpen" (beforeClose)="closeAttachmentDialog()">
+	<div slot="header" class="w-100">
+		<div>
+			<ui5-title class="pb-2 pt-2" level="H5" i18n>Attachment</ui5-title>
+		</div>
+	</div>
+	<ui5-busy-indicator [active]="isLoading" size="L" class="w-full">
+		<div class="w-full form">
+			<app-file-preview [model]="'ProdOrderPos'" [modelId]="itemId" [filesCount]="fileCount"
+				[filePreviewHeight]="filePreviewHeight"></app-file-preview>
+		</div>
+	</ui5-busy-indicator>
+	<div slot="footer" class="dialog-footer">
+		<ui5-button id='attachmentClose' (click)="closeAttachmentDialog()" id="closeButton"
+			design="Default">
+			{{ localization.close }}</ui5-button>
+	</div>
+</ui5-dialog>
+
+<div *ngIf="isViewDialogOpen">
+		<app-repair-details [modalType]="hasAuth ? 'edit' : 'view'" [modalHeight]="'87%'" [selectedProdOrderPos]="selectedOrder"
+		[allUserList]="userList" 
+		[allSupplierList]="supplierList"
+		[allRepairTypeList]="operationPlanList"
+		[repairId]="itemId || 0" 
+		[isDialogOpen]="isViewDialogOpen" 
+		(isCloseClicked)="closeViewDialog()"
+		(isSaveClicked)="isSavedModal()"
+		(isShowMessage)="isShowMessage($event)"
+		#repairDetailsTable>
+	</app-repair-details>
+</div>

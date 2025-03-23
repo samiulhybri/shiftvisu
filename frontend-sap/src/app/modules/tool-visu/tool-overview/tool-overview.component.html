@@ -1,0 +1,74 @@
+<div class="tableStandard">
+	<app-grid-table url="/Items"
+		[expandQuery]="expandQuery"
+		filterQuery="is_tool eq true"
+		sortBy="id" headerTitle="Tool Overview" i18n-headerTitle [columns]="columns" [showAction]="false"
+		[showDownload]="false" [showNewButton]="false" [showActiveButton]="true" button1Text="All" i18n-button1Text
+		button2Text="Inactive" i18n-button2Text button3Text="Active" i18n-button3Text [showTableSettingBtn]="false"
+		selectionMode="None" [enableServerSideFiltering]="true" [showSearch]="true"
+		[isBaseVisu]="true"
+	    [showTableSettingBtn]="false"
+		(downloadButtonClick)="OnClickDownload()" #childComponentRef>
+	</app-grid-table>
+</div>
+
+<div *ngIf="isOpenToolDetails">
+	<app-dialog id="toolDetailsDialog" [isDialogOpen]="isOpenToolDetails" [title]="dialogTitle" (onBeforeClose)="closeDialog()">
+		<div class="item-details-section">
+			<div class="flex flex-row mb-10">
+				<div class="flex-col-item w-full">
+					<ui5-label show-colon i18n>Active</ui5-label>
+					<ui5-switch id="itemsActiveSwitch" name="is_active" [disabled]="true"
+						[checked]="selectedTool.is_active"></ui5-switch>
+				</div>
+			</div>
+	
+			<div class="flex flex-row mb-10">
+				<div class="flex-col-item w-full">
+					<ui5-label show-colon i18n>Tool No</ui5-label>
+					<ui5-input class="w-100" readonly [value]="selectedTool.custom_id ?? ''"
+						name="custom_id" id="customIdInput">
+					</ui5-input>
+				</div>
+			</div>
+			<div class="flex flex-row mb-10">
+				<div class="flex-col-item w-full">
+					<ui5-label i18n show-colon i18n>Tool Name</ui5-label>
+					<ui5-input id="nameInput" class="w-100" readonly
+						[value]="selectedTool.name ?? ''" name="name"></ui5-input>
+				</div>
+			</div>
+		</div>
+		<div slot="footer" class="dialog-footer">
+			<ui5-button class="ml-8" (click)="closeDialog()" i18n>
+				{{ localization.close }}</ui5-button>
+		</div>
+	</app-dialog>
+</div>
+
+<app-active-repair #activeRepairTable
+	[activeRepairs]="toolOrdersList"
+	[isActiveRepairsDialogOpen]="isActiveRepairsDialogOpen" 
+	[isShowFilterButton]="true"
+	[hasActionEditButton]="false"
+	[allRepairTypeList]="[]"
+	[allUserList]="[]"
+	[allSupplierList]="[]"
+	[isRepairHistoryComponentShow]="true"
+	(afterTabChange)="afterTabchangeFromToolOverview()"
+	(filterRepairs)="onChangeRepairGrid($event)" 
+	[selectedTool]="selectedTool"
+	(closeActiveRepairsDialog)="closeActiveRepairsDialog()">
+</app-active-repair>
+
+<div *ngIf="isViewDialogOpen">
+	<app-repair-details 
+		[modalType]="'view'"
+		[modalHeight]="'92%'" 
+		[selectedProdOrderPos]="selectedRepair"
+		[isDialogOpen]="isViewDialogOpen" 
+		(isCloseClicked)="closeViewDialog()"
+		(isSaveClicked)="isSavedModal()"
+		#repairDetailsTable>
+	</app-repair-details>
+</div>

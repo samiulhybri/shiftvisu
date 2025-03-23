@@ -1,0 +1,232 @@
+<kendo-card [style.flex]="1" class="!k-w-full" *ngIf="calculation"
+
+			[ngClass]="{'disabled': (!isPermissionValidate() || !hweKalkService.fromCalDetail || hweKalkService.disableTabs)}" >
+    <kendo-card-header i18n>
+        <kendo-grid-spacer></kendo-grid-spacer>
+        <h3>Individual Assessment</h3>
+        <kendo-grid-spacer></kendo-grid-spacer>
+    </kendo-card-header>
+    <kendo-card-body class="individual-assessment-body">
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="strength_span" i18n i18n-text text="Strength span:"></kendo-label>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                    <kendo-label [for]="strength_span_min" i18n i18n-text text="min:"></kendo-label>
+                    <kendo-numerictextbox #strength_span_min name="strength_span_min" [(ngModel)]="calculation.strength_span_min" [step]="0.1"></kendo-numerictextbox>
+                    <kendo-label [for]="strength_span_min_unit" i18n i18n-text text="N/mm²"></kendo-label>
+                </kendo-stacklayout>
+    
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                    <kendo-label [for]="strength_span_max" i18n i18n-text text="max:"></kendo-label>
+                    <kendo-numerictextbox #strength_span_max name="strength_span_max" [(ngModel)]="calculation.strength_span_max" [step]="0.1"></kendo-numerictextbox>
+                    <kendo-label [for]="strength_span_max_unit" i18n i18n-text text="N/mm²"></kendo-label>
+                </kendo-stacklayout>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="strength_span" i18n i18n-text text="Hardness:"></kendo-label>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                    <kendo-label [for]="min_hardness" i18n i18n-text text="Min:"></kendo-label>
+                    <kendo-numerictextbox #min_hardness name="min_hardness" [(ngModel)]="calculation.min_hardness" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                    <kendo-label [for]="max_hardness" i18n i18n-text text="Max:"></kendo-label>
+                    <kendo-numerictextbox #max_hardness name="max_hardness" [(ngModel)]="calculation.max_hardness" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+        <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="nonDestructiveTesting" text="nonDestructiveTesting" i18n>Non Destructive Testing individual Id:
+                </label>
+                <kendo-combobox #nonDestructiveTesting [(ngModel)]="calculation.individualNonDestructiveTesting"
+                    name="nonDestructiveTesting" [data]="nonDestructiveTestings" textField="custom_id" valueField="id"
+                    [style.width]="'50%'" [filterable]="true"
+                    (filterChange)="handleFilter($event, 'non_destructive_testing')"
+                    >
+                </kendo-combobox>
+                <button kendoButton themeColor="info" (click)="openInfoPopup('individualNonDestructiveTesting')" class="k-ml-2"
+                        [style.maxWidth.px]="30" *ngIf="calculation.individualNonDestructiveTesting">
+						<span class="k-icon icon-information-circle"></span>
+				</button>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" class="calculation-tab" [gap]="9">
+                <label [for]="deformation_id" i18n>Deformation individual Id: </label>
+                <kendo-combobox #deformation_id name="deformation_id" [(ngModel)]="calculation.individualDeformation" [data]="deformations"
+                    textField="custom_id" valueField="id" [filterable]="true"
+                    (filterChange)="handleFilter($event, 'deformation')">
+                </kendo-combobox>
+
+                <button kendoButton themeColor="info" (click)="openInfoPopup('individualDeformation')" class="k-ml-2"
+                        [style.maxWidth.px]="30" *ngIf="calculation.individualDeformation">
+						<span class="k-icon icon-information-circle"></span>
+				</button>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <hr>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="charge" i18n i18n-text text="Charge"></kendo-label>
+                <input type="checkbox" kendoCheckBox #charge name="charge" [(ngModel)]="calculation.charge" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="melting_process" i18n i18n-text text="Melting Process"></kendo-label>
+                <input type="checkbox" kendoCheckBox #melting_process name="melting_process"
+                    [(ngModel)]="calculation.melting_process" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="dimension_control" i18n i18n-text text="Dimension Control"></kendo-label>
+                <input type="checkbox" kendoCheckBox #dimension_control name="dimension_control"
+                    [(ngModel)]="calculation.dimension_control" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="dimension_protocol" i18n i18n-text text="Dimension Protocol"></kendo-label>
+                <input type="checkbox" kendoCheckBox #dimension_protocol name="dimension_protocol"
+                    [(ngModel)]="calculation.dimension_protocol" />
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="cleanliness_of_the_charge" i18n i18n-text
+                    text="Cleanliness of the charge"></kendo-label>
+                <input type="checkbox" kendoCheckBox #cleanliness_of_the_charge name="cleanliness_of_the_charge"
+                    [(ngModel)]="calculation.cleanliness_of_the_charge" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="residual_magnetic_field_strength" i18n i18n-text
+                    text="Residual Magnetic Field Strength"></kendo-label>
+                <input type="checkbox" kendoCheckBox #residual_magnetic_field_strength
+                    name="residual_magnetic_field_strength"
+                    [(ngModel)]="calculation.residual_magnetic_field_strength" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="radioactivity_freedom_confirmation" i18n i18n-text
+                    text="Radioactivity Freedom Confirmation"></kendo-label>
+                <input type="checkbox" kendoCheckBox #radioactivity_freedom_confirmation
+                    name="radioactivity_freedom_confirmation"
+                    [(ngModel)]="calculation.radioactivity_freedom_confirmation" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="grainsize_of_the_charge" i18n i18n-text
+                    text="Grainsize of the charge"></kendo-label>
+                <input type="checkbox" kendoCheckBox #grainsize_of_the_charge name="grainsize_of_the_charge"
+                    [(ngModel)]="calculation.grainsize_of_the_charge" />
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="specify_deformation" i18n i18n-text text="Specify deformation"></kendo-label>
+                <input type="checkbox" kendoCheckBox #specify_deformation name="specify_deformation"
+                    [(ngModel)]="calculation.specify_deformation" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="heattreamtment" i18n i18n-text text="Heattreamtment"></kendo-label>
+                <input type="checkbox" kendoCheckBox #heattreamtment name="heattreamtment"
+                    [(ngModel)]="calculation.heattreamtment" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="heattreamtment_with_diagram" i18n i18n-text
+                    text="Heattreamtment With Diagram"></kendo-label>
+                <input type="checkbox" kendoCheckBox #heattreamtment_with_diagram
+                    name="heattreamtment_with_diagram"
+                    [(ngModel)]="calculation.heattreamtment_with_diagram" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="jominy" i18n i18n-text text="Jominy"></kendo-label>
+                <input type="checkbox" kendoCheckBox #jominy name="jominy" [(ngModel)]="calculation.jominy" />
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="hardness_testing_hbw" i18n i18n-text
+                    text="Hardness Testing HBW"></kendo-label>
+                <input type="checkbox" kendoCheckBox #hardness_testing_hbw name="hardness_testing_hbw"
+                    [(ngModel)]="calculation.hardness_testing_hbw" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="hardness_testing_hbw_per_piece" i18n i18n-text
+                    text="Hardness Testing HBW Per Piece"></kendo-label>
+                <input type="checkbox" kendoCheckBox #hardness_testing_hbw_per_piece
+                    name="hardness Testing HBW Per Piece"
+                    [(ngModel)]="calculation.hardness_testing_hbw_per_piece" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="get_approval_from_the_client" i18n i18n-text
+                    text="Get Approval From the Client"></kendo-label>
+                <input type="checkbox" kendoCheckBox #get_approval_from_the_client
+                    name="get_approval_from_the_client"
+                    [(ngModel)]="calculation.get_approval_from_the_client" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="pmi" i18n i18n-text text="PMI"></kendo-label>
+                <input type="checkbox" kendoCheckBox #pmi name="pmi" [(ngModel)]="calculation.pmi" />
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9" >
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="conversion_acc_iso_18265_table_a_1" i18n i18n-text
+                    text="Conversion Acc ISO 18265 Table A 1"></kendo-label>
+                <input type="checkbox" kendoCheckBox #conversion_acc_iso_18265_table_a_1
+                    name="conversion_acc_iso_18265_table_a_1"
+                    [(ngModel)]="calculation.conversion_acc_iso_18265_table_a_1" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="conversion_acc_iso_18265_table_b_2" i18n i18n-text
+                    text="Conversion Acc ISO 18265 Table B 2"></kendo-label>
+                <input type="checkbox" kendoCheckBox #conversion_acc_iso_18265_table_b_2
+                    name="conversion_acc_iso_18265_table_b_2"
+                    [(ngModel)]="calculation.conversion_acc_iso_18265_table_b_2" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="concentricity_check" i18n i18n-text
+                    text="Concentricity Check"></kendo-label>
+                <input type="checkbox" kendoCheckBox #concentricity_check name="concentricity_check"
+                    [(ngModel)]="calculation.concentricity_check" />
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="visual_inspection" i18n i18n-text text="Visual Inspection"></kendo-label>
+                <input type="checkbox" kendoCheckBox #visual_inspection name="visual_inspection"
+                    [(ngModel)]="calculation.visual_inspection" />
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+            
+            <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-align-items-center">
+                <kendo-label [for]="indication_of_the_surface_condition" i18n i18n-text
+                    text="Indication of the Surface Condition"></kendo-label>
+                <input type="checkbox" kendoCheckBox #indication_of_the_surface_condition
+                    name="indication_of_the_surface_condition"
+                    [(ngModel)]="calculation.indication_of_the_surface_condition" />
+            </kendo-stacklayout>
+            
+            <kendo-stacklayout orientation="horizontal" [gap]="9"></kendo-stacklayout>
+        </kendo-stacklayout>
+    </kendo-card-body>
+</kendo-card>
+<kendo-grid-edit-window [isNew]="false" [model]="infoPopupModel" [width]="infoPopupWidth" [showCloseButton]="false"
+    [closeGridWindow]="isInfoPopupClosed" [isWindowLoaderEnabled]="isWindowLoaderEnabled" [hideSaveOrUpdateBtn]="true"
+    (cancel)="onInfoPopupCancel()">
+
+    <ng-container [ngSwitch]="selectedAssessmentType">
+        <app-non-destructive-testing-details *ngSwitchCase="'individualNonDestructiveTesting'" [data]="calculation.individualNonDestructiveTesting"  [isAllDisabled]="true" [fromCalculationNonDestructiveTesting]="false"></app-non-destructive-testing-details>
+
+        <app-deformation-details [data]="calculation.individualDeformation" *ngSwitchCase="'individualDeformation'" [isAllDisabled]="true" [fromCalculation]="false"></app-deformation-details>
+    </ng-container>
+
+    
+</kendo-grid-edit-window>

@@ -1,0 +1,74 @@
+<div
+	class="sm:h-[10vh] lg:h-[24vh] md:h-[19vh] xl:h-[22vh] 2xl:h-[45vh] xxl:h-[52vh] mt-[10px] mb-[10px] mr-[10px]">
+	@if(directory){
+		<app-doc-visu-directory-view
+			#directoryViewComponent
+			[structure]="directory"
+			[showExpandButton]="true"
+			[processActionButtons]="processActionButtons"
+			[processClick]="processClick"
+			[folderActionButtons]="actionButtons"
+			class="overflow-auto"></app-doc-visu-directory-view>
+	}
+</div>
+
+<ui5-dialog
+	[headerText]="headerTitle"
+	#addFolderDialog>
+	<ui5-busy-indicator [active]="isLoading" size="L">
+		<div class="m-0 w-[450px]">
+			<ui5-label required show-colon i18n required>Folder Name</ui5-label>
+			<ui5-input [required]="true" [(ngModel)]="folderName" [valueState]="valueState" (input)="onChangeInput($event)"
+				class="w-full"></ui5-input>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Emphasized"
+			[disabled]="inProgress"
+			(click)="createNewFolder()"
+			id="saveButton"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			id="closeOverlapButton"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	class="h-[170px] w-[450px]"
+	header-text="Delete"
+	#deleteFolderDialog
+	i18n-header-text
+	state="Critical">
+	<ui5-busy-indicator class="w-full" [active]="isLoading" size="M">
+		<div class="m-0">
+			<ui5-text>
+				<span i18n
+					>All files will be deleted from this folder. Do you really want to delete this</span><strong>&nbsp;“{{ folderName }}”&nbsp;</strong><span i18n>folder?</span>
+			</ui5-text>
+		</div>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+		    design="Emphasized"
+			[disabled]="inProgress"
+			(click)="deleteFolder()"
+			id="deleteButton"
+			>{{ localization.ok}}</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			id="closeOverlapButton"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

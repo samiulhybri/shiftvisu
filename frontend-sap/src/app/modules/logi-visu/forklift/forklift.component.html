@@ -1,0 +1,452 @@
+<div
+	class="div-col"
+	class="w-100 h-100">
+	<app-header-nav
+		class="col-span-2 row-start-1 row-end-2 h-[52px]"
+		title="LogiVisu"
+		[isHomePage]="true"
+		i18n-title
+		(logOutDialogEvent)="logoutDialogOpen()"></app-header-nav>
+	<div class="main-body flex flex-row">
+		<div class="left">
+			<div class="left-div">
+				<app-grid-table
+					#gridTable
+					headerTitle="Planned"
+					[customUrl]="transportOrderPosCustomUrl"
+					[showRowDataCount]="true"
+					i18n-headerTitle
+					[columns]="columns"
+					[showAction]="false"
+					[showSearch]="true"
+					[showDownload]="false"
+					[showNewButton]="false"
+					[isBaseVisu]="false"
+					[useOdataStyles]="false"
+					[enableServerSideFiltering]="true"
+					[isCustomApiCall]="true"
+					[isCozy]="true"
+					[isMultiSelectOneActive]="true"
+					[isMultiSelectOneSelectAllFlag]="false"
+					multiSelectOneLabelText="Transport order type"
+					[multiSelectOneData]="orderTypeFilterItems"
+					[model]="transportOrderPos"
+					(processData)="processData($event[0], $event[1])"
+					selectionMode="Multiple"
+					keyForCacheCustomDataTableColumns="logiVisuForklift"
+					(multiSelectOneSelectionChanged)="multiSelectOneSelectionChange($event)"
+					(onSearchForCustomAPI)="onSearchForCustomAPI($event)"
+					(rowClick)="handleRowClick($event)"
+					(onLoadMoreForCustomAPI)="onLoadMoreForForklift()"
+					[segmentButtonItems]="segmentButtonItems"
+					(segmentButtonChange)="segmentButtonChange($event)"
+					(columnReorder)="onColumnsReorder($event)"
+					#childComponentRef>
+				</app-grid-table>
+			</div>
+		</div>
+		<div class="right div-col">
+			<div class="div-row right-title">
+				<ui5-title
+					level="H5"
+					class="ml-16"
+					i18n
+					>Order Detail</ui5-title
+				>
+			</div>
+			<div class="h-[90%] z-10 lg:overflow-y-auto overflow-y-hidden">
+				<div class="flex flex-col justify-start">
+					<div class="flex flex-col gap-2 max-h-[100px] px-4 pt-2">
+						<ui5-button
+							design="Emphasized"
+							(click)="acceptClick()"
+							*ngIf="!selectedTransportOrderPos?.currentDelivery?.user?.name"
+							i18n
+							[disabled]="
+								transportationMode == 'notDone'
+									? selectedTransportOrderPos
+										? selectedTransportOrderPos?.currentDelivery?.user?.name
+											? true
+											: isCanAccept
+												? false
+												: true
+										: true
+									: true
+							"
+							>Accept</ui5-button
+						>
+
+						<ui5-button
+							design="Emphasized"
+							(click)="declineClick()"
+							*ngIf="selectedTransportOrderPos?.currentDelivery?.user?.name"
+							i18n
+							[disabled]="
+								transportationMode == 'notDone'
+									? selectedTransportOrderPos
+										? selectedTransportOrderPos?.currentDelivery?.user?.id !=
+											authService.loggedInUser.id
+											? true
+											: isCanAccept
+												? false
+												: true
+										: true
+									: true
+							"
+							>Decline</ui5-button
+						>
+						<ui5-button
+							design="Default"
+							i18n
+							[disabled]="
+								transportationMode == 'notDone'
+									? selectedTransportOrderPos?.currentDelivery?.user?.id ==
+										authService.loggedInUser.id
+										? allSelectedRows.length > 1
+											? true
+											: false
+										: true
+									: true
+							"
+							(click)="openDeliveryDialog()"
+							>Delivery</ui5-button
+						>
+					</div>
+
+					<div class="flex flex-col gap-2 px-4 pt-1">
+						<div class="div-row align-center">
+							<div class="div-row label">
+								<ui5-label
+									show-colon
+									i18n
+									>Order Id</ui5-label
+								>
+							</div>
+							<ui5-input
+								[readonly]="true"
+								class="input"
+								placeholder="Text"
+								[value]="
+									selectedTransportOrderPos?.transportOrder?.custom_id ?? ''
+								"></ui5-input>
+						</div>
+						<div class="div-row align-center">
+							<div class="div-row label">
+								<ui5-label
+									show-colon
+									i18n
+									>Type</ui5-label
+								>
+							</div>
+							<ui5-input
+								[readonly]="true"
+								class="input"
+								placeholder="Text"
+								[value]="getTypeValue()"></ui5-input>
+						</div>
+						<div class="div-row align-center">
+							<div class="div-row label">
+								<ui5-label
+									show-colon
+									i18n
+									>Id</ui5-label
+								>
+							</div>
+							<ui5-input
+								[readonly]="true"
+								class="input"
+								placeholder="Text"
+								[value]="getIdValue()"></ui5-input>
+						</div>
+						<div class="div-row align-center">
+							<div class="div-row label">
+								<ui5-label
+									show-colon
+									i18n
+									>Quantity</ui5-label
+								>
+							</div>
+							<ui5-input
+								[readonly]="true"
+								class="input"
+								[value]="formatQuantity(selectedTransportOrderPos?.quantity) || ''"
+								placeholder="Text"></ui5-input>
+						</div>
+						<div class="div-row align-center">
+							<div class="div-row label">
+								<ui5-label
+									show-colon
+									i18n
+									>UoM</ui5-label
+								>
+							</div>
+							<ui5-input
+								[readonly]="true"
+								class="input"
+								placeholder="Text"
+								[value]="
+									selectedTransportOrderPos?.prodOrderPosBomPos?.unitOfMeasure
+										?.name || ''
+								"
+								class="input"></ui5-input>
+						</div>
+						<div class="div-row align-center">
+							<div class="div-row label">
+								<ui5-label
+									show-colon
+									i18n
+									>Transport Person</ui5-label
+								>
+							</div>
+							<ui5-input
+								[readonly]="true"
+								placeholder="Text"
+								[value]="
+									selectedTransportOrderPos?.currentDelivery?.user?.name || ''
+								"
+								class="input"></ui5-input>
+						</div>
+
+						<div>
+							<app-item-image
+								#appItemImage
+								[height]="'300px'"
+								[headerTitle]="'Item Image'"
+								[itemId]="
+									selectedTransportOrderPos?.itemPlant?.item?.id ||
+									selectedTransportOrderPos?.handlingUnit?.item?.id
+								"
+								[isCard]="true"
+								[isSingleImage]="true"
+								style="width: 100%; height: 100%"></app-item-image>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<app-dialog
+		id="accaptDialog"
+		[isDialogOpen]="isDeclineDialogOpen"
+		state="Critical"
+		title="Confirmation"
+		i18n-title>
+		<div class="div-col">
+			<ui5-text i18n>You are declining the order, please confirm.</ui5-text>
+			<ui5-busy-indicator [active]="isBusy"></ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="div-row button-layout items-center">
+			<ui5-button
+				design="Emphasized"
+				i18n
+				class="mr-1"
+				[disabled]="duringButtonClick"
+				(click)="declineOrder()"
+				>Confirm</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				i18n
+				(click)="closeAcceptDialog()"
+				>Cancel</ui5-button
+			>
+		</div>
+	</app-dialog>
+
+	<ui5-dialog
+		header-text="Confirm"
+		[open]="isLogOutDialogOpen"
+		state="Critical"
+		(beforeClose)="closeDialog()">
+		<div class="flex flex-col">
+			<ui5-text i18n> Do you want to logout? </ui5-text>
+			<ui5-busy-indicator
+				size="M"
+				[active]="isBusy"></ui5-busy-indicator>
+		</div>
+		<div
+			class="logout-footer"
+			slot="footer">
+			<ui5-button
+				design="Emphasized"
+				class="mr-[5px]"
+				i18n
+				(click)="logOut()"
+				>Confirm</ui5-button
+			>
+			<ui5-button
+				(click)="closeDialog()"
+				i18n
+				>Cancel</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+
+	<app-dialog
+		id="accaptDialog"
+		[isDialogOpen]="isAcceptDialogOpen"
+		state="Critical"
+		title="Confirmation"
+		i18n-title>
+		<div class="div-col">
+			<ui5-text i18n>You are accepting the order, please confirm.</ui5-text>
+			<ui5-busy-indicator [active]="isBusy"></ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="div-row button-layout items-center">
+			<ui5-button
+				design="Emphasized"
+				i18n
+				class="mr-1"
+				[disabled]="duringButtonClick"
+				(click)="acceptOrder()"
+				>Confirm</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				i18n
+				(click)="closeAcceptDialog()"
+				>Cancel</ui5-button
+			>
+		</div>
+	</app-dialog>
+
+	<app-dialog
+		id="errorDialog"
+		[isDialogOpen]="showErrorDialog"
+		state="Critical"
+		title="Error"
+		i18n-title>
+		<ui5-text>{{ errorMessage }}</ui5-text>
+		<div
+			slot="footer"
+			class="flex flex-row align-center justify-end w-100">
+			<ui5-button
+				design="Transparent"
+				class="mt-1"
+				i18n
+				(click)="closeErrorDialog()"
+				>Close</ui5-button
+			>
+		</div>
+	</app-dialog>
+
+	<app-dialog
+		id="deliveryDialog"
+		[isDialogOpen]="isDeliveryDialogOpen"
+		state="None"
+		title="Delivery"
+		i18n-title>
+		<form #quantityForm="ngForm">
+			<div class="flex-col flex gap-[5px] mt-2">
+				<ui5-label
+					show-colon
+					i18n
+					>Scan</ui5-label
+				>
+				<ui5-multi-input
+					id="multi-input"
+					#scanMultiInput
+					class="w-[650px] cursor-pointer"
+					(ui5Change)="updateSelectedScannedTextFromMultiInput()"
+					(ui5TokenDelete)="updateSelectedTextFromTokenDeleted($event)">
+					@for (text of scannedToken; track text) {
+						<ui5-token
+							slot="tokens"
+							[text]="text"></ui5-token>
+					}
+					<div
+						slot="icon"
+						class="flex">
+						<ui5-icon
+							name="qr-code"
+							class="icon"
+							(click)="openCodeScannerDialog()"></ui5-icon>
+					</div>
+				</ui5-multi-input>
+			</div>
+
+			<div class="div-col">
+				<ui5-label
+					required
+					show-colon
+					i18n
+					class="mb-[2px]"
+					>Delivered Quantity</ui5-label
+				>
+				<ui5-input
+					[(ngModel)]="quantity"
+					type="Number"
+					class="w-full"
+					name="quantity"
+					[required]="true"
+					pattern="^\d+(\.\d+)?$"
+					[disabled]="
+						scannedStocks.length > 0 ||
+						selectedTransportOrderPos?.transportable_type !=
+							transportableTypeEnum.ITEM_PLANT
+					"
+					id="quantity"></ui5-input>
+			</div>
+
+			<div class="div-col">
+				<ui5-checkbox
+					text="Complete Transport"
+					i18n-text
+					[checked]="isCompleted"
+					(change)="changeIsCompleted($event)"></ui5-checkbox>
+				<ui5-busy-indicator [active]="isBusy"></ui5-busy-indicator>
+			</div>
+		</form>
+		<div
+			slot="footer"
+			class="flex flex-row justify-end w-100 items-center">
+			<ui5-button
+				design="Emphasized"
+				i18n
+				class="mr-1"
+				[disabled]="isBusy || quantity <= 0 || (!scannedToken.length && selectedTransportOrderPos?.transportable_type == transportableTypeEnum.HANDLING_UNIT)"
+				(click)="deliveryDone()"
+				id="saveButton"
+				>Save</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				i18n
+				(click)="closeDeliveryDialog()"
+				>Cancel</ui5-button
+			>
+		</div>
+
+		<ui5-dialog
+			#codeScannerDialog
+			id="codeScannerClockDialog"
+			header-text="Scan barcode"
+			state="None"
+			i18n-header-text>
+			<video
+				#videoElement
+				style="width: 100%; max-height: 60vh"></video>
+			<div class="scanner-overlay"></div>
+			<p
+				i18n
+				*ngIf="!videoInputDevices.length"
+				>Video loading</p
+			>
+			<div
+				slot="footer"
+				class="left-component-footer">
+				<ui5-button
+					design="Transparent"
+					i18n
+					(click)="closeCodeScannerDialog()"
+					>Close</ui5-button
+				>
+			</div>
+		</ui5-dialog>
+	</app-dialog>
+</div>

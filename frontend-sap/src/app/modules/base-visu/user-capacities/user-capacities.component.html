@@ -1,0 +1,48 @@
+<div class="tableStandard">
+	<div class="grid grid-cols-1 gap-2">
+		<ui5-card
+			[ngStyle]="{ 'height.px': heightForMachineTree }"
+			class="col-span-1">
+			<div [ngStyle]="{ 'height.px': heightForMachineTree - 44}">
+				<ui5-bar slot="header" class="h-[44px]" design="Header">
+					<ui5-title level="H5" slot="startContent" i18n>Users</ui5-title>
+				
+					<ui5-input [value]="globalSearchValue" slot="endContent" (change)="onGlobalSearch($event)">
+						<ui5-icon id="valueHelpIcon" slot="icon" name="search"></ui5-icon>
+					</ui5-input>
+				</ui5-bar>
+				<app-grid-table
+					[columns]="columns"
+					[showAction]="false"
+					[showDownload]="false"
+					[showActiveButton]="false"
+					[data]="userCapacity"
+					[model]="user"
+					[showNewButton]="false"
+					[isBaseVisu]="false"
+					[isTreeTable]="true"
+					[customData]="true"
+					(rowClick)="selectionChange($event)"
+					[enableServerSideFiltering]="false"
+					[showSearch]="false"
+					[showActiveButton]="false"
+					(processData)="processData($event)"
+					[useOdataStyles]="false"
+					selectionMode="Single"
+					keyForCacheCustomDataTableColumns="userCapacity"
+					#childComponentRef>
+				</app-grid-table>
+			</div>
+		</ui5-card>
+
+		<ui5-card
+			[ngStyle]="{ 'height.px': heightForCalender }"
+			class="h-[485px] col-span-1">
+			<app-capacities
+				#capacitiesComponent
+				[selectedRow]="selectedRowValue"
+				[heightForCalenderEmptyData]="heightForCalenderEmptyData"
+				[heightForRows]="heightForRows" />
+		</ui5-card>
+	</div>
+</div>

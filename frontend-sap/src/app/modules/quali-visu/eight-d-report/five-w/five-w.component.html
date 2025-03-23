@@ -1,0 +1,28 @@
+<ui5-card class="h-[calc(100vh-375px)]">
+	<div class="h-[calc(100vh-400px)]">
+		<app-grid-table
+			headerTitle="Find the causes with the 5W method"
+			i18n-headerTitle
+			[customData]="eightDReportId == 0"
+			[url]="baseUrl"
+			[filterQuery]="filterQuery"
+			[columns]="columns"
+			[isBusy]="fiveWhyRefGrid?.isBusy || saveMode == null"
+			[data]="data"
+			[rowHeight]="100"
+			[showAction]="false"
+			[showSearch]="false"
+			[showDownload]="false"
+			[showActiveButton]="false"
+			addButtonText="Add"
+			i18n-addButtonText
+			[showNewButton]="true"
+			[addButtonDisable]="!eightDReportId"
+			selectionMode="None"
+			[enableServerSideFiltering]="false"
+			(processData)="processData($event[0], $event[1])"
+			(newButtonClick)="newButtonClick()"
+			keyForCacheCustomDataTableColumns="fiveWhy"
+			#fiveWhyRef></app-grid-table>
+	</div>
+</ui5-card>

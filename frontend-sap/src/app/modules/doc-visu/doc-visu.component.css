@@ -1,0 +1,10 @@
+div::data-component-name(ObjectPageContent) {
+	display: none;
+}
+
+.content {
+	height: 100%;
+	border-radius: 15px;
+	overflow: hidden;
+	margin-right: var(--gap-for-main-content) !important;
+}

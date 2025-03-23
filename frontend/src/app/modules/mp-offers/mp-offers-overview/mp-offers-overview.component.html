@@ -1,0 +1,127 @@
+<kendo-grid-component [moduleName]="'mp-offers'" [gridItems]="gridItems" [columns]="columns" [state]="state"
+	[isLoadedEnabled]="isLoadedEnabled" [isSortable]="isSortable" [isFilterable]="isFilterable"
+	[isGroupable]="isGroupable" [isPageable]="isPageable" [toolbarConfig]="toolbarConfig" [editView]="editView"
+	(gridRefersh)="sendRequest()" (emitAllFiledSearch)="sendRequest()" (emitState)="changeState($event)"
+	(deleteDataItem)="deleteDataItem($event)" (filterState)="changeGridFilter($event)">
+
+	<ng-template #toolBarBeforeSearchContent>
+		<span i18n>Show</span>
+		<input type="radio" #dataFilterNo kendoRadioButton value="openOffers" [(ngModel)]="gridDataFilterRadio"
+			(change)="changeGridData()" />
+		<kendo-label class="k-radio-label" [for]="dataFilterNo" i18n i18n-text text="No"></kendo-label>
+		<input type="radio" #dataFilterYes kendoRadioButton value="closedOffers" [(ngModel)]="gridDataFilterRadio"
+			(change)="changeGridData()" />
+		<kendo-label class="k-radio-label" [for]="dataFilterYes" i18n i18n-text text="Yes"></kendo-label>
+		<input type="radio" #dataFilterAll kendoRadioButton value="allOffers" [(ngModel)]="gridDataFilterRadio"
+			(change)="changeGridData()" />
+		<kendo-label class="k-radio-label" [for]="dataFilterAll" i18n i18n-text text="All"></kendo-label>
+	</ng-template>
+
+	<ng-template #toolBarAfterSearchContent>
+		<button kendoButton [primary]="true" icon="add" (click)="createNewOffer()" i18n>
+			New
+		</button>
+	</ng-template>
+
+	<ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+		<ng-container *ngIf="column.name == 'mp_offer_type'">
+			<div>{{ getEnumTranslateGrid('mp_offer_type', dataItem.mp_offer_type) }}</div>
+		</ng-container>
+		<ng-container *ngIf="column.name == 'tool_type'">
+			<div>{{ getEnumTranslateGrid('tool_type', dataItem.tool_type) }}</div>
+		</ng-container>
+		<ng-container *ngIf="column.name == 'construction_type'">
+			<div>{{ getEnumTranslateGrid('construction_type', dataItem.construction_type) }}</div>
+		</ng-container>
+		<ng-container *ngIf="column.name == 'total'">
+			<div>{{ intl.formatNumber(getOfferTotal(dataItem),'c', 'it') }}</div>
+		</ng-container>
+		<ng-container *ngIf="column.name == 'project_nr'">
+			<button [disabled]="getDisabledProperty(dataItem.project_nr)" (click)="openProjectWindow(true,dataItem)"
+				kendoButton>
+				<span class="k-icon icon-shopping-cart"></span>
+				<div *ngIf="dataItem.project_nr" style="display: inline-flex; margin-left: 5px;">{{dataItem.project_nr}}
+				</div>
+			</button>
+		</ng-container>
+		<ng-container *ngIf="column.name == 'log'">
+			<button kendoButton (click)="showOfferLog(dataItem)">
+				<span class="k-icon icon-view-list"></span>
+			</button>
+		</ng-container>
+	</ng-template>
+
+	<ng-template #actionColumnContent let-dataItem>
+		<!--<button kendoButton (click)="duplicateOffer(dataItem)">-->
+		<button kendoButton (click)="openCloneWindow(true,dataItem)">
+			<span class="k-icon icon-copy"></span>
+		</button>
+		<button kendoButton (click)="printOfferDetails(dataItem)">
+			<span class="k-icon icon-printer"></span>
+		</button>
+	</ng-template>
+</kendo-grid-component>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>
+
+<kendo-window i18n i18n-title title="Connect Project" *ngIf="projectWindowOpened" (close)="openProjectWindow(false)"
+	[minWidth]="450" style="width:30vw; top:10vw;left: 35vw;" [width]="500" [top]="80">
+	<app-project-window [offer]="selectedOffer" [users]="usersList"
+		(sendNotification)="dataChangeEvt($event)"></app-project-window>
+</kendo-window>
+
+<kendo-window i18n-title title="Clone Offer" *ngIf="cloneWindowOpened" (close)="closeCloneOptionModal()" [minWidth]="250"
+	style="width:30vw; top:10vw;left: 35vw;" [width]="400" [top]="80">
+	<kendo-card width="100%">
+		<kendo-card-body>
+			<kendo-gridlayout [align]="{ horizontal: 'start', vertical: 'middle' }" [gap]="{ rows: 10, cols: 10 }">
+				<kendo-gridlayout-item [row]="1" [col]="1" style="width: 100%;">
+					<kendo-textbox [(ngModel)]="cloneSelectedOffer.custom_id" [readonly]="cloneSelectedOffer.custom_id != null"
+						i18n-placeholder placeholder="Offer">
+					</kendo-textbox>
+				</kendo-gridlayout-item>
+				<kendo-gridlayout-item [row]="2" [col]="1" style="width: 100%;">
+					<button kendoButton themeColor="secondary" iconClass="k-icon icon-copy"
+						(click)="duplicateCloneOffer('duplicate')" style="width: inherit;" i18n [disabled]="showCopyPricesWarning">
+						Copy Offer As New Version
+					</button>
+				</kendo-gridlayout-item>
+				<kendo-gridlayout-item [row]="3" [col]="1" style="width: 100%;">
+					<button kendoButton themeColor="secondary" iconClass="k-icon icon-document-add"
+						(click)="duplicateCloneOffer('clone')" style="width: inherit;" i18n [disabled]="showCopyPricesWarning">
+						Copy Offer As New Offer
+					</button>
+				</kendo-gridlayout-item>
+			</kendo-gridlayout>
+		</kendo-card-body>
+	</kendo-card>
+</kendo-window>
+
+<kendo-dialog i18n-title title="Offer Logs" *ngIf="openLog" (close)="closeLog()" [minWidth]="450" [width]="1550"
+	[minHeight]="200" [maxHeight]="500">
+	<kendo-grid [data]="offerLogs"
+		[pageable]="false" [sortable]="false" [filterable]="false">
+		<kendo-grid-column *ngFor="let column of logColumns" kendoGridCellTemplate
+			field="{{ column.name }}" title="{{ column.title }}" filter="text">
+			<ng-container *ngIf="column.filterType == 'enum'">
+				<ng-template kendoGridCellTemplate let-dataItem>
+					<div>{{ getEnumTranslateGrid('mp_offer_log', dataItem.description) }}</div>
+				</ng-template>
+			</ng-container>
+		</kendo-grid-column>
+	</kendo-grid>
+</kendo-dialog>
+
+<kendo-dialog i18n-title [title]="'Warning'" *ngIf="showCopyPricesWarning" (close)="closeCopyPricesWarningModal()" [width]="500"
+    [height]="250">
+    <kendo-card width="100%">
+        <kendo-card-body>
+            <div class="attention-msg">
+				<strong i18n>ATTENTION: </strong> 
+				<span i18n>If the original quote (V. 0) was created before 03/31/2024, the prices used in the copied/cloned quote are no longer valid. Please create a new quote without using the copy function to have updated prices.</span>
+			</div>
+        </kendo-card-body>
+    </kendo-card>
+    <kendo-dialog-actions class="clone-warning-modal-action" [layout]="end">
+        <button themeColor="primary" kendoButton (click)="duplicateOffer()" i18n>OK</button>
+    </kendo-dialog-actions>
+</kendo-dialog>

@@ -1,0 +1,287 @@
+<div class="mx-[-16px] my-0 h-full">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		*ngIf="selectedCustomer"
+		class="w-full h-full"
+		size="L">
+		<div class="body form w-full h-full">
+			<div class="h-full w-full">
+				<ui5-card class="w-full h-[75vh]">
+					<div class="h-[74vh]">
+						<app-grid-table
+							headerTitle="Contacts"
+							i18n-headerTitle
+							[showAction]="false"
+							[showDownload]="false"
+							[showActiveButton]="false"
+							addButtonText="New"
+							i18n-addButtonText
+							[columns]="contactColumns"
+							selectionMode="None"
+							(newButtonClick)="associateButtonClick()"
+							[data]="allContacts"
+							keyForCacheCustomDataTableColumns="/CRM-contacts"
+							[customData]="true"
+							[showSearch]="true"
+							#childComponentRef>
+						</app-grid-table>
+					</div>
+				</ui5-card>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+</div>
+
+<ui5-dialog
+	#errorDialogSVK
+	id="errorDialogSVK"
+	header-text="Error"
+	state="Negative">
+	<p i18n>All Fields are empty!</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			i18n
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<app-dialog [isDialogOpen]="isContactDialogOpen">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="flex flex-row justify-between">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ associateDialogTitle }}</ui5-title
+			>
+		</div>
+	</div>
+	<div class="w-[80vw]">
+		<form
+			(ngSubmit)="onSubmit(createOrUpdateForm)"
+			#createOrUpdateForm="ngForm"
+			class="w-full h-[50vh]">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				class="w-full h-full"
+				size="L">
+				<div class="body form w-full h-full">
+					<div class="w-full">
+						<div class="w-full gap-2">
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Main Addressee</ui5-label>
+								<ui5-switch id="mainAddresseeSwitch" name="is_main_addressee" [checked]="contact.is_main_addressee"
+									[(ngModel)]="contact.is_main_addressee" #mainAddresseeSwitch="ngModel">
+								</ui5-switch>
+							</div>
+
+							<div class="flex flex-row gap-2 mt-3">
+								<div class="flex-column w-1/4">
+									<ui5-label
+										show-colon
+										required
+										i18n
+										>First Name</ui5-label
+									>
+									<ui5-input
+										#firstNameInput="ngModel"
+										[(ngModel)]="contact.first_name"
+										name="first_name"
+										class="w-full"
+										id="firstNameInput"
+										[required]="true"
+										[valueState]="
+										firstNameInput.valid == false &&
+										(firstNameInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'">
+									</ui5-input>
+								</div>
+								<div class="flex-column w-1/4">
+									<ui5-label
+										show-colon
+										i18n
+										>Last Name</ui5-label
+									>
+									<ui5-input
+										#lastNameInput="ngModel"
+										[(ngModel)]="contact.last_name"
+										name="last_name"
+										class="w-full"
+										id="lastNameInput">
+									</ui5-input>
+								</div>
+
+								<div class="flex-column w-1/4">
+									<ui5-label
+										show-colon
+										i18n
+										>Email</ui5-label
+									>
+									<ui5-input
+										#emailInput="ngModel"
+										[valueState]="
+											emailInput.valid == false && emailInput.touched
+												? 'Negative'
+												: 'None'
+										"
+										[(ngModel)]="contact.email"
+										name="email"
+										[email]="true"
+										type="Email"
+										class="w-full"
+										id="emailInput">
+									</ui5-input>
+								</div>
+
+								<div class="flex-column w-1/4">
+									<ui5-label
+										show-colon
+										i18n
+										>Mobile</ui5-label
+									>
+									<ui5-input
+										#mobileInput="ngModel"
+										[(ngModel)]="contact.mobile"
+										pattern="^(\+?[1-9]\d{0,2}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$|0\d{10})$"
+										[valueState]="
+											mobileInput.valid == false && mobileInput.touched
+												? 'Negative'
+												: 'None'
+										"
+										name="mobile"
+										class="w-full"
+										id="mobileInput">
+									</ui5-input>
+								</div>
+							</div>
+
+							<div class="flex flex-row gap-2 mt-3">
+								<div class="flex-column w-1/4">
+									<ui5-label
+										show-colon
+										i18n
+										>Telephone</ui5-label
+									>
+									<ui5-input
+										#telephoneInput="ngModel"
+										[(ngModel)]="contact.telephone"
+										[valueState]="
+											telephoneInput.valid == false && telephoneInput.touched
+												? 'Negative'
+												: 'None'
+										"
+										pattern="^(\+?[1-9]\d{0,2}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$|0\d{10})$"
+										name="telephone"
+										class="w-full"
+										id="telephoneInput">
+									</ui5-input>
+								</div>
+								<div class="flex-column w-1/4">
+									<ui5-label
+										show-colon
+										i18n
+										>Role Description</ui5-label
+									>
+									<ui5-input
+										#roleDescriptionInput="ngModel"
+										[(ngModel)]="contact.role_description"
+										name="role_description"
+										class="w-full"
+										id="roleDescriptionInput">
+									</ui5-input>
+								</div>
+								<div class="flex-column w-1/4">
+									<ui5-label
+										show-colon
+										i18n
+										>LinkedIn</ui5-label
+									>
+									<ui5-input
+										#linkedinInput="ngModel"
+										[(ngModel)]="contact.linkedin"
+										name="linkedin"
+										class="w-full"
+										id="linkedinInput">
+									</ui5-input>
+								</div>
+								<div class="flex-column w-1/4">
+									<ui5-label
+										show-colon
+										i18n
+										>Xing</ui5-label
+									>
+									<ui5-input
+										#xingInput="ngModel"
+										[(ngModel)]="contact.xing"
+										name="xing"
+										class="w-full"
+										id="xingInput">
+									</ui5-input>
+								</div>
+							</div>
+
+							<div class="flex flex-row gap-2 mt-3">
+								<div class="flex-column w-1/2">
+									<ui5-label
+										show-colon
+										i18n
+										>Note</ui5-label
+									>
+									<ui5-input
+										#noteInput="ngModel"
+										[(ngModel)]="contact.note"
+										name="note"
+										class="w-full"
+										id="noteInput">
+									</ui5-input>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</ui5-busy-indicator>
+		</form>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			id="saveButtonMachineState"
+			(click)="onSave()"
+			i18n>
+			Save
+		</ui5-button>
+		<ui5-button
+			design="Transparent"
+			class="ml-8"
+			id="cancelButtonMachineState"
+			(click)="cancelDialog()"
+			i18n>
+			Close
+		</ui5-button>
+	</div>
+</app-dialog>
+ 
+<app-crm-action-logs
+	[isDialogOpen]="isDialogOpen" 
+	[customer]="selectedCustomer"
+	[contact]="contact"
+	(onActionLogCreated)="onActionLogCreated($event)"
+	(closeActivityDialog)= "closeActivityDialog()"
+	[tableHeight]="'hide'"
+	>
+</app-crm-action-logs>

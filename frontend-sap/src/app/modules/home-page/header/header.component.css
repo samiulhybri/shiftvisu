@@ -1,0 +1,23 @@
+ui5-bar {
+	height: 52px !important;
+}
+.ui5-bar-startcontent-container {
+	padding-left: 48px !important;
+}
+#schertech_logo {
+	/* margin: 0 0 0 36px; */
+	margin: 0;
+	height: 24.23px;
+}
+.header-user-part-components {
+	color: #0064d9;
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0 16px 0 0;
+}
+#header-user-part {
+	padding: 0 40px 0 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

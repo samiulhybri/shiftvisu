@@ -1,0 +1,17 @@
+<app-hall 
+    (halls)="getHallData($event)"
+    [filter]="'is_enabled_plan_visu eq 1'"
+>
+</app-hall>
+<app-scheduler 
+    *ngIf="schedulerData.length"
+    [events]="schedulerData"
+    [selectedDate]="selectedDate"
+    [resources]="resources"
+    [group]="group"
+    [schedulerConfig]="schedulerConfig"
+    [slotDuration]="slotDuration"
+    [createFormGroup]="createFormGroup"
+>
+</app-scheduler>
+<app-loader *ngIf="isLoading"></app-loader>

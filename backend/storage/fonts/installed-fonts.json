@@ -1,0 +1,10 @@
+{
+    "poppins": {
+        "normal": "poppins_normal_12f61e1aca2bd22472c17cf0465b304e",
+        "600": "poppins_600_a68d0fa714114c7ef3a2a04bbe8fda45",
+        "bold": "poppins_bold_dd0c9eff9089b312c7d5e9a1f45059a4"
+    },
+    "poppins-regular": {
+        "normal": "poppins_regular_normal_15f101cef39f37657256913b1f0c5b88"
+    }
+}

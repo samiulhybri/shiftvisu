@@ -1,0 +1,332 @@
+<ui5-card class="bottom-sidebar">
+	<div
+		class="scrollable-content"
+		[ngStyle]="{ height: display }">
+		<div>
+			<ui5-button
+				id="setUpButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.STATUS_BOARD)"
+				[ngClass]="{ selected: selectedButton === machineBoardButtonNames.STATUS_BOARD }">
+				{{ getStateTranslate(machineBoardButtonNames.STATUS_BOARD) }}
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.MACHINEBOARD_CLOCKIN_CLOCKOUT_EDIT)
+			">
+			<ui5-button
+				id="clockInOutButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.CLOCK_IN_OUT)"
+				[ngClass]="{
+					selected: selectedButton === machineBoardButtonNames.CLOCK_IN_OUT,
+				}">
+				<ui5-busy-indicator [active]="isClockInBusy">
+					{{ getStateTranslate(machineBoardButtonNames.CLOCK_IN_OUT) }} ({{
+						totalClockedInUsers
+					}})
+				</ui5-busy-indicator>
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.MACHINEBOARD_PRODUCTION_PLAN_VIEW) ||
+				authService.isPermissionValid(permissionEnums.MACHINEBOARD_PRODUCTION_PLAN_EDIT) ||
+				authService.isPermissionValid(
+					permissionEnums.MACHINEBOARD_PRODUCTION_PLAN_EDIT_IF_QUALIFIED
+				)
+			">
+			<ui5-button
+				id="productionPlanButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.PRODUCTION_PLAN)"
+				[class.clicked]="isClicked"
+				[ngClass]="{
+					selected: selectedButton === machineBoardButtonNames.PRODUCTION_PLAN,
+				}"
+				>{{ getStateTranslate(machineBoardButtonNames.PRODUCTION_PLAN) }}
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				(authService.isPermissionValid(
+					permissionEnums.MACHINEBOARD_MACHINE_STATE_CHANGE_VIEW
+				) ||
+					authService.isPermissionValid(
+						permissionEnums.MACHINEBOARD_MACHINE_STATE_CHANGE_EDIT_IF_QUALIFIED
+					))
+			">
+			<ui5-button
+				id="machineStateButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.MACHINE_STATE)"
+				[ngClass]="{
+					selected: selectedButton === machineBoardButtonNames.MACHINE_STATE,
+				}"
+				>{{ getStateTranslate(machineBoardButtonNames.MACHINE_STATE) }}
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				authService.isPermissionValid(
+					permissionEnums.MACHINEBOARD_MACHINE_STATE_HISTORY_VIEW
+				) ||
+				authService.isPermissionValid(
+					permissionEnums.MACHINEBOARD_MACHINE_STATE_HISTORY_EDIT_IF_QUALIFIED
+				)
+			">
+			<ui5-button
+				id="machineStateHistoryButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.MACHINE_STATE_HISTORY)"
+				[ngClass]="{
+					selected: selectedButton === machineBoardButtonNames.MACHINE_STATE_HISTORY,
+				}"
+				>{{ getStateTranslate(machineBoardButtonNames.MACHINE_STATE_HISTORY) }}
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.MACHINEBOARD_QUANTITY_EDIT) ||
+				authService.isPermissionValid(
+					permissionEnums.MACHINEBOARD_QUANTITY_EDIT_IF_QUALIFIED
+				)
+			">
+			<ui5-button
+				id="quantityButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.QUANTITY)"
+				[ngClass]="{ selected: selectedButton === machineBoardButtonNames.QUANTITY }"
+				[disabled]="this.operationId == null"
+				>{{ getStateTranslate(machineBoardButtonNames.QUANTITY) }}
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				authService.isPermissionValid(
+					permissionEnums.MACHINEBOARD_MATERIAL_CONSUMPTION_EDIT
+				) ||
+				authService.isPermissionValid(
+					permissionEnums.MACHINEBOARD_MATERIAL_CONSUMPTION_EDIT_IF_QUALIFIED
+				)
+			">
+			<ui5-button
+				id="materialConsumptionButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.MATERIAL_CONSUMTION)"
+				[ngClass]="{
+					selected: selectedButton === machineBoardButtonNames.MATERIAL_CONSUMTION,
+				}"
+				>{{ getStateTranslate(machineBoardButtonNames.MATERIAL_CONSUMTION) }}
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.MACHINEBOARD_PACKAGING_EDIT) ||
+				authService.isPermissionValid(
+					permissionEnums.MACHINEBOARD_PACKAGING_EDIT_IF_QUALIFIED
+				)
+			">
+			<ui5-button
+				id="packagingButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.PACKAGING)"
+				[ngClass]="{ selected: selectedButton === machineBoardButtonNames.PACKAGING }"
+				>{{ getStateTranslate(machineBoardButtonNames.PACKAGING) }}
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.MACHINEBOARD_DEFAULT_PACKAGING_EDIT) ||
+				authService.isPermissionValid(
+					permissionEnums.MACHINEBOARD_DEFAULT_PACKAGING_EDIT_IF_QUALIFIED
+				)
+			">
+			<ui5-button
+				id="defaultPackagingButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.DEFAULT_PACKAGING)"
+				[ngClass]="{ selected: selectedButton === machineBoardButtonNames.DEFAULT_PACKAGING }"
+				>{{ getStateTranslate(machineBoardButtonNames.DEFAULT_PACKAGING) }}
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.MACHINEBOARD_PRINT_HU_EDIT)
+			">
+			<ui5-button
+				id="defaultPackagingButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.PRINT_HU)"
+				[ngClass]="{ selected: selectedButton === machineBoardButtonNames.PRINT_HU }"
+				>{{ getStateTranslate(machineBoardButtonNames.PRINT_HU) }}
+			</ui5-button>
+		</div>
+		<div
+			*ngIf="
+			authService.isPermissionValid(permissionEnums.MACHINEBOARD_RESET_PROPOSAL_EDIT) ||
+			authService.isPermissionValid(
+				permissionEnums.MACHINEBOARD_RESET_PROPOSAL_EDIT_IF_QUALIFIED
+			)
+			">
+		<ui5-button
+			id="resetProposalButton"
+			class="sapHoverColor nav-button"
+			(click)="onButtonClick(machineBoardButtonNames.RESET_PROPOSAL)"
+			[ngClass]="{ selected: selectedButton === machineBoardButtonNames.RESET_PROPOSAL}"
+			>{{ getStateTranslate(machineBoardButtonNames.RESET_PROPOSAL) }}
+		</ui5-button>
+		</div>
+		<div
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.MACHINEBOARD_PAINTING_LINE_EDIT)
+			">
+			<ui5-button
+				id="paintingLineButton"
+				class="sapHoverColor nav-button"
+				(click)="onButtonClick(machineBoardButtonNames.PAINTING_LINE)"
+				[ngClass]="{ selected: selectedButton === machineBoardButtonNames.PAINTING_LINE}"
+				>{{ getStateTranslate(machineBoardButtonNames.PAINTING_LINE) }}
+			</ui5-button>
+		</div>
+		@if (authService.isPermissionValid(permissionEnums.MACHINEBOARD_DOCVISU_EDIT) ||
+			authService.isPermissionValid(permissionEnums.MACHINEBOARD_DOCVISU_EDIT_IF_QUALIFIED)) {
+			<div>
+				<ui5-button id="docVisuButton" class="sapHoverColor nav-button"
+					(click)="onButtonClick(machineBoardButtonNames.DOC_VISU)"
+					[ngClass]="{ selected: selectedButton === machineBoardButtonNames.DOC_VISU}">{{
+					getStateTranslate(machineBoardButtonNames.DOC_VISU) }}
+				</ui5-button>
+			</div>
+		}
+		<!-- <div>
+        <ui5-button
+          id="materialConsumptionButton"
+          class="sapHoverColor nav-button"
+          (click)="onButtonClick(machineBoardButtonNames.MATERIAL_CONSUMTION)"
+          [ngClass]="{'selected': selectedButton === machineBoardButtonNames.MATERIAL_CONSUMTION}"
+          >{{ machineBoardButtonNames.MATERIAL_CONSUMTION }}
+        </ui5-button>
+      </div>
+     <div>
+        <ui5-button
+          id="docVisuButton"
+          class="sapHoverColor nav-button"
+          (click)="onButtonClick(machineBoardButtonNames.PACKAGING)"
+          [ngClass]="{'selected': selectedButton === machineBoardButtonNames.PACKAGING}"
+          >{{ machineBoardButtonNames.PACKAGING }}
+        </ui5-button>
+      </div>
+      <div>
+        <ui5-button
+          id="mesButton"
+          class="sapHoverColor nav-button"
+          (click)="onButtonClick(machineBoardButtonNames.RE_PACKAGING)"
+          [ngClass]="{'selected': selectedButton === machineBoardButtonNames.RE_PACKAGING}"
+          >{{ machineBoardButtonNames.RE_PACKAGING }}
+        </ui5-button>
+      </div>
+      <div>
+        <ui5-button
+          id="setUpButton"
+          class="sapHoverColor nav-button"
+          (click)="onButtonClick(machineBoardButtonNames.GOODS_RECEIPT)"
+          [ngClass]="{'selected': selectedButton === machineBoardButtonNames.GOODS_RECEIPT}"
+          >{{ machineBoardButtonNames.GOODS_RECEIPT }}
+        </ui5-button>
+      </div> -->
+      <div
+	  	*ngIf="
+	  		authService.isPermissionValid(permissionEnums.MACHINEBOARD_QUALIVISU_EDIT) ||
+			authService.isPermissionValid(permissionEnums.MACHINEBOARD_QUALIVISU_EDIT_IF_QUALIFIED)
+  		">
+        <ui5-button
+          id="mesButton"
+          class="sapHoverColor nav-button"
+          (click)="onButtonClick(machineBoardButtonNames.QUALI_VISU)"
+          [ngClass]="{'selected': selectedButton === machineBoardButtonNames.QUALI_VISU}"
+		  [disabled]="this.operationId == null"
+          >{{ getStateTranslate(machineBoardButtonNames.QUALI_VISU)}}
+        </ui5-button>
+      </div>
+	</div>
+
+	<div class="h-1 c-grey"></div>
+	<div class="terminal-pad">
+		<div
+			slot="footer"
+			class="left-component-footer">
+			<div class="left-side">
+				<ui5-icon
+					id="btn"
+					slot="icon"
+					name="person-placeholder"></ui5-icon>
+				<ui5-title
+					slot="title"
+					level="H6"
+					class="m-1"
+					>{{ authService.loggedInUser.name }}
+				</ui5-title>
+			</div>
+			<img
+				id="login_logo"
+				src="./assets/images/login.svg"
+				slot="endContent"
+				(click)="goToLogIn()" />
+		</div>
+	</div>
+</ui5-card>
+<app-dialog
+	title="Warning"
+	id="warningDialog"
+	[isDialogOpen]="isDialogOpen"
+	[state]="'Critical'">
+	<div>
+		<p i18n>No qualified user clocked in</p>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="cancelButton"
+			class="ml-8"
+			(click)="closeDialog('clock-in')"
+			i18n>Cancel</ui5-button>
+	</div>
+</app-dialog>
+
+<app-dialog
+	title="Warning"
+    i18n-title
+	id="qualiVisuWarningDialog"
+	[isDialogOpen]="isQualiVisuWarningDialogOpen && isInMachineboardMain"
+	[state]="'Critical'">
+	<div class="h-[20vh] w-[40vw]">
+		<p>
+			<span i18n class="text-[30px]">You have {{numberOfOpenInspections}} Inspection Operation(s) with open Inspection Points.</span>
+		</p>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+
+		<ui5-button
+			id="cancelButton"
+			class="ml-8"
+			design="Emphasized"
+			(click)="onButtonClick(machineBoardButtonNames.QUALI_VISU,true)"
+			i18n>Go to QualiVisu</ui5-button>
+
+		@if(!isBlockedForInspectionPoints) {
+			<ui5-button
+			id="cancelButton"
+			class="ml-8"
+			(click)="closeDialog('quali-visu')"
+			i18n>Cancel</ui5-button>
+		}
+		
+	</div>
+</app-dialog>
+
+<router-outlet></router-outlet>

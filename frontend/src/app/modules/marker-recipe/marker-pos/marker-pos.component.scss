@@ -1,0 +1,71 @@
+:host {
+    width: 100%;
+    height: 100%;
+}
+.repice-pos-container {
+    width: 100%;
+    height: 100%;
+    .repice-pos-section,
+    .recipe-block-section {
+        width: 100%;
+        height: 49%;
+    }
+    .repice-pos-section {
+        .pos-header-container {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            .pos-action-section {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        .block-card-body {
+            height: 42.8vh;
+        } 
+        .recipe-pos-grid-layout {
+            height: 40vh;
+        }
+    }
+    .recipe-block-section {
+        margin-top: 15px;
+    }
+}
+
+.formError {
+    border: 1px solid red;
+}
+.pos-form-body {
+    .form-sections {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 10px;
+        .label-input-section {
+            width: 49%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .custom_id_field {
+            width: 100% !important;
+        }
+    }
+}
+.pos-modal-action {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    .pos-modal-action-btn {
+        align-self: flex-end;
+    }
+}

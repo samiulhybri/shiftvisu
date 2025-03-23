@@ -1,0 +1,106 @@
+<ui5-dialog #defaultPackagingModalRef [open]="true" [headerText]="dialogTitle" (beforeClose)="closeDialog()">
+	<ui5-busy-indicator [active]="isInstructionLoading" size="L">
+		<div style="display: flex; flex-direction: row;">
+			<!-- second level of next packaging instruction -->
+			<div class="w-[500px] p-8">
+				<div>
+					<div class="input-selection-grid">
+						<ui5-label class="label-flex-end" for="packagingInstruction" show-colon 
+							i18n>Packaging Instruction</ui5-label>
+						<ui5-busy-indicator [active]="loading" class="w-full busy-indicator-flex">
+							<ui5-multi-input id="itemsMultiInput" class="w-full" #instructionInputRef
+								[disabled]="!packagingInstructions.length && !loading"
+								[showValueHelpIcon]="packagingInstructions.length"
+								[(ngModel)]="instructionCustomID" (ui5Input)="onSearchInstruction()"
+								(ui5ValueHelpTrigger)="onOpenInstructions()"></ui5-multi-input>
+						</ui5-busy-indicator>
+					</div>
+					<div class="input-selection-grid">
+						<ui5-label class="label-flex-end" for="quantityProduced" [required]="true" [showColon]="true"
+							i18n>Item</ui5-label>
+						<ui5-busy-indicator class="w-full busy-indicator-flex">
+							<ui5-multi-input id="itemsMultiInput" class="w-full" #itemsMultiInputRef
+								[showValueHelpIcon]="instructionCustomID ? false : true"
+								[disabled]="instructionCustomID || loading ? true : false" [(ngModel)]="selectedItemName"
+								(ui5Input)="onSearchItem()" (ui5ValueHelpTrigger)="onOpenItemList()"></ui5-multi-input>
+						</ui5-busy-indicator>
+					</div>
+				</div>
+				<div class="mt-5" *ngIf="selectedItem.id">
+					<app-item-image [height]="'340px'" [itemId]="selectedItem.id" [itemCustomId]="selectedItem.custom_id" class="w-full" [isCard]="true"
+						[isSingleImage]="true"></app-item-image>
+				</div>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+
+	<div slot="footer" class="dialog-footer">
+		<ui5-button design="Default" [disabled]="(instructionCustomID === '' && selectedItemName === '') || isInstructionLoading" (click)="removeNextPackaging()" i18n>Remove Packaging Instruction</ui5-button>
+		<ui5-button class="ml-8" design="Emphasized"
+			[disabled]="selectedItemName == '' || isInstructionLoading ? true : false" (click)="saveNextPackaging()">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button class="ml-8" (click)="closeDialog()">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</ui5-dialog>
+
+<ui5-popover #itemListPopover class="w-[500px] h-[500px]" [placement]="'Bottom'" header-text="Items" i18n-header-text>
+	<div>
+		<ui5-list [loading]="loading" [growing]="'Scroll'" (ui5LoadMore)="onLoadMoreItems()"
+			(ui5ItemClick)="onItemSelect($event)">
+			<ng-container *ngFor="let item of items">
+				<ui5-li *ngIf="item.is_active" [id]="item.id" [additionalText]="item.custom_id"
+					[selected]="selectedItem.custom_id === item.custom_id">{{item.name}}</ui5-li>
+			</ng-container>
+		</ui5-list>
+	</div>
+</ui5-popover>
+
+<ui5-popover #packagingInstructionPopover class="w-[500px] h-[500px]" [placement]="'Bottom'"
+	header-text="Packaging Instruction" i18n-header-text>
+	<div>
+		<ui5-list [loading]="loading" [growing]="'Scroll'" (ui5LoadMore)="onLoadMoreInstruction()"
+			(ui5ItemClick)="onInstructionSelect($event)">
+			<ng-container *ngFor="let instruction of packagingInstructions">
+				<ui5-li style="height: 150px;" [id]="instruction.packaging_instruction_id_child"
+					[attr.data-customid]="instruction.packaging_instruction_custom_id_parent ?? instruction.packaging_instruction_custom_id_child"
+					[attr.data-childid]="instruction.packaging_instruction_id_child"
+					[attr.data-parentid]="instruction.packaging_instruction_id_parent"
+					[selected]="selectedPackagingInstruction?.packaging_instruction_id_child == instruction.packaging_instruction_id_child && selectedPackagingInstruction?.packaging_instruction_id_parent == instruction.packaging_instruction_id_parent">
+					<div class="packaging-instruction-container">
+						<div class="packaging-instruction-info">
+							<app-item-image class="w-[130px]" [height]="'110px'" 
+							[itemId]="instruction?.item_id_container_child" [itemCustomId]="instruction?.item_custom_id_container" [isCard]="false"
+							[isSingleImage]="true"></app-item-image>
+							<div>
+								<ui5-title level="H4">{{instruction.packaging_instruction_custom_id_parent || instruction.packaging_instruction_custom_id_child}}</ui5-title>
+								<p class="description-text-color">{{instruction.item_custom_id_container}}</p>
+								<p class="description-text-color"><span i18n>Target Quantity:</span> {{instruction.target_quantity}}</p>
+							</div>
+						</div>
+						<ui5-tag *ngIf="selectedOrderDetails?.packagingInstructionId && instruction.is_default" design="Set1" color-scheme="4"><span i18n>Default</span></ui5-tag>
+					</div>
+				</ui5-li>
+			</ng-container>
+		</ui5-list>
+	</div>
+</ui5-popover>
+
+<ui5-dialog
+	#errorDialog
+	id="errorDialog"
+	header-text="Error"
+	state="Negative">
+	<p i18n>Next Packaging is not found for all operations.</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

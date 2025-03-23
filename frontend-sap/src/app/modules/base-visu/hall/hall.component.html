@@ -1,0 +1,321 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Halls"
+		url="/Halls"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_HALLS_EDIT')"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		[showSearch]="true"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+	<ui5-dialog
+		id="deleteDialogHall"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+
+	<ui5-dialog
+		#deleteErrorDialogHall
+		id="deleteErrorDialogHall"
+		state="Negative"
+		header-text="Error">
+		<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+		<div
+			slot="footer"
+			class="deleteErrorDialogFooter">
+			<ui5-button
+				class="dialogCloser"
+				design="Transparent"
+				(click)="closeDeleteErrorDialog()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+<app-dialog
+	id="hallDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div>
+			<ui5-title
+				class="pd-10 ml-[-10px]"
+				level="H5"
+				>{{ dialogTitle }}
+			</ui5-title>
+		</div>
+		<div class="flex justify-start">
+			<ui5-tabcontainer
+				class="ml-[-19px]"
+				(tab-select)="tabNavChanged($event)"
+				fixed
+				collapsed>
+				<ui5-tab
+					#code_dataTab
+					i18n-text
+					text="Core Data"
+					[selected]="selectedTab === 'core_data'"
+					id="core_data"
+					[disabled]="disableButtonDuringRequest">
+				</ui5-tab>
+				<ui5-tab
+					#modulesTab
+					i18n-text
+					text="Modules"
+					id="modules"
+					[selected]="selectedTab === 'modules'"
+					[disabled]="disableButtonDuringRequest">
+				</ui5-tab>
+			</ui5-tabcontainer>
+		</div>
+	</div>
+	<form
+		(ngSubmit)="onSubmit(create0rUpdateForm)"
+		#create0rUpdateForm="ngForm"
+		class="w-[500px] h-[230px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			class="w-full"
+			size="L">
+			<div
+				class="w-full"
+				[ngStyle]="{ display: selectedTab != 'core_data' ? 'none' : '' }">
+				<div class="flex flex-col gap-[5rem] w-full">
+					<div class="flex flex-col">
+						<ui5-label show-colon>{{ localization.active }}</ui5-label>
+						<ui5-switch
+							id="activeSwitch"
+							name="is_active"
+							[checked]="selectedHall.is_active"
+							[(ngModel)]="selectedHall.is_active"
+							[disabled]="shouldBeDisabled('is_active')">
+						</ui5-switch>
+					</div>
+				</div>
+				<div class="flex flex-row w-full gap-2 mt-3">
+					<div class="flex flex-col h-full">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								#customId="ngModel"
+								[disabled]="shouldBeDisabled('custom_id')"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || create0rUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								[(ngModel)]="selectedHall.custom_id"
+								(input)="onChangeCustomId()"
+								class="w-[245px]"
+								id="customIdInput"
+								name="custom_id"
+								[required]="true">
+								<div slot="valueStateMessage">
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+
+					<div class="flex flex-col h-full">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.name }}</ui5-label
+						>
+						<ui5-input
+							id="hallNameInput"
+							class="w-[245px]"
+							#nameInput="ngModel"
+							[required]="true"
+							[disabled]="shouldBeDisabled('name')"
+							[(ngModel)]="selectedHall.name"
+							(change)="onChangeName($event)"
+							[valueState]="
+								nameInput.valid == false &&
+								(nameInput.touched || create0rUpdateForm.submitted)
+									? 'Negative'
+									: 'None'
+							"
+							name="name"></ui5-input>
+					</div>
+				</div>
+				<div class="flex flex-row w-full gap-2 mt-3">
+					<div class="flex flex-col h-full w-full">
+						<ui5-label
+							i18n
+							show-colon
+							>Production Planning Page</ui5-label>
+						<ui5-combobox
+							[disabled]="selectedHall.is_enabled_plan_visu == false"
+							class="w-[245px]"
+							(selection-change)="onChangeProductionPlanningPage($event)"
+							value="{{ getPageName(selectedHall.production_planning_page!) }}">
+							<ui5-cb-item
+								*ngFor="let item of productionPlanningPageNameItems"
+								text="{{ getPageName(item.text) }}"></ui5-cb-item>
+						</ui5-combobox>
+					</div>								
+					<div class="flex flex-col h-full w-full">
+						<ui5-label
+							i18n
+							show-colon
+							>Frozen Zone Before Days</ui5-label
+						>
+						<ui5-input
+							#frozenZoneBeforeDaysInput="ngModel"
+							[(ngModel)]="selectedHall.frozen_zone_before_days"
+							pattern="^[0-9]*$"
+							[disabled]="shouldBeDisabled('frozen_zone_before_days')"
+							name="frozen_zone_before_days"
+							class="w-[245px]"
+							id="frozenZoneBeforeDaysInput">
+						</ui5-input>
+				    </div>
+				
+			    </div>
+				<div class="flex flex-row w-full gap-2 mt-3">
+					<div class="flex flex-col h-full w-full">
+						<ui5-label
+							i18n
+							show-colon
+							>Frozen Zone After Weeks</ui5-label
+						>
+						<ui5-input
+							#frozenZoneAfterWeeksInput="ngModel"
+							[(ngModel)]="selectedHall.frozen_zone_after_weeks"
+							pattern="^[0-9]*$"
+							[disabled]="shouldBeDisabled('frozen_zone_after_weeks')"
+							name="frozen_zone_after_weeks"
+							class="w-[245px]"
+							id="frozenZoneAfterWeeksInput">
+						</ui5-input>
+					</div>
+					
+				</div>
+			</div>
+			<div [ngStyle]="{ display: selectedTab != 'modules' ? 'none' : '' }">
+				<div class="flex flex-row w-[500px] h-[230px]">
+					<div class="">
+						<ui5-label
+							show-colon
+							i18n
+							>Statusboard</ui5-label>
+						<ui5-switch
+							class="w-full"
+							id="statusBoardSwitch"
+							name="is_enabled_statusboard"
+							[disabled]="shouldBeDisabled('is_enabled_statusboard')"
+							[(ngModel)]="selectedHall.is_enabled_statusboard">
+						</ui5-switch>
+					</div>
+					
+					<div>
+						<ui5-label
+						show-colon
+						i18n
+						>PlanVisu</ui5-label>
+						<ui5-switch
+						class="w-full"
+						id="planVisuSwitch"
+						name="is_enabled_plan_visu"
+						[disabled]="shouldBeDisabled('is_enabled_plan_visu')"
+						[(ngModel)]="selectedHall.is_enabled_plan_visu">
+					</ui5-switch>
+				</div>
+			</div>
+
+			</div>
+		</ui5-busy-indicator>
+	</form>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogHalls
+	id="errorDialogHalls"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

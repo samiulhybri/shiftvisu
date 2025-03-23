@@ -1,0 +1,106 @@
+<span #CustomObjectPageLayout></span>
+
+<ui5-dialog
+	[open]="isViewSettingsOpen"
+	style="width: 600px">
+	<div
+		class="dialog-header"
+		slot="header">
+		<div class="setting-dialog-body">
+			<ui5-title
+				level="H5"
+				i18n
+				>View Settings</ui5-title
+			>
+			<div>
+				<ui5-button
+					id="allSelectionButton"
+					i18n
+					design="Transparent"
+					(click)="selectAllBtn()"
+					>Select All</ui5-button
+				>
+				<ui5-button
+					id="resetButton"
+					i18n
+					design="Transparent"
+					(click)="reset()"
+					>Reset to Default</ui5-button
+				>
+			</div>
+		</div>
+	</div>
+	<div
+		*ngIf="isViewSettingsOpen"
+		class="setting-dialog-list">
+		<ui5-list
+			selectionMode="Multiple"
+			#viewSettingListDialog
+			(selectionChange)="selectionChange($event)">
+			<ui5-li
+				*ngFor="let column of cachedColumn;index as i"
+				[selected]="column['isSelected']"
+				[id]="i"
+				>{{column.Header}}</ui5-li
+			>
+		</ui5-list>
+	</div>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			(click)="applyChanges()"
+			i18n>
+			Save
+		</ui5-button>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8"
+			(click)="toggleSettingDialog(true)"
+			i18n>
+			Cancel
+		</ui5-button>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#resetConfirmDialog
+	id="resetConfirmDialog"
+	header-text="Warning"
+	state="Critical"
+	i18n-header-text>
+	<p i18n>Do you want to remove the Table Cache?</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="resetConfirmationSubmit()"
+			i18n
+			>OK</ui5-button
+		>
+		<ui5-button
+			i18n
+			(click)="closeResetDialog()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#codeScannerDialog
+	id="codeScannerDialog"
+	header-text="Scan barcode"
+	state="None"
+	i18n-header-text>
+	<video #videoElement style="width: 100%; max-height: 60vh;"></video>
+	<div class="scanner-overlay"></div>
+	<p i18n *ngIf="!videoInputDevices.length">Video loading</p>
+	<div slot="footer" class="left-component-footer">
+		<ui5-button i18n design="Transparent" (click)="closeCodeScannerDialog()">Close</ui5-button>
+	</div>
+</ui5-dialog>

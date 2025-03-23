@@ -1,0 +1,216 @@
+<router-outlet></router-outlet>
+<div class="tableStandard">
+	@if (isPrepared) {
+		<app-grid-table
+			[headerTitle]="tableTitle"
+			[columns]="gridColumns"
+			[url]="endPoint"
+			[showAction]="true"
+			[showSearch]="true"
+			[showDownload]="false"
+			selectionMode="Single"
+			showTableSettingBtn="true"
+			[showActiveButton]="useFilter"
+			[showNewButton]="canAddNew"
+			button1Text="All"
+			button2Text="Inactive"
+			button3Text="Active"
+			keyForCacheCustomDataTableColumns="docVisuDocSectionItems"
+			addButtonText="New"
+			[isBaseVisu]="true"
+			[showRowDataCount]="true"
+			i18n-addButtonText
+			i18n-button1Text
+			i18n-button2Text
+			i18n-button3Text
+			[enableServerSideFiltering]="true"
+			[plantId]="usePlantId ? this.plantId : undefined"
+			[customActionButtons]="actionButtons"
+			(newButtonClick)="newButtonClick()"
+			(rowClick)="handleRowClick($event)"
+			[onDoubleClick]="onDoubleClick"
+			[filterQuery]="filterQuery"
+			#consumptionChildComponentRef>
+		</app-grid-table>
+	}
+</div>
+
+<ui5-dialog
+	class="h-[720px] w-[1150px]"
+	header-text="Add"
+	#addNewDialog
+	i18n-header-text>
+	<ui5-busy-indicator
+		class="w-full"
+		[active]="isLoading">
+		<div class="grid grid-flow-col grid-cols-7 gap-2 justify-between h-[600px] gap-x-3 w-full">
+			<ui5-card class="h-[180px] grid col-span-3 mr-4">
+				<div class="m-4 flex flex-col">
+					<div class="flex flex-col">
+						<ui5-label
+							show-colon
+							i18n
+							>Active</ui5-label
+						>
+						<ui5-switch [(ngModel)]="isActive"></ui5-switch>
+					</div>
+					<div class="flex flex-col">
+						<ui5-label
+							required
+							show-colon
+							i18n
+							>Name</ui5-label
+						>
+						<ui5-input
+							[required]="true"
+							class="w-full"
+							[(ngModel)]="itemName"
+							#nameInput="ngModel"
+							[valueState]="
+								nameInput.valid == false && nameInput.touched ? 'Negative' : 'None'
+							">
+						</ui5-input>
+					</div>
+					<div class="flex flex-col">
+						<ui5-label
+							class="m-1"
+							show-colon
+							i18n
+							>Folder Structure</ui5-label
+						>
+						<ui5-combobox
+							#directoryStructureComboBox
+							id="directoryStructureComboBox"
+							class="w-full"
+							[value]="selectedDocumentSection.directoryStructure?.name || ''"
+							(selection-change)="onChangeDirectoryStructure($event)"
+							(input)="onInputChange($event)"
+							(change)="
+								inputInvalidEntryRestrict(
+									$event,
+									selectedDocumentSection.directoryStructure?.name
+								)
+							">
+							@for (item of directoryStructures; track $index) {
+								@if (item.is_active) {
+									<ui5-cb-item
+										id="{{ item.id }}"
+										text="{{ item.name }}"
+										[additionalText]="item.custom_id"></ui5-cb-item>
+								}
+							}
+						</ui5-combobox>
+					</div>
+				</div>
+			</ui5-card>
+
+			<ui5-card class="grid col-span-4">
+					<ui5-busy-indicator
+						class="w-full "
+						[active]="isStructureLoading">
+						@if (directory) {
+							<app-doc-visu-directory-view
+								[title]="title"
+								[showExpandButton]="true"
+								class="w-full h-[580px] pb-[20px]"
+								[processClick]="processClick"
+								[structure]="directory"></app-doc-visu-directory-view>
+						}
+					</ui5-busy-indicator>
+			</ui5-card>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Emphasized"
+			(click)="createProcess(nameInput)"
+			[disabled]="isLoading"
+			id="saveButton"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button (click)="createPopUpClose(nameInput)" id="closeOverlapButton">{{ localization.close }}</ui5-button>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	class="w-[450px]"
+	header-text="Edit"
+	#editProcessDialog
+	i18n-header-text>
+	<ui5-busy-indicator
+		class="w-full"
+		[active]="isLoading"
+		size="M">
+		<div class="w-full">
+			<div class="flex flex-col">
+				<ui5-label
+					show-colon
+					i18n
+					>Active</ui5-label
+				>
+				<ui5-switch [(ngModel)]="isActive"></ui5-switch>
+			</div>
+			<div class="mb-1">
+				<ui5-label required show-colon i18n>Name</ui5-label>
+			</div>
+			<ui5-input [required]="true" class="w-full" [(ngModel)]="itemName" #itemNameInput="ngModel" 
+			    [valueState]="itemNameInput.valid == false &&(itemNameInput.touched)
+					?'Negative' : 'None'">
+			</ui5-input>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			(click)="updateProcess()"
+			[disabled]="isLoading"
+			id="saveButton"
+			design="Emphasized"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			id="closeOverlapButton"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	class="h-[170px] w-[450px]"
+	header-text="Warning"
+	#deleteProcessDialog
+	i18n-header-text
+	state="Critical">
+	<ui5-busy-indicator
+		class="w-full"
+		[active]="isLoading"
+		size="M">
+		<div class="m-0">
+			<ui5-text>
+				<span i18n>All folders and files will be deleted from this process. Do you really want to delete this</span><strong>&nbsp;“{{ selectedProcessItem?.name }}”&nbsp;</strong><span i18n>structure?</span>
+			</ui5-text>
+		</div>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Emphasized"
+			[disabled]="disableButtonDuringRequest"
+			(click)="deleteProcess()"
+			id="deleteButton"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			[disabled]="disableButtonDuringRequest"
+			id="closeOverlapButton"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

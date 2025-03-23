@@ -1,0 +1,50 @@
+<kendo-card class="card" width="'20%'">
+  <!-- Header -->
+  <kendo-card-header>
+    <div i18n>Employee Information</div>
+  </kendo-card-header>
+  <!-- Body -->
+  <kendo-card-body>
+    <form [formGroup]="employeeFormGroup">
+      <kendo-stacklayout orientation="vertical" [gap]="9">
+        <kendo-label
+          [for]="'employeeName'"
+          i18n i18n-text
+          text="Enter Your Employee Personal Number:"
+        ></kendo-label>
+        <kendo-dropdownlist
+          [id]="'employeeName'"
+          #employeeName
+          formControlName="employeeName"
+          [defaultItem]="defaultSelectedUser"
+          [data]="users"
+          [valuePrimitive]="true"
+          [filterable]="true"
+          textField="name"
+          valueField="id"
+          (valueChange)="userSelectionChange($event)"
+          (filterChange)="handleFilter($event)"
+        >
+        </kendo-dropdownlist>
+        <kendo-textbox
+          formControlName="employeeNumber"
+          [readonly]="true"
+          [disabled]="true"
+          i18n i18n-placeholder
+          placeholder="Employee Number"
+        ></kendo-textbox>
+        <kendo-label
+          [for]="'actualWeight'"
+          i18n i18n-text
+          text="Actual Weight"
+        ></kendo-label>
+        <kendo-numerictextbox
+          [min]="0"
+          [id]="'actualWeight'"
+          formControlName="actualWeight"
+          [format]="'0.00 kg'"
+        ></kendo-numerictextbox>
+      </kendo-stacklayout>
+    </form>
+  </kendo-card-body>
+</kendo-card>

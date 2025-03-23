@@ -1,0 +1,177 @@
+<form class="k-form" [formGroup]="form" *ngIf="data">
+	<kendo-stacklayout orientation="horizontal" [gap]="12">
+		<kendo-card [style.flex]="6">
+			<kendo-card-header i18n>
+			  Base Material
+			</kendo-card-header>
+			<kendo-card-body class="chem-details-body">
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="custom_id" i18n i18n-text text="Material Id"> <span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+						<kendo-textbox #custom_id 
+							formControlName="custom_id"
+							[(ngModel)]="data.custom_id"
+							[disabled]="isAllDisabled"
+						>
+						</kendo-textbox>
+						<div *ngIf="form.controls['custom_id'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+							DIN Norm  is required.
+						</div>
+					</div>
+				</kendo-stacklayout>
+			
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					
+					<kendo-label [for]="name" i18n i18n-text text="Material Name"><span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+						<kendo-textbox #name formControlName="name"
+						[(ngModel)]="data.name" [disabled]="isAllDisabled"
+						></kendo-textbox>
+						<div *ngIf="form.controls['name'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+							Material Name is required.
+						</div>
+					</div>
+				</kendo-stacklayout>
+            
+              
+				<kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9"  >
+					
+						<label [for]="density"  i18n> Density <span class="k-text-error k-pl-1">*</span> </label>
+						<div>
+							<kendo-numerictextbox format="#.##\ kg/dm³" #density formControlName="density" name="density" decimals="4" [(ngModel)]="data.density" [disabled]="isAllDisabled">
+							</kendo-numerictextbox>
+							<div *ngIf="form.controls['density'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+								Density id is required.
+							</div>
+					    </div>
+				</kendo-stacklayout>
+                
+            
+
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="warehouse_material" i18n i18n-text text="Warehouse Material"><span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+						<kendo-combobox 
+							#warehouse_material 
+							[(ngModel)]="data.warehouse_material" 
+							formControlName="warehouse_material"
+							[data]="warehouseMaterialData"
+							textField="text" 
+							valueField="value"
+                            [valuePrimitive]="true"
+							name="warehouse_material"
+							[disabled]="isAllDisabled"
+						>
+					   </kendo-combobox>
+						<div *ngIf="form.controls['warehouse_material'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+							Warehouse material id is required.
+						</div>
+                    </div>
+				</kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="material_group_type" i18n i18n-text text="Material Group Type"><span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+						<kendo-combobox 
+							#material_group_type 
+							[(ngModel)]="data.material_group_type" 
+							formControlName="material_group_type"
+							[data]="materialGroupTypes"
+							textField="text" 
+							valueField="value"
+                            [valuePrimitive]="true"
+							name="material_group_type"
+							[disabled]="isAllDisabled"
+						>
+					   </kendo-combobox>
+					<div *ngIf="form.controls['material_group_type'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+						Material Group type is required.
+					</div>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="check_starting_material"
+                    i18n i18n-text  text="Check Starting Material"></kendo-label>
+                    <input type="checkbox" 
+                        kendoCheckBox 
+                        [(ngModel)]="data.check_starting_material" 
+                        formControlName="check_starting_material"
+                        #check_starting_material 
+						[disabled]="isAllDisabled"/>
+                </kendo-stacklayout>
+				<kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" >
+					
+					<label [for]="forging_temperature_min"  i18n> Forging temperature min</label>
+					<div>
+						<kendo-numerictextbox format="#.##\ °C" #forging_temperature_min formControlName="forging_temperature_min" name="forging_temperature_min" [decimals]="0" [(ngModel)]="data.forging_temperature_min" [disabled]="isAllDisabled">
+						</kendo-numerictextbox>
+					
+					</div>
+			</kendo-stacklayout>
+			<kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9"  >
+					
+				<label [for]="forging_temperature_max"  i18n>Forging temperature max  </label>
+				<div>
+					<kendo-numerictextbox format="#.##\ °C" #forging_temperature_max formControlName="forging_temperature_max" name="forging_temperature_max" [decimals]="0" [(ngModel)]="data.forging_temperature_max" [disabled]="isAllDisabled">
+					</kendo-numerictextbox>
+				</div>
+		</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="put_in_cold_oven" i18n i18n-text text="Put in cold oven"></kendo-label>
+					<input type="checkbox" 
+					kendoCheckBox 
+					[(ngModel)]="data.put_in_cold_oven" 
+					formControlName="put_in_cold_oven"
+					#put_in_cold_oven 
+					[disabled]="isAllDisabled"/>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="shrinkage" i18n i18n-text text="Shrinkage"><span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+						<kendo-combobox
+							#shrinkage 
+							[(ngModel)]="data.shrinkage"
+							[data]="hweShrinkageData"
+							textField="text" 
+							valueField="value"
+                            [valuePrimitive]="true"
+                            [ngModelOptions]="{standalone: true}"
+							name="shrinkage"
+							[disabled]="isAllDisabled"
+						>
+					   </kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="color_type" i18n i18n-text text="Color type"></kendo-label>
+					<div>
+						<kendo-combobox 
+							#color_type 
+							[(ngModel)]="data.color_type"
+							[data]="hweColorTypeData"
+							textField="text" 
+							valueField="value"
+                            [valuePrimitive]="true"
+                            [ngModelOptions]="{standalone: true}"
+							name="color_type"
+							[disabled]="isAllDisabled"
+						>
+					   </kendo-combobox>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="note" i18n i18n-text text="Note"></kendo-label>
+					<kendo-textarea #note 
+						formControlName="note"  
+						[style.width]="'50%'"
+						[(ngModel)]="data.note"
+						[disabled]="isAllDisabled"
+					>
+					</kendo-textarea>
+				</kendo-stacklayout>
+			</kendo-card-body>	
+		</kendo-card>
+    </kendo-stacklayout>
+</form>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

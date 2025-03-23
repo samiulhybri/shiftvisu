@@ -1,0 +1,274 @@
+.offer-pos {
+    kendo-stacklayout {
+        padding: 0 6px;
+        align-items: center;
+        font-size: 13px;
+    }
+    .mt-15{
+        margin-top: 15px;
+    }
+    .dimension-header {
+        display: block;
+        // font-size: 1.17em;
+        // margin-block-start: 1em;
+        margin-block-end: -.5em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+        font-weight: bold;
+    }
+    .dimension-section-width{
+        width: 33.6%;
+    }
+    .dimension-sub-header {
+        display: flex;
+        flex-direction: row-reverse;
+        margin-right: 17%;
+        font-weight: 600
+    }
+
+    .raw-header {
+        display: flex;
+        justify-content: space-between;
+
+        button {
+            margin-top: 10px;
+            height: 30px;
+        }
+    }
+
+    .raw-body {
+        width: 100%;
+        margin-bottom: 12px;
+        margin-top: 6px;
+        .input-box-width{
+            width: 28.5%;
+        }
+        .semi-product-type{
+            width: 50%;
+        }
+    }
+}
+.table-view .k-align-items-stretch:nth-child(even) {
+    background: #f5f5f5;
+}
+.second_part .k-align-items-stretch:nth-child(odd) {
+    background: rgb(177, 177, 210, 0.5);
+}
+.second_part .k-align-items-stretch:nth-child(even) {
+    background: white;
+}
+
+.fourth_part .k-align-items-stretch:nth-child(odd) {
+    background: rgba(221, 176, 176, 0.5);
+}
+.fourth_part .k-align-items-stretch:nth-child(even) {
+    background: white;
+}
+
+.third .k-align-items-stretch:nth-child(odd) {
+    background: rgba(177, 210, 200, 0.5);
+} .third .k-align-items-stretch:nth-child(even) {
+    background:white
+}
+.k-input-solid{
+    background-color: transparent;
+}
+.font-medium{
+    font-size: 15px;
+}
+.basismaterial-dropdown{
+    width: 50%;
+    display: flex;
+}
+.tool-dropdown{
+    width: 48%;
+}
+.dimensions {
+
+    .finished {
+        margin: 10px;
+
+        p {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .dimension-surface {
+            display: flex;
+            flex-direction: row-reverse;
+            margin-right: 14%;
+            font-weight: 600
+        }
+
+        table {
+            width: 100%;
+
+            tr:nth-child(even) {
+                background: #f5f5f5;
+            }
+
+            tr {
+                width: 100%;
+                padding: 6px;
+
+               
+
+                td:last-child {
+                    text-align: center;
+                }
+                td{
+                    width: 25%;
+                }
+            }
+        }
+    }
+
+    .blank {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        .raw-table {
+            margin: 4px;
+            width: 100%;
+
+            p {
+                margin-top: 3px;
+                font-size: 13px;
+                font-weight: 700;
+            }
+
+            table {
+                width: 100%;
+
+                tr:nth-child(even) {
+                    background: #f5f5f5;
+                }
+
+                tr {
+                    width: 100%;
+                    padding: 6px;
+
+                    td {
+                        width: 16%;
+                    }
+                }
+            }
+        }
+
+    }
+}
+.w-41p{
+    width: 41%;
+}
+.w-40p{
+    width: 40%;
+}
+::ng-deep .input-field .k-numerictextbox .k-input-spinner {
+	display: none;
+}
+
+.bordered-table {
+    border-collapse: collapse;
+}
+.bordered-table tr:nth-child(even) {
+    background: #f5f5f5;
+}
+
+.bordered-table td, .bordered-table th {
+    border:none;
+    padding: 8px;
+    text-align: left;
+}
+
+.bordered-table th {
+    background-color: #f2f2f2;
+}
+.custom-hr-dotted {
+    background: blue;
+    border: 1px dotted blue;
+    height: 1px;
+}
+.font-size-12{
+font-size: 12px;
+}
+.diagram-table tr td,th {
+    border: 2px solid black;
+    box-sizing: border-box;
+    margin-top: 2px;
+}
+.diagram-table tr  td{
+    border-bottom: none;
+}
+.diagram-table tr .k-input-solid {
+    margin: 2px 35px;
+
+}
+.diagram-table{
+    border-collapse: collapse;
+    width: 100%;
+    box-sizing: border-box;
+}
+.diagram-table kendo-numerictextbox {
+    width: 80%;
+}
+
+.numeric-textbox {
+    width: 75%;
+    margin: 0 8px;
+}
+
+.numeric-textbox-red {
+    width: 75%;
+    color: red;
+}
+
+.flex-row {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.flex-row-small {
+    display: flex;
+    align-items: center;
+    margin-top: 2px;
+    input{
+        border-color: red;
+    }
+}
+
+.hr-line {
+    border: none;
+    border-top: 1px solid black !important;
+    width: 15%;
+    margin-top: 14px;
+}
+.forged-part {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 90%;
+}
+.forged-part:nth-of-type(1), 
+.forged-part:nth-of-type(3) {
+    flex-grow: 2; 
+}
+.forged-part:nth-of-type(2) {
+    flex-grow: 3; 
+}
+@media screen and (max-width: 2000px) {
+    .forged-part {
+        width:100%;
+    }
+}
+
+@media screen and (min-width: 850px) and (max-width: 1400px) {
+    .responsive-text-break {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+    }
+}

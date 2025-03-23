@@ -1,0 +1,68 @@
+<kendo-card width="100" *ngIf="meltAnalysis">
+	<div class="panelbar-wrapper">
+		<kendo-panelbar>
+			<kendo-panelbar-item i18n-title title="Notes" [expanded]="false">
+				<ng-template kendoPanelBarContent>
+					<div class="main-div">
+						<div class="content">
+							<table class="table">
+								<thead>
+									<tr>
+										<td i18n>Additional fields</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<kendo-textbox [(ngModel)]="meltAnalysis.note"></kendo-textbox>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<kendo-textbox [(ngModel)]="meltAnalysis.note_2"></kendo-textbox>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<kendo-textbox [(ngModel)]="meltAnalysis.note_3"></kendo-textbox>
+										</td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+						<div class="content">
+							<table class="table">
+								<thead>
+									<tr>
+										<td i18n>Free text field</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<kendo-textbox [(ngModel)]="meltAnalysis.note_4"></kendo-textbox>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<kendo-textbox [(ngModel)]="meltAnalysis.note_5"></kendo-textbox>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<kendo-textbox [(ngModel)]="meltAnalysis.note_6"></kendo-textbox>
+										</td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+
+
+					</div>
+				</ng-template>
+			</kendo-panelbar-item>
+		</kendo-panelbar>
+	</div>
+</kendo-card>

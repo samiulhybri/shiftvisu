@@ -1,0 +1,33 @@
+.manual-dialog {
+	height: 624px;
+	width: 500px;
+}
+
+.state-list {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.selected {
+	background-color: var(--listHoverBgColor);
+	border: var(--listHoverBorder);
+}
+
+.list-button {
+	width: 100%;
+	margin-top: 8px !important;
+	cursor: pointer;
+	outline: none !important;
+	box-shadow: none !important;
+	display: inline-block;
+	margin: auto;
+}
+
+.list-button:hover {
+	background-color: var(--listHoverBgColor);
+	border: var(--listHoverBorder);
+	outline: none;
+	box-shadow: none;
+}
+
+

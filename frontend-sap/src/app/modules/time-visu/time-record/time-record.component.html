@@ -1,0 +1,90 @@
+<div class="h-full flex flex-col">
+	<ui5-bar slot="header" design="Header" class="h-[44px]">
+		<ui5-title level="H5" slot="startContent" class="text-base font-bold title-color" i18n>Time Record</ui5-title>
+		<ui5-combobox *ngIf="isAdmin" id="userCombobox" #userCombobox [value]="selectedUser || ''"
+			(input)="onUserInputChange($event)" (selection-change)="onChangeUser($event)" placeholder="select person"
+			i18n-placeholder slot="endContent">
+			<div slot="valueStateMessage" i18n>Field is Empty</div>
+			<ng-container *ngFor="let user of users">
+				<ui5-cb-item id="{{ user.id }}" text="{{ user.name }}"></ui5-cb-item> </ng-container>
+		</ui5-combobox>
+		<ui5-input  *ngIf="!isAdmin" class="w-2/5" [value]="authService.loggedInUser.name ?? ''" readonly="true"  slot="endContent"></ui5-input>
+		<ui5-label i18n show-colon slot="endContent">Date</ui5-label>
+		<ui5-date-picker slot="endContent" id="date" class="h-6" [readonly]="!isAdmin" [maxDate]="formatedCurrentDate"
+			(change)="onDateChange($event)" (input)="onDateInput($event)" [value]="currentDate">
+		</ui5-date-picker>
+	</ui5-bar>
+
+	<div class="flex-grow p-4 grid grid-cols-2 gap-3 overflow-hidden calc-height">
+		<div class="border border-solid border-gray-300 shadow-lg rounded-xl overflow-hidden h-full">
+			<app-grid-table [headerTitle]="headerTitle" i18n-headerTitle [columns]="columns"
+				[data]="allActiveProdOrderPos" [customData]="true"
+				[editPermission]="authService.isPermissionValid('TIMEVISU_TIME_RECORD_EDIT')" [showEditButton]="false"
+				[showDeleteButton]="false" [showAction]="false" [showDownload]="false" [showActiveButton]="false"
+				[showTableSettingBtn]="true" [limit]="1000" [showSearch]="true" [showNewButton]="false"
+				[isBaseVisu]="true" [selectionMode]="'None'" keyForCacheCustomDataTableColumns="timeVisuTimeRecord" #childComponentRef>
+			</app-grid-table>
+		</div>
+
+		<div class="border border-solid border-gray-300 shadow-lg rounded-xl">
+			<div class="h-[750px] flex flex-col">
+				<div class="flex-grow overflow-y-auto">
+					<app-grid-table headerTitle="Details" i18n-headerTitle [columns]="DetailTableColumns"
+						[showDownload]="false" [showSearch]="false" [editPermission]="
+							authService.isPermissionValid('TIMEVISU_TIME_RECORD_EDIT')
+						" (newButtonClick)="saveUserRegisteredTimes()" [showNewButton]="true" [customData]="true"
+						[addButtonText]="addButtonText" [addButtonDisable]="addButtonDisable" i18n-addButtonText
+						[data]="userRegisteredTimes" selectionMode="Multiple" [showDeleteButton]="true"
+						deleteButtonText="Delete" [showDeleteButtonInHeader]="true"
+						(deleteButtonClick)="deleteClickMultiple()" (rowClick)="rowSelectionChangeForDetails($event)"
+						#detailComponentRef>
+					</app-grid-table>
+				</div>
+
+				<div class="pl-4 pr-4 pb-2 grid grid-cols-2">
+					<ui5-label i18n show-colon class="text-sm font-bold">Total</ui5-label>
+					<span class="amount text-green-700 text-sm font-bold flex justify-end pr-14">
+						{{ totalHours }}h
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<app-dialog id="addGroupDialog" [isDialogOpen]="isPreviewDialogOpen" [title]="previewDialogTitle">
+	<div class="w-[1168px] ml-[-16px] mr-[-16px]">
+		<app-file-preview [model]="'ProdOrderPos'" [modelId]="showAttachmentId" [filesCount]="fileCount"
+			[filePreviewHeight]="filePreviewHeight"></app-file-preview>
+	</div>
+	<div slot="footer" class="dialog-footer">
+		<ui5-button class="ml-8" (click)="closeAttachmentDialog()">{{localization.close}}
+		</ui5-button>
+	</div>
+</app-dialog>
+
+<div *ngIf="isViewDialogOpen">
+	<app-repair-details [modalType]="modalType" [modalHeight]="'85%'" [selectedProdOrderPos]="selectedOrder"
+		[repairId]="selectedOrder?.id || 0" [selectedNewOtherRepairOp]="otherRepairList"
+		[allRepairTypeList]="allOperationPlanList" [isDialogOpen]="isViewDialogOpen"
+		[isPlannedOrder]="modalType == 'view' ? false : true" [allUserList]="users"
+		(isCloseClicked)="closeUpdateDialog()" (isSaveClicked)="isSavedModal()" #repairDetailsTable>
+	</app-repair-details>
+</div>
+
+<ui5-toast #modalToast id="modalToast" placement="BottomCenter">{{ toastMessage }}</ui5-toast>
+
+<ui5-dialog id="deleteUserRegisteredTimesDataDialog" #deleteUserRegisteredTimesDataDialog header-text="Warning"
+	state="Critical">
+	<p>{{localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator [active]="isLoading" size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button id="deleteForShiftButton" class="dialogSubmit" design="Emphasized" (click)="onDelete()"
+			[disabled]="disableButtonDuringRequest">{{localization.ok}}</ui5-button>
+		<ui5-button design="Transparent" id="closeButon"
+			(click)="closeDialogDelete()">{{localization.close}}</ui5-button>
+	</div>
+</ui5-dialog>

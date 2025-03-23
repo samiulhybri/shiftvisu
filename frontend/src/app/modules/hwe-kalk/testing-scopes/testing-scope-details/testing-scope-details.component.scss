@@ -1,0 +1,18 @@
+.testing-scope-details-body {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.j-min-max {
+	text-align: center;
+}
+
+:host .k-form {
+	height: calc(100vh - 189px);
+	overflow: auto;
+}
+
+::ng-deep .input-field .k-numerictextbox .k-input-spinner {
+    display: none;
+}

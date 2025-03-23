@@ -1,0 +1,32 @@
+<ng-container *ngIf="isCard; else noCardImageContainer">
+    <ui5-card  [ngStyle]="{'height': height}"  class="main-image-card">
+        <ui5-card-header slot="header" i18n [titleText]="cardHeaderText"></ui5-card-header>
+        <div class="content content-padding item-card-body" [ngStyle]="{'height': cardHeight}">
+            <div class="busy-indicator" *ngIf="isLoading">
+                <ui5-busy-indicator [active]="isLoading" size="M"></ui5-busy-indicator>
+            </div>
+
+            <div class="image-section" *ngIf="(settings?.is_external_dms_enabled && externalImageUrl) || (displayedImage && displayedImage.path)">
+                <img [src]="settings?.is_external_dms_enabled ? externalImageUrl : displayedImage.path" [alt]="displayedImage.file_name ?? ''" draggable="false" (loadeddata)="alert()" (error)="resetExternalImageUrl()"/>
+            </div>
+            <div *ngIf="!isLoading && !displayedImage && !(settings?.is_external_dms_enabled && externalImageUrl)" class="no-image-section" [ngStyle]="{'height': cardHeight}">
+                <span i18n>No Image Found!</span>
+            </div>
+        </div>
+    </ui5-card>
+</ng-container>
+<ng-template #noCardImageContainer>
+    <span i18n class="no-card-header">{{ headerTitle }}</span>
+    <div class="no-card-image-container" [ngStyle]="{'height': height}"  class="image-container">
+        <div class="busy-indicator" *ngIf="isLoading">
+            <ui5-busy-indicator [active]="isLoading" size="M"></ui5-busy-indicator>
+        </div>
+
+        <div class="image-section" *ngIf="(settings?.is_external_dms_enabled && externalImageUrl) || (displayedImage && displayedImage.path)">
+            <img [src]="settings?.is_external_dms_enabled ? externalImageUrl : displayedImage.path" [alt]="displayedImage.file_name ?? ''" draggable="false" (error)="resetExternalImageUrl()"/>
+        </div>
+        <div *ngIf="!isLoading && !displayedImage && !(settings?.is_external_dms_enabled && externalImageUrl)" class="no-image-section" [ngStyle]="{'height': cardHeight}">
+            <span i18n>No Image Found!</span>
+        </div>
+    </div>
+</ng-template>

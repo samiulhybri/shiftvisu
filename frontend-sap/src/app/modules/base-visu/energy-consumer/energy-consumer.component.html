@@ -1,0 +1,189 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Energy Consumers"
+		url="/EnergyConsumers"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showSearch]="true"
+		[showDownload]="false"
+		[showActiveButton]="false"
+		addButtonText="New"
+		i18n-addButtonText
+		[showNewButton]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_ENERGY_CONSUMERS_EDIT')"
+		[isBaseVisu]="true"
+		(deleteClick)="deleteClick($event)"
+		(newButtonClick)="newButtonClick()"
+		(editClick)="editClick($event)"
+		expandQuery="$expand=energyConsumerGroups"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+	<ui5-dialog
+		id="deleteDialogEnergyConsumer"
+		header-text="Warning"
+		i18n-header-text
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col gap-[5px]">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()"
+	[title]="dialogTitle">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		*ngIf="isDialogOpen"
+		size="L">
+		<form
+			(ngSubmit)="onSubmit(createOrUpdateForm)"
+			#createOrUpdateForm="ngForm">
+			<div class="energy-consumer-dialog-body form w-[418px] h-[190px]">
+				<div class=" w-full">
+				<div
+					class="flex-col flex gap-[5px]"
+					*ngIf="selectedEnergyConsumer">
+					<ui5-label
+						show-colon
+						required
+						>{{ localization.id }}</ui5-label>
+					<ui5-busy-indicator
+						[active]="isLoadingCustomId"
+						size="S">
+						<ui5-input
+							[(ngModel)]="selectedEnergyConsumer.custom_id"
+							[disabled]="shouldBeDisabled('custom_id')"
+							#customId="ngModel"
+							[valueState]="
+								customId.valid == false &&
+								(customId.touched || createOrUpdateForm.submitted)
+									? 'Negative'
+									: customIdState
+							"
+							(input)="onChangeCustomId()"
+							class="w-full"
+							id="customId"
+							name="custom_id"
+							[required]="true">
+							<div
+								slot="valueStateMessage"
+								>
+								{{ customIdValueStateText }}
+							</div>
+						</ui5-input>
+					</ui5-busy-indicator>
+				</div>
+				<div class="flex-col flex mt-3 gap-[5px]">
+					<ui5-label
+						i18n
+						show-colon
+						>{{ localization.name }}</ui5-label>
+					<ui5-input
+					    class="w-full"
+						id="nameInput"
+						[(ngModel)]="selectedEnergyConsumer.name"
+						[disabled]="shouldBeDisabled('name')"
+						name="name"></ui5-input>
+				</div>
+                <div class="flex-col flex mt-3 gap-[5px]">
+					<ui5-label
+						i18n
+						show-colon
+						>Energy Consumer Group</ui5-label>
+					<ui5-combobox
+				        class="w-full"
+						[value]="selectedEnergyConsumer.energyConsumerGroups?.name || ''"
+						id="energyConsumerGroupsCombobox"
+						[disabled]="shouldBeDisabled('energy_consumer_group')"
+						(selection-change)="onChangEnergyConsumerGroup($event)"
+						(input)="onInputChange($event)"
+						(change)="inputInvalidEntryRestrict($event, selectedEnergyConsumer.energyConsumerGroups?.name)"
+						>
+						<ng-container *ngFor="let item of energyConsumerGroups">
+						<ui5-cb-item
+							*ngIf="item.is_active"
+							id="{{ item.id }}"
+							text="{{ item.name }}"
+							[additionalText]="item.custom_id"
+							></ui5-cb-item>
+						</ng-container>
+					</ui5-combobox>
+				</div>
+			
+			</div>
+		</div>
+		</form>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogEnergyConsumers
+	id="errorDialogEnergyConsumers"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

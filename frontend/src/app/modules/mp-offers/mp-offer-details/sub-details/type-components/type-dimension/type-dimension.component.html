@@ -1,0 +1,42 @@
+<div [formGroup]="form" *ngIf="data != undefined">
+
+    <kendo-gridlayout [gap]="{ cols: 10 }" [cols]="[{width: 250 },{ width: 'auto' },{width: 100 },{width: 70 },{width: 70 },{width: 70 },{width: 150 } ]">
+        <kendo-gridlayout-item class="label-format" [row]="index" [col]="1" [colSpan]="1">
+            <label [textContent]="data.name" style="min-width: 200px;"></label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="2" >
+            <kendo-combobox #mp_material_id formControlName="mp_material_id" style="min-width: 200px;"
+                [(ngModel)]="data.mp_material_id" [data]="base_data" [valuePrimitive]="true" textField="name"
+                valueField="id" [filterable]="true" (filterChange)="handleFilter($event)" [disabled]="isFieldDisabled"></kendo-combobox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="3" >
+            <kendo-numerictextbox #price class="number-right-align" formControlName="price" 
+                [(ngModel)]="data.price" format="c2" [readonly]="true" tabindex="-1"
+                [spinners]="false"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="4" >
+            <kendo-numerictextbox #length class="number-right-align" formControlName="length"
+                [(ngModel)]="data.length" [spinners]="false" [step]="1" format="n" [disabled]="isFieldDisabled"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="5" >
+            <kendo-numerictextbox class="align-right" class="number-right-align" #width formControlName="width"
+                 [(ngModel)]="data.width" [spinners]="false" [step]="1"
+                format="n" [disabled]="isFieldDisabled"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="6">
+            <kendo-numerictextbox #height formControlName="height" class="number-right-align" [(ngModel)]="data.height"
+                 [spinners]="false" [step]="1" format="n" [disabled]="isFieldDisabled"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="7" style="text-align: right;">
+            <kendo-numerictextbox #total tabindex="-1" formControlName="total" class="number-right-align"
+                [style.width.px]="150" placeholder="{{intl.formatNumber(data.getTotal(), 'c2', 'it')}}"
+                [readonly]="true" [spinners]="false"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+        <!--
+        <kendo-gridlayout-item [row]="index" [col]="10" style="display: none;">
+            <kendo-numerictextbox #density formControlName="density" [(ngModel)]="data.density" format="c2"
+                [readonly]="true" [spinners]="false"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+        -->
+    </kendo-gridlayout>
+</div>

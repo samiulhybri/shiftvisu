@@ -1,0 +1,156 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('hwe_melt_analyses', function (Blueprint $table) {
+            $table->id();
+            $table->string('custom_id')->unique();
+            $table->foreignIdFor(\App\Models\Supplier::class)->nullable()->constrained()->nullOnDelete();
+            $table->foreignIdFor(\App\Models\Item::class)->nullable()->constrained()->nullOnDelete();
+            $table->string('delivery_specification')->nullable();
+            $table->integer('year')->nullable();
+            $table->string('radioactivity')->nullable();
+            $table->string('grain_size_testing_operator')->nullable();
+            $table->string('grain_size_value')->nullable();
+            $table->string('grain_size_testing_operator_hwe')->nullable();
+            $table->string('grain_size_value_hwe')->nullable();
+            $table->double('k3')->nullable();
+            $table->double('k4')->nullable();
+            $table->double('k3_hwe')->nullable();
+            $table->double('k4_hwe')->nullable();
+            $table->double('fine_a')->nullable();
+            $table->double('fine_b')->nullable();
+            $table->double('fine_c')->nullable();
+            $table->double('fine_d')->nullable();
+            $table->double('ds')->nullable();
+            $table->double('thick_a')->nullable();
+            $table->double('thick_b')->nullable();
+            $table->double('thick_c')->nullable();
+            $table->double('thick_d')->nullable();
+            $table->double('thick_ds')->nullable();
+            $table->double('fine_a_hwe')->nullable();
+            $table->double('fine_b_hwe')->nullable();
+            $table->double('fine_c_hwe')->nullable();
+            $table->double('fine_d_hwe')->nullable();
+            $table->double('ds_hwe')->nullable();
+            $table->double('thick_a_hwe')->nullable();
+            $table->double('thick_b_hwe')->nullable();
+            $table->double('thick_c_hwe')->nullable();
+            $table->double('thick_d_hwe')->nullable();
+            $table->double('thick_ds_hwe')->nullable();
+            $table->string('variant')->nullable();
+            $table->double('j_1_sw')->nullable();
+            $table->double('j_1_5_sw')->nullable();
+            $table->double('j_2_sw')->nullable();
+            $table->double('j_3_sw')->nullable();
+            $table->double('j_4_sw')->nullable();
+            $table->double('j_5_sw')->nullable();
+            $table->double('j_6_sw')->nullable();
+            $table->double('j_7_sw')->nullable();
+            $table->double('j_8_sw')->nullable();
+            $table->double('j_9_sw')->nullable();
+            $table->double('j_10_sw')->nullable();
+            $table->double('j_11_sw')->nullable();
+            $table->double('j_13_sw')->nullable();
+            $table->double('j_15_sw')->nullable();
+            $table->double('j_20_sw')->nullable();
+            $table->double('j_25_sw')->nullable();
+            $table->double('j_30_sw')->nullable();
+            $table->double('j_35_sw')->nullable();
+            $table->double('j_40_sw')->nullable();
+            $table->double('j_45_sw')->nullable();
+            $table->double('j_50_sw')->nullable();
+            $table->double('j_1_hwe')->nullable();
+            $table->double('j_1_5_hwe')->nullable();
+            $table->double('j_2_hwe')->nullable();
+            $table->double('j_3_hwe')->nullable();
+            $table->double('j_4_hwe')->nullable();
+            $table->double('j_5_hwe')->nullable();
+            $table->double('j_6_hwe')->nullable();
+            $table->double('j_7_hwe')->nullable();
+            $table->double('j_8_hwe')->nullable();
+            $table->double('j_9_hwe')->nullable();
+            $table->double('j_10_hwe')->nullable();
+            $table->double('j_11_hwe')->nullable();
+            $table->double('j_13_hwe')->nullable();
+            $table->double('j_15_hwe')->nullable();
+            $table->double('j_20_hwe')->nullable();
+            $table->double('j_25_hwe')->nullable();
+            $table->double('j_30_hwe')->nullable();
+            $table->double('j_35_hwe')->nullable();
+            $table->double('j_40_hwe')->nullable();
+            $table->double('j_45_hwe')->nullable();
+            $table->double('j_50_hwe')->nullable();
+            $table->string('note')->nullable();
+            $table->string('note_2')->nullable();
+            $table->string('note_3')->nullable();
+            $table->string('note_4')->nullable();
+            $table->string('note_5')->nullable();
+            $table->string('note_6')->nullable();
+            $table->double('element_c')->nullable();
+            $table->double('element_si')->nullable();
+            $table->double('element_mn')->nullable();
+            $table->double('element_p')->nullable();
+            $table->double('element_s')->nullable();
+            $table->double('element_cr')->nullable();
+            $table->double('element_mo')->nullable();
+            $table->double('element_ni')->nullable();
+            $table->double('element_v')->nullable();
+            $table->double('element_ai')->nullable();
+            $table->double('element_h2')->nullable();
+            $table->double('element_cu')->nullable();
+            $table->double('element_w')->nullable();
+            $table->double('element_ti')->nullable();
+            $table->double('element_co')->nullable();
+            $table->double('element_b')->nullable();
+            $table->double('element_o2')->nullable();
+            $table->double('element_sn')->nullable();
+            $table->double('element_n')->nullable();
+            $table->double('element_nb')->nullable();
+            $table->double('element_ca')->nullable();
+            $table->double('element_c_hwe')->nullable();
+            $table->double('element_si_hwe')->nullable();
+            $table->double('element_mn_hwe')->nullable();
+            $table->double('element_p_hwe')->nullable();
+            $table->double('element_s_hwe')->nullable();
+            $table->double('element_cr_hwe')->nullable();
+            $table->double('element_mo_hwe')->nullable();
+            $table->double('element_ni_hwe')->nullable();
+            $table->double('element_v_hwe')->nullable();
+            $table->double('element_ai_hwe')->nullable();
+            $table->double('element_h2_hwe')->nullable();
+            $table->double('element_cu_hwe')->nullable();
+            $table->double('element_w_hwe')->nullable();
+            $table->double('element_ti_hwe')->nullable();
+            $table->double('element_co_hwe')->nullable();
+            $table->double('element_b_hwe')->nullable();
+            $table->double('element_o2_hwe')->nullable();
+            $table->double('element_sn_hwe')->nullable();
+            $table->double('element_n_hwe')->nullable();
+            $table->double('element_nb_hwe')->nullable();
+            $table->double('element_ca_hwe')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('hwe_melt_analyses');
+    }
+};

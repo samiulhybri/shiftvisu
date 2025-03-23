@@ -1,0 +1,42 @@
+
+#addActiveDialog .ui5-popup-content {
+    padding: 90vh !important;
+}
+
+.busy-indicator {
+    height: 100%;
+}
+
+.repair-card,
+.repair-card-div {
+    height: 70vh;
+}
+
+.tab-details-section {
+    height: 100%;
+}
+
+@media (min-width: 1601px) and (max-width: 1950px) {
+    .repair-card,
+    .repair-card-div {
+        height: 65vh;
+    }
+}
+
+@media (min-width: 1401px) and (max-width: 1600px) {
+    .repair-card,
+    .repair-card-div {
+        height: 78vh;
+    }
+}
+
+@media (max-width: 1400px) {
+    .repair-card,
+    .repair-card-div {
+        height: 55vh;
+    }
+
+    .tab-details-section {
+        height: 80%;
+    }
+}

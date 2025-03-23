@@ -1,0 +1,169 @@
+<span class="h-[calc(100vh-72px)] grid grid-cols-2 gap-5">
+	<div class="w-auto">
+		<ui5-card>
+			<div class="h-[calc(100vh-72px)]">
+				<app-grid-table
+					headerTitle="Component Name"
+					i18n-headerTitle
+					[url]="baseUrl"
+					expandQuery="$expand=shiftVisuComponentOptions"
+					[filterQuery]="filterQuery"
+					[columns]="columns"
+					[showAction]="true"
+					[showSearch]="true"
+					[showActiveButton]="false"
+					[showTableSettingBtn]="true"
+					addButtonText="New"
+					i18n-addButtonText
+					[showNewButton]="true"
+					[showDownload]="false"
+					selectionMode="Single"
+					[enableServerSideFiltering]="true"
+					[editPermission]="authService.isPermissionValid(shiftVisuAdminPermission)"
+					(processData)="processData($event[0], $event[1])"
+					(newButtonClick)="newButtonClick()"
+					[addButtonDisable]="isLoadingCustomId || (gridTable?.isBusy ?? false)"
+					(deleteClick)="deleteClick($event)"
+					(editClick)="editClick($event)"
+					(rowClick)="onRowClicked($event)"
+					(searchClick)="searchClick()"
+					keyForCacheCustomDataTableColumns="shiftVisuComponents"
+					#componentsRef></app-grid-table>
+			</div>
+		</ui5-card>
+	</div>
+
+	<div>
+		<app-shift-visu-component-option
+			[component]="selectedComponent"
+			(updateComponent)="updateComponents()"></app-shift-visu-component-option>
+	</div>
+</span>
+
+<app-dialog
+	#addOrEditComponentDialog
+	[title]="saveMode == 'post' ? 'Add' : 'Edit'"
+	title-i18n>
+	<ui5-busy-indicator [active]="isSavingOrDeletingComponent">
+		<form
+			#addOrEditComponentForm="ngForm"
+			class="w-[450px] min-h-[500px] flex flex-col gap-2">
+			<div class="w-[450px]">
+				<ui5-label
+					i18n
+					show-colon
+					required
+					>Component</ui5-label
+				>
+				<ui5-input
+					#componentName="ngModel"
+					i18n-placeholder
+					class="w-full"
+					placeholder="Write component name"
+					sanitize-input
+					required
+					[valueState]="
+						componentName.touched && !componentName.valid ? 'Negative' : 'None'
+					"
+					[(ngModel)]="modalComponent.name"
+					name="componentName">
+					<div
+						slot="valueStateMessage"
+						i18n
+						>Component name is required.</div
+					>
+				</ui5-input>
+			</div>
+			<div class="w-[450px]">
+				<ui5-label
+					show-colon
+					i18n
+					>Model Type</ui5-label
+				>
+				<ui5-combobox
+					id="modelTypeCombobox"
+					class="w-full"
+					[(ngModel)]="selectedModelType"
+					name="model_type"
+					i18n-placeholder
+					placeholder="Select model"
+					show-clear-icon
+					(selection-change)="updateModelTypeValues($event)"
+					(blur)="onModelTypeBlur()">
+					@for (item of modelTypeItems; track $index) {
+						<ui5-cb-item
+							[text]="item.value"
+							[id]="item.modelType">
+						</ui5-cb-item>
+					}
+				</ui5-combobox>
+			</div>
+			<div class="w-full">
+				<ui5-label
+					i18n
+					show-colon
+					>Choose Type</ui5-label
+				>
+				<div class="flex flex-col justify-between">
+					@for (type of componentOptionTypeArray; track $index) {
+						<ui5-radio-button
+							[hidden]="
+								!(type.value | isComponentTypeVisible: modalComponent.model_type)
+							"
+							name="component_type"
+							[text]="type.text"
+							[disabled]="
+								type.value == componentOptionTypes.MEASURE || saveMode == 'patch'
+							"
+							[checked]="modalComponent.component_type == type.value"
+							(click)="modalComponent.component_type = type.value"></ui5-radio-button>
+					}
+				</div>
+			</div>
+		</form>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButtonId"
+			design="Emphasized"
+			[disabled]="isSavingOrDeletingComponent || !addOrEditComponentForm.valid"
+			(click)="onComponentSave(addOrEditComponentForm)">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			id="CancelButtonId"
+			type="Button"
+			[disabled]="isSavingOrDeletingComponent"
+			(click)="handleComponentPopupClose(addOrEditComponentForm)">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	#deleteComponentDialog
+	i18n-header-text
+	header-text="Warning"
+	state="Critical">
+	<p i18n>Do you really want to delete this component?</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteComponent()"
+			[disabled]="isSavingOrDeletingComponent"
+			>{{ localization.yes }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			[disabled]="isSavingOrDeletingComponent"
+			(click)="handleComponentPopupClose()"
+			>{{ localization.cancel }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

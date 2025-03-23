@@ -1,0 +1,83 @@
+<ui5-bar
+	slot="header"
+	design="Header"
+	class="mb-2">
+	<ui5-title
+		level="H5"
+		i18n
+		slot="startContent">
+		Hall Capacity Settings
+	</ui5-title>
+
+	<ui5-button
+		slot="endContent"
+		design="Emphasized"
+		*ngIf="authService.isPermissionValid('BASEVISU_HALL_CAPACITY_SETTINGS_EDIT')"
+		(click)="onAddClick()"
+		[disabled]="isLoading"
+		id="editButton" i18n>Clone</ui5-button
+	>
+
+	<ui5-button
+		*ngIf="authService.isPermissionValid('BASEVISU_HALL_CAPACITY_SETTINGS_EDIT')"
+		slot="endContent"
+		design="Emphasized"
+		[disabled]="isLoading"
+		(click)="onSave()"
+		id="saveButton">
+		{{ localization.save }}</ui5-button
+	>
+</ui5-bar>
+
+<div
+	class="px-4 overflow-y-auto"
+	style="height: calc(100vh - 130px)">
+	<ng-container *ngIf="!isLoading">
+		<div
+			class="h-[305px] w-full shadow-md shadow-gray-500/50 mb-1 rounded-[4px]"
+			*ngFor="let hallCapacityValue of allHallCapacityValues">
+			<app-grid-table
+				headerTitle="Week: {{ hallCapacityValue.week }}"
+				[data]="hallCapacityValue.data"
+				[customData]="true"
+				i18n-headerTitle
+				[columns]="columns"
+				[showAction]="false"
+				[showSearch]="false"
+				[showDownload]="false"
+				[showNewButton]="false"
+				[isBaseVisu]="false"
+				selectionMode="None"
+				#childComponentRef>
+			</app-grid-table>
+		</div>
+	</ng-container>
+
+	<ng-container *ngIf="isLoading">
+		<div
+			class="px-4 overflow-y-auto flex items-center justify-center"
+			style="height: calc(100vh - 130px)">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+	</ng-container>
+</div>
+
+<ui5-dialog
+	#errorDialog
+	id="errorDialog"
+	header-text="Error"
+	state="Negative">
+	<p>{{ errorMessage }}</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

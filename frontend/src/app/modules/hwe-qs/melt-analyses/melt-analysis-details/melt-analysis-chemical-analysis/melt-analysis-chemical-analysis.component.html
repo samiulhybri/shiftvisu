@@ -1,0 +1,355 @@
+<kendo-card width="100" *ngIf="meltAnalysis">
+	<div class="panelbar-wrapper">
+		<kendo-panelbar>
+			<kendo-panelbar-item i18n-title title="Chemical Analysis" [expanded]="false">
+				<ng-template kendoPanelBarContent>
+					<kendo-card-body class="table-div">
+						<div class="content">
+							<table class="table">
+								<thead>
+									<tr>
+										<td i18n>Name</td>
+										<td i18n>Steel Company</td>
+										<td i18n>HWE</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>C</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_c"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_c_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Si</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_si"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_si_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Mn</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_mn"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_mn_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>P</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_p"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_p_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>S</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_s"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_s_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Cr</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_cr"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_cr_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Mo</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_mo"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_mo_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Ni</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ni"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ni_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>V</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_v"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_v_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>AI</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ai"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ai_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>H2</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_h2"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_h2_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>CU</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_cu"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_cu_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>W</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_w"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_w_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>TI</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ti"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ti_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Co</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_co"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_co_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>B</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\ppm"
+												[(ngModel)]="meltAnalysis.element_b"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\ppm"
+												[(ngModel)]="meltAnalysis.element_b_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>O2</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_o2"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_o2_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Sn</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_sn"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_sn_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>N</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_n"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_n_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Nb</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_nb"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_nb_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Ca</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ca"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ca_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>As</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_as"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_as_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Ta</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ta"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_ta_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Sb</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_sb"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_sb_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Zr</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_zr"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												[(ngModel)]="meltAnalysis.element_zr_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>C+N</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%" disabled="disabled"
+												[ngModel]="meltAnalysis.element_c+meltAnalysis.element_n"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%" disabled="disabled"
+												[ngModel]="(meltAnalysis.element_c_hwe+ meltAnalysis.element_n_hwe)??0"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Nb+TI+V</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%" disabled="disabled"
+												[ngModel]="(meltAnalysis.element_nb+meltAnalysis.element_ti+meltAnalysis.element_v)??0"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%" disabled="disabled"
+												[ngModel]="(meltAnalysis.element_nb_hwe+ meltAnalysis.element_ti_hwe+ meltAnalysis.element_v_hwe)??0"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Cu+10+N</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%" disabled="disabled"
+												[ngModel]="(meltAnalysis.element_cu + 10 + meltAnalysis.element_n)??0"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%" disabled="disabled"
+												[ngModel]="(meltAnalysis.element_cu_hwe + 10 + meltAnalysis.element_n_hwe)??0"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>Ceq</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%" [value]="getCeqSw()"
+												disabled="disabled"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												disabled="disabled" [value]="getCeqHwe()"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td>PREN</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												disabled="disabled"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox format="#.#####\%"
+												disabled="disabled"></kendo-numerictextbox>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</kendo-card-body>
+				</ng-template>
+			</kendo-panelbar-item>
+		</kendo-panelbar>
+	</div>
+</kendo-card>

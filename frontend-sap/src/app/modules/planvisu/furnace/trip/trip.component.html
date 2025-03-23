@@ -1,0 +1,9 @@
+<ui5-dialog #tripDialog  header-text="Select From Existing Trip" i18n-header-text="Select From Existing Trip" [open]="isDialogOpen" style="width: 600px;height: 400px;">
+            <ui5-list #prodList selectionMode="Single" *ngFor="let prod of data" (selectionChange)="onSelectionChange($event)">
+                <ui5-li [description]="prod.machine?.name" additionalText="{{prod.formatedStartDate}}">{{prod.custom_id}}</ui5-li>
+            </ui5-list>
+        <div slot="footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center">
+            <div style="flex: 1;"></div>
+            <ui5-button i18n (click)="closeDialog()">{{ localization.cancel }}</ui5-button>
+        </div>    
+</ui5-dialog>

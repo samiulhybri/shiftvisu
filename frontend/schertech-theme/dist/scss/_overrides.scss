@@ -1,0 +1,393 @@
+// Compatible with @progress/kendo-theme-default v.6.0.3
+
+%tb-typography {
+  @include typography-classes($tb-typography);
+}
+
+    .k-appbar.k-appbar-light{
+        color: inherit;
+                background-color: $tb-kendo-button-bg;
+                background-image: none;
+        
+}
+    .k-appbar.k-appbar-dark{
+        background-color: $tb-kendo-base-text;
+                background-image: none;
+        
+}
+    .k-upload .k-upload-files .k-file .k-file-single .k-file-icon-wrapper .k-icon.k-i-file.k-file-icon::before{
+        content: "\e906";
+        
+}
+    .k-datepicker .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-input-button .k-button-icon.k-icon.k-i-calendar::before{
+          content: "\e018";
+        
+}
+    .k-datepicker .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-input-button .k-button-icon.k-icon.k-i-calendar{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-split-button.k-button-group .k-button.k-icon-button.k-split-button-arrow .k-button-icon.k-icon.k-i-caret-alt-down::before{
+          content: "\e028";
+        
+}
+    .k-split-button.k-button-group .k-button.k-icon-button.k-split-button-arrow .k-button-icon.k-icon.k-i-caret-alt-down{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-numerictextbox .k-input-spinner.k-spin-button .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-spinner-increase .k-button-icon.k-icon.k-i-caret-alt-up::before{
+          content: "\e025";
+        
+}
+    .k-numerictextbox .k-input-spinner.k-spin-button .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-spinner-increase .k-button-icon.k-icon.k-i-caret-alt-up{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-numerictextbox .k-input-spinner.k-spin-button .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-spinner-decrease .k-button-icon.k-icon.k-i-caret-alt-down::before{
+          content: "\e028";
+        
+}
+    .k-numerictextbox .k-input-spinner.k-spin-button .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-spinner-decrease .k-button-icon.k-icon.k-i-caret-alt-down{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-slider .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-rounded-full.k-button-increase .k-button-icon.k-icon.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-slider .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-rounded-full.k-button-increase .k-button-icon.k-icon.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-slider .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-rounded-full.k-button-decrease .k-button-icon.k-icon.k-i-caret-alt-left::before{
+          content: "\e027";
+        
+}
+    .k-slider .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-rounded-full.k-button-decrease .k-button-icon.k-icon.k-i-caret-alt-left{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-datetimepicker .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-input-button .k-button-icon.k-icon.k-i-calendar::before{
+          content: "\e018";
+        
+}
+    .k-datetimepicker .k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button.k-input-button .k-button-icon.k-icon.k-i-calendar{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-calendar.k-calendar-range .k-calendar-header.k-hstack .k-calendar-nav.k-hstack .k-button.k-button-md.k-button-flat.k-button-flat-base.k-rounded-md.k-icon-button.k-calendar-nav-prev .k-button-icon.k-icon.k-i-chevron-left::before{
+          content: "\e014";
+        
+}
+    .k-calendar.k-calendar-range .k-calendar-header.k-hstack .k-calendar-nav.k-hstack .k-button.k-button-md.k-button-flat.k-button-flat-base.k-rounded-md.k-icon-button.k-calendar-nav-prev .k-button-icon.k-icon.k-i-chevron-left{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-calendar.k-calendar-range .k-calendar-header.k-hstack .k-calendar-nav.k-hstack .k-button.k-button-md.k-button-flat.k-button-flat-base.k-rounded-md.k-icon-button.k-calendar-nav-next .k-button-icon.k-icon.k-i-chevron-right::before{
+          content: "\e013";
+        
+}
+    .k-calendar.k-calendar-range .k-calendar-header.k-hstack .k-calendar-nav.k-hstack .k-button.k-button-md.k-button-flat.k-button-flat-base.k-rounded-md.k-icon-button.k-calendar-nav-next .k-button-icon.k-icon.k-i-chevron-right{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-dropdownlist .k-input-button .k-button-icon.k-icon.k-i-caret-alt-down::before{
+          content: "\e028";
+        
+}
+    .k-dropdownlist .k-input-button .k-button-icon.k-icon.k-i-caret-alt-down{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-dropdowntree .k-input-button.k-button.k-icon-button .k-button-icon.k-icon.k-i-caret-alt-down::before{
+          content: "\e028";
+        
+}
+    .k-dropdowntree .k-input-button.k-button.k-icon-button .k-button-icon.k-icon.k-i-caret-alt-down{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-combobox .k-input-button .k-button-icon.k-icon.k-i-caret-alt-down::before{
+          content: "\e028";
+        
+}
+    .k-combobox .k-input-button .k-button-icon.k-icon.k-i-caret-alt-down{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-combobox.k-hover .k-clear-value .k-icon.k-i-x::before, .k-combobox.k-state-hover .k-clear-value .k-icon.k-i-x::before, .k-combobox.k-state-hovered .k-clear-value .k-icon.k-i-x::before, .k-combobox:hover .k-clear-value .k-icon.k-i-x::before{
+          content: "\e011";
+        
+}
+    .k-combobox.k-hover .k-clear-value .k-icon.k-i-x, .k-combobox.k-state-hover .k-clear-value .k-icon.k-i-x, .k-combobox.k-state-hovered .k-clear-value .k-icon.k-i-x, .k-combobox:hover .k-clear-value .k-icon.k-i-x{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-combobox.k-state-focus-within .k-clear-value .k-icon.k-i-x::before, .k-combobox:focus-within .k-clear-value .k-icon.k-i-x::before{
+          content: "\e011";
+        
+}
+    .k-combobox.k-state-focus-within .k-clear-value .k-icon.k-i-x, .k-combobox:focus-within .k-clear-value .k-icon.k-i-x{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-treeview .k-treeview-lines.k-treeview-group .k-treeview-item .k-treeview-toggle .k-icon.k-i-caret-alt-down::before{
+          content: "\e028";
+        
+}
+    .k-treeview .k-treeview-lines.k-treeview-group .k-treeview-item .k-treeview-toggle .k-icon.k-i-caret-alt-down{
+                  @extend %tb-typography-SchertechVersion1;
+              color: inherit;
+        
+}
+    .k-treeview .k-treeview-lines.k-treeview-group .k-treeview-item .k-treeview-toggle .k-icon.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-treeview .k-treeview-lines.k-treeview-group .k-treeview-item .k-treeview-toggle .k-icon.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+              color: inherit;
+        
+}
+    .k-grid.k-grid-md .k-grouping-header .k-chip-list.k-chip-list-md .k-chip.k-chip-md.k-chip-solid.k-chip-solid-base.k-rounded-md .k-icon.k-i-sort-asc-small::before{
+          content: "\e01b";
+        
+}
+    .k-grid.k-grid-md .k-grouping-header .k-chip-list.k-chip-list-md .k-chip.k-chip-md.k-chip-solid.k-chip-solid-base.k-rounded-md .k-icon.k-i-sort-asc-small{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md .k-grouping-header .k-chip-list.k-chip-list-md .k-chip.k-chip-md.k-chip-solid.k-chip-solid-base.k-rounded-md .k-icon.k-i-sort-desc-small::before{
+          content: "\e01e";
+        
+}
+    .k-grid.k-grid-md .k-grouping-header .k-chip-list.k-chip-list-md .k-chip.k-chip-md.k-chip-solid.k-chip-solid-base.k-rounded-md .k-icon.k-i-sort-desc-small{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-filterable .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before{
+          content: "\e006";
+        
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-filterable .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-filterable.k-focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-state-focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-state-focused .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable:focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before{
+          content: "\e006";
+        
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-filterable.k-focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-state-focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-state-focused .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable:focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-filterable.k-sorted .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before{
+          content: "\e006";
+        
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-filterable.k-sorted .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-filterable.k-sorted.k-focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-sorted.k-state-focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-sorted.k-state-focused .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-sorted:focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical::before{
+          content: "\e006";
+        
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-filterable.k-sorted.k-focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-sorted.k-state-focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-sorted.k-state-focused .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical,.k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row  .k-header.k-table-th.k-filterable.k-sorted:focus .k-cell-inner .k-grid-column-menu.k-grid-header-menu .k-icon.k-i-more-vertical{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-sorted .k-cell-inner .k-link .k-icon.k-i-sort-asc-small::before{
+          content: "\e01b";
+        
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-sorted .k-cell-inner .k-link .k-icon.k-i-sort-asc-small{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-sorted .k-cell-inner .k-link .k-icon.k-i-sort-desc-small::before{
+          content: "\e01e";
+        
+}
+    .k-grid.k-grid-md .k-grid-header .k-grid-header-wrap .k-table.k-grid-header-table.k-grid-md .k-table-thead .k-table-row .k-header.k-table-th.k-sorted .k-cell-inner .k-link .k-icon.k-i-sort-desc-small{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md .k-grid-container .k-grid-content .k-grid-table .k-grouping-row .k-reset .k-icon.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-grid.k-grid-md .k-grid-container .k-grid-content .k-grid-table .k-grouping-row .k-reset .k-icon.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md .k-grid-container .k-grid-content .k-grid-table .k-grouping-row .k-reset .k-icon.k-i-caret-alt-down::before{
+          content: "\e028";
+        
+}
+    .k-grid.k-grid-md .k-grid-container .k-grid-content .k-grid-table .k-grouping-row .k-reset .k-icon.k-i-caret-alt-down{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-popup .k-grid-columnmenu-popup .k-columnmenu-item-wrapper .k-columnmenu-item .k-icon.k-i-sort-asc-small::before{
+          content: "\e01b";
+        
+}
+    .k-popup .k-grid-columnmenu-popup .k-columnmenu-item-wrapper .k-columnmenu-item .k-icon.k-i-sort-asc-small{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-popup .k-grid-columnmenu-popup .k-columnmenu-item-wrapper .k-columnmenu-item .k-icon.k-i-sort-desc-small::before{
+          content: "\e01e";
+        
+}
+    .k-popup .k-grid-columnmenu-popup .k-columnmenu-item-wrapper .k-columnmenu-item .k-icon.k-i-sort-desc-small{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-scheduler.k-floatwrap .k-toolbar.k-scheduler-toolbar .k-toolbar-item .k-button-group.k-scheduler-navigation .k-button.k-button-md.k-button-solid.k-button-solid-base.k-rounded-md.k-icon-button.k-group-end .k-button-icon.k-icon.k-i-caret-alt-right::before,.k-scheduler.k-floatwrap .k-toolbar.k-scheduler-toolbar .k-toolbar-item .k-button-group.k-scheduler-navigation  .k-button.k-button-md.k-button-solid.k-button-solid-base.k-rounded-md.k-icon-button:last-child .k-button-icon.k-icon.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-scheduler.k-floatwrap .k-toolbar.k-scheduler-toolbar .k-toolbar-item .k-button-group.k-scheduler-navigation .k-button.k-button-md.k-button-solid.k-button-solid-base.k-rounded-md.k-icon-button.k-group-end .k-button-icon.k-icon.k-i-caret-alt-right,.k-scheduler.k-floatwrap .k-toolbar.k-scheduler-toolbar .k-toolbar-item .k-button-group.k-scheduler-navigation  .k-button.k-button-md.k-button-solid.k-button-solid-base.k-rounded-md.k-icon-button:last-child .k-button-icon.k-icon.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-scheduler.k-floatwrap .k-toolbar.k-scheduler-toolbar .k-toolbar-item .k-button-group.k-scheduler-navigation .k-button.k-button-md.k-button-solid.k-button-solid-base.k-rounded-md.k-icon-button .k-button-icon.k-icon.k-i-caret-alt-left::before{
+          content: "\e027";
+        
+}
+    .k-scheduler.k-floatwrap .k-toolbar.k-scheduler-toolbar .k-toolbar-item .k-button-group.k-scheduler-navigation .k-button.k-button-md.k-button-solid.k-button-solid-base.k-rounded-md.k-icon-button .k-button-icon.k-icon.k-i-caret-alt-left{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-scheduler.k-floatwrap .k-toolbar.k-scheduler-toolbar .k-button.k-button-md.k-button-flat.k-button-flat-base.k-nav-current .k-button-icon.k-icon.k-i-calendar::before{
+          content: "\e018";
+        
+}
+    .k-scheduler.k-floatwrap .k-toolbar.k-scheduler-toolbar .k-button.k-button-md.k-button-flat.k-button-flat-base.k-nav-current .k-button-icon.k-icon.k-i-calendar{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-scheduler .k-event.k-hover .k-event-actions .k-link.k-event-delete .k-icon.k-i-x::before,.k-scheduler  .k-event.k-state-hover .k-event-actions .k-link.k-event-delete .k-icon.k-i-x::before,.k-scheduler  .k-event.k-state-hovered .k-event-actions .k-link.k-event-delete .k-icon.k-i-x::before,.k-scheduler  .k-event:hover .k-event-actions .k-link.k-event-delete .k-icon.k-i-x::before{
+          content: "\e011";
+        
+}
+    .k-scheduler .k-event.k-hover .k-event-actions .k-link.k-event-delete .k-icon.k-i-x,.k-scheduler  .k-event.k-state-hover .k-event-actions .k-link.k-event-delete .k-icon.k-i-x,.k-scheduler  .k-event.k-state-hovered .k-event-actions .k-link.k-event-delete .k-icon.k-i-x,.k-scheduler  .k-event:hover .k-event-actions .k-link.k-event-delete .k-icon.k-i-x{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-scheduler .k-scheduler-layout-flex .k-scheduler-cell.k-slot-cell .k-button.k-button-md.k-button-solid.k-button-solid-base.k-rounded-md.k-icon-button.k-more-events .k-icon.k-i-more-horizontal.k-button-icon::before{
+          content: "\e007";
+        
+}
+    .k-scheduler .k-scheduler-layout-flex .k-scheduler-cell.k-slot-cell .k-button.k-button-md.k-button-solid.k-button-solid-base.k-rounded-md.k-icon-button.k-more-events .k-icon.k-i-more-horizontal.k-button-icon{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-reset.k-header.k-menu.k-menu-horizontal .k-item.k-menu-item .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-down::before{
+          content: "\e028";
+        
+}
+    .k-reset.k-header.k-menu.k-menu-horizontal .k-item.k-menu-item .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-down{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+              color: inherit;
+        
+}
+    .k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first.k-hover .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right,.k-reset.k-header.k-menu.k-menu-vertical  .k-item.k-menu-item.k-first.k-state-hover .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right,.k-reset.k-header.k-menu.k-menu-vertical  .k-item.k-menu-item.k-first.k-state-hovered .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right,.k-reset.k-header.k-menu.k-menu-vertical  .k-item.k-menu-item.k-first:hover .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+              color: inherit;
+        
+}
+    .k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first.k-hover .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before,.k-reset.k-header.k-menu.k-menu-vertical  .k-item.k-menu-item.k-first.k-state-hover .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before,.k-reset.k-header.k-menu.k-menu-vertical  .k-item.k-menu-item.k-first.k-state-hovered .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before,.k-reset.k-header.k-menu.k-menu-vertical  .k-item.k-menu-item.k-first:hover .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first .k-link.k-menu-link.k-active .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before,.k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first  .k-link.k-menu-link.k-state-active .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before,.k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first  .k-link.k-menu-link:active .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first .k-link.k-menu-link.k-active .k-icon.k-menu-expand-arrow.k-i-caret-alt-right,.k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first  .k-link.k-menu-link.k-state-active .k-icon.k-menu-expand-arrow.k-i-caret-alt-right,.k-reset.k-header.k-menu.k-menu-vertical .k-item.k-menu-item.k-first  .k-link.k-menu-link:active .k-icon.k-menu-expand-arrow.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-menu-popup.k-popup .k-menu-group .k-item.k-menu-item .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-menu-popup.k-popup .k-menu-group .k-item.k-menu-item .k-link.k-menu-link .k-icon.k-menu-expand-arrow.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-panelbar .k-panelbar-item.k-panelbar-header.k-level-0 .k-link .k-panelbar-toggle.k-icon.k-i-chevron-down.k-panelbar-expand::before{
+          content: "\e015";
+        
+}
+    .k-panelbar .k-panelbar-item.k-panelbar-header.k-level-0 .k-link .k-panelbar-toggle.k-icon.k-i-chevron-down.k-panelbar-expand{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-panelbar .k-panelbar-item.k-panelbar-header.k-level-0.k-expanded .k-link .k-panelbar-toggle.k-icon.k-i-chevron-up.k-panelbar-collapse::before{
+          content: "\e012";
+        
+}
+    .k-panelbar .k-panelbar-item.k-panelbar-header.k-level-0.k-expanded .k-link .k-panelbar-toggle.k-icon.k-i-chevron-up.k-panelbar-collapse{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-dialog-wrapper .k-window.k-dialog .k-window-titlebar.k-dialog-titlebar .k-window-titlebar-actions.k-dialog-titlebar-actions .k-window-titlebar-action.k-dialog-titlebar-action.k-button.k-button-md.k-button-flat.k-button-flat-base.k-rounded-md.k-icon-button .k-button-icon.k-icon.k-i-x::before{
+          content: "\e011";
+        
+}
+    .k-dialog-wrapper .k-window.k-dialog .k-window-titlebar.k-dialog-titlebar .k-window-titlebar-actions.k-dialog-titlebar-actions .k-window-titlebar-action.k-dialog-titlebar-action.k-button.k-button-md.k-button-flat.k-button-flat-base.k-rounded-md.k-icon-button .k-button-icon.k-icon.k-i-x{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-window .k-window-titlebar .k-window-titlebar-actions .k-window-titlebar-action.k-button.k-button-md.k-button-flat.k-button-flat-base.k-rounded-md.k-icon-button .k-icon.k-i-x.k-button-icon::before{
+          content: "\e011";
+        
+}
+    .k-window .k-window-titlebar .k-window-titlebar-actions .k-window-titlebar-action.k-button.k-button-md.k-button-flat.k-button-flat-base.k-rounded-md.k-icon-button .k-icon.k-i-x.k-button-icon{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md.k-treelist-scrollable .k-table.k-table-md.k-grid-table .k-table-tbody .k-table-row.k-master-row .k-table-td.k-text-nowrap .k-icon.k-i-caret-alt-right::before{
+          content: "\e026";
+        
+}
+    .k-grid.k-grid-md.k-treelist-scrollable .k-table.k-table-md.k-grid-table .k-table-tbody .k-table-row.k-master-row .k-table-td.k-text-nowrap .k-icon.k-i-caret-alt-right{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-grid.k-grid-md.k-treelist-scrollable .k-table.k-table-md.k-grid-table .k-table-tbody .k-table-row.k-master-row .k-table-td.k-text-nowrap .k-icon.k-i-caret-alt-down::before{
+          content: "\e028";
+        
+}
+    .k-grid.k-grid-md.k-treelist-scrollable .k-table.k-table-md.k-grid-table .k-table-tbody .k-table-row.k-master-row .k-table-td.k-text-nowrap .k-icon.k-i-caret-alt-down{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}
+    .k-notification-group .k-notification-container .k-notification.k-notification-closable.k-notification-success .k-notification-actions .k-notification-action.k-notification-close-action .k-icon.k-i-x::before{
+          content: "\e011";
+        
+}
+    .k-notification-group .k-notification-container .k-notification.k-notification-closable.k-notification-success .k-notification-actions .k-notification-action.k-notification-close-action .k-icon.k-i-x{
+                  @extend %tb-typography-SchertechVersion1;
+      
+}

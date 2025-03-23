@@ -1,0 +1,54 @@
+{
+	"success": true,
+	"project": {
+		"calendar": "workweek"
+	},
+	"calendars": {
+		"rows": [
+			{
+				"id": "workweek",
+				"name": "Work week",
+                "unspecifiedTimeIsWorking": true
+			},
+			{
+				"id": "firstdayhalf",
+				"name": "First day half",
+				"unspecifiedTimeIsWorking": false,
+				"intervals": [
+					{
+						"name": "Available",
+						"recurrentStartDate": "every weekday at 08:00",
+						"recurrentEndDate": "every weekday at 12:00",
+						"isWorking": true
+					}
+				]
+			},
+			{
+				"id": "seconddayhalf",
+				"name": "Second day half",
+				"unspecifiedTimeIsWorking": false,
+				"intervals": [
+					{
+						"name": "Available",
+						"recurrentStartDate": "every weekday at 13:00",
+						"recurrentEndDate": "every weekday at 17:00",
+						"isWorking": true
+					}
+				]
+			},
+			{
+				"id": "allday",
+				"name": "All day",
+				"unspecifiedTimeIsWorking": false,
+				"intervals": [
+					{
+						"name": "Available",
+						"recurrentStartDate": "every weekday at 09:00",
+						"recurrentEndDate": "every weekday at 19:00",
+						"isWorking": true
+					}
+				]
+			}
+		]
+	}
+}

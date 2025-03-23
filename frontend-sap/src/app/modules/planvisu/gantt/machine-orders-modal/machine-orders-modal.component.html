@@ -1,0 +1,124 @@
+<ui5-dialog [open]="showDialog" class="h-[800px] w-[1800px]" cdkDropList (cdkDropListDropped)="drop($event)">
+	<ui5-bar slot="header" class="h-[44px]" design="Header">
+		<ui5-title level="H5" slot="startContent">{{machineName}}</ui5-title>
+		<ui5-button slot="endContent" design="Emphasized" [disabled]="isLoading" (click)="openCreateOrderModal()" id="createOrder" i18n>Create Order</ui5-button>
+	</ui5-bar>
+	<ui5-busy-indicator [active]="isLoading"
+		class="rounded-lg shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] w-full h-full">
+		<ui5-table id="table" class="h-full w-full">
+			<ui5-table-selection mode="Multiple" id="selection" [selected]="selectedOrders" slot="features" (change)="onSelectOrder($event)"></ui5-table-selection>
+			<ui5-table-header-row class="list-table" slot="headerRow" sticky>
+				<ui5-table-header-cell class="overflow-hidden w-[15%]" id="orderNumber" i18n>Order Number</ui5-table-header-cell>
+				<ui5-table-header-cell class="overflow-hidden w-[20%]" id="name" i18n>Item Name</ui5-table-header-cell>
+				<ui5-table-header-cell class="overflow-hidden w-[15%]" id="status" i18n>Status</ui5-table-header-cell>
+				<ui5-table-header-cell class="overflow-hidden w-[24%]" id="startTime" i18n>Start Time</ui5-table-header-cell>
+				<ui5-table-header-cell class="overflow-hidden w-[24%]" id="endTime" i18n>End Time</ui5-table-header-cell>
+				<ui5-table-header-cell class="overflow-hidden w-[2%]" id="infoCombine"></ui5-table-header-cell>
+			</ui5-table-header-row>
+			@for (order of orders; track $index) {
+				<ui5-table-row class="list-table-item" cdkDrag [rowKey]="order.id">
+					<ui5-table-cell><ui5-label>{{ order.prodOrderPos?.prodOrder.custom_id }}</ui5-label></ui5-table-cell>
+					<ui5-table-cell><ui5-label>{{ order?.prodOrderPos?.item?.custom_id }} - {{ order?.prodOrderPos?.item?.name }}</ui5-label></ui5-table-cell>
+					<ui5-table-cell><ui5-label>{{ order.status }}</ui5-label></ui5-table-cell>
+					<ui5-table-cell>
+						<ui5-datetime-picker [readonly]="$index !== 0 || order.status === prodOrderPosOperationStatus.IN_PRODUCTION" [ngModel]="order.start | date: 'dd.MM.yyyy HH:mm'"
+							(ngModelChange)="onChangeStartTime($event, order)" formatPattern="dd.MM.YYYY HH:mm"></ui5-datetime-picker>
+						</ui5-table-cell>
+						<ui5-table-cell>
+							<ui5-datetime-picker [readonly]="true" [ngModel]="order.end | date: 'dd.MM.yyyy HH:mm'" formatPattern="dd.MM.YYYY HH:mm"></ui5-datetime-picker>
+						</ui5-table-cell>
+					<ui5-table-cell>
+						<ui5-button
+						class="mr-1"
+						icon="hint"
+						(click)="openOrderDetails(order)"></ui5-button>
+						<ui5-button
+						class="ml-1 mr-1"
+						icon="combine"
+						[disabled]="order.status === prodOrderPosOperationStatus.IN_PRODUCTION"
+						(click)="combineOrder(order)"></ui5-button>
+						@if (order.belongsToGroup) {
+							<ui5-button
+							class="ml-1"
+							icon="broken-link"
+							[disabled]="order.status === prodOrderPosOperationStatus.IN_PRODUCTION"
+							(click)="unlinkOrder(order)">{{order.belongsToGroupId}}</ui5-button>
+						}
+					</ui5-table-cell>
+				</ui5-table-row>
+			}
+		</ui5-table>
+	</ui5-busy-indicator>
+
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button design="Emphasized" [disabled]="isLoading || !willBeSave" (click)="saveOrder()" id="saveButton" i18n>Save</ui5-button>
+		<ui5-button [disabled]="isLoading || selectedOrderIds.length == 0" (click)="reSchedule()" id="schedule" i18n>Re-Schedule</ui5-button>
+		<ui5-button (click)="closeDialog()" id="closeOverlapButton">{{ localization.close }}</ui5-button>
+	</div>
+</ui5-dialog>
+
+@if (combineOrderDialog) {
+	<ui5-dialog [open]="combineOrderDialog" class="h-[720px] w-[1600px]">
+		<ui5-bar slot="header" class="h-[44px]" design="Header">
+			<ui5-title level="H5" slot="startContent" i18n>
+				{{ selectedParentOrder?.prodOrderPos?.prodOrder?.custom_id }} | {{ selectedParentOrder?.prodOrderPos?.item?.custom_id }} - {{ selectedParentOrder?.prodOrderPos?.item?.name }} | {{ selectedParentOrder?.start | date: 'dd.MM.yyyy HH:mm' }} - {{ selectedParentOrder?.start | date: 'dd.MM.yyyy HH:mm' }}
+			</ui5-title>
+		</ui5-bar>
+		<ui5-busy-indicator [active]="isLoading"
+			class="rounded-lg shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] w-full h-full">
+			<ui5-table id="table" class="h-full w-full">
+				<ui5-table-selection mode="Multiple" id="selection" [selected]="initialSelectedOrders" slot="features" (change)="onSelectCombineOrder($event)"></ui5-table-selection>
+				<ui5-table-header-row class="list-table" slot="headerRow" sticky>
+					<ui5-table-header-cell class="overflow-hidden w-[15%]" id="orderNumber" i18n>Order
+						Number</ui5-table-header-cell>
+					<ui5-table-header-cell class="overflow-hidden w-[20%]" id="name" i18n>Item Name</ui5-table-header-cell>
+					<ui5-table-header-cell class="overflow-hidden w-[15%]" id="status" i18n>Status</ui5-table-header-cell>
+					<ui5-table-header-cell class="overflow-hidden w-[25%]" id="startTime" i18n>Start Time</ui5-table-header-cell>
+					<ui5-table-header-cell class="overflow-hidden w-[25%]" id="endTime" i18n>End Time</ui5-table-header-cell>
+				</ui5-table-header-row>
+				@for (order of forCombineOrders; track $index) {
+					<ui5-table-row class="list-table-item" [rowKey]="order.id">
+						<ui5-table-cell><ui5-label>{{ order.prodOrderPos?.prodOrder.custom_id }}</ui5-label></ui5-table-cell>
+						<ui5-table-cell><ui5-label>{{ order?.prodOrderPos?.item?.custom_id }} - {{ order?.prodOrderPos?.item?.name }}</ui5-label></ui5-table-cell>
+						<ui5-table-cell><ui5-label>{{ order.status }}</ui5-label></ui5-table-cell>
+						<ui5-table-cell><ui5-label>{{ order.start | date: 'dd.MM.yyyy HH:mm' }}</ui5-label></ui5-table-cell>
+						<ui5-table-cell><ui5-label>{{ order.end | date: 'dd.MM.yyyy HH:mm' }}</ui5-label></ui5-table-cell>
+					</ui5-table-row>
+				}
+			</ui5-table>
+		</ui5-busy-indicator>
+
+		<div slot="footer" class="footer-style gap-8">
+			<ui5-button design="Emphasized" [disabled]="isLoading" (click)="confirmCombineOrder()" id="saveButton" i18n>Save</ui5-button>
+			<ui5-button (click)="closeCombineOrderDialog()" id="closeOverlapButton">{{ localization.close }}</ui5-button>
+		</div>
+	</ui5-dialog>
+}
+
+@if (isOrderDetailsDialogOpen) {
+	<app-order-details-dialog
+		#orderDetailsDialog
+		[open]="isOrderDetailsDialogOpen"
+		dialogTitle="Order Details"
+		[isDialogEditable]="true"
+		(changeIsDialogOpen)="closeOrderDetails()"
+		[isSaveButton]="true"
+		[selecteItem]="selectedItem"
+		[operationEnd]="formatTime(selectedParentOrder.end)"
+		[operationStart]="formatTime(selectedParentOrder.start)"
+		[selectedOperation]="selectedParentOrder"
+		[selecteItem]="selectedItem"
+		></app-order-details-dialog>
+}
+
+@if (isNewOrderDialogOpen) {
+	<ui5-dialog id="orderDialog" [open]="isNewOrderDialogOpen" class="w-[1260px] h-[840px]">
+		<ui5-bar slot="header" class="h-[40px]" design="Header">
+			<ui5-title level="H5" slot="startContent" i18n>New Order</ui5-title>
+		</ui5-bar>
+		<app-create-order [selectedMachineId]="machineId" [onFinalSave]="createOrder"></app-create-order>
+		<div slot="footer" class="footer-style gap-8">
+			<ui5-button (click)="closeNewOrderDialog()" id="closeOverlapButton">{{ localization.close }}</ui5-button>
+		</div>
+	</ui5-dialog>
+}

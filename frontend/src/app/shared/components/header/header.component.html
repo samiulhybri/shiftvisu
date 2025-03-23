@@ -1,0 +1,34 @@
+<kendo-appbar [themeColor]="theme">
+    <kendo-appbar-section (click)="navigate('home', $event)">
+        <!-- <a [href]="homeLink"> <img [src]="logo" alt="" width="186"> </a> -->
+        <img [src]="logo" alt="" class="logo" width="186">
+    </kendo-appbar-section>
+    <kendo-appbar-spacer></kendo-appbar-spacer>
+
+    <kendo-appbar-section class="module-name" (click)="navigate('module', $event)">
+        <span class="blue">{{firstTitle}}</span><span class="yellow">{{secondTitle}}</span>
+    </kendo-appbar-section>
+
+    <kendo-appbar-spacer></kendo-appbar-spacer>
+    <kendo-appbar-section class="user-section">
+       
+        <span class="user-name" [hidden]="!user"> {{user?.name}} </span>
+        <span class="user-name" [hidden]="user"> Login </span>
+    </kendo-appbar-section>
+    
+    <kendo-appbar-section class="language-section" [hidden]="firstTitle != 'absence'">
+        <kendo-dropdownlist 
+        [data]="languageList"
+        (valueChange)="switchLanguage($event)"
+        textField="name"
+        valueField="code"
+        [valuePrimitive]="true"
+        [(ngModel)]="selectedLanguage"
+        style="width: 75px;"
+    >
+        <ng-template kendoDropDownListValueTemplate let-dataItem>
+            <span class="template">{{ dataItem?.code.toUpperCase() }}</span>
+        </ng-template>
+    </kendo-dropdownlist>
+    </kendo-appbar-section>
+</kendo-appbar>

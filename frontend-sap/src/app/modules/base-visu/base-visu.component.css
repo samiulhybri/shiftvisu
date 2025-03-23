@@ -1,0 +1,104 @@
+.ui5-bar-startcontent-container {
+	padding-left: 48px !important;
+}
+
+.header-user-part-components {
+	color: #0064d9;
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0 16px 0 0;
+}
+#header-user-part {
+	padding: 0 40px 0 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+ui5-bar {
+	grid-column: 1 / span 2;
+	grid-row: 1 / 2;
+	height: 52px !important;
+}
+
+ui5-bar::part(root) {
+	padding-inline-start: 0.75rem;
+	padding-inline-end: 1.25rem;
+	box-shadow: 0 0 0.125rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent),
+		0 0.5rem 1rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent);
+}
+
+.tool-layout {
+	padding: 0rem 0rem 0.5rem 0rem;
+	background: color-mix(in srgb, black 4%, var(--sapBackgroundColor));
+	box-sizing: border-box;
+	display: grid;
+	gap: 0.5rem;
+	grid-template-rows: auto 1fr;
+	grid-template-columns: auto 1fr;
+	height: 100vh;
+}
+
+.content {
+	background: var(--sapList_HeaderBackground);
+	border-radius: 15px;
+	box-shadow: 0 0 0.125rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent),
+		0 0.5rem 1rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent);
+	height: 100%;
+	overflow: hidden;
+	margin-right: 12px !important;
+}
+
+.contentForCapacity {
+	height: 100%;
+	border-radius: 15px;
+	overflow: hidden;
+	margin-right: var(--gap-for-main-content) !important;
+}
+
+/* Media query for height less than 800px */
+@media (max-height: 799px) {
+	.content {
+	  height: 110%;
+	}
+  }
+
+  /* Media query for height less than 800px */
+@media (max-height: 799px) {
+	.contentForCapacity {
+	  height: 110%;
+	}
+  }
+
+ui5-side-navigation {
+	border-radius: 0.5rem;
+	box-shadow: var(--_ui5-v1-20-1_side_navigation_box_shadow);
+	height: 100%;
+	overflow-y: auto;
+	margin-left: 12px !important;
+	overflow: visible ;
+}
+
+/* Media query for height less than 800px */
+@media (max-height: 799px) {
+	ui5-side-navigation {
+	  height: 110%;
+	}
+  }
+
+.logout-footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: end;
+	align-items: center;
+	width: 100%;
+}
+
+.logout-content {
+	display: flex;
+	flex-direction: column;
+}
+
+.mr5 {
+	margin-right: 5px;
+}

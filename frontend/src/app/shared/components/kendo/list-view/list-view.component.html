@@ -1,0 +1,18 @@
+<kendo-listview 
+    [data]="events"
+    class="k-rounded-lg"
+    containerClass="k-d-flex k-flex-row k-flex-nowrap k-listview-content-padding-square k-gap-3"
+>
+    <ng-template kendoListViewItemTemplate let-dataItem="dataItem" let-isFirst="isFirst" class="">
+        <button
+            kendoButton
+            [themeColor]="activeItem == dataItem[listViewConfig.nameKey] ? 'primary' : 'light'"
+            icon="menu"
+            (click)="onSelect(dataItem)"
+        >
+            <span>
+                {{ dataItem[listViewConfig.nameKey] | translate}}
+            </span>
+        </button>
+    </ng-template>
+</kendo-listview>

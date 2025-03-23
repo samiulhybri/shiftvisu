@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+# Launches backend services necessary for development on the chat component
+
+trap 'kill $(jobs -p)' EXIT
+
+php artisan serve &
+php artisan queue:listen --sleep=0.1 &
+soketi start

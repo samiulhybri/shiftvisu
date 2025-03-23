@@ -1,0 +1,139 @@
+<ui5-card>
+	<ui5-card-header
+		slot="header"
+		title-text="Order Details"
+		i18n-title-text>
+	</ui5-card-header>
+
+	<div
+		class="order-buttons-wrapper w-full py-2 px-4"
+		*ngIf="hasOperation()">
+		<div
+			class="gap-8 flex"
+			id="orderButtons">
+			<ui5-toolbar
+				align-content="Start"
+				class="hide-bottom-border">
+				<ng-container *ngFor="let operation of orderDetails">
+					<ui5-toolbar-button
+						text="{{ operation?.prodOrderCustomId }}"
+						(click)="selectedOperation(operation?.id)"
+						[design]="getButtonStatus(selectedId === operation?.id)">
+					</ui5-toolbar-button>
+				</ng-container>
+			</ui5-toolbar>
+		</div>
+	</div>
+	<div
+		class="order-cards grid xl:grid-cols-3 lg:grid-cols-2 sm:grid-cols-1 border-top"
+		*ngIf="selectedOperations?.prodOrderPosOperationPosition; else noContent"
+		id="orderCards">
+		<div class="order-card firstItem">
+			<ui5-title
+				level="H5"
+				id="itemName"
+				(mouseenter)="onMouseEnter()"
+				(mouseleave)="onMouseLeave()"
+				>{{ selectedOperations?.itemId }}
+				-
+				{{ selectedOperations?.itemName || "" | truncate: 50 }}</ui5-title
+			>
+			<ui5-label
+				wrapping-type="None"
+				class="label-style"
+				i18n
+				>Item</ui5-label
+			>
+		</div>
+
+		<div class="order-card">
+			<ui5-title level="H5"
+				>{{ selectedOperations?.orderQuantity }}
+				{{ selectedOperations?.unitOfMeasureCustomId }} |
+				{{ selectedOperations?.residualQuantityDetails2 }}
+				{{ selectedOperations?.unitOfMeasureCustomId }}</ui5-title
+			>
+
+			<ui5-label
+				wrapping-type="None"
+				class="label-style"
+				i18n
+				>Order | Residual Quantity</ui5-label
+			>
+		</div>
+		<div class="order-card">
+			<ui5-title
+				id="scrap"
+				level="H5"
+				>{{ selectedOperations?.goodItemsCount }}
+				{{ selectedOperations?.unitOfMeasureCustomId }} |
+				{{ selectedOperations?.reworkItemsCount }}
+				{{ selectedOperations?.unitOfMeasureCustomId }} |
+				{{ selectedOperations?.badItemsCount }}
+				{{ selectedOperations?.unitOfMeasureCustomId }}</ui5-title
+			>
+			<ui5-label
+				wrapping-type="None"
+				class="label-style"
+				i18n
+				>Good | Rework | Scrap</ui5-label
+			>
+		</div>
+		<div class="order-card">
+			<ui5-title
+				id="itemName"
+				level="H5"
+				>{{ selectedOperations?.standardVelocity | number: "2.0-2" }}
+				{{
+					machineStateTypeClass.getStateValue(machine?.machine_state_type) ==
+					machineStateType.IIOT
+						? " | " +
+							(selectedOperations?.currentVelocity === 60
+								? " - "
+								: (selectedOperations?.currentVelocity | number: "2.0-2"))
+						: ""
+				}}
+				{{ selectedOperations?.unitOfMeasureCustomId }} {{ "/" }}
+				{{ localizedMin }}</ui5-title
+			>
+			<ui5-label
+				wrapping-type="None"
+				class="label-style"
+				><span i18n>Standard</span>
+				{{
+					machineStateTypeClass.getStateValue(machine?.machine_state_type) ==
+					machineStateType.IIOT
+						? "| " + actualText
+						: " "
+				}}
+				<span i18n>Velocity</span>
+			</ui5-label>
+		</div>
+	</div>
+
+	<ng-template #noContent>
+		<div
+			class="w-full h-full flex justify-center items-center min-height-order-details"
+			[ngStyle]="isOneId ? { minHeight: '365px' } : {}">
+			<span *ngIf="isLoading; else noContentFound">
+				<ui5-busy-indicator
+					size="M"
+					active></ui5-busy-indicator>
+			</span>
+			<ng-template #noContentFound>
+				<label i18n>No data found!</label>
+			</ng-template>
+		</div>
+	</ng-template>
+</ui5-card>
+
+<ui5-popover
+	id="popOver"
+	[open]="showPopOver"
+	[opener]="opener"
+	placement="Bottom"
+	(after-close)="onMouseLeave()">
+	<div class="popover-content">
+		<ui5-text>{{ selectedOperations?.itemName }}</ui5-text>
+	</div>
+</ui5-popover>

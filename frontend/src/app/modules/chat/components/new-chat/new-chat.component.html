@@ -1,0 +1,64 @@
+<kendo-label
+  *ngIf="forGroupChat"
+  text="Group Name"
+  i18n-text="Group chat name input label"
+>
+</kendo-label>
+
+<kendo-textbox
+  *ngIf="forGroupChat"
+  [(ngModel)]="groupChatName"
+  placeholder="Group name"
+  i18n-placeholder="Group hat name input placeholder"
+>
+</kendo-textbox>
+
+<kendo-label
+  class="multiselect-label"
+  *ngIf="forGroupChat"
+  text="Add Member"
+  i18n-text="Group chat members multiselect label"
+>
+</kendo-label>
+
+<kendo-multiselect
+  #multiselect
+  [data]="displayUsers()"
+  textField="name"
+  valueField="id"
+  [(ngModel)]="selectedUsers"
+  (close)="$event.preventDefault()"
+  (valueChange)="onValueChange($event)"
+  [listHeight]="120"
+>
+  <ng-template kendoMultiSelectTagTemplate let-dataItem>
+    {{ dataItem.name }}
+    <kendo-button
+      fillMode="clear"
+      imageUrl="assets/images/svg/x_circle.svg"
+      (click)="removeUser(dataItem)"
+      size="none"
+    ></kendo-button> </ng-template
+></kendo-multiselect>
+
+<kendo-dialog-actions layout="end">
+  <button
+    *ngIf="forGroupChat"
+    kendoButton
+    themeColor="primary"
+    (click)="createGroupChat()"
+    [disabled]="groupChatName.trim() === ''"
+    i18n="Create group chat button"
+    imageUrl="assets/images/svg/save_light.svg"
+  >
+    Save
+  </button>
+  <button
+    kendoButton
+    (click)="closeDialog()"
+    i18n="Close new chat dialog button"
+    imageUrl="assets/images/svg/x_dark.svg"
+  >
+    Cancel
+  </button>
+</kendo-dialog-actions>

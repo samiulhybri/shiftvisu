@@ -1,0 +1,46 @@
+<form novalidate class="k-form" *ngIf="hweOfferPosWorkPlanLeadTime">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="1">
+            <kendo-card-header i18n>
+                Hwe Offer Pos Work Plan Lead Times
+            </kendo-card-header>
+            <kendo-card-body class="details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="name" i18n i18n-text text="Lead time Name"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-combobox
+                            #name
+                            [(ngModel)]="hweOfferPosWorkPlanLeadTime.name" 
+                            [data]="offerPosWorkPlans"
+                            [filterable]="true"
+                            [valuePrimitive]="true" 
+                            textField="text"
+                            valueField="value"
+                            name="name"
+                            (filterChange)="handleFilter($event, 'name')"
+                        >
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="machine" i18n i18n-text text="Lead time machine"></kendo-label>
+                    <kendo-combobox 
+						#machine 
+						[(ngModel)]="hweOfferPosWorkPlanLeadTime.machine"
+						name="machine"
+						[data]="machines"
+						textField="custom_id" 
+						valueField="id"
+						[style.width]="'100%'"
+						[filterable]="true"
+						(filterChange)="handleFilter($event, 'machine')"
+					>
+				   </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="lead_time_days" i18n i18n-text text="Lead Time Days"></kendo-label>
+                    <kendo-numerictextbox format="#.##\ t" #lead_time_days name="lead_time_days" [(ngModel)]="hweOfferPosWorkPlanLeadTime.lead_time_days" [step]="1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

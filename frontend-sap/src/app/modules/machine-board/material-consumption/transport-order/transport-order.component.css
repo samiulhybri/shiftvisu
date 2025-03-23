@@ -1,0 +1,7 @@
+.staging-area-wraper {
+	gap: 0.75rem;
+}
+
+.list-border-bottom {
+	border-bottom: var(--card-border-color);
+}

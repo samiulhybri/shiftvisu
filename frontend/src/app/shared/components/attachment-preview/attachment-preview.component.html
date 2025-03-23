@@ -1,0 +1,115 @@
+<div class="grid-container">
+	<div class="grid-item">
+
+		<div
+			class="card"
+			[ngStyle]="{ 'height.px': filePreviewHeight }">
+			<div class="card-header">
+				<h3>{{ documentTitle }} ({{ filesCount }})</h3>
+			</div>
+			<div class="divider"></div>
+			<div
+				class="card-body"
+				>
+
+				<div
+					*ngIf="isLoading"
+					class="busy-indicator"></div>
+				<ul class="file-list">
+					<li
+						*ngFor="let file of files"
+						class="file-list-item"
+						[class.selected]="file.original_url === selectedFile.original_url"
+						(click)="selectFile(file)">
+						<img
+							*ngIf="file.checkFileType() === 'image'"
+							[src]="file.original_url"
+							class="file-thumbnail"
+							width="40px" />
+						<span
+							*ngIf="file.checkFileType() === 'document'"
+							class="k-icon k-i-file-word"></span>
+						<span
+							*ngIf="file.checkFileType() === 'pdf'"
+							class="k-icon k-i-file-pdf"></span>
+						<span
+							*ngIf="file.checkFileType() === 'excel'"
+							class="k-icon k-i-file-excel"></span>
+						<span
+							*ngIf="file.checkFileType() === 'powerpoint'"
+							class="k-icon k-i-file-ppt"></span>
+						<span
+							*ngIf="file.checkFileType() === 'text'"
+							class="k-icon k-i-file-txt"></span>
+						<span
+							*ngIf="file.checkFileType() === null"
+							class="icon document"></span>
+						<div style="display: flex; flex-direction: column">
+							<div>{{ file.name }}</div>
+							<div>{{ fileSize }}: {{ file.getFileSizeInKB() }}</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="grid-item">
+		<div
+			class="card preview-card"
+			>
+			<div class="card-header k-flex" style="display: flex;justify-content: space-between">
+				<h3>Preview</h3>
+                <button kendoButton type="button" themeColor="primary" *ngIf="selectedFile?.mime_type == 'text'" (click)="downloadTextFile()" > <span class="icon icon-download"></span> {{ selectedFile?.name }}</button>
+
+			</div>
+			<div class="divider"></div>
+			<div
+				class="preview-body"
+				>
+				<div
+					class="preview-content"
+					>
+					<ng-container [ngSwitch]="selectedFile?.checkFileType()">
+						<iframe
+							*ngSwitchCase="'pdf'"
+							[src]="selectedFile?.original_url | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+						<img
+							*ngSwitchCase="'image'"
+							[src]="selectedFile?.original_url"
+							alt="{{ selectedFile.name }}"
+							style="max-height: 98%" />
+						<iframe
+							*ngSwitchCase="'document'"
+							[src]="selectedFile?.getGoogleDocViewerUrl() | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+						<iframe
+							*ngSwitchCase="'powerpoint'"
+							[src]="selectedFile?.getGoogleDocViewerUrl() | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+						<iframe
+							*ngSwitchCase="'excel'"
+							[src]="selectedFile?.getGoogleDocViewerUrl() | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+                        <iframe
+                                *ngSwitchCase="'text'"
+                                [src]="selectedFile?.getGoogleDocViewerUrl() | safeUrl"
+                                width="98%"
+                                height="98%"></iframe>
+						<iframe
+							*ngSwitchDefault
+							[src]="selectedFile?.original_url | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+					</ng-container>
+
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

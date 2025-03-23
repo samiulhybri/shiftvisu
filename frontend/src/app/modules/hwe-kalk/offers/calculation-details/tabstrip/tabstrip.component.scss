@@ -1,0 +1,142 @@
+.calculation-tab {
+    padding-bottom: 12px;
+
+    .k-label {
+        align-items: center;
+    }
+}
+::ng-deep .k-upload .k-upload-files{
+    max-height: unset;
+}
+.image-preview {
+    height: 100%;
+    display: flex;
+    width: 100%;
+
+    > div {
+        display: flex;
+        width: inherit;
+        justify-content: center;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    }
+}
+
+.pointer-element {
+    cursor: pointer;
+}
+
+.work-plan {
+    display: flex;
+    flex-flow: wrap;
+    flex-direction: row-reverse;
+
+    .buttons {
+        :first-child {
+            margin-right: 5px;
+        }
+    }
+
+    form table {
+        tr td:last-child {
+            width: 75px;
+            text-align: center;
+
+            button {
+                margin: 1px;
+            }
+        }
+    }
+}
+
+.additional_info_section {
+    width: calc(100% - 32px); 
+}
+
+.heat-treatment {
+    width: 100% !important;
+    flex-basis: calc(50vh - 162px);
+    overflow: auto;
+}
+
+.file-item-container {
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+}
+
+.file-image {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.file-icon {
+    width: 32;
+    height: 32;
+}
+
+.file-details {
+    display: flex;
+    flex-direction: column;
+    margin-right: 8px;
+}
+
+.file-details>div:nth-child(1) {
+    font-size: 14px;
+    /* Set font size to 14px for the first div inside .file-details */
+}
+
+.file-details>div:nth-child(2) {
+    font-size: 12px;
+    /* Set font size to 12px for the second div inside .file-details */
+}
+
+.file-actions {
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    kendo-button{
+        margin: 3px;
+    }
+}
+
+.action-icon {
+    font-size: 16px;
+    margin-right: 8px;
+    /* Add space of 8px between the two icons */
+}
+
+@media screen and (max-width: 1980px) {
+    .assessment-tabstrip {
+        height: calc(100vh - 210px);
+    }
+}
+
+.item-show{
+    display: flex;
+}
+
+@media screen and (min-width: 850px) and (max-width: 1400px) {
+    .assessment-tabstrip {
+        height: calc(100vh - 64px);
+    }
+
+    .heat-treatment {
+        flex-basis: calc(50vh - 88px);
+    }
+}
+
+@media screen and (min-width: 1400px) and (max-width: 1800px) {
+    .assessment-tabstrip {
+        height: calc(100vh - 64px);
+    }
+    
+    .heat-treatment {
+        flex-basis: calc(50vh - 88px);
+    }
+}

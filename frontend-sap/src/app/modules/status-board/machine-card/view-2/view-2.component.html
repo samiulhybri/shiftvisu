@@ -1,0 +1,276 @@
+<div
+	id="machine-card"
+	class="card xl:w-[406px] lg:w-[365px] md:w-[365px] sm:w-[365px]">
+	<div
+		[ngClass]="
+			cardType == card.PRODUCTION && selectedCardView == cardView.Standard
+				? 'green card-header half-radius'
+				: cardType == card.PRODUCTION && selectedCardView == cardView.Compact
+				? 'green-compact card-header full-radius'
+				: cardType == card.STANDSTILL && selectedCardView == cardView.Standard
+				? 'red card-header half-radius'
+				: cardType == card.STANDSTILL && selectedCardView == cardView.Compact
+				? 'red-compact card-header full-radius'
+				: (cardType == card.SETUP || cardType == prodOrderPosOperationStatus.IN_SETUP || cardType == prodOrderPosOperationStatus.IN_TEARDOWN) && selectedCardView == cardView.Standard
+				? 'yellow card-header half-radius'
+				: (cardType == card.SETUP || cardType == prodOrderPosOperationStatus.IN_SETUP || cardType == prodOrderPosOperationStatus.IN_TEARDOWN) && selectedCardView == cardView.Compact
+				? 'yellow-compact card-header full-radius'
+				: cardType == card.OFF && selectedCardView == cardView.Standard
+				? 'off card-header half-radius'
+				: cardType == card.OFF && selectedCardView == cardView.Compact
+				? 'off-compact card-header full-radius'
+				: cardType == card.READY && selectedCardView == cardView.Standard
+				? 'azzurro card-header half-radius'
+				: cardType == card.READY && selectedCardView == cardView.Compact
+				? 'azzurro-compact card-header full-radius'
+				: cardType == prodOrderPosOperationStatus.IN_PRODUCTION && selectedCardView == cardView.Standard
+				? 'green card-header half-radius'
+				: cardType == prodOrderPosOperationStatus.IN_PRODUCTION && selectedCardView == cardView.Compact
+				? 'green-compact card-header full-radius'
+				: selectedCardView == cardView.Standard
+				? 'red card-header half-radius'
+				: 'red-compact card-header full-radius'
+		">
+		<div class="div-row icon-layout">
+			<div
+				class="div-row"
+				style="align-items: center; width: 40%">
+				<ui5-icon
+					[name]="
+						cardType == card.PRODUCTION || cardType == prodOrderPosOperationStatus.IN_PRODUCTION
+							? 'media-play'
+							: cardType == card.STANDSTILL
+							? 'media-pause'
+							: cardType == card.SETUP || cardType == prodOrderPosOperationStatus.IN_SETUP || cardType == prodOrderPosOperationStatus.IN_TEARDOWN
+							? 'wrench'
+							: cardType == card.READY
+							? 'accept'
+							: 'decline'
+					"
+					style="height: 40px; width: 40px"
+					[ngStyle]="{
+						color: cardType == card.OFF ? 'var(--sapTextColor)' : 'var(--sapBaseColor)'
+					}"></ui5-icon>
+				<div class="flex-column card-header-label-layout">
+					<ui5-text
+						class="title-text-benacchio"
+						[ngStyle]="
+							cardType == card.OFF
+								? { color: 'var(--sapTextColor)' }
+								: { color: 'var(--sapBaseColor)' }
+						"
+						>{{ cardTypeText }}</ui5-text
+					>
+				</div>
+			</div>
+			<div class="percentage-layout-benacchio">
+				<ui5-text
+					class="title-text-benacchio"
+					[ngStyle]="
+						cardType == card.OFF
+							? { color: 'var(--sapTextColor)' }
+							: { color: 'var(--sapBaseColor)' }
+					"
+					>{{ machine?.custom_id }} {{ machine?.name|slice:0:25 }}{{machine?.name!.length>25?'...':''}}</ui5-text
+				>
+			</div>
+		</div>
+	</div>
+
+	<div
+		*ngIf="selectedCardView == cardView.Standard"
+		class="xl:justify-center"
+		[ngStyle]="
+			cardType == card.PRODUCTION || cardType == prodOrderPosOperationStatus.IN_PRODUCTION
+				? { border: '1px solid var(--production-color)' }
+				: cardType == card.STANDSTILL
+				? { border: '1px solid var(--statnstill-color)' }
+				: cardType == card.SETUP || cardType == prodOrderPosOperationStatus.IN_SETUP || cardType == prodOrderPosOperationStatus.IN_TEARDOWN
+				? { border: '1px solid var(--setup-color-machine-card-view2)' }
+				: cardType == card.READY
+				? { border: '1px solid var(--ready-color)' }
+				: { border: '1px solid var(--sapTextColor)' }
+		"
+		[ngClass]="
+			cardType == card.PRODUCTION || cardType == prodOrderPosOperationStatus.IN_PRODUCTION
+				? 'production-class card-footer card-height-for-pc xl:h-[144px] lg:h-[100px]'
+				: cardType == card.SETUP || cardType == prodOrderPosOperationStatus.IN_SETUP || cardType == prodOrderPosOperationStatus.IN_TEARDOWN
+				? 'standstill-class card-footer card-height-for-pc xl:h-[144px] lg:h-[100px]'
+				: cardType == card.STANDSTILL
+				? 'standstill-class card-footer card-height-for-pc xl:h-[144px] lg:h-[100px]'
+				: cardType == card.READY
+				? 'ready-class card-footer card-height-for-pc xl:h-[144px] lg:h-[100px]'
+				: 'off-class card-footer card-height-for-pc xl:h-[144px] lg:h-[100px]'
+		">
+		<div class="div-row justify-content-align-items-benacchio">
+			<div class="div-row justify-align-center">
+				<ui5-text
+					class="side-text"
+					id="itemId{{ index }}"
+					(mouseenter)="onMouseEnterItemID($event, index)"
+					(mouseleave)="onMouseLeaveTimeline()"
+					>{{
+						machine?.current_operation?.prodOrderPos?.item?.custom_id
+							? machine?.current_operation?.prodOrderPos?.item?.custom_id
+							: "No Data"
+					}}
+				</ui5-text>
+			</div>
+
+			<div class="div-row justify-align-center">
+				<div class="order-card">
+					<ui5-title
+						id="itemName"
+						level="H5"
+						class="text-end"
+						>{{ (machine?.operationDetails?.standardCycle | number: "2.0-2") || 0 }}
+						{{ localizedSec }}
+						{{
+							machineStateTypeClass.getStateValue(machine?.machine_state_type) ==
+							machineStateType.IIOT
+								? " | " +
+									((machine?.operationDetails?.currentCycle | number: "2.0-2") ||
+										0)
+								: ""
+						}}
+						{{
+							machineStateTypeClass.getStateValue(machine?.machine_state_type) ==
+							machineStateType.IIOT
+								? localizedSec
+								: ""
+						}}</ui5-title
+					>
+					<ui5-label
+						wrapping-type="None"
+						class="label-style text-end"
+						><span i18n>Standard</span>
+						{{
+							machineStateTypeClass.getStateValue(machine?.machine_state_type) ==
+							machineStateType.IIOT
+								? "| " + currentText
+								: " "
+						}}
+						<span i18n>Cycle</span>
+					</ui5-label>
+				</div>
+			</div>
+		</div>
+		<div class="div-row justify-content-align-items-benacchio xl:mt-2">
+			<div
+				class="div-row justify-align-center"
+				style="height: 100%; margin-top: 3px">
+				<div class="order-card">
+					<ui5-title
+						level="H5"
+						>{{ machine?.operationDetails?.orderQuantity || 0 }}
+						{{ machine?.operationDetails?.unitOfMeasureCustomId }} |
+						{{ machine?.operationDetails?.residualQuantity || 0 }}
+						{{ machine?.operationDetails?.unitOfMeasureCustomId }}</ui5-title
+					>
+
+					<ui5-label
+						wrapping-type="None"
+						class="label-style"
+						i18n
+						>{{orderText | truncate: 5}} | {{resQuantityText | truncate: 17}}</ui5-label
+					>
+				</div>
+			</div>
+			<div
+				class="div-row justify-align-center"
+				style="height: 100%; margin-top: 3px">
+				<div class="order-card">
+					<ui5-title
+						id="scrap"
+						class="text-end"
+						level="H5"
+						>{{ machine?.operationDetails?.goodItemsCount || 0 }}
+						{{ machine?.operationDetails?.unitOfMeasureCustomId }} |
+						{{ machine?.operationDetails?.reworkItemsCount || 0 }}
+						{{ machine?.operationDetails?.unitOfMeasureCustomId }} |
+						{{ machine?.operationDetails?.badItemsCount || 0 }}
+						{{ machine?.operationDetails?.unitOfMeasureCustomId }}</ui5-title
+					>
+					<ui5-label
+						wrapping-type="None"
+						class="label-style text-end"
+						>{{goodText | truncate: 4}} | {{reworkText | truncate: 6}} | {{scrapText | truncate: 5}} </ui5-label
+					>
+				</div>
+			</div>
+		</div>
+		<div
+			id="progressBar{{ index }}"
+			(mouseenter)="onMouseEnterProgressBar($event, index)"
+			(mouseleave)="onMouseLeaveTimeline()">
+			<ui5-progress-indicator
+				[value]="machine?.getTotalQuantityPercentage() ?? 0"
+				id="progressIndicatorOfMachineCard"
+				hide-value="true"
+				style="padding: 3px 0px 2px 0px"></ui5-progress-indicator>
+		</div>
+
+		<div class="div-row mb-1">
+			<div class="oee-display">
+				<div class="oee-layout w-[90px]">
+					<ui5-label
+						class="oee-text"
+						id="OEE{{ index }}"
+						i18n
+						(mouseenter)="onMouseOEE($event, index, machine?.oee || 0)"
+						(mouseleave)="onMouseLeaveTimeline()"
+						wrapping-type="None"
+						>OEE {{ (machine?.oee || 0) * 100 | number: "2.0-0" }}%</ui5-label
+					>
+				</div>
+			</div>
+
+			<div class="performance-display">
+				<div class="div-row">
+					<div class="performance-layout mr-5">
+						<ui5-label
+							class="kpi-text"
+							id="machineUsage{{ index }}"
+							(mouseenter)="onMouseEnterMachineUsage($event, index, machine?.machineUsage || 0)"
+							(mouseleave)="onMouseLeaveTimeline()"
+							wrapping-type="None"
+							>D{{ (machine?.machineUsage || 0) * 100 | number: "2.0-0" }}%</ui5-label
+						>
+					</div>
+					<div class="performance-layout mr-5">
+						<ui5-label
+							class="kpi-text"
+							id="performance{{ index }}"
+							(mouseenter)="onMouseEnterPerformance($event, index, machine?.machinePerformance || 0)"
+							(mouseleave)="onMouseLeaveTimeline()"
+							wrapping-type="None"
+							>A{{
+								(machine?.machinePerformance || 0) * 100 | number: "2.0-0"
+							}}%</ui5-label
+						>
+					</div>
+					<div class="performance-layout">
+						<ui5-label
+							class="quality-text"
+							id="quality{{ index }}"
+							(mouseenter)="onMouseEnterQuality($event, index, machine?.machineQuality || 0)"
+							(mouseleave)="onMouseLeaveTimeline()"
+							wrapping-type="None"
+							>Q{{ (machine?.machineQuality || 0) * 100 | number: "2.0-0" }}%</ui5-label
+						>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<ui5-popover
+		id="popOver"
+		[open]="showPopOver"
+		[opener]="opener"
+		(after-close)="close()">
+		<div class="popover-content">
+			<ui5-text>{{ popoverText }}</ui5-text>
+		</div>
+	</ui5-popover>
+</div>
+

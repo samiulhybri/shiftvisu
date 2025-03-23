@@ -1,0 +1,464 @@
+<div class="scroll-content" *ngIf="usNorm">
+    <form novalidate class="k-form">
+        <kendo-stacklayout orientation="horizontal" [gap]="9">
+            <kendo-card [style.flex]="6">
+                <kendo-card-header i18n>
+                    Information
+                </kendo-card-header>
+                <kendo-card-body class="us-norm-details-body">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="custom_id" i18n i18n-text text="custom Id">
+                            <span class="k-text-error k-pl-1">*</span>
+                        </kendo-label>
+                        <kendo-textbox #custom_id name="custom_id" [disabled]="isAllDisabled" [(ngModel)]="usNorm.custom_id">
+                        </kendo-textbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="name" i18n i18n-text text="Name">
+                        </kendo-label>
+                        <kendo-textbox #name name="name" [disabled]="isAllDisabled" [(ngModel)]="usNorm.name">
+                        </kendo-textbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="specification" i18n i18n-text text="Specification"></kendo-label>
+                        <kendo-textbox #specification name="specification" [disabled]="isAllDisabled"
+                            [(ngModel)]="usNorm.specification">
+                        </kendo-textbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label name="issue" [for]="issue" i18n i18n-text text="issue">
+                        </kendo-label>
+                        <kendo-textbox name="issue" #issue [disabled]="isAllDisabled" [(ngModel)]="usNorm.issue">
+                        </kendo-textbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="quality_class" i18n i18n-text text="Quality Class"></kendo-label>
+                        <kendo-textbox #quality_class [disabled]="isAllDisabled" [(ngModel)]="usNorm.quality_class"
+                            name="quality_class">
+                        </kendo-textbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="detection_threshold" i18n i18n-text text="Detection Threshold"></kendo-label>
+                        <kendo-numerictextbox name="detection_threshold" [(ngModel)]="usNorm.detection_threshold" [step]="1" format="##"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="detection_threshold_operator" i18n i18n-text text="Detection Threshold Operator"></kendo-label>
+                        <kendo-combobox #detection_threshold_operator [disabled]="isAllDisabled" [(ngModel)]="usNorm.detection_threshold_operator"
+                            [data]="operatorData" textField="text" [valuePrimitive]="true" name="detection_threshold_operator"
+                            valueField="value">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                
+                </kendo-card-body>
+            </kendo-card>
+            <kendo-card [style.flex]="6">
+                <kendo-card-header i18n>
+                    Information
+                </kendo-card-header>
+                <kendo-card-body class="us-norm-details-body">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="surface_finish" i18n i18n-text text="Surface Finish"></kendo-label>
+                        <kendo-combobox #surface_finish [disabled]="isAllDisabled" [(ngModel)]="usNorm.surface_finish"
+                            [data]="surfaceFinisData" textField="text" [valuePrimitive]="true" name="surface_finish"
+                            valueField="value">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="coupling" i18n i18n-text text="Coupling"><span
+                                class="k-text-error k-pl-1">*</span></kendo-label>
+                        <kendo-dropdownlist #coupling [disabled]="isAllDisabled" [(ngModel)]="usNorm.coupling"
+                            [data]="couplingData" textField="text" [valuePrimitive]="true" name="coupling"
+                            valueField="value">
+                        </kendo-dropdownlist>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="adjustment" i18n i18n-text text="Adjustments"></kendo-label>
+                        <kendo-multiselect #adjustment [disabled]="isAllDisabled" [(ngModel)]="usNorm.adjustments"
+                            [data]="adjustmentData" [filterable]="true" textField="text" valueField="value"
+                            name="adjustment" (filterChange)="handleFilter($event,'adjustment')">
+                        </kendo-multiselect>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="amplification" i18n i18n-text text="Amplification"><span
+                                class="k-text-error k-pl-1">*</span></kendo-label>
+                        <kendo-dropdownlist #amplification [disabled]="isAllDisabled" [(ngModel)]="usNorm.amplification"
+                            [data]="amplificationData" textField="text" name="amplification" [valuePrimitive]="true"
+                            valueField="value">
+                        </kendo-dropdownlist>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="residual_magnetism" i18n i18n-text text="Residual Magnetism"></kendo-label>
+                        <kendo-numerictextbox name="residual_magnetism" [(ngModel)]="usNorm.residual_magnetism" [step]="1" format="##"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="note" i18n i18n-text text="Note"></kendo-label>
+                        <kendo-textarea #note [disabled]="isAllDisabled" name="note"
+                            [(ngModel)]="usNorm.note"></kendo-textarea>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="testing_device" i18n i18n-text text="Testing Device"></kendo-label>
+                        <kendo-combobox 
+                            #testing_device 
+                            [disabled]="isAllDisabled" 
+                            [(ngModel)]="usNorm.testing_device"
+                            [data]="testingDeviceData" 
+                            textField="text" 
+                            [valuePrimitive]="true" 
+                            name="testing_device"
+                            valueField="value">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="shim" i18n i18n-text text="Shim"></kendo-label>
+                        <kendo-combobox 
+                            #shim 
+                            [disabled]="isAllDisabled" 
+                            [(ngModel)]="usNorm.shim"
+                            [data]="shimData" 
+                            textField="text" 
+                            [valuePrimitive]="true" 
+                            name="shim"
+                            valueField="value">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                </kendo-card-body>
+            </kendo-card>
+            
+        </kendo-stacklayout>
+    </form>
+    <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-pt-3">
+        <kendo-card [style.flex]="12">
+            <kendo-card-header >
+                <b i18n>
+                    Test Scopes
+                </b>
+                <kendo-grid-spacer></kendo-grid-spacer>
+                    <button kendoButton themeColor="primary" [disabled]="isAllDisabled"   i18n (click)="addTestScope()">
+                        <span class="k-icon icon-add"></span> New
+                    </button>
+            </kendo-card-header>
+            <kendo-card-body class="us-norm-details-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th i18n>Test Scope</th>
+                            <th i18n>Probe</th>
+                            <th i18n>Test Direction</th>
+                            <th i18n>Sound Attenuation </th>
+                            <th i18n>Action</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody >
+                        <tr *ngFor="let testScope of this.usNorm?.usNormTestScopes; let i = index" >
+                            <td [style.minWidth]="'60px'">
+                                <kendo-textbox 
+                                    [ngModelOptions]="{standalone: true}"  
+                                    [(ngModel)]="testScope.test_scope" 
+                                >
+                                </kendo-textbox>
+                            </td>
+                            <td >
+                                <kendo-combobox
+                                    [ngModelOptions]="{standalone: true}"  	
+                                    [(ngModel)]="testScope.probe"
+                                    [data]="probeData"
+                                    [filterable]="true" 
+                                    textField="text" 
+                                    valueField="value"
+                                    [valuePrimitive]="true"
+                                    (filterChange)="handleFilter($event,'probe')"
+                                    >
+                                </kendo-combobox>
+                            </td>	
+                            <td >
+                                <kendo-combobox
+                                     
+                                    [ngModelOptions]="{standalone: true}"  	
+                                    [(ngModel)]="testScope.test_direction"
+                                    [data]="testDirectionData"
+                                    textField="text" 
+                                    valueField="value" 
+                                    [valuePrimitive]="true"
+                                    >
+                                </kendo-combobox>
+                            </td>	
+                            <td>
+                                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                                    <kendo-combobox 
+                                        #sound_attenuation_operator 
+                                        [disabled]="isAllDisabled" 
+                                        [(ngModel)]="testScope.sound_attenuation_operator"
+                                        [data]="soundAttenuationOperatorData" 
+                                        textField="text" 
+                                        [valuePrimitive]="true" 
+                                        name="sound_attenuation_operator"
+                                        valueField="value"
+                                        [style.flex]="2">
+                                    </kendo-combobox>
+                                    <kendo-numerictextbox  name="pos" [(ngModel)]="testScope.sound_attenuation" [step]="1" format="##" [style.flex]="8"></kendo-numerictextbox>
+                                </kendo-stacklayout>
+                            </td>
+                           
+                            <td [style.minWidth]="'122px'">
+        
+                                <button  kendoButton
+                                    themeColor="primary" icon="trash" (click)="removeTestScope(testScope,i)"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+    <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-pt-3">
+        <kendo-card [style.flex]="12">
+            <kendo-card-header >
+                <b i18n>
+                    Test Sections
+                </b>
+                <kendo-grid-spacer></kendo-grid-spacer>
+                    <button kendoButton themeColor="primary" [disabled]="isAllDisabled"   i18n (click)="addSection()">
+                        <span class="k-icon icon-add"></span> New
+                    </button>
+            </kendo-card-header>
+            <kendo-card-body class="us-norm-details-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th i18n>Test Sections</th>
+                            <th i18n>Registration Threshold</th>
+                            <th i18n>Reporting Threshold</th>
+                            <th i18n>Decision Threshold</th>
+                            <th i18n>Allowed Threshold</th>
+                            <th i18n>Expansion With</th>
+                            <th i18n>Expansion Without</th>
+                            <th i18n>Scrap Limit</th>
+                            <th i18n>Action</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody >
+                        <tr *ngFor="let section of this.usNorm?.usNormTestSections; let i = index" >
+                            <td [style.minWidth]="'120px'">
+                                <kendo-combobox 
+                                    #test_section 
+                                    [disabled]="isAllDisabled" 
+                                    [(ngModel)]="section.test_section"
+                                    [data]="testSectionData" 
+                                    textField="text" 
+                                    [valuePrimitive]="true" 
+                                    name="test_section"
+                                    valueField="value">
+                                </kendo-combobox>
+                            </td>
+                            <td>
+                                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                                    <kendo-combobox 
+                                        #registration_threshold_operator 
+                                        [disabled]="isAllDisabled" 
+                                        [(ngModel)]="section.registration_threshold_operator"
+                                        [data]="operatorData" 
+                                        textField="text" 
+                                        [valuePrimitive]="true" 
+                                        name="registration_threshold_operator"
+                                        valueField="value"
+                                        [style.flex]="7">
+                                    </kendo-combobox>
+                                    <kendo-numerictextbox name="registration_threshold" [style.flex]="8" [(ngModel)]="section.registration_threshold" [step]="1" format="##"></kendo-numerictextbox>
+                                </kendo-stacklayout>
+                            </td>
+                            <td>
+                                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                                    <kendo-combobox 
+                                        #reporting_threshold_operator 
+                                        [disabled]="isAllDisabled" 
+                                        [(ngModel)]="section.reporting_threshold_operator"
+                                        [data]="operatorData" 
+                                        textField="text" 
+                                        [valuePrimitive]="true" 
+                                        name="reporting_threshold_operator"
+                                        valueField="value"
+                                        [style.flex]="7">
+                                    </kendo-combobox>
+                                    <kendo-numerictextbox name="reporting_threshold" [style.flex]="8" [(ngModel)]="section.reporting_threshold" [step]="1" format="##"></kendo-numerictextbox>
+                                </kendo-stacklayout>
+                            </td>
+                             <td>
+                                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                                    <kendo-combobox 
+                                        #decision_threshold_operator 
+                                        [disabled]="isAllDisabled" 
+                                        [(ngModel)]="section.decision_threshold_operator"
+                                        [data]="operatorData" 
+                                        textField="text" 
+                                        [valuePrimitive]="true" 
+                                        name="decision_threshold_operator"
+                                        valueField="value"
+                                        [style.flex]="7">
+                                    </kendo-combobox>
+                                    <kendo-numerictextbox name="decision_threshold" [style.flex]="8" [(ngModel)]="section.decision_threshold" [step]="1" format="##"></kendo-numerictextbox>
+                                </kendo-stacklayout>
+                            </td>
+                             <td>
+                                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                                    <kendo-combobox 
+                                        #allowed_threshold_operator 
+                                        [disabled]="isAllDisabled" 
+                                        [(ngModel)]="section.allowed_threshold_operator"
+                                        [data]="operatorData" 
+                                        textField="text" 
+                                        [valuePrimitive]="true" 
+                                        name="allowed_threshold_operator"
+                                        valueField="value"
+                                        [style.flex]="7">
+                                    </kendo-combobox>
+                                    <kendo-numerictextbox name="allowed_threshold" [style.flex]="8" [(ngModel)]="section.allowed_threshold" [step]="1" format="##"></kendo-numerictextbox>
+                                </kendo-stacklayout>
+                            </td> 
+                            <td>
+                                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                                    <kendo-combobox 
+                                        #expansion_with_operator 
+                                        [disabled]="isAllDisabled" 
+                                        [(ngModel)]="section.expansion_with_operator"
+                                        [data]="operatorData" 
+                                        textField="text" 
+                                        [valuePrimitive]="true" 
+                                        name="expansion_with_operator"
+                                        valueField="value"
+                                        [style.flex]="7">
+                                    </kendo-combobox>
+                                    <kendo-numerictextbox name="expansion_with" [style.flex]="8" [(ngModel)]="section.expansion_with" [step]="1" format="##"></kendo-numerictextbox>
+                                </kendo-stacklayout>
+                            </td> 
+                            <td>
+                                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                                    <kendo-combobox 
+                                        #expansion_without_operator 
+                                        [disabled]="isAllDisabled" 
+                                        [(ngModel)]="section.expansion_without_operator"
+                                        [data]="operatorData" 
+                                        textField="text" 
+                                        [valuePrimitive]="true" 
+                                        name="expansion_without_operator"
+                                        valueField="value"
+                                        [style.flex]="7">
+                                    </kendo-combobox>
+                                    <kendo-numerictextbox name="expansion_without" [style.flex]="8" [(ngModel)]="section.expansion_without" [step]="1" format="##"></kendo-numerictextbox>
+                                </kendo-stacklayout>
+                            </td>
+                            <td>
+                                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                                    <kendo-combobox 
+                                        #expansion_without_operator 
+                                        [disabled]="isAllDisabled" 
+                                        [(ngModel)]="section.scrap_limit_operator"
+                                        [data]="operatorData" 
+                                        textField="text" 
+                                        [valuePrimitive]="true" 
+                                        name="scrap_limit_operator"
+                                        valueField="value"
+                                        [style.flex]="7">
+                                    </kendo-combobox>
+                                    <kendo-numerictextbox name="scrap_limit" [style.flex]="8" [(ngModel)]="section.scrap_limit" [step]="1" format="##"></kendo-numerictextbox>
+                                </kendo-stacklayout>
+                            </td>
+                           
+                            <td [style.minWidth]="'122px'">
+        
+                                <button  kendoButton
+                                    themeColor="primary" icon="trash" (click)="removeSection(section , i)"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+    <kendo-stacklayout orientation="horizontal" [gap]="9" class="k-pt-3">
+        <kendo-card [style.flex]="12">
+            <kendo-card-header >
+                <b i18n>
+                    Ratings
+                </b>
+                <kendo-grid-spacer></kendo-grid-spacer>
+                    <button kendoButton themeColor="primary" [disabled]="isAllDisabled"   i18n (click)="addRatings()">
+                        <span class="k-icon icon-add"></span> New
+                    </button>
+            </kendo-card-header>
+            <kendo-card-body class="us-norm-details-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th i18n>Ratting</th>
+                            <th i18n>Probe</th>
+                            <th i18n>Sender Section</th>
+                            <th i18n>Test Direction</th>
+                            <th i18n>Amplification </th>
+                            <th i18n>Justification </th>
+                            <th i18n>ksr </th>
+                            <th i18n>Action</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody >
+                        <tr *ngFor="let rating of this.usNorm?.usNormRatings; let i = index" >
+                            <td [style.minWidth]="'60px'">
+                                <kendo-textbox 
+                                    [ngModelOptions]="{standalone: true}"  
+                                    [(ngModel)]="rating.rating" 
+                                    [readonly]="true"
+                                >
+                                </kendo-textbox>
+                            </td>
+                            <td >
+                                <kendo-combobox
+                                    [ngModelOptions]="{standalone: true}"  	
+                                    [(ngModel)]="rating.probe"
+                                    [data]="probeData"
+                                    [filterable]="true" 
+                                    textField="text" 
+                                    valueField="value"
+                                    (filterChange)="handleFilter($event,'probe')"
+                                    [valuePrimitive]="true"
+                                    >
+                                </kendo-combobox>
+                            </td>	
+                            <td>
+                                <kendo-numerictextbox name="sender_section" [(ngModel)]="rating.sender_section" [step]="1" format="##"></kendo-numerictextbox>
+                            </td>
+                            <td >
+                                <kendo-combobox
+                                    [ngModelOptions]="{standalone: true}"  	
+                                    [(ngModel)]="rating.test_direction"
+                                    [data]="testDirectionData"
+                                    textField="text" 
+                                    valueField="value"
+                                    [valuePrimitive]="true"
+                                    >
+                                </kendo-combobox>
+                            </td>	
+                            <td>
+                                <kendo-numerictextbox name="amplification" [(ngModel)]="rating.amplification" [step]="1" format="##"></kendo-numerictextbox>
+                            </td> 
+                            <td>
+                                <kendo-numerictextbox name="justification" [(ngModel)]="rating.justification" [step]="1" format="##"></kendo-numerictextbox>
+                            </td>
+                             <td>
+                                <kendo-numerictextbox name="ksr" [(ngModel)]="rating.ksr" [step]="1" format="##"></kendo-numerictextbox>
+                            </td>
+                           
+                            <td [style.minWidth]="'122px'">
+        
+                                <button  kendoButton
+                                    themeColor="primary" icon="trash" (click)="removeRatings(rating,i)"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</div>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

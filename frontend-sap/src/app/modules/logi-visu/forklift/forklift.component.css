@@ -1,0 +1,120 @@
+.ui5-bar-startcontent-container {
+	padding-left: 48px !important;
+}
+#schertech_logo {
+	margin: 0 0 0 36px;
+	height: 24.23px;
+}
+.header-user-part-components {
+	color: var(--sapHighlightColor);
+	font-size: var(--text-font-size);
+	font-weight: 600;
+	margin: 0 16px 0 0;
+}
+#header-user-part {
+	padding: 0 40px 0 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+ui5-bar {
+	grid-column: 1 / span 2;
+	grid-row: 1 / 2;
+	height: 52px !important;
+}
+
+ui5-bar::part(root) {
+	padding-inline-start: 0.75rem;
+	padding-inline-end: 1.25rem;
+	box-shadow: 0 0 0.125rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent),
+		0 0.5rem 1rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent);
+}
+
+ui5-tabcontainer {
+	border-radius: var(--cardBorderRadius);
+	background-color: red;
+	background: red;
+	margin-top: 9px;
+	margin-left: 0px;
+}
+
+.button-layout {
+	justify-content: end;
+	width: 100%;
+	align-items: center;
+}
+
+.logout-footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: end;
+	align-items: center;
+	width: 100%;
+}
+
+#schertech_logo:hover {
+	cursor: pointer;
+	background-color: rgba(128, 128, 128, 0.134);
+}
+
+.main-body {
+	height: calc(100% - 65px);
+	margin: var(--cardBorderRadius);
+}
+
+.right {
+	width: 346px;
+	min-width: 346px;
+	background-color: var(--sapList_HeaderBackground);
+	border-radius: var(--cardBorderRadius);
+	box-shadow: 0 0 0.125rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent),
+		0 0.5rem 1rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent);
+	height: auto;
+}
+
+.right-title {
+	height: 52px;
+	align-items: center;
+	border-bottom: 1px solid #d9d9d9;
+	justify-content: space-between;
+}
+
+.left {
+	background-color: var(--sapList_HeaderBackground);
+	border-radius: var(--cardBorderRadius);
+	box-shadow: 0 0 0.125rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent),
+		0 0.5rem 1rem 0 color-mix(in srgb, var(--sapContent_ShadowColor) 16%, transparent);
+	flex: 1;
+	margin-right: var(--cardBorderRadius);
+	width: calc(100vw-346px);
+	overflow: hidden;
+}
+
+.left-div {
+	height: calc(100% - 1px);
+	width: calc(100% - 1px);
+	border-radius: 0px 0px var(--cardBorderRadius) var(--cardBorderRadius);
+	overflow: hidden;
+}
+.input {
+	width: 50%;
+}
+
+.label {
+	display: flex;
+	flex-direction: row;
+	justify-content: end;
+	width: 50%;
+	margin-right: 16px;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.right-footer {
+	border-top: 1px solid #d9d9d9;
+	height: 44px;
+	margin-top: auto;
+	justify-content: end;
+	align-items: center;
+}

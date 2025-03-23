@@ -1,0 +1,95 @@
+<kendo-grid-component [gridItems]="gridItems" [columns]="columns" [state]="state" [isLoadedEnabled]="isLoadedEnabled"
+    [isSortable]="isSortable" [toolbarConfig]="toolbarConfig" [isFilterable]="isFilterable" [isGroupable]="isGroupable"
+    [isPageable]="isPageable" (emitState)="changeState($event)" [editView]="editView" (gridRefersh)="sendRequest()"
+    (filterState)="changeGridFilter($event)" (dblClick)="openRequestDetailsModal($event)" [rowCallback]="rowCallback">
+    <ng-template #actionColumnAfterCommonContent let-dataItem>
+        <button kendoButton [disabled]="true">
+            <span class="k-icon icon-edit"></span>
+        </button>
+        <button kendoButton (click)="openDeleteModal(dataItem)"
+            [disabled]="dataItem.status !== statusEnum.PENDING  && dataItem.status !== statusEnum.APPROVED">
+            <span class="k-icon icon-trash"></span>
+        </button>
+
+    </ng-template>
+    <ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+        <ng-container *ngIf="column.name == 'status'">
+
+            <div class="badge" [ngStyle]="geStatusBackgroundColor(dataItem.status)">{{dataItem.status ==
+                statusEnum.PENDING && pageType == absenceManagerPageTypes.REQUEST ? statusEnumClass.getStateTranslate(statusEnum.NEW) : statusEnumClass.getStateTranslate(dataItem.status)}}
+            </div>
+        </ng-container>
+        <ng-container *ngIf="column.name == 'total_hour'">
+            {{ dataItem.totalHourChecking(dataItem)}}
+        </ng-container>
+        <ng-container *ngIf="column.name == 'start'">
+            {{ dataItem.is_full_day ? intl.formatDate(dataItem.start, 'dd.MM.yyyy') : intl.formatDate(dataItem.start, 'dd.MM.yyyy HH:mm')}}
+        </ng-container>
+        <ng-container *ngIf="column.name == 'end'">
+            {{ dataItem.is_full_day ? intl.formatDate(dataItem.end, 'dd.MM.yyyy') : intl.formatDate(dataItem.end, 'dd.MM.yyyy HH:mm')}}
+        </ng-container>
+
+    </ng-template>
+
+    <ng-template #toolBarBeforeSearchContent>
+        <div *ngIf="isRequestPage" style="display: flex;
+        align-items: center;
+        gap: 12px;">
+            <div style="display: flex;
+            align-items: center; gap: 5px;">
+                <span i18n>View:</span>
+                <kendo-dropdownlist #filterType name="filterType" style="width: 175px;"
+                    (valueChange)="changeDropdownData()" [disabled]="!authService.user.is_absence_manager_admin"
+                    [(ngModel)]="gridDataFilterDropdown" [data]="dropDownData" [valuePrimitive]="true" textField="name"
+                    valueField="value">
+                </kendo-dropdownlist>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span i18n>Show:</span>
+                <div class="all">
+                    <input type="radio" #dataFilterNo kendoRadioButton [value]="filterEnum.ALL" [(ngModel)]="gridDataFilterRadio"
+                        (change)="changeDropdownData()" />
+                    <kendo-label class="k-radio-label" [for]="dataFilterNo" i18n i18n-text text="All"></kendo-label>
+                </div>
+                <div class="approved">
+                    <input type="radio" #dataFilterYes kendoRadioButton [value]="statusEnum.APPROVED"
+                        [(ngModel)]="gridDataFilterRadio" (change)="changeDropdownData()" />
+                    <kendo-label class="k-radio-label" [for]="dataFilterYes" i18n i18n-text
+                        text="Approved"></kendo-label>
+                </div>
+                <div class="pending">
+                    <input type="radio" #dataFilterAll kendoRadioButton [value]="statusEnum.PENDING"
+                        [(ngModel)]="gridDataFilterRadio" (change)="changeDropdownData()" />
+                    <kendo-label class="k-radio-label" [for]="dataFilterAll" i18n i18n-text
+                        text="Pending"></kendo-label>
+                </div>
+            </div>
+        </div>
+
+
+    </ng-template>
+
+</kendo-grid-component>
+
+<div class="dialog-container">
+    <kendo-dialog *ngIf="opened" [actions]="myActions" i18n-title title="Revoke request" (close)="close('cancel')" [themeColor]="dialogThemeColor"
+    (action)="onUpdate()" (close)="close('cancel')" [minWidth]="250" [width]="350">
+    <div class="ttlte" style="width: 100%; text-align: center; padding-bottom: 10px;"><span class="note-text-color" i18n>Add
+            a reason:</span></div>
+    <div class="action-layout-config">
+        <kendo-textarea  i18n-placeholder  placeholder="Type here.." resizable="none"
+            style="height: 62px; overflow-y: auto;" [(ngModel)]="selectedData.applicant_note"></kendo-textarea>
+    </div>
+    <kendo-dialog-actions [layout]="actionsLayout" style="flex: 0 0 auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 8px; width: 100%;">
+        <kendo-button kendoButton (click)="close('cancel')"  style="width: 47%;" i18n> <span class="k-icon icon-close"></span> Cancel</kendo-button>
+        <kendo-button (click)="onUpdate()" imageUrl="assets/icons/send-w.png"  style="width: 50%; display: flex; align-items: center;" themeColor="primary" i18n>
+          Send
+        </kendo-button>
+      </kendo-dialog-actions>
+</kendo-dialog>
+</div>
+<app-loader *ngIf="isWindowLoaderEnabled"></app-loader>

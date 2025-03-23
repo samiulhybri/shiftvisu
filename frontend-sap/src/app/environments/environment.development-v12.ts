@@ -1,0 +1,21 @@
+export const environment = {
+	title: "Local Environment Heading",
+	apiURL: "https://development-api-talkative-platypus-ry.cfapps.us10.hana.ondemand.com/odata",
+	apiPrefix: "odata",
+	apiPrefixForRest:
+		"https://development-api-talkative-platypus-ry.cfapps.us10.hana.ondemand.com/api",
+	soketiHost: "localhost",
+	soketiPort: 6001,
+	soketiPath: "",
+	soketiAppKey: "app-key",
+	isLogoutHide: false,
+	isV9enable: false,
+	isV10enable: false,
+	homeLink: "/",
+	v12HomeLink: "/",
+	homeLogo: "derga",
+	isHomeLogoCustom: 0,
+	isPlanVisuGanttRestrictionRemove: false,
+  	clientName : '',
+	isToolRepairProductionDateManual: true,
+};

@@ -1,0 +1,344 @@
+<ui5-dialog
+	[open]="true"
+	class="dialog-container"
+	*ngIf="isDialogOpen"
+	(beforeClose)="closeDialog()">
+	<div>
+		<div class="flex flex-space-between">
+			<ui5-title
+				class="mt-28 ml-0"
+				level="H6"
+				i18n
+				>Shopfloor Suite</ui5-title
+			>
+			<img
+				class="login-img"
+				[src]="logoSrc"/>
+		</div>
+		<form
+			(ngSubmit)="onSubmit(loginForm)"
+			#loginForm="ngForm"
+			action="#"
+			class="w-100">
+			<div>
+				<div class="h-130px mt-20">
+					<ui5-title
+						class="ml-0"
+						level="H4"
+						>{{ dialogTitle }}</ui5-title
+					>
+				</div>
+
+				<!-- Log In section -->
+				<div
+					class="form flex-col-item ml-0"
+					*ngIf="dialogType == dialogTypeEnum.login">
+					<ui5-label
+						i18n
+						show-colon
+						level="H6"
+						>User name</ui5-label
+					>
+					<input
+						type="Text"
+						name="username"
+						[required]="true"
+						autocomplete="username"
+						[(ngModel)]="username"
+						(keydown)="changeInput($event)" />
+					<ui5-label
+						class="mt-35"
+						i18n
+						show-colon
+						level="H6"
+						>Password</ui5-label
+					>
+
+					<div class="input-container">
+						<input
+							[type]="passwordStyles.passwordInputType"
+							name="password"
+							[(ngModel)]="password"
+							autocomplete="password"
+							[required]="true"
+							(keydown)="changeInput($event)"
+							autofill />
+						<div class="eye-button">
+							<ui5-button
+								*ngIf="passwordStyles.isShowPassword"
+								icon="show"
+								design="Transparent"
+								(click)="onClickPassword()">
+							</ui5-button>
+							<ui5-button
+								*ngIf="!passwordStyles.isShowPassword"
+								icon="hide"
+								design="Transparent"
+								(click)="onClickPassword()">
+							</ui5-button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Forgot password In section -->
+				<div
+					class="form flex-col-item ml-0"
+					*ngIf="dialogType == dialogTypeEnum.forgotPassword">
+					<ui5-label
+						i18n
+						class="pt-[-20px] pb-4"
+						>To reset your password, enter your email and continue.</ui5-label
+					>
+
+					<ui5-label
+						i18n
+						show-colon
+						level="H6"
+						>Email</ui5-label
+					>
+					<input
+						#email="ngModel"
+						type="email"
+						name="email"
+						[email]="true"
+						ngModel
+						[required]="true"
+						autocomplete="email"
+						(keydown)="changeInput($event)" />
+
+					<ui5-busy-indicator
+						[hidden]="!isLoading"
+						[active]="isLoading"
+						size="M">
+					</ui5-busy-indicator>
+				</div>
+
+				<!-- Change password In section -->
+				<div
+					class="form flex-col-item ml-0"
+					*ngIf="dialogType == dialogTypeEnum.changePassword">
+					<ui5-label
+						class="mt-35"
+						i18n
+						show-colon
+						level="H6"
+						>New Password</ui5-label
+					>
+
+					<div class="input-container">
+						<input
+							[type]="passwordStyles.newPasswordInputType"
+							#newPassword="ngModel"
+							name="newPassword"
+							ngModel
+							autocomplete="newPassword"
+							[required]="true"
+							(keydown)="changeInput($event)"
+							autofill />
+						<div class="eye-button">
+							<ui5-button
+								*ngIf="passwordStyles.isShowNewPassword"
+								icon="show"
+								design="Transparent"
+								(click)="onClickPassword('newPassword')">
+							</ui5-button>
+							<ui5-button
+								*ngIf="!passwordStyles.isShowNewPassword"
+								icon="hide"
+								design="Transparent"
+								(click)="onClickPassword('newPassword')">
+							</ui5-button>
+						</div>
+					</div>
+					<ui5-label
+						class="mt-35"
+						i18n
+						show-colon
+						level="H6"
+						>Confirm Password</ui5-label
+					>
+
+					<div class="input-container">
+						<input
+							[type]="passwordStyles.confirmPasswordInputType"
+							#confirmPassword="ngModel"
+							name="confirmPassword"
+							ngModel
+							autocomplete="confirmPassword"
+							[required]="true"
+							(keydown)="changeInput($event)"
+							autofill />
+						<div class="eye-button">
+							<ui5-button
+								*ngIf="passwordStyles.isShowConfirmPassword"
+								icon="show"
+								design="Transparent"
+								(click)="onClickPassword('confirmPassword')">
+							</ui5-button>
+							<ui5-button
+								*ngIf="!passwordStyles.isShowConfirmPassword"
+								icon="hide"
+								design="Transparent"
+								(click)="onClickPassword('confirmPassword')">
+							</ui5-button>
+						</div>
+					</div>
+
+					<ui5-busy-indicator
+						[hidden]="!isLoading"
+						[active]="isLoading"
+						size="M">
+					</ui5-busy-indicator>
+				</div>
+
+				<div
+					class="error-message"
+					*ngIf="errorMessage">
+					<ui5-text style="color: red">
+						{{ errorMessage }}
+					</ui5-text>
+					<div class="busy">
+						<ui5-busy-indicator
+							size="M"
+							[active]="isLoading"
+							style="align-self: center"></ui5-busy-indicator>
+					</div>
+				</div>
+
+				<div
+					class="w-full text-end pt-2"
+					*ngIf="dialogType == dialogTypeEnum.login">
+					<a
+						i18n
+						class="no-underline hover:underline text-[#0064D9] font-semibold"
+						[routerLink]="['/forgot-password']"
+						>Forgot Password?</a
+					>
+				</div>
+			</div>
+
+			<div
+				slot="footer"
+				class="login-footer">
+				<div
+					class="flex mr-8"
+					*ngIf="dialogType == dialogTypeEnum.login">
+					<div>
+						<ui5-button
+							id="loginButton"
+							design="Emphasized"
+							class="mr-8 mb-16"
+							(click)="onClickLoginButton()"
+							i18n>
+							Login
+						</ui5-button>
+					</div>
+
+					<div *ngIf="isMachineBoardLogin">
+						<ui5-button
+							id="loginButton"
+							class="mb-16 mr-8"
+							(click)="onTerminalLogin()"
+							i18n>
+							Terminal Login
+						</ui5-button>
+						<ui5-button
+							id="closeButton"
+							design="Transparent"
+							class="mr-8 mb-16"
+							(click)="closeDialog()"
+							i18n>
+							Close
+						</ui5-button>
+					</div>
+				</div>
+				<div
+					class="flex w-[400px]"
+					*ngIf="dialogType == dialogTypeEnum.forgotPassword">
+					<div class="flex flex-col w-full justify-center pl-3">
+						<ui5-label>Get access another way?</ui5-label>
+						<a
+							i18n
+							class="no-underline hover:underline text-[#0064D9] font-semibold"
+							[routerLink]="['/login']"
+							>Return to Sign In</a
+						>
+					</div>
+					<div class="w-full flex justify-end items-center mr-8">
+						<ui5-button
+							id="loginButton"
+							design="Emphasized"
+							class="mr-8 mb-16"
+							(click)="onClickLoginButton()"
+							i18n>
+							Continue
+						</ui5-button>
+					</div>
+				</div>
+				<div
+					class="flex w-[400px]"
+					*ngIf="dialogType == dialogTypeEnum.changePassword">
+					<div class="w-full flex justify-end items-center mr-8">
+						<ui5-button
+							id="loginButton"
+							design="Emphasized"
+							class="mr-8 mb-16"
+							[disabled]="isLoading"
+							(click)="onClickLoginButton()"
+							i18n>
+							Submit
+						</ui5-button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#errorDialog
+	id="deleteDialogMachineState"
+	header-text="Error"
+	state="Negative"
+	i18n-header-text>
+	<ui5-label>{{ errorMessageForResponse }}</ui5-label>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			i18n
+			(click)="closeErrorDialog()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#successDialog
+	id="successDialog"
+	header-text="Success"
+	state="Positive"
+	i18n-header-text>
+	<ui5-label>{{ successMessageForResponse }}</ui5-label>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			i18n
+			(click)="closeSuccessDialog()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>

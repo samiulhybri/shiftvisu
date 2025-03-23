@@ -1,0 +1,320 @@
+<ui5-busy-indicator
+	[active]="isDownloadingFile"
+	class="w-full">
+	<ui5-card class="h-[calc(100vh-70px)]">
+		<div class="h-[calc(100vh-80px)]">
+			<app-grid-table
+				headerTitle="8D Report"
+				i18n-headerTitle
+				[url]="'/' + baseUrl"
+				expandQuery="$expand=supplier,team($expand=userGroup),plant,author,media,chat($expand=messages($expand=sender))"
+				[columns]="columns"
+				[showAction]="true"
+				[showSearch]="true"
+				[showActiveButton]="false"
+				[showTableSettingBtn]="true"
+				[isMultiSelectOneActive]="true"
+				[multiSelectOnePlaceholder]="'Select Customer'"
+				i18n-multiSelectOneLabelText
+				[isMultiSelectTwoActive]="true"
+				[multiSelectTwoPlaceholder]="'Select Item'"
+				i18n-multiSelectTwoLabelText
+				[isMultiSelectThreeActive]="true"
+				[multiSelectThreePlaceholder]="'Defect Type'"
+				i18n-multiSelectThreeLabelText
+				[showDatePicker]="true"
+				[datePickerFormat]="'dd.MM.YYYY'"
+				addButtonText="New"
+				i18n-addButtonText
+				[showNewButton]="true"
+				[showDownload]="true"
+				[disableDownloadButton]="isDownloadingFile"
+				[customActionButtons]="customButtons"
+				selectionMode="Multiple"
+				[isBaseVisu]="true"
+				[enableServerSideFiltering]="true"
+				[editPermission]="
+					authService.isPermissionValid(permissionEnum.QUALIVISU_8D_REPORT_EDIT)
+				"
+				[enableServerSideFiltering]="true"
+				(processData)="processData($event[0], $event[1])"
+				(downloadButtonClick)="downloadButtonClick()"
+				(newButtonClick)="newButtonClick()"
+				(editClick)="editClick($event)"
+				(rowClick)="onRowClicked($event)"
+				keyForCacheCustomDataTableColumns="eightDReport"
+				#eightDReportRef></app-grid-table>
+		</div>
+	</ui5-card>
+</ui5-busy-indicator>
+
+<ui5-dialog
+	id="reportDialog"
+	[open]="is8DReportPopupOpen"
+	headerText="8D Report"
+	i18n-headerText
+	preventInitialFocus
+	(ui5BeforeClose)="closeDialog('8D')">
+	<ui5-card class="h-[calc(100vh-250px)] w-[calc(90vw-100px)] min-w-[72vw]">
+		<ui5-bar
+			slot="header"
+			class="h-[44px]"
+			design="Header">
+			<ui5-title
+				level="H5"
+				slot="startContent"
+				i18n
+				>Report</ui5-title
+			>
+			<ui5-button
+				id="chatButton"
+				design="Emphasized"
+				slot="endContent"
+				i18n
+				[disabled]="!selectedEightDReportId"
+				(ui5Click)="openChat()"
+				>Chat</ui5-button
+			>
+		</ui5-bar>
+		<ui5-tabcontainer
+			#eightDReportTabRef
+			(tab-select)="updateSelectedTabOnTabSelect($event)">
+			<ui5-tab
+				[id]="eightDReportTabType.GENERAL"
+				i18n-text
+				text="General"
+				[selected]="selectedTab == eightDReportTabType.GENERAL">
+				<app-eight-d-report-general
+					#generalComponent
+					[eightDReport]="selectedEightDReport"
+					[isSaving]="saveMode == null"></app-eight-d-report-general>
+			</ui5-tab>
+			<ui5-tab
+				[id]="eightDReportTabType.DESCRIPTION"
+				i18n-text
+				text="Problem Description"
+				[selected]="selectedTab == eightDReportTabType.DESCRIPTION">
+				<app-description
+					[(description)]="selectedEightDReport.description"
+					[isSaving]="saveMode == null"></app-description>
+			</ui5-tab>
+			<ui5-tab
+				[id]="eightDReportTabType.IMMEDIATE"
+				i18n-text
+				text="Immediate Actions"
+				[selected]="selectedTab == eightDReportTabType.IMMEDIATE">
+				@if (selectedTab == eightDReportTabType.IMMEDIATE) {
+					<app-immediate-action
+						[eightDReportId]="selectedEightDReportId ?? 0"
+						[isSaving]="saveMode == null"></app-immediate-action>
+				} @else {
+					<div class="h-[calc(100vh-373px)]"></div>
+				}
+			</ui5-tab>
+			<ui5-tab
+				[id]="eightDReportTabType.CORRECTIVE"
+				i18n-text
+				text="Corrective Actions"
+				[selected]="selectedTab == eightDReportTabType.CORRECTIVE">
+				@if (selectedTab == eightDReportTabType.CORRECTIVE) {
+					<app-corrective-action
+						[eightDReportId]="selectedEightDReportId ?? 0"
+						[isSaving]="saveMode == null"></app-corrective-action>
+				} @else {
+					<div class="h-[calc(100vh-373px)]"></div>
+				}
+			</ui5-tab>
+			<ui5-tab
+				[id]="eightDReportTabType.IMPLEMENTED"
+				i18n-text
+				text="Implemented Actions"
+				[selected]="selectedTab == eightDReportTabType.IMPLEMENTED">
+				@if (selectedTab == eightDReportTabType.IMPLEMENTED) {
+					<app-implemented-action
+						[eightDReportId]="selectedEightDReportId ?? 0"
+						[isSaving]="saveMode == null"></app-implemented-action>
+				} @else {
+					<div class="h-[calc(100vh-373px)]"></div>
+				}
+			</ui5-tab>
+			<ui5-tab
+				[id]="eightDReportTabType.PREVENTIVE"
+				i18n-text
+				text="Prevent Recurrence"
+				[selected]="selectedTab == eightDReportTabType.PREVENTIVE">
+				@if (selectedTab == eightDReportTabType.PREVENTIVE) {
+					<app-prevent-recurrence
+						[eightDReportId]="selectedEightDReportId ?? 0"
+						[isSaving]="saveMode == null"></app-prevent-recurrence>
+				} @else {
+					<div class="h-[calc(100vh-373px)]"></div>
+				}
+			</ui5-tab>
+			<ui5-tab
+				[id]="eightDReportTabType.CONGRATULATION"
+				i18n-text
+				text="Congratulation"
+				[selected]="selectedTab == eightDReportTabType.CONGRATULATION">
+				@if (selectedTab == eightDReportTabType.CONGRATULATION) {
+					<app-congratulation
+						[eightDReport]="selectedEightDReport"
+						[setEightDReportId]="selectedEightDReportId ?? 0"
+						[saveMode]="saveMode"></app-congratulation>
+				}
+			</ui5-tab>
+			<ui5-tab
+				[id]="eightDReportTabType.FIVE_W"
+				i18n-text
+				text="5W"
+				[selected]="selectedTab == eightDReportTabType.FIVE_W">
+				@if (selectedTab == eightDReportTabType.FIVE_W) {
+					<app-five-w
+						#fiveWComponent
+						[eightDReportId]="selectedEightDReportId ?? 0"
+						[(saveMode)]="saveMode"
+						(closeDialogue)="closeDialog('8D')"
+						(selectNextTab)="selectNextTab()"></app-five-w>
+				} @else {
+					<div class="h-[calc(100vh-373px)]"></div>
+				}
+			</ui5-tab>
+			<ui5-tab
+				[id]="eightDReportTabType.ISHIKAWA"
+				i18n-text
+				text="Ishikawa"
+				[selected]="selectedTab == eightDReportTabType.ISHIKAWA">
+				@if (selectedTab == eightDReportTabType.ISHIKAWA) {
+					<app-ishikawa
+						#ishikawaComponent
+						[eightDReportId]="selectedEightDReportId ?? 0"
+						[saveMode]="saveMode"></app-ishikawa>
+				} @else {
+					<div class="h-[calc(100vh-373px)]"></div>
+				}
+			</ui5-tab>
+			<ui5-tab
+				[id]="eightDReportTabType.ATTACHMENT"
+				i18n-text
+				text="Attachment"
+				[selected]="selectedTab == eightDReportTabType.ATTACHMENT">
+				@if (selectedTab == eightDReportTabType.ATTACHMENT) {
+					<app-eight-d-attachment
+						#eightDAttachment
+						[eightDReportId]="selectedEightDReportId ?? 0"
+						[isSaving]="saveMode == null"
+						(refreshGrid)="refreshGrid()"></app-eight-d-attachment>
+				} @else {
+					<div class="h-[calc(100vh-373px)]"></div>
+				}
+			</ui5-tab>
+		</ui5-tabcontainer>
+	</ui5-card>
+	<ui5-bar slot="footer">
+		<ui5-button
+			class="ml-8"
+			id="closeButtonId"
+			type="Button"
+			design="Emphasized"
+			slot="endContent"
+			[disabled]="
+				fiveWComponent?.fiveWhyRefGrid?.isBusy ||
+				ishikawaComponent?.isIshikawaLoading ||
+				saveMode == null ||
+				!checkIfSaveable()
+			"
+			i18n
+			(ui5Click)="saveData(true)"
+			>Save & Next</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			id="closeButtonId"
+			type="Button"
+			design="Emphasized"
+			slot="endContent"
+			[disabled]="
+				fiveWComponent?.fiveWhyRefGrid?.isBusy ||
+				ishikawaComponent?.isIshikawaLoading ||
+				saveMode == null ||
+				!checkIfSaveable()
+			"
+			(ui5Click)="saveData()">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			id="closeButtonId"
+			type="Button"
+			slot="endContent"
+			[disabled]="fiveWComponent?.fiveWhyRefGrid?.isBusy || saveMode == null"
+			(ui5Click)="closeDialog('8D')">
+			{{ localization.close }}
+		</ui5-button>
+	</ui5-bar>
+</ui5-dialog>
+
+<ui5-dialog
+	#deleteTaskDialog
+	i18n-header-text
+	header-text="Warning"
+	state="Critical"
+	[open]="deleteId != null"
+	(ui5BeforeClose)="closeDialog('delete')">
+	<p i18n>Do you really want to delete this report?</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteReport()"
+			[disabled]="isDeletingReport"
+			>{{ localization.yes }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			[disabled]="isDeletingReport"
+			(click)="closeDialog('delete')"
+			>{{ localization.cancel }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="chat"
+	*ngIf="isChatOpen"
+	[open]="isChatOpen"
+	(ui5BeforeClose)="closeChat()">
+	<div>
+		<app-chat
+			[modelId]="selectedEightDReportId ?? 0"
+			[modelName]="'EightDReports'"
+			[chat]="selectedEightDReport.chat"
+			(closeDialog)="closeChat()"></app-chat>
+	</div>
+</ui5-dialog>
+
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isPreviewDialogOpen"
+	title="Attachment"
+	title-i18n
+	(onBeforeClose)="closeAttachmentDialog()">
+	<div class="w-[1168px] ml-[-16px] mr-[-16px]">
+		<app-file-preview
+			[modelId]="selectedEightDReportId"
+			[model]="'EightDReport'"
+			[filePreviewHeight]="filePreviewHeight"
+			[filesCount]="fileCount"></app-file-preview>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-32px]">
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeAttachmentDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>

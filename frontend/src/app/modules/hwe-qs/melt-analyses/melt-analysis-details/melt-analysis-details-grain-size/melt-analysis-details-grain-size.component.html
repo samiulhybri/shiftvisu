@@ -1,0 +1,118 @@
+<kendo-card width="100" *ngIf="meltAnalysis">
+	<div class="panelbar-wrapper">
+		<kendo-panelbar>
+			<kendo-panelbar-item i18n-title title="Grain Size Determination" [expanded]="false">
+				<ng-template kendoPanelBarContent>
+					<kendo-card-body class="table-div">
+						<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+							<kendo-stacklayout orientation="horizontal" [gap]="9">
+								<kendo-label [for]="material_analysis" i18n i18n-text
+											 text="Test specification:"></kendo-label>
+								<kendo-combobox #material_analysis [(ngModel)]="meltAnalysis.grain_size_specification"
+												name="grain_size_specification"
+												[data]="grainSizeSpecificationData"  textField="text"
+														[valuePrimitive]="true"
+														valueField="value" [style.flex]="2">
+								</kendo-combobox>
+							</kendo-stacklayout>
+							<kendo-stacklayout orientation="horizontal" [gap]="9">
+								<kendo-label [for]="material_analysis" i18n i18n-text
+											 text="Procedure:"></kendo-label>
+								<kendo-combobox #material_analysis [(ngModel)]="meltAnalysis.grain_size_procedure"
+												name="grain_size_procedure"
+												[data]="grainSizeProcedureData"  textField="text"
+														[valuePrimitive]="true"
+														valueField="value" [style.flex]="2">
+								</kendo-combobox>
+							</kendo-stacklayout>
+							<kendo-stacklayout orientation="horizontal" [gap]="9">
+								<kendo-label [for]="material_analysis" i18n i18n-text
+											 text="Testing Scope:"></kendo-label>
+								<kendo-combobox #material_analysis [(ngModel)]="meltAnalysis.grain_size_testing_scope"
+												name="grain_size_testing_scope"
+												[data]="grainSizeTestingScopeData"  textField="text"
+														[valuePrimitive]="true"
+														valueField="value" [style.flex]="2">
+								</kendo-combobox>
+							</kendo-stacklayout>
+						</kendo-stacklayout>
+						<div class="content">
+							<table class="table">
+								<thead>
+								<tr>
+									<td i18n>Name</td>
+									<td i18n class="k-center">Steel Company</td>
+									<td i18n class="k-center">Hwe</td>
+								</tr>
+								</thead>
+								<tbody>
+								<tr>
+									<td> Grain size</td>
+									<td>
+										<div class="table-td">
+												<span class="first">
+													<kendo-combobox
+														[(ngModel)]="meltAnalysis.grain_size_testing_operator"
+														[data]="soundAttenuationOperatorData" textField="text"
+														[valuePrimitive]="true" name="sound_attenuation_operator"
+														valueField="value" [style.flex]="2">
+													</kendo-combobox>
+												</span>
+											<span class="second">
+													<kendo-textbox
+														[(ngModel)]="meltAnalysis.grain_size_value"></kendo-textbox>
+												</span>
+										</div>
+									</td>
+									<td>
+										<div class="table-td">
+												<span class="first">
+													<kendo-combobox
+														[(ngModel)]="meltAnalysis.grain_size_testing_operator_hwe"
+														[data]="soundAttenuationOperatorData" textField="text"
+														[valuePrimitive]="true" name="sound_attenuation_operator"
+														valueField="value" [style.flex]="2">
+													</kendo-combobox>
+												</span>
+											<span class="second">
+													<kendo-textbox
+														[(ngModel)]="meltAnalysis.grain_size_value_hwe"></kendo-textbox>
+												</span>
+										</div>
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="content">
+							<table class="table">
+								<thead>
+								<tr>
+									<td i18n>Class</td>
+									<td i18n>Relative Quantity (%)</td>
+								</tr>
+								</thead>
+								<tbody>
+								<tr *ngFor="let row of grainSizeData">
+									<td class="table-width">{{row.id}}</td>
+									<td>
+										<div>
+											<span class="second">
+												<kendo-numerictextbox
+													[(ngModel)]="row.grain_size_value"
+													(ngModelChange)="updateMeltAnalysisValues(row)">
+												</kendo-numerictextbox>
+											</span>
+										</div>
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</kendo-card-body>
+				</ng-template>
+			</kendo-panelbar-item>
+		</kendo-panelbar>
+	</div>
+</kendo-card>

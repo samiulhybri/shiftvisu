@@ -1,0 +1,87 @@
+<kendo-card class="card" width="100%">
+  <!-- Header -->
+  <kendo-card-header>
+    <div *ngIf="!isEditMode" i18n>New Entry</div>
+    <div *ngIf="isEditMode"  i18n>Update Entry</div>
+    <kendo-grid-spacer></kendo-grid-spacer>
+    <button kendoButton icon="close" (click)="closeEntry()" i18n>Close</button>
+    <kendo-grid-spacer width="10px"></kendo-grid-spacer>
+    <button *ngIf="!isEditMode" kendoButton themeColor="primary" [disabled]="isValidForm() || isMachineSelected()" (click)="saveMaterialConsumption()" icon="save" i18n>Save</button>
+    <button *ngIf="isEditMode" kendoButton themeColor="primary" [disabled]="isValidForm() || isMachineSelected()" (click)="saveMaterialConsumption()" icon="edit" i18n> Update</button>
+  </kendo-card-header>
+  <!-- Header Body -->
+  <kendo-card-body>
+    <kendo-stacklayout orientation="horizontal" [gap]="5">
+      <app-card
+        i18n i18n-title
+        title="Choose Furnace"
+        [isMultipleSelectionEnabled]="false"
+        (returnData)="getCardData($event)"
+        [list]="furnace"
+        (onReset)="resetCard($event)"
+        [type]="eCardType.FURNACE"
+      ></app-card>
+
+      <app-card
+        i18n i18n-title
+        title="Choose Alloy"
+        [isMultipleSelectionEnabled]="false"
+        (returnData)="getCardData($event)"
+        [list]="alloy"
+        (onReset)="resetCard($event)"
+        [type]="eCardType.ALLOY"
+        [showCustomId]="false"
+      ></app-card>
+
+      <app-card
+        i18n i18n-title
+        title="Choose Machines"
+        [isMultipleSelectionEnabled]="true"
+        (returnData)="getCardData($event)"
+        [list]="machines"
+        [showOnlyCustomId]="true"
+        (onReset)="resetCard($event)"
+        [type]="eCardType.MACHINE"
+      ></app-card>
+
+      <app-card
+        i18n i18n-title
+        title="Choose Crucible"
+        [isMultipleSelectionEnabled]="false"
+        (returnData)="getCardData($event)"
+        [list]="crucibles"
+        (onReset)="resetCard($event)"
+        [type]="eCardType.CRUCIBLE"
+        ></app-card>
+
+      <!-- Employee Information Section -->
+      <app-employee-information
+        [materials]="materials"
+        [employeeFormGroup]="employeeFormGroup"
+        [users]="users"
+        (userSelection)="userSelectionChange($event)">
+      </app-employee-information>
+
+    </kendo-stacklayout>
+  </kendo-card-body>
+</kendo-card>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>
+
+<div class="example-wrapper">
+  <kendo-dialog
+    i18n-title
+    title="Warning"
+    *ngIf="dialogOpened"
+    (close)="close('dialog')"
+    [minWidth]="250"
+    [width]="450"
+  >
+    <p style="margin: 30px; text-align: center;" i18n>
+      Are you sure you want to continue? all entered data will be lost!
+    </p>
+    <kendo-dialog-actions>
+      <button  kendoButton (click)="action(eDialogeStatus.N0)" i18n>No</button>
+      <button kendoButton (click)="action(eDialogeStatus.YES)" themeColor="primary" i18n>Yes</button>
+    </kendo-dialog-actions>
+  </kendo-dialog>
+</div>

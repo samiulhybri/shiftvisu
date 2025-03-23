@@ -1,0 +1,128 @@
+<ui5-card class="h-[calc(100vh-375px)]">
+	<div class="h-[calc(100vh-400px)]">
+		<app-grid-table
+			headerTitle="Implemented Actions List"
+			i18n-headerTitle
+			url="/EightDReportActions"
+			[filterQuery]="filterQuery"
+			expandQuery="$expand=responsible"
+			[isBusy]="implementedActionGrid?.isBusy || isSaving"
+			[columns]="columns"
+			[customData]="eightDReportId == 0"
+			[showAction]="true"
+			[showSearch]="true"
+			[showDownload]="false"
+			[showActiveButton]="false"
+			[showEditButton]="false"
+			addButtonText="New"
+			i18n-addButtonText
+			[showNewButton]="true"
+			[addButtonDisable]="implementedActionGrid?.isBusy || !eightDReportId"
+			selectionMode="None"
+			[enableServerSideFiltering]="false"
+			(newButtonClick)="newButtonClick()"
+			(deleteClick)="deleteClick($event)"
+			keyForCacheCustomDataTableColumns="implementedAction"
+			#implementedActionRef></app-grid-table>
+	</div>
+</ui5-card>
+
+<app-dialog
+	[isDialogOpen]="isActionToImplementDialogOpen"
+	id="actionToImplementDialog"
+	i18n-title
+	[title]="'Add'">
+	<ui5-card class="max-h-[500px] h-[calc(100vh-375px)] max-w-[870px] w-[90vw]">
+		<div class="max-h-[475px] h-[calc(100vh-400px)]">
+			@if(isActionToImplementDialogOpen) {
+				<app-grid-table
+					headerTitle="Corrective Actions List"
+					i18n-headerTitle
+					url="/EightDReportActions"
+					[filterQuery]="filterQueryCorrecitve"
+					[columns]="columns"
+					[isBusy]="actionToImplementGrid?.isBusy || isSaving || isSavingActionToImplement"
+					[showSearch]="true"
+					[showDownload]="false"
+					[showActiveButton]="false"
+					[showAction]="false"
+					[showNewButton]="false"
+					selectionMode="Multiple"
+					(rowClick)="onActionToImplementRowClick($event)"
+					(processData)="processDataActionToImplement($event[0], $event[1])"
+					[enableServerSideFiltering]="true"
+					keyForCacheCustomDataTableColumns="actionToImplement"
+					#actionToImplementRef></app-grid-table>
+			}
+		</div>
+	</ui5-card>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButtonId"
+			design="Emphasized"
+			[disabled]="isSavingActionToImplement"
+			(ui5Click)="actionToImplementDialogSaveClick()">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			id="CancelButtonId"
+			[disabled]="isSavingActionToImplement"
+			(ui5Click)="closeActionToImplementDialog()">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	header-text="Description"
+	[open]="isDescriptionModal"
+	state="None"
+	i18n-header-text>
+	<div class="h-full">
+		<app-text-editor
+			[notes]="description"
+			[isReadOnly]="true"
+			style="width: 100%; height: 100%">
+		</app-text-editor>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			id="deleteCloseButton"
+			(click)="closeDialog('description')"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#deleteTaskDialog
+	i18n-header-text
+	header-text="Warning"
+	state="Critical"
+	[open]="deleteId != null"
+	(ui5BeforeClose)="closeDialog('delete')">
+	<p i18n>Do you really want to remove this task from Implemented Actions?</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteTask()"
+			[disabled]="isDeletingImplementedTask"
+			>{{ localization.yes }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			[disabled]="isDeletingImplementedTask"
+			(click)="closeDialog('delete')"
+			>{{ localization.cancel }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

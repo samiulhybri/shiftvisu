@@ -1,0 +1,248 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Tools"
+		url="/Items"
+		filterQuery="is_tool eq true"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_TOOLS_EDIT')"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		[showSearch]="true"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		expandQuery="$expand=media"
+		#childComponentRef>
+	</app-grid-table>
+	<ui5-dialog
+		id="deleteDialogTools"
+		header-text="Warning"
+		i18n-header-text
+		state="Critical">
+		<ui5-label class="sapTextColor">{{ localization.doYouWantToDeleteThisRecord }}</ui5-label>
+		<div
+			class="flex flex-col"
+			*ngIf="isLoading">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				id="yesButton"
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				id="noButton"
+				(click)="closeDialogDelete()"
+				class="border-none"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()"
+	[title]="dialogTitle">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="ml-[-24px]">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ dialogTitle }}
+			</ui5-title>
+		</div>
+		<div class="flex justify-start">
+			<ui5-tabcontainer
+				class="ml-[-46px]"
+				(tab-select)="tabNavChanged($event)"
+				fixed
+				collapsed>
+				<ui5-tab
+					#toolDetailsTab
+					i18n-text
+					text="Core Data"
+					[selected]="selectedTab === 'core_data'"
+					id="core_data"></ui5-tab>
+				<ui5-tab
+					#toolAttachmentsTab
+					i18n-text
+					text="Attachment ({{ attachmentCount }})"
+					[selected]="selectedTab === 'attachment'"
+					id="attachment"></ui5-tab>
+			</ui5-tabcontainer>
+		</div>
+	</div>
+
+	<div
+		class="2xl:h-[527px] xl:h-[527px] lg:h-[475px] md:h-[375px] 2xl:w-[836px] xl:w-[836px] lg:w-[836px] md:w-[745px] mx-[-16px]">
+		<div [style.display]="selectedTab === 'core_data' ? 'Block' : 'None'">
+			<form (ngSubmit)="onSubmit(createOrUpdateForm)" #createOrUpdateForm="ngForm">
+				<ui5-busy-indicator [active]="isLoading" class="w-full" size="L" *ngIf="selectedTool">
+					<div class="w-full" [style.display]="selectedTab === 'core_data' ? 'Block' : 'None'">
+						<div class="flex flex-row gap-[5rem] w-[620px]">
+							<div class="flex flex-col">
+								<ui5-label show-colon>{{ localization.active }}</ui5-label>
+								<ui5-switch id="toolsIsActiveSwitch" (change)="onChangeIsActive($event)"
+									[checked]="selectedTool.is_active" [disabled]="shouldBeDisabled('is_active')"
+									class="mb-1"></ui5-switch>
+							</div>
+						</div>
+						<div class="flex flex-space-between w-full">
+							<div class="flex-col w-1/2 mr-[10px]">
+								<ui5-label show-colon required>{{ localization.id }}</ui5-label>
+								<ui5-busy-indicator [active]="isLoadingCustomId" size="S">
+									<ui5-input #customId="ngModel" [disabled]="shouldBeDisabled('custom_id')" [valueState]="
+										customId.valid == false &&
+										(customId.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: customIdState
+									" [(ngModel)]="selectedTool.custom_id" name="custom_id" (input)="onChangeCustomId()" class="w-full"
+										[required]="true" id="customId">
+										<div slot="valueStateMessage">
+											{{ customIdValueStateText }}
+										</div>
+									</ui5-input>
+								</ui5-busy-indicator>
+							</div>
+							<div class="flex-col w-1/2">
+								<ui5-label show-colon required>{{ localization.name }}</ui5-label>
+								<ui5-input id="nameInput" #nameInput="ngModel" [disabled]="shouldBeDisabled('name')"
+									[required]="true" [valueState]="
+									nameInput.valid == false &&
+									(nameInput.touched || createOrUpdateForm.submitted)
+										? 'Negative'
+										: 'None'
+								" [(ngModel)]="selectedTool.name" (change)="onChangeName($event)" class="w-full" name="name"></ui5-input>
+							</div>
+						</div>
+					</div>
+				</ui5-busy-indicator>
+			</form>
+		</div>
+		<div class="h-full w-full" *ngIf="selectedTab === 'attachment'">
+			<app-attachment-upload [model]="'Item'" [uploadedFiles]="tempFiles" [deletedFiles]="deletedSavedFiles"
+				[modelId]="selectedTool ? selectedTool.id : null" [checkNewFiles]="checkForNewAttachments"
+				[fileCount]="attachmentCount" [fileFormat]="''" [updatedStandardFile]="selectedStandardFile"
+				(tempFilesChanged)="onAttachmentChanges($event, 'onUpload')"
+				(deletedFilesChanged)="onAttachmentChanges($event, 'onDelete')"
+				(standardFileSelected)="onAttachmentChanges($event, 'onStandardSelect')"
+				(newFilesCount)="onAttachmentChanges($event, 'fileCount')" class="xl:h-[528px] lg:h-[280px] w-full">
+			</app-attachment-upload>
+		</div>
+	</div>
+	<div
+		slot="footer"
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			id="toolsSaveButton"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="toolsCancelButton"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isPreviewDialogOpen"
+	title="Attachment"
+	title-i18n>
+	<div class="w-[1168px] ml-[-16px] mr-[-16px]">
+		<app-file-preview
+			[modelId]="selectedTool.id"
+			[model]="'item'"
+			[filePreviewHeight]="filePreviewHeight"
+			[filesCount]="fileCount"></app-file-preview>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-32px]">
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeAttachmentDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogTools
+	id="errorDialogTools"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+<ui5-dialog
+		#deleteErrorDialogTools
+		id="deleteErrorDialogTools"
+		state="Negative"
+		header-text="Error">
+		<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+		<div
+			slot="footer"
+			class="deleteErrorDialogFooter">
+			<ui5-button
+				class="dialogCloser"
+				design="Transparent"
+				(click)="closeDeleteErrorDialog()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>

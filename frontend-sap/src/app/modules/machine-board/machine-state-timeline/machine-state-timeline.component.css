@@ -1,0 +1,37 @@
+.card{
+    border-radius: var(--machineBoardCardBorderRadius);
+    background-color: var(--sapBaseColor);
+    height: 100%;
+}
+
+.header{
+    height: 44px;
+    border-bottom: 1px solid #A8B3BD;
+    display: flex;
+    align-items: center;
+    padding-left: var(--machineBoardCardBorderRadius);
+}
+
+.middle-content{
+    margin-top: var(--machineBoardCardBorderRadius);
+    margin-left: var(--machineBoardCardBorderRadius);
+    margin-right: var(--machineBoardCardBorderRadius);
+}
+
+.bottom-content{
+    margin-bottom: var(--machineBoardCardBorderRadius);
+    margin-right: var(--machineBoardCardBorderRadius);
+    margin-left: var(--machineBoardCardBorderRadius);
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.machine-board-chart{
+    height: 64px; width: auto
+}
+
+.busy-indicator{
+    width: 100%
+}

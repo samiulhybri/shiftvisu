@@ -1,0 +1,265 @@
+<ui5-card class="h-full">
+	<ui5-bar
+		slot="header"
+		class="h-[44px]"
+		design="Header">
+		<ui5-title
+			level="H5"
+			slot="startContent"
+			i18n
+			>Failure Settings</ui5-title
+		>
+	</ui5-bar>
+	<div class="p-10 h-[calc(100vh-150px)] grid grid-cols-2 gap-x-5">
+		<ui5-card>
+			<div class="h-[calc(100vh-140px)]">
+				<app-grid-table
+					[headerTitle]="settingsListName"
+					[url]="odataUrl"
+					[filterQuery]="filterQuery"
+					expandQuery="$expand=halls"
+					[columns]="columns"
+					[showAction]="true"
+					[showSearch]="true"
+					[showActiveButton]="false"
+					[showTableSettingBtn]="true"
+					addButtonText="New"
+					i18n-addButtonText
+					[extraButtonText]="are_active_errors_displaying ? 'Archived' : 'Active Error'"
+					i18n-extraButtonText
+					[showDownload]="false"
+					[showNewButton]="true"
+					[addButtonDisable]="
+						failureSettingsGrid?.isBusy || isLoadingCustomId || isBatchCallRunning
+					"
+					[showExtraButton]="true"
+					[extraButtonDisable]="failureSettingsGrid?.isBusy"
+					[editPermission]="authService.isPermissionValid(shiftVisuAdminPermission)"
+					[isBaseVisu]="true"
+					[customActionButtons]="!are_active_errors_displaying ? customButtons : []"
+					[showDeleteButton]="are_active_errors_displaying"
+					[enableServerSideFiltering]="true"
+					[selectedRowsId]="selectedRowsId"
+					(newButtonClick)="newButtonClick()"
+					(extraButtonClick)="switchErrorDisplayType()"
+					(deleteClick)="deleteClick($event)"
+					(editClick)="editClick($event)"
+					(archiveClick)="retrieveClick($event)"
+					selectionMode="Single"
+					(rowClick)="onRowClicked($event)"
+					(processData)="processData($event[0], $event[1])"
+					keyForCacheCustomDataTableColumns="failureSettings"
+					#failureSettingsRef></app-grid-table>
+			</div>
+		</ui5-card>
+
+		<ui5-card>
+			<ui5-card-header
+				[titleText]="
+					selectedIssueType?.id ? selectedIssueType.name : rightCardDefaultTitle
+				"></ui5-card-header>
+			<ui5-tabcontainer>
+				<ui5-tab
+					i18n-text
+					text="Model Component">
+					<app-shift-visu-model-component
+						[issueType]="selectedIssueType"></app-shift-visu-model-component>
+				</ui5-tab>
+				<ui5-tab
+					i18n-text
+					text="Component">
+					<app-shift-visu-general-component
+						[issueType]="selectedIssueType"></app-shift-visu-general-component>
+				</ui5-tab>
+			</ui5-tabcontainer>
+			<ui5-bar>
+				<ui5-button
+					design="Emphasized"
+					slot="endContent"
+					>{{ localization.save }}</ui5-button
+				>
+				<ui5-button slot="endContent">{{ localization.cancel }}</ui5-button>
+			</ui5-bar>
+		</ui5-card>
+	</div>
+</ui5-card>
+
+<app-dialog
+	#addOrEditIssueTypeDialog
+	[title]="saveMode == 'post' ? 'Add' : 'Edit'"
+	i18n-title>
+	<ui5-busy-indicator [active]="isSavingOrDeletingIssueType">
+		<form
+			class="flex flex-col gap-2.5"
+			#repairForm="ngForm">
+			<div class="w-[450px]">
+				<ui5-label
+					i18n
+					show-colon
+					required
+					>Repair</ui5-label
+				>
+				<ui5-input
+					#repairName="ngModel"
+					class="w-full"
+					i18n-placeholder
+					placeholder="Write repair name"
+					required
+					[(ngModel)]="modalIssueType.name"
+					name="name"
+					[valueState]="repairName?.touched && !repairName.valid ? 'Negative' : 'None'"
+					sanitize-input>
+					<div
+						slot="valueStateMessage"
+						i18n>
+						Repair name is required.
+					</div>
+				</ui5-input>
+			</div>
+
+			<div class="w-[450px]">
+				<ui5-label
+					i18n
+					show-colon
+					required
+					>Hall</ui5-label
+				>
+				<ui5-busy-indicator
+					[active]="isBatchCallRunning"
+					class="w-full">
+					<ui5-multi-combobox
+						class="w-full"
+						i18n-placeholder
+						placeholder="Write hall name"
+						showSelectAll="true"
+						#repairHalls="ngModel"
+						ngModel
+						name="halls"
+						[valueState]="repairHalls?.touched && !hall0?.valid ? 'Negative' : 'None'"
+						(ui5SelectionChange)="setComboboxValue($event, repairHalls)">
+						<div
+							slot="valueStateMessage"
+							i18n
+							>At least 1 hall must be selected.</div
+						>
+						@for (hall of halls; track $index) {
+							<ui5-mcb-item
+								[text]="hall.name"
+								[selected]="this.modalIssueType.halls.includes(hall.id)"
+								[id]="hall.id"></ui5-mcb-item>
+						}
+					</ui5-multi-combobox>
+					<ui5-input
+						hidden
+						required
+						[(ngModel)]="modalIssueType.halls[0]"
+						required
+						name="hall0"
+						#hall0="ngModel">
+					</ui5-input>
+				</ui5-busy-indicator>
+			</div>
+		</form>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButtonId"
+			[disabled]="
+				(initialIssueType | json) == (modalIssueType | json) ||
+				!repairForm.valid ||
+				isSavingOrDeletingIssueType
+			"
+			design="Emphasized"
+			(ui5Click)="onIssueTypeSave(repairForm)">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			id="CancelButtonId"
+			[disabled]="isSavingOrDeletingIssueType"
+			(click)="handleIssueTypePopupClose(repairForm)">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	#deleteIssueTypeDialog
+	i18n-header-text
+	header-text="Warning"
+	state="Critical">
+	<p i18n>Do you really want to delete this item?</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteIssueType()"
+			[disabled]="isSavingOrDeletingIssueType"
+			>{{ localization.yes }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			[disabled]="isSavingOrDeletingIssueType"
+			(click)="handleIssueTypePopupClose()"
+			>{{ localization.cancel }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#archiveIssueTypeDialog
+	i18n-header-text
+	header-text="Warning"
+	state="Critical">
+	<p i18n
+		>You can’t delete this item. This component already in use. Do you really want to Archive
+		this item?</p
+	>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="archiveIssueType()"
+			[disabled]="isSavingOrDeletingIssueType"
+			>{{ localization.yes }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			[disabled]="isSavingOrDeletingIssueType"
+			(click)="handleIssueTypePopupClose()"
+			>{{ localization.cancel }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#retrieveIssueTypeDialog
+	i18n-header-text
+	header-text="Warning"
+	state="Critical">
+	<p i18n>Do you really want to retrieve this item?</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="retrieveIssueType()"
+			[disabled]="isSavingOrDeletingIssueType"
+			>{{ localization.yes }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			[disabled]="isSavingOrDeletingIssueType"
+			(click)="handleIssueTypePopupClose()"
+			>{{ localization.cancel }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

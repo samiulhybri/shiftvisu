@@ -1,0 +1,76 @@
+.background-image {
+  background-image: url("../../../assets/images/png/schertechbg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.k-flex-layout {
+  align-items: center;
+}
+
+.custom-li {
+  list-style-type: none;
+  align-items: center;
+}
+.custom-dropdown {
+  font-size: 16px;
+  color: #e4e4e4;
+  border: 1px solid #e4e4e4;
+  border-radius: 3px;
+  background-color: transparent;
+  text-align: center;
+}
+.custom-dropdown:hover {
+  background-color: white;
+  color: black;
+}
+
+.logo-section {
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-section hr {
+  width: 50%;
+  border: 1px solid rgb(248 248 248 / 18%);
+}
+
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 10%;
+  text-align: center;
+}
+
+.box {
+  float: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25% !important;
+  padding-bottom: 5px;
+  height: 100px;
+  text-align: center;
+}
+
+.box a {
+  text-decoration: none;
+}
+
+.box span {
+  font-size: 38px;
+  font-family: Snasm-Regular;
+}
+.responsive-logo {
+  max-width: 100%;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+@media (max-width: 950px) {
+  .responsive-logo {
+    transform: scale(0.8);
+  }
+  .box {
+    width: 50% !important;
+  }
+}

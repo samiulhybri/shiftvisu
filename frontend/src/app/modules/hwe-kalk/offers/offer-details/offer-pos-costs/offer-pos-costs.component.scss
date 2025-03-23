@@ -1,0 +1,14 @@
+.cost-footer-column {
+    padding-block: 12px;
+    padding-inline-end: 37px;
+    text-align: right;
+}
+
+::ng-deep .cost-table td:not(.material-cost) .k-input-inner {
+    text-align: right !important;
+}
+
+.heat-treatment {
+    max-height: calc(100vh - 300px);
+    overflow: auto;
+}

@@ -1,0 +1,14 @@
+<ui5-busy-indicator [active]="plants === undefined" *ngIf="plants?.length !== 1">
+	<ui5-select
+    (ui5Change)="onPlantChange($event)"
+    >
+		@for (plant of plants; track $index) {
+		<ui5-option
+			[value]="plant.id?.toString()"
+			[additionalText]="plant.custom_id"
+            [selected]="plant.id === selectedId"
+			>{{ plant.name }}</ui5-option
+		>
+		}
+	</ui5-select>
+</ui5-busy-indicator>

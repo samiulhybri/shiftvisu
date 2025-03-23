@@ -1,0 +1,182 @@
+.upload-collection-container {
+    width: inherit;
+    height: inherit;
+    overflow: hidden auto;
+}
+
+.upload-collection-container::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 8px;
+    overflow-y: scroll;
+    background: transparent;
+    box-shadow: inset 0 0 4px transparent;
+}
+
+.upload-collection-container::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-color);
+    border-radius: 8px;
+}
+
+.attachment-upload-card-container {
+    width: inherit;
+    height: inherit;
+    border: 1px solid var(--div-border-color); 
+    border-radius: var(--machineBoardCardBorderRadius);
+    box-shadow: 0 0 .125rem 0 rgba(34,53,72,.2), 0 .125rem .25rem 0 rgba(34,53,72,.2);
+    box-sizing: border-box;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--div-border-color); 
+}
+
+table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table-row {
+    padding: 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.attachment-block-header,
+.attachment-item-details-block,
+.item-action-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.loader-body {
+    width: inherit;
+    height: calc(45vh - 55px);
+}
+
+.header-button-section,
+.loader-body,
+.attachment-item-actions,
+.file-image-thumbnil,
+.file-doc-thumbnil {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.file-details-section,
+.file-sub-details-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.file-details-section {
+    margin-left: 10px;
+}
+
+.attachment-block-header {
+    padding: 10px;
+    border-bottom: var(--card-border-color);
+}
+
+.header-title-section {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.download-button,
+.start-upload-button {
+    margin: 0 5px;
+}
+
+.standard-select-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.file-image-thumbnil,
+.file-doc-thumbnil {
+    margin: 0 5px;
+}
+
+.file-image-thumbnil {
+    width: 100%;
+    height: 100%;
+    border: var(--light-border);
+    border-radius: 8px;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+.file-image-thumbnil img {
+    width: 90%;
+    height: 90%;
+}
+
+.file-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--file-icon-color);
+}
+
+.file-name {
+    font-size: 16px;
+    font-weight: 400;
+    white-space: nowrap;
+    width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--listTitleColor);
+}
+
+.file-sub-details-section span {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--list-description-text-color);
+}
+
+.item-action-section {
+    justify-content: flex-end;
+}
+
+.item-action-section button {
+    margin: 2px;
+}
+
+.not-saved-files-container.ui5-uci-progress-box.ui5-progress-indicator-root,
+.not-saved-files-container.ui5-uci-progress-box.ui5-uci-progress-labels {
+    display: none !important;
+}
+
+.camera-modal-body {
+    min-width: 900px;
+    width: 100%;
+    min-height: 634px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.webcam-wrapper,
+.webcam-wrapper video {
+    width: 100%;
+    height: 100%;
+}
+
+.webcam-wrapper video {
+    border-radius: var(--cardBorderRadius);
+}

@@ -1,0 +1,13 @@
+:host {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.users-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0px;
+  overflow-y: auto;
+}

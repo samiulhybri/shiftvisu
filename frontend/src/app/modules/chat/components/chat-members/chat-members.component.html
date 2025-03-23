@@ -1,0 +1,30 @@
+<button kendoButton id="close-button" (click)="closePanel.emit()">
+  <kendo-icon name="close"></kendo-icon>
+</button>
+
+<span *ngIf="chat.isManagedChat" i18n="Managed chat label"
+  >This chat has been created automatically and cannot be modified.</span
+>
+
+<button
+  kendoButton
+  *ngIf="!chat.isManagedChat"
+  (click)="leaveChat()"
+  i18n="Leave chat button"
+>
+  Leave Chat
+</button>
+
+<div *ngFor="let member of chatPartners()" class="chat-member">
+  <span class="member-name">{{ member.name }}</span>
+  <button
+    kendoButton
+    *ngIf="!chat.isManagedChat"
+    class="remove-user-button"
+    (click)="removeUser(member)"
+  >
+    <kendo-icon name="close"></kendo-icon>
+  </button>
+</div>
+
+<app-add-member *ngIf="!chat.isManagedChat" [chat]="chat"></app-add-member>

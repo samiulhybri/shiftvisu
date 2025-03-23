@@ -1,0 +1,60 @@
+.calculation-details-body {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+#pdf-container{
+	min-height: calc(100vh - 535px);
+}
+.copy-page {
+	height: 82vh;
+}
+
+@media screen and (min-width: 850px) and (max-width: 1350px) {
+	.responsive_label {
+		font-size: 14px !important;
+		margin-right: 0.5rem;
+	}
+
+	.responsive_btn{
+		width: 8vw !important;
+	}
+
+	#label_for_delivery_state {
+		overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+	}
+}
+
+@media screen and (min-width: 1351px) and (max-width: 1800px) {
+	.responsive_label {
+		font-size: 14px !important;
+		margin-right: 0.5rem;
+	}
+
+	.responsive_btn{
+		width: 9vw !important;
+	}
+
+	#label_for_delivery_state {
+		overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+	}
+}
+
+
+@media screen and (min-width: 1400px) and (max-width: 2000px) {
+	.responsive_label {
+		font-size: 18px !important;
+		margin-right: 0.5rem;
+	}
+
+	.responsive_btn {
+		width: 8vw !important;
+	}
+}

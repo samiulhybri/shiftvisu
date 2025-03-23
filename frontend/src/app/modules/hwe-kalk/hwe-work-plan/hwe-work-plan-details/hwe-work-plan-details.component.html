@@ -1,0 +1,42 @@
+<div class="k-form" *ngIf="hweWorkPlan" [ngClass]="{'disabled': isAllDisabled}">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="1">
+            <kendo-card-header i18n> Heat work Plan</kendo-card-header>
+            <kendo-card-body class="cost-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <span>
+                        <label [for]="custom_id" [ngStyle]="{'margin-bottom': '2px'}" i18n>Custom Id:<span class="k-text-error k-pl-1">*</span> </label>
+                        <kendo-textbox #custom_id [(ngModel)]="hweWorkPlan.custom_id"
+                                       [ngModelOptions]="{standalone: true}" format="n2">
+                        </kendo-textbox>
+                    </span>
+                    <span>
+                         <label [for]="name" [ngStyle]="{'margin-bottom': '2px'}" i18n>Name: </label>
+                        <kendo-textbox #name [(ngModel)]="hweWorkPlan.name"
+                                       [ngModelOptions]="{standalone: true}" format="n2">
+                        </kendo-textbox>
+                     </span>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+    <kendo-stacklayout orientation="horizontal" [gap]="12" class="work-plan">
+        <kendo-card [style.flex]="1" class="heat-treatment">
+            <kendo-card-header i18n> Work Plan Heat Treatment</kendo-card-header>
+            <kendo-card-body class="cost-details-body">
+                <app-work-plan-heat-treatment [hasValidationErrorHeatTreatment]="hasValidationErrorHeatTreatment"
+                                              [heatTreatments]="hweWorkPlan.heatTreatments"></app-work-plan-heat-treatment>
+            </kendo-card-body>
+        </kendo-card>
+        <kendo-card [style.flex]="1" class="heat-treatment">
+            <kendo-card-header i18n> Work Plan Additional Heat Treatment</kendo-card-header>
+            <kendo-card-body class="cost-details-body">
+                <app-work-plan-add-heat-treatment
+                        [hasValidationErrorAdditionalHeatTreatment]="hasValidationErrorAdditionalHeatTreatment"
+                        [additionalHeatTreatments]="hweWorkPlan.additionalHeatTreatments"></app-work-plan-add-heat-treatment>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+
+</div>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

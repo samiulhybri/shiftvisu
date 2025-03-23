@@ -1,0 +1,11 @@
+<div [formGroup]="form" *ngIf="data != undefined">
+    <kendo-gridlayout [gap]="{ cols: 10 }" [cols]="[{width:'auto'},{width:150}]">
+        <kendo-gridlayout-item class="label-format" [col]="1">
+            <label [textContent]="data.name"></label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [col]="2">
+            <kendo-numerictextbox [(ngModel)]="data.total" class="number-right-align" formControlName="total"
+                [spinners]="false" format="c2" [disabled]="isFieldDisabled">></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>

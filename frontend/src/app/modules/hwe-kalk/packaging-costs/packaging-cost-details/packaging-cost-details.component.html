@@ -1,0 +1,67 @@
+<form novalidate class="k-form" *ngIf="packagingCost">
+    <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="1">
+            <kendo-card-header i18n>
+                Packaging Cost Details
+            </kendo-card-header>
+            <kendo-card-body class="packaging-cost-details-body">
+                <kendo-stacklayout  orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="product_type" i18n i18n-text text="Product Type"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-multiselect
+                            #product_type
+                            [(ngModel)]="packagingCost.hwePackagingCostProductTypes" 
+                            [data]="packagingCostProductTypeData"
+                            [filterable]="true"
+                            textField="text"
+                            valueField="value"
+                            name="product_type"
+                            (filterChange)="handleFilter($event, 'product_type')"
+                        >
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+                <kendo-stacklayout  class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="outer_diameter_min" i18n i18n-text text="Outer Diameter Min"></kendo-label>
+                     <kendo-numerictextbox format="#.##\ mm" #outer_diameter_min name="outer_diameter_min" [(ngModel)]="packagingCost.outer_diameter_min" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="outer_diameter_max" i18n i18n-text text="Outer Diameter Max"></kendo-label>
+                     <kendo-numerictextbox format="#.##\ mm" #outer_diameter_max name="outer_diameter_max" [(ngModel)]="packagingCost.outer_diameter_max" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="height_min" i18n i18n-text text="Height Min"></kendo-label>
+                     <kendo-numerictextbox format="#.##\ mm" #height_min name="height_min" [(ngModel)]="packagingCost.height_min" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="height_max" i18n i18n-text text="Height Max"></kendo-label>
+                     <kendo-numerictextbox format="#.##\ mm" #height_max name="height_max" [(ngModel)]="packagingCost.height_max" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="weight_min" i18n i18n-text text="Weight Min"></kendo-label>
+                     <kendo-numerictextbox format="#.##\ kg" #weight_min name="weight_min" [(ngModel)]="packagingCost.weight_min" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="weight_max" i18n i18n-text text="Weight Max"></kendo-label>
+                     <kendo-numerictextbox format="#.##\ kg" #weight_max name="weight_max" [(ngModel)]="packagingCost.weight_max" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="quantity_min" i18n i18n-text text="Quantity Min"></kendo-label>
+                     <kendo-numerictextbox format="#.##\ st" #quantity_min name="quantity_min" [(ngModel)]="packagingCost.quantity_min" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="quantity_max" i18n i18n-text text="Quantity Max"></kendo-label>
+                     <kendo-numerictextbox format="#.##\ st" #quantity_max name="quantity_max" [(ngModel)]="packagingCost.quantity_max" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="cost" i18n i18n-text text="Cost"></kendo-label>
+                     <kendo-numerictextbox format="#.##\ €" #cost name="cost" [(ngModel)]="packagingCost.cost" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="packaging_cost_unit" i18n i18n-text text="Packaging Cost Unit"></kendo-label>
+                    <kendo-combobox #packaging_cost_unit name="packaging_cost_unit" [(ngModel)]="packagingCost.packaging_cost_unit"
+                        [data]="packagingCostUnitData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>

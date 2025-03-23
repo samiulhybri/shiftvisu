@@ -1,0 +1,22 @@
+
+.close-button{
+  margin-right: -1.7vw;
+  padding: 10px 20px;
+}
+.main-div{
+  margin-left: -28px;
+    margin-right: -32px;
+  height: 100%;
+}
+.info-main-div{
+    height: calc(100% - 2rem);
+}
+
+.AnalyticalTable_th{
+  display: none;
+}
+
+.disabled{
+    opacity: .5;
+    pointer-events: none;
+}

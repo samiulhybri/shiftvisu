@@ -1,0 +1,290 @@
+import { Component, ViewChild } from "@angular/core";
+import {
+	CustomReactGridTable,
+	GridTableColumnDataType,
+} from "@app/shared/components/CustomGridTable";
+import ItemType from "@app/shared/models/item-type.model";
+import { CommonService } from "@app/shared/services/common.service";
+import Dialog from "@ui5/webcomponents/dist/Dialog";
+import Toast from "@ui5/webcomponents/dist/Toast";
+import { NgForm } from "@angular/forms";
+import { ConfigService } from "@app/shared/services/config.service";
+import { AuthService } from "@app/shared/services/auth.service";
+import ValueState from "@ui5/webcomponents-base/dist/types/ValueState";
+import { ToastService } from "@app/shared/services/toaster.service";
+import { Localization } from "@app/shared/utils/common-localize";
+import { HandleRowClickService } from "@app/shared/services/handle-row-click.service";
+
+@Component({
+	selector: "app-item-type",
+	templateUrl: "./item-type.component.html",
+	styleUrl: "./item-type.component.css",
+})
+export class ItemTypeComponent {
+	isUpdateDialog = false;
+	selectedRowValue = new ItemType().deserialize({});
+	value!: string;
+	autoIncrementId!: string;
+	localization = Localization;
+	isLoading: boolean = false;
+	dialogTitle: string = "";
+	isDialogOpen = false;
+	customIdState: keyof typeof ValueState = "None";
+	customIdValueStateText: string = Localization.idIsRequired;
+	customId?: string;
+	isLoadingCustomId: boolean = false;
+	disableButtonDuringRequest: boolean = false;
+	cachedCustomId?: string = "";
+	ItemTypeConfig?: any = {};
+
+	constructor(
+		public commonService: CommonService,
+		public authService: AuthService,
+		private configService: ConfigService,
+		public _toasterSrv: ToastService		
+	) {
+		this.ItemTypeConfig = this.configService.getConfigValue("ItemType");
+	}
+
+	@ViewChild("create0rUpdateForm") form?: NgForm;
+	@ViewChild("errorDialogTPMSubGroups", { static: false }) errorDialogTPMSubGroups: any;
+	@ViewChild("childComponentRef", { static: false }) childComponent:
+		| CustomReactGridTable
+		| undefined;
+
+	columns: any = [
+		{
+			Header: this.localization.active,
+			accessor: "is_active",
+			disableFilters: true,
+			disableGroupBy: true,
+			disableSortBy: true,
+			dataType: GridTableColumnDataType.Boolean,
+			isSelected: true,
+			hAlign: "Center",
+			maxWidth: 72,
+			autoResizable: true,
+		},
+		{
+			Header: this.localization.id,
+			accessor: "custom_id",
+			isSelected: true,
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: false,
+			autoResizable: true,
+      		width: 200
+		},
+		{
+			Header: this.localization.name,
+			accessor: "name",
+			isSelected: true,
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: false,
+			autoResizable: true,
+		},
+		{
+			Header: $localize`Stocked in Handling Unit`,
+			accessor: "is_stocked_in_hu",
+			hAlign: "Center",
+			minWidth: 50,
+			isSelected: true,
+			dataType: GridTableColumnDataType.Boolean,
+			disableFilters: false,
+			disableGroupBy: true,
+			maxWidth: 200,
+			autoResizable: true,
+		},
+		{
+			Header: $localize`Packaging`,
+			accessor: "is_packaging",
+			hAlign: "Center",
+			isSelected: true,
+			dataType: GridTableColumnDataType.Boolean,
+			disableFilters: false,
+			disableGroupBy: true,
+			maxWidth: 200,
+			autoResizable: true,
+		},
+	];
+
+	ngOnInit() {
+		this.getCustomId();
+	}
+
+	deleteClick(value: any): void {
+		this.selectedRowValue = new ItemType().deserialize(value);
+		(document.getElementById("deleteDialog") as Dialog).open = true;
+	}
+
+	editClick(value: object): void {
+		this.dialogTitle = this.localization.edit;
+		this.selectedRowValue = new ItemType().deserialize(value);
+		(document.getElementById("ItemTypeDialog") as Dialog).open = true;
+		this.isDialogOpen = true;
+		this.isUpdateDialog = true;
+		this.customIdState = "None";
+		this.cachedCustomId = this.selectedRowValue.custom_id;
+	}
+
+	async newButtonClick() {
+		this.dialogTitle = this.localization.add;
+		this.isUpdateDialog = false;
+		this.selectedRowValue = new ItemType().deserialize({});
+		this.customIdState = "None";
+		this.selectedRowValue.custom_id = this.customId;
+
+		this.disableButtonDuringRequest = false;
+		if (!this.customId) {
+			this.selectedRowValue.custom_id = "";
+			this.getCustomId();
+		}
+		this.isDialogOpen = true;
+	}
+
+	handleClose() {
+		this.selectedRowValue = new ItemType().deserialize({});
+		this.isDialogOpen = false;
+		(this.form as any).onReset();
+	}
+
+	async getCustomId() {
+		this.isLoadingCustomId = true;
+		this.customId = await this.commonService.getEntity("ItemType").catch(() => false);
+		this.selectedRowValue.custom_id = this.customId;
+		if (typeof this.customId === "boolean") this.selectedRowValue.custom_id = "";
+		this.isLoadingCustomId = false;
+	}
+
+	onChangeCustomId() {
+		this.customIdState = "None";
+	}
+
+	public filterHandler(
+		fieldName: string = "",
+		value: string = "",
+		filterOperator: string = "Contain"
+	) {
+		this.childComponent?.onFilterAndSorting(fieldName, value, filterOperator);
+		this.getCustomId();
+	}
+
+	deleteSubmit() {
+		const { recordDeleted } = Localization;
+		this.disableButtonDuringRequest = true;
+		this.isLoading = true;
+		this.commonService.delete(`/ItemTypes(${this.selectedRowValue.id})`).subscribe({
+			next: () => {
+				this.disableButtonDuringRequest = false;
+				this.closeDialogDelete();
+				this.isLoading = false;
+				this.filterHandler();
+				this._toasterSrv.showToast(recordDeleted, "success");
+			},
+			error: err => {
+				this.disableButtonDuringRequest = false;
+				this.isLoading = false;
+				this.errorDialogTPMSubGroups.elementRef.nativeElement.open = true;
+				this.closeDialogDelete();
+			},
+		});
+	}
+
+	closeDialogDelete() {
+		const dialog = document.getElementById("deleteDialog") as Dialog;
+		dialog.open = false;
+		this.isDialogOpen = false;
+	}
+
+	closeErrorDialog() {
+		this.errorDialogTPMSubGroups.elementRef.nativeElement.open = false;
+	}
+
+	onSave() {
+		this.disableButtonDuringRequest = true;
+		(this.form as any).onSubmit(undefined);
+	}
+
+	checkCustomId() {
+		const result = this.commonService.customIdValidation(
+			this.customId || "",
+			this.selectedRowValue.custom_id || ""
+		);
+		const urlString = `ItemTypes?$filter=custom_id eq '${this.selectedRowValue.custom_id}'&$select=custom_id`;
+		if (result.success) {
+			this.commonService.get(urlString).subscribe({
+				next: (response: any) => {
+					if (response.value.length === 0) this.onCreateOrUpdate();
+					else {
+						const { idIsAlreadyTaken } = Localization;
+						this.disableButtonDuringRequest = false;
+						this.customIdState = "Negative";
+						this.customIdValueStateText = idIsAlreadyTaken;
+					}
+				},
+				error: () => {
+					this.disableButtonDuringRequest = false;
+				},
+			});
+		} else {
+			this.disableButtonDuringRequest = false;
+			this.customIdState = "Negative";
+			this.customIdValueStateText = result.msg;
+		}
+	}
+
+	async onCreateOrUpdate() {
+		this.isLoading = true;
+		const payload = this.selectedRowValue?.toOdata();
+		const method = this.isUpdateDialog ? "put" : "post";
+		const urlString = this.isUpdateDialog
+			? `ItemTypes(${this.selectedRowValue?.id})`
+			: `ItemTypes`;
+		this.commonService[method](urlString, payload).subscribe({
+			next: () => {
+				const { recordSavedSuccessfully } = Localization;
+				this._toasterSrv.showToast(recordSavedSuccessfully, "success");
+
+				this.filterHandler();
+				this.handleClose();
+				this.isLoading = false;
+				this.isDialogOpen = false;
+				this.disableButtonDuringRequest = false;
+				(this.form as any).onReset();
+			},
+			error: () => {
+				this.disableButtonDuringRequest = false;
+				this.isLoading = false;
+				this.errorDialogTPMSubGroups.elementRef.nativeElement.open = true;
+			},
+		});
+	}
+	onChangeName(event: any) {
+		if (this.selectedRowValue) this.selectedRowValue.name = (event.target as any).value;
+	}
+
+	onSubmit(form: NgForm) {
+		if (!form.valid) {
+			this.disableButtonDuringRequest = false;
+			return;
+		}
+
+		const customId = this.selectedRowValue.custom_id?.trim();
+		this.selectedRowValue.custom_id = customId;
+		if (this.isUpdateDialog) {
+			this.cachedCustomId === customId ? this.onCreateOrUpdate() : this.checkCustomId();
+		} else this.checkCustomId();
+	}
+
+	shouldBeDisabled(fieldName: string) {
+		if (this.ItemTypeConfig && this.selectedRowValue) {
+			return (
+				this.ItemTypeConfig[fieldName] === 0 &&
+				(this.selectedRowValue as any).is_imported_from_erp
+			);
+		} else {
+			return false;
+		}
+	}
+}

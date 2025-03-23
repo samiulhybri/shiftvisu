@@ -1,0 +1,35 @@
+<kendo-drawer-container>
+    <kendo-drawer
+      #drawer
+      [items]="sidebarMenu"
+      mode="push"
+      [mini]="true"
+      [expanded]="true"
+      (select)="onSelect($event)" 
+      [autoCollapse]="false"
+      [isItemExpanded]="isItemExpanded"
+    >
+    <ng-template kendoDrawerItemTemplate let-sidebarMenu>
+        <div class="flex-container">
+            <div class="menu-content">
+                <span *ngIf="sidebarMenu.icon" [class]="'sidebar-icon k-icon icon ' + sidebarMenu.icon"></span>
+                <img *ngIf="sidebarMenu.imgPath" [src]="'assets/images/' + sidebarMenu.imgPath" alt="Icon" class="img sidebar-icon" />
+                <span class="menu-text text-ellipsis">{{ sidebarMenu.text }}</span>
+            </div>
+    
+            <span *ngIf="hasChildren(sidebarMenu)" class="expand-icon">
+                <span class="sidebar-icon k-icon" [ngClass]="{'icon-chevron-down': isItemExpanded(sidebarMenu), 'icon-chevron-up': !isItemExpanded(sidebarMenu)}"></span>
+            </span>
+        </div>
+    </ng-template>
+    </kendo-drawer>
+    <kendo-drawer-content >
+        <router-outlet></router-outlet>
+    </kendo-drawer-content>
+
+    <!-- Other Drawer Content Goes Here -->
+    <div class="release" *ngIf="setting.release">
+        <p> <span i18n>Release</span> {{setting.release}} <br>
+         <span class="copy-right">{{setting.copy_right}}</span> </p>
+    </div>
+</kendo-drawer-container>

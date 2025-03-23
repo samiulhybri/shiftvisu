@@ -1,0 +1,239 @@
+<div class="tableStandard">
+	<app-grid-table headerTitle="Items" [url]="url" i18n-headerTitle [columns]="columns" [showAction]="true" [showRowDataCount]="true"
+		[showDownload]="false" [showActiveButton]="true" button1Text="All" button2Text="Inactive" button3Text="Active"
+		addButtonText="New" [editPermission]="authService.isPermissionValid('BASEVISU_ITEMS_EDIT')"
+		i18n-addButtonText i18n-button1Text i18n-button2Text i18n-button3Text [showNewButton]="true" [isBaseVisu]="true"
+		[showSearch]="true" expandQuery="$expand=itemGroup,media,itemType,customers" filterQuery="(is_tool ne true or is_tool eq null)" (newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)" (editClick)="editClick($event)" [enableServerSideFiltering]="true" selectionMode="Single"
+		sortBy="custom_id" #childComponentRef>
+	</app-grid-table>
+
+	<ui5-dialog id="deleteDialogItem" header-text="Warning" state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div slot="footer" class="footer-style gap-8">
+			<ui5-button class="dialogSubmit" design="Emphasized" (click)="deleteSubmit()"  [disabled]="disableButtonDuringRequest">{{ localization.ok }}</ui5-button>
+			<ui5-button  design="Transparent" (click)="closeDialogDelete()">{{ localization.close }}</ui5-button>
+		</div>
+	</ui5-dialog>
+</div>
+
+<app-dialog id="addGroupDialog" [isDialogOpen]="isDialogOpen" (onBeforeClose)="closeDialog()">
+	<div slot="header" class="w-[100%]">
+		<div class="ml-[-24px]">
+			<ui5-title class="pd-10 " level="H5">{{ dialogTitle }}</ui5-title>
+		</div>
+		<ui5-tabcontainer class="ml-[-48px]" (tab-select)="tabNavChanged($event)" fixed collapsed>
+			<ui5-tab #itemDetailsTab i18n-text text="Core Data" [selected]="selectedTab === 'item_details'" id="item_details" [disabled]="disableButtonDuringRequest"></ui5-tab>
+			<ui5-tab #itemAttachmentsTab i18n-text text="Attachment ({{ attachmentCount }})" id="item_attachments" [selected]="selectedTab === 'item_attachments'" [disabled]="disableButtonDuringRequest"></ui5-tab>
+		</ui5-tabcontainer>
+	</div>
+	<ui5-busy-indicator [active]="isLoading" size="L">
+		<div class="2xl:w-[836px] xl:w-[836px] lg:w-[830px] md:w-[800px] h-[65vh] max-h-[530px] ml-[-12px] form">
+			<form (ngSubmit)="onSubmit(createOrUpdateForm)" #createOrUpdateForm="ngForm" [hidden]="!isDialogOpen" >
+				<div class="item-details-section h-[65vh] max-h-[480px]"  [hidden]="selectedTab !== 'item_details'">
+					<div class="flex mb-10">
+						<div class="flex-col-item w-33">
+							<ui5-label show-colon>{{ localization.active }}</ui5-label>
+							<ui5-switch id="itemsActiveSwitch" ngDefaultControl name="is_active"
+								[disabled]="shouldBeDisabled('is_active')"
+								[(ngModel)]="selectedItem.is_active"></ui5-switch>
+						</div>
+						<div class="flex-col-item w-33">
+							<ui5-label show-colon i18n>Sales Item</ui5-label>
+							<ui5-switch id="itemsIsSalesItemsSwitch" name="is_sales_item"
+								[disabled]="shouldBeDisabled('is_sales_item')"
+								[(ngModel)]="selectedItem.is_sales_item"></ui5-switch>
+						</div>
+						<div class="flex-col-item w-33">
+							<ui5-label show-colon i18n>Alloy</ui5-label>
+							<ui5-switch id="itemsIsAlloySwitch" name="is_alloy"
+								[disabled]="shouldBeDisabled('is_alloy')"
+								[(ngModel)]="selectedItem.is_alloy"></ui5-switch>
+						</div>
+						<div class="flex-col-item w-33">
+							<ui5-label show-colon i18n>Package Item</ui5-label>
+							<ui5-switch name="is_packaging_item" id="isPackagingItemSwitch"
+								[disabled]="shouldBeDisabled('is_packaging_item')"
+								[(ngModel)]="selectedItem.is_packaging_item"></ui5-switch>
+						</div>
+					</div>
+
+					<div class="flex flex-row mb-10 w-[100%] gap-2 justify-stretch">
+						<div class="flex-col-item w-1/2">
+							<ui5-label show-colon  required>{{ localization.id }}</ui5-label>
+							<ui5-busy-indicator [active]="isLoadingCustomId" size="S">
+								<ui5-input class="w-100" #customId="ngModel" [disabled]="shouldBeDisabled('custom_id')" [valueState]="
+										customId.valid == false &&
+										(customId.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: customIdState
+									" [(ngModel)]="selectedItem.custom_id" name="custom_id" (input)="onChangeCustomId()" [required]="true"
+									id="customIdInput">
+									<div slot="valueStateMessage">
+										{{ customIdValueStateText }}
+									</div>
+								</ui5-input>
+							</ui5-busy-indicator>
+						</div>
+						<div class="flex-col-item w-1/2">
+							<ui5-label show-colon i18n>Item Group</ui5-label>
+							<ui5-combobox id="itemGroupCombobox" [value]="selectedItem.itemGroup?.name || ''"
+								[disabled]="shouldBeDisabled('item_group')"
+								class="w-100"
+								(selection-change)="onChangeItemGroup($event)"
+								(input)="onInputChange($event)" #itemGroupCombobox>
+								<ng-container *ngFor="let itemGroup of itemGroups">
+									<ui5-cb-item id="{{ itemGroup.id }}" text="{{ itemGroup.name }}"
+										[additionalText]="itemGroup.custom_id?.toString() || ''"
+										*ngIf="itemGroup.is_active"></ui5-cb-item>
+								</ng-container>
+							</ui5-combobox>
+						</div>
+						
+					</div>
+					<div class="flex flex-row mb-10 w-[100%] gap-2 justify-stretch">
+						<div class="flex-col-item w-1/2">
+							<ui5-label show-colon  required>{{ localization.name }}</ui5-label>
+							<ui5-input id="nameInput" class="w-100" #nameInput="ngModel" [required]="true"
+								[disabled]="shouldBeDisabled('name')" [valueState]="
+									nameInput.valid == false &&
+									(nameInput.touched || createOrUpdateForm.submitted)
+										? 'Negative'
+										: 'None'
+								" [(ngModel)]="selectedItem.name" name="name"></ui5-input>
+						</div>
+						<div class="flex-col-item w-1/2">
+							<ui5-label show-colon i18n>Note</ui5-label>
+							<ui5-input id="noteInput" class="w-100" #noteInput="ngModel"
+								 [(ngModel)]="selectedItem.note" name="note">
+								</ui5-input>
+						</div>
+					</div>
+
+					<div class="flex flex-row mb-10 w-[100%] gap-2 justify-stretch">
+						<div class="flex-col-item w-1/2">
+							<ui5-label show-colon i18n>Item Type</ui5-label>
+							<ui5-combobox id="itemTypeCombobox" [value]="selectedItem.itemType.name || ''"
+								[disabled]="shouldBeDisabled('item_type')"
+								class="w-100"
+								(selection-change)="onChangeItemType($event)"
+								(input)="onInputItemTypeChange($event)" #itemTypeCombobox>
+								<ng-container *ngFor="let itemType of itemTypes">
+									<ui5-cb-item id="{{ itemType.id }}" text="{{ itemType.name }}"
+										[additionalText]="itemType.custom_id?.toString() || ''"
+										*ngIf="itemType.is_active"></ui5-cb-item>
+								</ng-container>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col-item w-1/2">
+							<ui5-label show-colon i18n>Batch Quantity</ui5-label>
+							<ui5-input id="batch_quantity" class="w-100" #batch_quantity="ngModel"
+								[(ngModel)]="selectedItem.batch_quantity" name="batch_quantity">
+							</ui5-input>
+						</div>
+					</div>
+
+					<div class="flex flex-row mb-10 w-[100%] gap-2 justify-stretch">
+						<div class="flex-col-item w-1/2">
+							<ui5-label show-colon i18n>Name 2</ui5-label>
+							<ui5-input id="name2" class="w-100" #name2="ngModel"
+								[(ngModel)]="selectedItem.name2" name="name2">
+							</ui5-input>
+						</div>
+						
+						<div class="flex-col-item w-1/2">
+							<ui5-label show-colon i18n>Name 3</ui5-label>
+							<ui5-input id="name3" class="w-100" #name3="ngModel"
+								[(ngModel)]="selectedItem.name3" name="name3">
+							</ui5-input>
+						</div>
+					</div>
+
+					<div class="flex flex-row mb-10 w-[100%] gap-2 justify-stretch">
+						<div class="flex-col-item w-1/2">
+							<ui5-label show-colon i18n>Customer</ui5-label>
+							<ui5-multi-combobox
+								slot="endContent"
+								#customerRef
+								(selectionChange)="customerSelection($event)"
+								id="customerMultiSelect"
+								placeholder="Select Client"
+								i18n-placeholder
+								class="multi-combobox w-full">
+								<ui5-mcb-item
+									*ngFor="let customer of customers"
+									text="{{ customer.name }}"
+									[id]="customer.id">
+								</ui5-mcb-item>
+       						</ui5-multi-combobox>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="item-attachment-section h-[65vh] max-h-[530px]"  *ngIf="selectedTab === 'item_attachments'">
+					<app-attachment-upload 
+						[model]="'Item'" 
+						[uploadedFiles]="tempFiles" 
+						[deletedFiles]="deletedSavedFiles" 
+						[modelId]="selectedItem ? selectedItem.id : null"
+						[checkNewFiles]="checkForNewAttachments"
+						[fileCount]="attachmentCount" 
+						[updatedStandardFile]="selectedStandardFile"
+						(tempFilesChanged)="onAttachmentChanges($event, 'onUpload')"
+						(deletedFilesChanged)="onAttachmentChanges($event, 'onDelete')"
+						(standardFileSelected)="onAttachmentChanges($event, 'onStandardSelect')"
+						(newFilesCount)="onAttachmentChanges($event, 'fileCount')"
+						style="width: 100%; height: 100%;">
+					</app-attachment-upload>
+			</div>			
+		</div>
+	</ui5-busy-indicator>
+
+	<div slot="footer" style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button design="Emphasized" (click)="onSave()" id="itemsSaveButton"  [disabled]="disableButtonDuringRequest">{{ localization.save }}</ui5-button
+		>
+		<ui5-button class="ml-8" design="Transparent" (click)="closeDialog()" id="itemsCancelButton"  [disabled]="disableButtonDuringRequest">
+			{{ localization.close }}</ui5-button>
+	</div>
+</app-dialog>
+
+<app-dialog id="addGroupDialog" [isDialogOpen]="isPreviewDialogOpen" title="Attachment" title-i18n (onBeforeClose)="closeAttachmentDialog()">
+	<div class="w-[1168px] ml-[-16px] mr-[-16px]">
+		<app-file-preview [modelId]="selectedItem.id" [model]="'item'" [filePreviewHeight]="filePreviewHeight"
+		[filesCount]="fileCount"
+		></app-file-preview>	
+	</div>
+	<div slot="footer" class="dialog-footer mr-[-32px]">
+		<ui5-button class="ml-8" design="Transparent" (click)="closeAttachmentDialog()" >
+			{{ localization.close }}</ui5-button>
+	</div>
+</app-dialog>
+<ui5-dialog
+		#deleteErrorDialogItems
+		id="deleteErrorDialogItems"
+		state="Negative"
+		header-text="Error">
+		<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+		<div
+			slot="footer"
+			class="deleteErrorDialogFooter">
+			<ui5-button
+				class="dialogCloser"
+				design="Transparent"
+				(click)="closeDeleteErrorDialog()"
+				>{{ localization.close }}</ui5-button>
+		</div>
+	</ui5-dialog>

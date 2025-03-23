@@ -1,0 +1,57 @@
+<ui5-card class="card-design">
+	<ui5-card-header
+		slot="header"
+		title-text="Tool"
+		i18n-title-text>
+	</ui5-card-header>
+
+	<div class="hrStyle"></div>
+
+	<div
+		class="tool-cards"
+		id="toolCards"
+		*ngIf="toolDetails.custom_id; else noToolContainer">
+		<div class="tool-card">
+			<ui5-title
+				level="H5"
+				id="operation"
+				>{{ toolDetails.custom_id }}</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Tool Id</span
+			>
+		</div>
+		<div class="tool-card">
+			<ui5-title
+				level="H5"
+				id="operation"
+				>{{ toolDetails.name }}</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Tool Name</span
+			>
+		</div>
+		<div class="tool-card">
+			<ui5-title
+				level="H5"
+				id="operation"
+				>Not defined yet</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Status</span
+			>
+		</div>
+	</div>
+	<ng-template #noToolContainer>
+		<div class="h-[276px] flex items-center justify-center">
+            <span i18n *ngIf="!isLoading">No Tool Found!</span>
+			<ui5-busy-indicator [active]="isLoading" size="M" *ngIf="isLoading"></ui5-busy-indicator>
+        </div>
+	</ng-template>
+</ui5-card>

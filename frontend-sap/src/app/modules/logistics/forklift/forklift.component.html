@@ -1,0 +1,424 @@
+<div
+	class="div-col"
+	style="height: 100%; width: 100%">
+	<app-header-nav
+		class="col-span-2 row-start-1 row-end-2"
+		[isHomePage]="true"
+		title='LogiVisu'
+		(logOutDialogEvent)="logoutDialogOpen()"></app-header-nav>
+<div class="main-body div-row">
+		<div class="left">
+			<div class="left-div">
+				<app-grid-table
+					#gridTable
+					headerTitle="Planned"
+					url="/ProdOrderPosOperations"
+					i18n-headerTitle
+					[columns]="columns"
+					[showAction]="false"
+					[showSearch]="true"
+					[showDownload]="false"
+					[showNewButton]="false"
+					[isBaseVisu]="false"
+					[isCozy]="true"
+					[limit]="100"
+					[model]="prodOrderPosOperation"
+					(processData)="processData($event[0], $event[1])"
+					expandQuery="$expand=prodOrderProdOperationDeliveries($expand=user),prodOrderPos($expand=item,prodOrder,calculation(expand=offerPos($expand=offerPosRawDimensions))),machine($expand=hall) & $filter= status eq 'IN_PREPARATION' or status eq 'WAITING_FOR_PREPARATION'"
+					multiSelectOneLabelText="Hall"
+					selectionMode="Single"
+					i18n-multiSelectOneLabelText
+					(multiSelectOneSelectionChanged)="multiSelectOneSelectionChange($event)"
+					[multiSelectOneData]="halls"
+					[isMultiSelectOneActive]="true"
+					(rowClick)="handleRowClick($event)"
+					[segmentButtonItems]="segmentButtonItems"
+					(segmentButtonChange)="segmentButtonChange($event)"
+					(columnReorder)="onColumnsReorder($event)"
+					#childComponentRef>
+				</app-grid-table>
+			</div>
+		</div>
+		<div class="right div-col">
+			<div class="div-row right-title">
+				<ui5-title
+					level="H5"
+					class="ml-16"
+					i18n
+					>Order Detail</ui5-title
+				>
+			</div>
+			<div style="overflow-y: auto; height: 90%">
+				<div class="input-list">
+					<ui5-button
+						design="Emphasized"
+						(click)="acceptClick()"
+						i18n
+						class="mb-10"
+						[disabled]="
+							transportationMode == 'notDone'
+								? selectedProdOrderPosOperation
+									? selectedProdOrderPosOperation.currentDelivery?.user?.name
+										? true
+										: false
+									: true
+								: true
+						"
+						>Accept</ui5-button
+					>
+					<ui5-button
+						design="Default"
+						i18n
+						class="mb-10"
+						[disabled]="
+							transportationMode == 'notDone'
+								? selectedProdOrderPosOperation?.currentDelivery?.user?.id ==
+									authService.loggedInUser.id
+									? false
+									: true
+								: true
+						"
+						(click)="opneParitalDeleveryDialog()"
+						>Partial Delivery</ui5-button
+					>
+					<ui5-button
+						design="Default"
+						i18n
+						class="mb-10"
+						[disabled]="
+							transportationMode == 'notDone'
+								? selectedProdOrderPosOperation?.currentDelivery?.user?.id ==
+									authService.loggedInUser.id
+									? false
+									: true
+								: true
+						"
+						(click)="clickTransportationDone()"
+						>Transport Done</ui5-button
+					>
+					<div class="div-row align-center">
+						<div class="div-row label">
+							<ui5-label
+								show-colon
+								i18n
+								>Order Id</ui5-label
+							>
+						</div>
+						<ui5-input
+							[readonly]="true"
+							class="input"
+							placeholder="Text"
+							[value]="
+								selectedProdOrderPosOperation?.prodOrderPos?.prodOrder?.custom_id ??
+								''
+							"></ui5-input>
+					</div>
+					<div class="div-row align-center">
+						<div class="div-row label">
+							<ui5-label
+								show-colon
+								i18n
+								>Machine Id</ui5-label
+							>
+						</div>
+						<ui5-input
+							[readonly]="true"
+							class="input"
+							placeholder="Text"
+							class="input"
+							[value]="
+								selectedProdOrderPosOperation?.machine?.name ?? ''
+							"></ui5-input>
+					</div>
+					<div class="div-row align-center">
+						<div class="div-row label">
+							<ui5-label
+								show-colon
+								i18n
+								>Quantity</ui5-label
+							>
+						</div>
+						<ui5-input
+							[readonly]="true"
+							class="input"
+							placeholder="Text"
+							[value]="
+								selectedProdOrderPosOperation?.prodOrderPos?.quantity?.toString() ??
+								''
+							"></ui5-input>
+					</div>
+					<div class="div-row align-center">
+						<div class="div-row label">
+							<ui5-label
+								show-colon
+								i18n
+								>Delivered</ui5-label
+							>
+						</div>
+						<ui5-input
+							[readonly]="true"
+							class="input"
+							placeholder="Text"
+							class="input"
+							[value]="
+								selectedProdOrderPosOperation?.quantityDelivered?.toString() ?? ''
+							"></ui5-input>
+					</div>
+					<div class="div-row align-center">
+						<div class="div-row label">
+							<ui5-label
+								show-colon
+								i18n
+								>Product Type</ui5-label
+							>
+						</div>
+						<ui5-input
+							[readonly]="true"
+							class="input"
+							placeholder="Text"
+							[value]="
+								selectedProdOrderPosOperation?.prodOrderPos?.calculation?.offerPos
+									?.product_type ?? ''
+							"></ui5-input>
+					</div>
+					<div class="div-row align-center">
+						<div class="div-row label">
+							<ui5-label
+								show-colon
+								i18n
+								>Raw Weight</ui5-label
+							>
+						</div>
+						<ui5-input
+							[readonly]="true"
+							class="input"
+							placeholder="Text"
+							class="input"
+							[value]="
+								selectedProdOrderPosOperation?.prodOrderPos?.calculation?.offerPos
+									?.offerPosRawDimensions?.length
+									? ((selectedProdOrderPosOperation?.prodOrderPos?.calculation
+											?.offerPos)!.offerPosRawDimensions[0].gross_weight ??
+										'')
+									: ''
+							"></ui5-input>
+					</div>
+
+					<div class="div-row align-center">
+						<div class="div-row label">
+							<ui5-label
+								show-colon
+								i18n
+								>Operating Weight</ui5-label
+							>
+						</div>
+						<ui5-input
+							[readonly]="true"
+							placeholder="Text"
+							class="input"
+							[value]="
+								selectedProdOrderPosOperation?.prodOrderPos?.calculation?.offerPos
+									?.offerPosRawDimensions?.length
+									? ((selectedProdOrderPosOperation?.prodOrderPos?.calculation
+											?.offerPos)!.offerPosRawDimensions[0]
+											.operating_weight ?? '')
+									: ''
+							"></ui5-input>
+					</div>
+
+					<div class="div-row align-center">
+						<div class="div-row label">
+							<ui5-label
+								show-colon
+								i18n
+								>Preliminary Piece</ui5-label
+							>
+						</div>
+						<ui5-input
+							[readonly]="true"
+							placeholder="Text"
+							class="input"></ui5-input>
+					</div>
+					<div class="div-row align-center">
+						<div class="div-row label">
+							<ui5-label
+								show-colon
+								i18n
+								>Delivery Accepted</ui5-label
+							>
+						</div>
+						<ui5-input
+							[readonly]="true"
+							placeholder="Text"
+							class="input"
+							[value]="
+								selectedProdOrderPosOperation?.currentDelivery?.user?.name ?? ''
+							"></ui5-input>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<ui5-dialog
+	header-text="Confirm"
+	[open]="isLogOutDialogOpen"
+	state="Critical"
+	(beforeClose)="closeDialog()">
+	<div class="logout-content">
+		<ui5-text i18n> Do you want to logout? </ui5-text>
+		<ui5-busy-indicator
+			size="M"
+			[active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		class="logout-footer"
+		slot="footer">
+		<ui5-button
+			design="Emphasized"
+			class="mr5"
+			i18n
+			(click)="logOut()"
+			>Confirm</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			i18n
+			>Cancel</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<app-dialog
+	id="accaptDialog"
+	[isDialogOpen]="isAcceptDialogOpen"
+	state="Critical"
+	title="Confirmation"
+	i18n-title>
+	<div class="div-col">
+		<ui5-text i18n>You are accepting the order, please confirm.</ui5-text>
+		<ui5-busy-indicator [active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="div-row button-layout">
+		<ui5-button
+			design="Emphasized"
+			i18n
+			style="margin-right: 4px"
+			(click)="acceptOrder()"
+			>Confirm</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			i18n
+			(click)="closeAcceptDialog()"
+			>Cancel</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<app-dialog
+	id="errorDialog"
+	[isDialogOpen]="showErrorDialog"
+	state="Negative"
+	title="Error"
+	i18n-title>
+	<ui5-text>{{ errorMessage }}</ui5-text>
+	<div
+		slot="footer"
+		class="div-row align-center"
+		style="justify-content: end; width: 100%">
+		<ui5-button
+			design="Transparent"
+			i18n
+			(click)="closeErrorDialog()"
+			>Close</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<app-dialog
+	id="transportDialog"
+	[isDialogOpen]="isConfirmDialogOpen"
+	state="Critical"
+	title="Confirmation"
+	i18n-title>
+	<div class="div-col">
+		<ui5-text i18n>Please confirm you have delivered 100% of the quantity.</ui5-text>
+		<ui5-busy-indicator [active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="div-row align-center"
+		style="justify-content: end; width: 100%">
+		<ui5-button
+			design="Emphasized"
+			i18n
+			style="margin-right: 4px"
+			(click)="transportationDone()"
+			>Confirm</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			i18n
+			(click)="closeConfirmDialog()"
+			>Cancel</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<app-dialog
+	id="partialDeliveryDialog"
+	[isDialogOpen]="isPartialDeliveryDialogOpen"
+	state="None"
+	title="Partial Delivery"
+	i18n-title>
+	<form #quantityForm="ngForm">
+		<div class="div-col">
+			<ui5-label
+				required
+				show-colon
+				i18n
+				style="margin-bottom: 2px"
+				>Delivered Quantity</ui5-label
+			>
+			<ui5-input
+				[(ngModel)]="partialQuantity"
+				type="Number"
+				name="parQty"
+				[required]="true"
+				pattern="^[0-9]*$"
+				[valueState]="
+					parQty.valid == false ||
+					selectedProdOrderPosOperation?.prodOrderPos?.quantity! -
+						selectedProdOrderPosOperation?.quantityDelivered! <
+						partialQuantity ||
+					partialQuantity < 1
+						? 'Negative'
+						: 'None'
+				"
+				#parQty="ngModel"
+				id="parQty"></ui5-input>
+			<ui5-busy-indicator [active]="isBusy"></ui5-busy-indicator>
+		</div>
+	</form>
+	<div
+		slot="footer"
+		class="div-row partial-footer">
+		<ui5-button
+			design="Emphasized"
+			i18n
+			style="margin-right: 4px"
+			(click)="partialDeliveryDone()"
+			>Save</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			i18n
+			(click)="closePartialDeliveryDialog()"
+			>Cancel</ui5-button
+		>
+	</div>
+</app-dialog>

@@ -1,0 +1,448 @@
+<app-dialog
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()"
+	[title]="clockInOutDialog">
+	<!-- clockin dialog -->
+	<div style="margin: -16px">
+		<div
+			class="root-div-clock-in"
+			*ngIf="!showMachineBoard">
+			<div>
+				<ui5-card class="2xl:w-[320px] xl:w-[350px] lg:w-[320px] md:w-[330px] sm:w-[240px]
+								2xl:h-[540px] xl:h-[485px] lg:h-[385px] md:h-[375px] sm:h-[240px]">
+					<div class="clock-in-card-header">
+						<ui5-title
+							i18n
+							level="H6"
+							>Clock In</ui5-title>
+					</div>
+					<div class="custom-header-hr"></div>
+					<div class="items-center 2xl:h-[445px] xl:h-[382px] lg:h-[290px] md:h-[280px] overflow-scroll p-1">
+						<ui5-busy-indicator
+							*ngIf="isLoadingClockedUser"
+							class="input-class"
+							[active]="isLoadingClockedUser"
+							size="M"
+						>
+						</ui5-busy-indicator>
+						<div *ngIf="machineLoggedUsers.length"
+							class="max-h-48 min-h-16 overflow-y-auto overflow-x-hidden">
+							<ui5-input
+								*ngFor="let msUser of machineLoggedUsers"
+								id="userId"
+								[readonly]="true"
+								value="{{ msUser?.name }}"
+								class="input-class">
+							</ui5-input>
+						</div>
+
+						<ui5-busy-indicator
+							style="margin-top: 12px;"
+							[active]="isLoadingUserId"
+							size="M"
+						>
+							<ui5-input
+								#inputRef
+								style="margin-top: 0px;"
+								id="name"
+								name="name"
+								class="input-class"
+								[value]="dialerButtonValue"
+								[valueState]="isErrorMessage ? 'Negative' : 'None'"
+								[(ngModel)]="dialerButtonValue"
+								(input)="inputValue($event)"
+                                i18n-placeholder
+								placeholder="Enter User Id or Chip Number">
+								<div slot="valueStateMessage">
+									{{ customIdValueStateText }}
+								</div>
+								<div slot="icon" class="flex">
+									<ui5-icon name="qr-code" class="icon" (click)="openCodeScannerDialog()"></ui5-icon>
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+
+						<div class="keypad">
+							<ui5-button
+								*ngFor="let button of buttons"
+								[disabled]="isLoadingClockedUser"
+								class="key"
+								(click)="dialerButton($event)">
+								{{ button }}
+							</ui5-button>
+						</div>
+					</div>
+					<div class="custom-hr"></div>
+					<div class="left-component-footer">
+						<ui5-button
+							[disabled]="isErrorMessage || isLoadingUserId || !selectedUser?.id || !isEnabledForClockin"
+							design="Emphasized"
+							class="clock-in-confirm-button"
+							(click)="confirmClicked()"
+							i18n>Confirm</ui5-button>
+					</div>
+				</ui5-card>
+			</div>
+			<ui5-busy-indicator size="L" [active]="isIndicator">
+				<div class="flex flex-space-between right-component-div" [class.dim-content]="isIndicator">
+					<ui5-card class="flex flex-space-between 2xl:w-[886px] xl:w-[700px] lg:w-[570px] md:w-[480px] sm:w-[240px]
+					 2xl:h-[540px] xl:h-[485px] lg:h-[385px] md:h-[375px] sm:h-[240px]">
+						<div>
+							<div class="clock-in-card-header">
+								<ui5-title
+									level="H6"
+									i18n>User Details</ui5-title>
+							</div>
+							<div class="flex flex-space-between custom-header-hr"></div>
+							<div *ngIf="showTableDiv && selectedUser" class="flex flex-row items-center justify-start gap-3 p-4 w-full">
+								<div class="flex flex-col 2xl:w-[47%] xl:w-[46%] lg:w-[46%] md:w-[46%]">
+									<ui5-label
+										i18n
+										show-colon
+										>User Name</ui5-label>
+									<ui5-input
+										id="userName"
+										class="w-full"
+										value="{{ selectedUser.name }}"
+										[readonly]="true">
+									</ui5-input>
+								</div>
+								<div class="flex flex-col 2xl:w-[47%] xl:w-[46%] lg:w-[46%] md:w-[46%]">
+									<ui5-label
+										i18n
+										show-colon
+										>User Id</ui5-label
+									>
+									<ui5-input
+										id="userId"
+										[readonly]="true"
+										value="{{ selectedUser.custom_id }}"
+										class="flex flex-space-between w-full">
+									</ui5-input>
+								</div>
+							</div>
+							<div
+								*ngIf="!showTableDiv"
+								class="no-table-data">
+								<img
+									id="no_user"
+									width="144px"
+									src="./assets/images/no_user.svg" />
+								<ui5-text
+									i18n
+									class="no-user-logged-in-text"
+									>No user Logged In.</ui5-text
+								>
+							</div>
+							<div
+								*ngIf="showTableDiv"
+								class="table-div">
+								<div class="2xl:h-[396px] xl:h-[350px] lg:h-[240px] md:h-[235px] overflow-auto
+										w-[854px] border border-solid border-gray-400 rounded-lg">
+									<app-clockin-table
+										headerTitle=""
+										url="/Machines"
+										[columns]="columns"
+										i18n-headerTitle
+										selectionMode="None"
+										[data]="machineUserTimes"
+										#childComponentRef>
+									</app-clockin-table>
+								</div>
+							</div>
+						</div>
+					</ui5-card>
+				</div>
+			</ui5-busy-indicator>
+			<ui5-toast
+				#clockinNotEnabledRef
+				id="isClockinEnabled"
+				placement="BottomCenter"
+				i18n
+				>No Clock In enabled user group found for the user</ui5-toast>
+		</div>
+	</div>
+
+	<!-- Confirm dialog -->
+	<div
+		class="confirm-div-clock-in"
+		*ngIf="showMachineBoard">
+		<div class="flex flex-space-between gap-12 w-100">
+			<div class="2xl:w-[320px] xl:w-[280px] lg:w-[220px] md:w-[200px] 2xl:h-[560px] xl:h-[540px] lg:h-[400px] md:h-[380px]" *ngIf="isShiftClockedRequired">
+				<ui5-card class="2xl:h-[220px] xl:h-[180px] lg:h-[130px] md:h-[100px] pb-10">
+					<ui5-card-header
+						slot="header"
+						title-text="Shift">
+					</ui5-card-header>
+					<div class="divider"></div>
+					<div class="flex-col pd-10">
+						<ui5-toggle-button
+							*ngFor="let machineShift of currentMachineShifts"
+							[pressed]="selectedShift.id === machineShift.id"
+							class="clock-button"
+							(click)="onShiftSelect(machineShift)"
+							>{{machineShift.custom_id}} - {{machineShift.name}}</ui5-toggle-button
+						>
+					</div>
+				</ui5-card>
+				<ui5-card class="2xl:h-[310px] xl:h-[340px] lg:h-[245px] md:h-[260px]">
+					<ui5-card-header
+						slot="header"
+						i18n
+						title-text="Choose Another Shift">
+					</ui5-card-header>
+					<div class="divider"></div>
+					<div class="2xl:max-h-[260px] xl:max-h-[255px] lg:max-h-[200px] md:max-h-[190px] overflow-scroll">
+						<div class="flex-col pd-10">
+							<ui5-toggle-button
+								*ngFor="let shift of allShiftList"
+								[pressed]="selectedShift.id === shift.id"
+								class="clock-button"
+								(click)="onShiftSelect(shift)"
+								>{{ shift.custom_id }} - {{ shift.name }}
+							</ui5-toggle-button>
+						</div>
+					</div>
+				</ui5-card>
+			</div>
+			<ui5-busy-indicator size="L" [active]="isIndicator">
+				<div class="2xl:w-[905px] xl:w-[700px] lg:w-[700px] md:w-[500px] 2xl:h-[560px] xl:h-[540px] lg:h-[400px] md:h-[380px]" [class.dim-content]="isIndicator">
+					<ui5-card class="2xl:h-[97%] xl:h-[98%] lg:h-[96%] md:h-[98%]">
+						<div
+							slot="header"
+							class="header-content">
+							<ui5-card-header
+                                i18n-title-text
+								title-text="Select Workplace"
+								i18n></ui5-card-header>
+							<ui5-button
+								(click)="OnDeselectAll()"
+								class="deselect-button"
+								design="Default"
+								i18n
+								>Deselect All</ui5-button
+							>
+						</div>
+						<div class="divider"></div>
+
+						<div *ngIf="!isIndicator || isOnSave" class="pd-10 2xl:h-[476px] xl:h-[476px] lg:h-[330px] md:h-[305px] 2xl:w-[1000px] lg:w-[680px] overflow-scroll">
+							<ui5-card
+								*ngFor="let machine of userMachineList"
+								class="workplace-card relative">
+								<div
+									class="absolute z-[1] flex w-[calc(100%-2*8px)] gap-1 status-tag-center top-[-5%] justify-between">
+									@if (currentMachine.id === machine.id) {
+										<ui5-tag
+											class="whitespace-nowrap overflow-hidden text-ellipsis"
+											design="Set1"
+											color-scheme="3"
+											wrappingType="None"
+											title="Current Machine"
+											i18n
+											i18n-title
+											>Current Machine</ui5-tag>
+									} @else {
+										<div></div>
+									}
+									@if (selectedMachineIds.includes(machine.id!)) {
+										<ui5-tag
+											class="whitespace-nowrap overflow-hidden text-ellipsis"
+											design="Set1"
+											color-scheme="4"
+											wrappingType="None"
+											[title]="clockedInMachineIds.includes(machine.id!)
+											? 'Clocked In'
+											: 'Clock In'"
+											i18n>
+											{{
+												clockedInMachineIds.includes(machine.id!)
+													? "Clocked In"
+													: "Clock In"
+											}}
+										</ui5-tag>
+									} @else if (clockedInMachineIds.includes(machine.id!)) {
+										<ui5-tag
+											class="whitespace-nowrap overflow-hidden text-ellipsis"
+											design="Set1"
+											color-scheme="2"
+											wrappingType="None"
+											title="Clock Out"
+											i18n
+											i18n-title
+											>Clock Out</ui5-tag>
+									}
+								</div>
+								<div
+									(click)="onMachineSelect(machine)"
+									class="machine-card-wrap z-0"
+									[ngClass]="
+										selectedMachineIds.includes(machine.id!)
+											? 'default-div'
+											: 'card-div-center'
+									"
+									[class.clockin-active-machine]="
+										currentMachine.id === machine.id
+									">
+									<div class="w-[200px] center-grid-wrap">
+										<ui5-title
+											class="mt-10"
+											level="H6"
+											>{{ machine.custom_id }}</ui5-title
+										>
+										<ui5-label class="mb-10">{{ machine.name }}</ui5-label>
+										<div
+											*ngIf="machine.clockInActivityTypes.length"
+											class="activity-selection-wrap"
+											(click)="onClickSelectionDiv($event)">
+											<ui5-select
+												ngDefaultControl
+												class="activity-type-selection"
+												(ui5Change)="onActivityTypeChange($event, machine.id!)"
+											>
+												<ui5-option value={{0}}>Select option</ui5-option>
+												<ui5-option
+													*ngFor="let activityType of machine.clockInActivityTypes; let i = index"
+													[selected]="selectedActivityTypes[machine.id!] === activityType.id?.toString()"
+													value={{activityType.id}}
+												>{{activityType.pos}}
+												</ui5-option>
+											</ui5-select>
+										</div>
+									</div>
+								</div>
+							</ui5-card>
+						</div>
+					</ui5-card>
+				</div>
+			</ui5-busy-indicator>
+		</div>
+	</div>
+
+	<!-- Dialog footer -->
+	<div
+		slot="footer"
+		class="left-component-footer">
+		<ui5-button
+			*ngIf="showMachineBoard"
+			id="saveButton"
+			[disabled]="(isShiftClockedRequired ? (!selectedShift.id && selectedMachineIds.length !== 0) : false)"
+			design="Emphasized"
+			(click)="onSave()"
+			i18n
+			>Save</ui5-button
+		>
+		<ui5-button
+			*ngIf="showMachineBoard"
+			class="ml-8"
+			id="clockInBackButton"
+			(click)="onBack()"
+			i18n
+			>Back</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			id="clockInCloseButton"
+			design="Transparent"
+			(click)="closeDialog()"
+			i18n
+			>Close</ui5-button
+		>
+	</div>
+
+	<ui5-toast
+		#clockedInToastRef
+		id="clockedInToast"
+		placement="BottomCenter"
+		i18n
+		>Selected machines are successfully Clocked In</ui5-toast>
+</app-dialog>
+
+<div>
+	<app-dialog
+		[isDialogOpen]="warningPopup"
+		title="Warning"
+		state="Critical">
+		<div *ngIf="isCloseWarning">
+			<ui5-text
+				class="fs-14"
+				i18n
+				>Do you really want to {{ isBackAction ? "back" : "close" }} without saving?</ui5-text
+			>
+		</div>
+		<div
+			*ngIf="!isCloseWarning"
+			class="save-popup">
+			<ui5-text
+				i18n
+				class="fs-14"
+				>Required training time is not achieved. You won't be allowed to take any other
+				action on the machineboard. Please ask an additional user, who achieves the full
+				training time, to clockes in.</ui5-text
+			>
+		</div>
+		<div
+			*ngIf="!isConfirmAction"
+			slot="footer"
+			class="left-component-footer">
+			<ui5-button
+				*ngIf="isCloseWarning"
+				(click)="onSave()"
+				design="Emphasized"
+				i18n>Save</ui5-button>
+			<ui5-button
+				class="ml-8"
+				id="clockInCloseButton"
+				(click)="closeAndNavigate()"
+				>
+				{{isBackAction ? 'Back' : 'Close'}}
+			</ui5-button>
+		</div>
+
+		<div
+			*ngIf="isConfirmAction"
+			slot="footer"
+			class="left-component-footer">
+			<ui5-button
+				id="clockInCloseButton"
+				design="Emphasized"
+				(click)="onCancelWarning()"
+				i18n>Cancel</ui5-button>
+			<ui5-button
+				class="ml-8"
+				(click)="closeAndNavigate()"
+				i18n
+				>Confirm</ui5-button>
+		</div>
+	</app-dialog>
+</div>
+
+<ui5-dialog
+	#codeScannerDialog
+	id="codeScannerClockDialog"
+	header-text="Scan barcode"
+	state="None"
+	i18n-header-text>
+	<video #videoElement style="width: 100%;max-height: 60vh"></video>
+	<div class="scanner-overlay"></div>
+	<p i18n *ngIf="!videoInputDevices.length">Video loading</p>
+	<div slot="footer" class="left-component-footer">
+		<ui5-button design="Transparent" i18n (click)="closeCodeScannerDialog()">Close</ui5-button>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog #clockOutErrorDialog header-text="ClockOut Error"
+	[open]="showClockOutErrorDialog" state="Critical" i18n-header-text>
+	<div *ngIf="!isCloseWarning" class="grid grid-flow-row">
+		<div>
+			<ui5-label i18n [showColon]="true">Selected machines are not Clocked Out</ui5-label>
+		</div>
+		<div class="mt-2">
+			@for (machine of clockOutErrorMachines; track $index) {
+				<ui5-button>{{ machine?.custom_id}}</ui5-button>
+			}
+		</div>
+	</div>
+	<div slot="footer" class="left-component-footer">
+		<ui5-button class="ml-8" (click)="closeClockOutError()" i18n>Confirm</ui5-button>
+	</div>
+</ui5-dialog>

@@ -1,0 +1,13 @@
+export enum MPCostType {
+    DIMENSION = "DIMENSION",
+    PIECES = "PIECES",
+    OFFER = "OFFER",
+    FIXED = "FIXED",
+    FIXED_NAME = "FIXED_NAME",
+    WEIGHT = "WEIGHT",
+    HOURS = "HOURS",
+    HOURS_FIXED = "HOURS_FIXED",
+    PF_PM = "PF_PM",
+    MOULDFLOW = "MOULDFLOW",
+    FIXED_WEIGHT = "FIXED_WEIGHT",
+}

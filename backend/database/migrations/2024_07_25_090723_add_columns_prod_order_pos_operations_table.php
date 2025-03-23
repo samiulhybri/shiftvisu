@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('prod_order_pos_operations', function (Blueprint $table) {
+            $table->boolean('is_repair_completed')->default(false);
+            $table->dateTime('repair_completed_date')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('prod_order_pos_operations', function (Blueprint $table) {
+            $table->dropColumn(['is_repair_completed', 'repair_completed_date']);
+        });
+    }
+};

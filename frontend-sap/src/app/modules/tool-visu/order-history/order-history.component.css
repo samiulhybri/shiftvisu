@@ -1,0 +1,12 @@
+#viewDialog{
+    width: 62.5vw;
+}
+
+.busy-indicator {
+    width: 100%;
+    height: 100%;
+}
+
+.standardTable {
+    height: calc(100vh - 70px);
+}

@@ -1,0 +1,309 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Notification Groups"
+		url="/NotificationGroups"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="false"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		[showSearch]="true"
+		expandQuery="$expand=notificationGroupUsers,notificationGroupEmailAddresses($expand=notificationGroup),notificationGroupNotificationTypes"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		(newButtonClick)="newButtonClick()"
+		[editPermission]="authService.isPermissionValid('BASEVISU_NOTIFICATION_GROUPS_EDIT')"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+</div>
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()"
+	[title]="dialogTitle">
+	<div
+		slot="header"
+		class="ml-[-16px] mr-[-76px] w-[708px]">
+		<div>
+			<ui5-title
+				class="pt-4"
+				level="H5"
+				>{{ dialogTitle }}</ui5-title
+			>
+		</div>
+		<ui5-tabcontainer
+			class="ml-[-32px]"
+			(tab-select)="tabNavChanged($event)"
+			fixed
+			collapsed>
+			<ui5-tab
+				#coreDataTab
+				i18n-text
+				text="Core Data"
+				[selected]="selectedTab === 'core_data'"
+				id="core_data"></ui5-tab>
+			<ui5-tab
+				#assignedUserTab
+				i18n-text
+				text="Assigned Users"
+				[selected]="selectedTab === 'assigned_user'"
+				id="assigned_user"></ui5-tab>
+			<ui5-tab
+				#emailsTab
+				i18n-text
+				text="Emails"
+				[selected]="selectedTab === 'emails'"
+				id="emails"></ui5-tab>
+		</ui5-tabcontainer>
+	</div>
+
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L"
+		class="ml-[-16px] mr-[-16px]">
+		<div class="2xl:w-[868px] xl:w-[868px] lg:w-[868px] md:w-[848px] h-[582px] form">
+			<div [ngStyle]="{ display: selectedTab != 'core_data' ? 'none' : '' }">
+			   <form
+				     (ngSubmit)="onSubmit(create0rUpdateForm)"
+				     #create0rUpdateForm="ngForm">
+					<div>
+						<div class="flex flex-col gap-[5px]">
+							<ui5-label show-colon required>{{ localization.id }}</ui5-label>
+							<ui5-busy-indicator [active]="isLoadingCustomId" size="S">
+								<ui5-input class="w-full" #customId="ngModel" [valueState]="
+														customId.valid == false &&
+														(customId.touched || create0rUpdateForm.submitted)
+															? 'Negative'
+															: customIdState
+													" [(ngModel)]="selectedRowValue.custom_id" (input)="onChangeCustomId()" 
+													id="customIdInput" name="custom_id"
+									[required]="true">
+									<div slot="valueStateMessage">
+										{{ customIdValueStateText }}
+									</div>
+								</ui5-input>
+							</ui5-busy-indicator>
+						</div>
+						<div class="flex-col flex gap-[5px] mt-3">
+							<ui5-label show-colon required>{{ localization.name }}</ui5-label>
+							<ui5-input class="w-full" id="name" #nameInput="ngModel" [required]="true" [(ngModel)]="selectedRowValue.name"
+								(change)="onChangeName($event)" [valueState]="
+													nameInput.valid == false &&
+													(nameInput.touched || create0rUpdateForm.submitted)
+														? 'Negative'
+														: 'None'
+												" name="name"></ui5-input>
+						</div>
+					
+						<div class="flex-col flex gap-[5px] mt-3">
+							<ui5-label show-colon i18n>Notification Type</ui5-label>
+							<ui5-multi-combobox #typeRef (ui5SelectionChange)="onTypeChange()" placeholder="Type Notification Group"
+								i18n-placeholder class="w-full">
+								<ui5-mcb-item *ngFor="let type of notificationType" id="{{ type.value }}"
+									[selected]="selectedTypeList.includes(type.value)" text="{{ type.text }}"></ui5-mcb-item>
+							</ui5-multi-combobox>
+						</div>
+					</div>
+			   </form>
+		    </div>
+		    <div [ngStyle]="{ display: selectedTab != 'assigned_user' ? 'none' : '' }">
+					<ui5-card>
+						<div class="h-[580px]">
+							<app-grid-table
+								#childComponentUser
+								headerTitle="Assigned Users"
+								i18n-headerTitle
+								[showRowDataCount]="true"
+								[showAction]="false"
+								[showDownload]="false"
+								[showActiveButton]="false"
+								[addButtonText]="addButtonText"
+								[columns]="userColumns"
+								(newButtonClick)="associateButtonClick()"
+								(onSearchOnKeyUp)="onSearchOnChangeInput($event, 'user')"
+								selectionMode="None"
+								[data]="associateData"
+								[customData]="true"
+								[showSearch]="true">
+							</app-grid-table>
+						</div>
+					</ui5-card>
+		    </div>
+
+			<div [ngStyle]="{ display: selectedTab != 'emails' ? 'none' : '' }">
+				<ui5-card>
+					<div class="h-[580px]">
+							<app-grid-table
+								headerTitle="Emails"
+								i18n-headerTitle
+								[showRowDataCount]="true"
+								[showAction]="false"
+								[showDownload]="false"
+								[showActiveButton]="false"
+								[addButtonText]="localization.add"
+								[columns]="emailColumns"
+								(newButtonClick)="associateEmailButtonClick()"
+								(deleteClick)="associateEmailDeleteClick($event)"
+								(onSearchOnKeyUp)="onSearchOnChangeInput($event, 'email')"
+								selectionMode="None"
+								[showEditButton]="false"
+								[data]="associatedEmailData"
+								[showAction]="true"
+								[customData]="true"
+								[showSearch]="true"
+								#emailAssociatedChildComponent>
+							</app-grid-table>
+						</div>
+					</ui5-card>
+			</div>			
+		</div>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	id="deleteDialog"
+	header-text="Warning"
+	state="Critical">
+	<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteSubmit()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="errorDialog"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<app-dialog [isDialogOpen]="isAssociateDialogOpen">
+	<div
+		slot="header"
+		class="w-full">
+		<div class="flex flex-row justify-between">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ associateTitle }} ({{ filteredUsers.length }})</ui5-title
+			>
+			<app-associate-selector
+				(selectionEvent)="selectAllAssociate($event)"
+				[enableSelection]="isDeselectEnable"></app-associate-selector>
+		</div>
+		<ui5-input
+			id="searchInput"
+			class="w-full"
+			slot="searchField"
+			[(ngModel)]="searchedValue"
+			(input)="onSearchInput($event)">
+			<ui5-icon
+				name="search"
+				slot="icon"
+				ui5-icon=""></ui5-icon>
+		</ui5-input>
+	</div>
+	<div class="h-[557px] w-[518px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="S"
+			class="w-full">
+			<ui5-list
+				selectionMode="Multiple"
+				(selectionChange)="userChange($event)">
+				<ui5-li
+					*ngFor="let user of filteredUsers"
+					[selected]="user.isSelected"
+					[id]="user.id">
+					{{ user.custom_id }} | {{ user.name }}
+				</ui5-li>
+			</ui5-list>
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			id="saveButtonMachineState"
+			(click)="onSaveUser()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="cancelButtonMachineState"
+			(click)="cancelDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<app-associate-preview-dialog
+	[isPreviewDialogOpen]="isPreviewDialogOpen"
+	[title]="associateDialogTitle"
+	[columns]="userColumns"
+	[data]="associateData"
+	(closeAssociate)="closeAssociateDialog()">
+</app-associate-preview-dialog>

@@ -1,0 +1,20 @@
+<div class="h-[calc(100vh-65px)] overflow-y-auto">
+<ui5-bar class="mt-[10px] w-[99%] ml-[10px]">
+        <ui5-combobox
+			#hallRef
+			id="hallMultiComboBox"
+            slot="endContent"
+			placeholder="Select Hall"
+            [value]="selectedHallValue"
+            (selection-change)="selectHall($event)"
+			i18n-placeholder >
+			<ui5-cb-item
+				*ngFor="let hall of halls"
+				text="{{ hall.name }}"
+				[id]="hall.id">
+			</ui5-cb-item>
+		</ui5-combobox>
+	</ui5-bar>
+
+    <router-outlet></router-outlet>
+</div>

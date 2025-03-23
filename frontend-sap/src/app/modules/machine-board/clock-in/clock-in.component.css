@@ -1,0 +1,193 @@
+.left-component {
+	width:320px;
+	height: 540px;
+}
+
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 12px;
+}
+
+.key {
+	width: 88px;
+}
+
+.input-class {
+	max-width: 288px;
+	margin-top: 12px;
+	margin-left: 12px;
+}
+
+.input-class-right-component {
+	width: 419px;
+}
+
+.left-component-body {
+	display: flex;
+	flex-direction:column;
+	align-items:center;
+	height: 452px
+}
+
+.clock-in-confirm-button {
+	margin-right: 16px;
+}
+
+.left-component-footer {
+	display: flex;
+	align-items: center;
+	justify-content: end;
+	flex-direction: row;
+	width: 100%;
+	height: 44px;
+}
+
+.right-component-div {
+	margin-left: 12px;
+}
+
+.right-component {
+	max-width:886px;
+	height: 540px;
+}
+
+.root-div-clock-in {
+	display: flex; 
+	flex-direction: row;
+	margin: -16px;
+	padding: 13.5px 16px;
+	background-color: var(--clockInBackgroundColor);
+}
+
+.user-name-id-div {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: start;
+	max-width: 854px;
+}
+
+.user-name-div {
+	display: flex; 
+	flex-direction: column; 
+	padding: 16px
+}
+
+.user-id-div {
+	display: flex; 
+	flex-direction: column
+}
+
+.user-table-div {
+	max-width: 854px;
+	height: 386px;
+}
+
+.no-user-logged-in-text {
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 24px;
+	margin-top: 12px;
+	color: var(--customTextColor); 
+}
+
+.clock-in-card-header {
+	margin-top: 12px; 
+	margin-left: 14px
+}
+
+.no-table-data{
+	height: 386px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.table-div{
+	/* width: 875px; */
+	border-radius: var(--cardBorderRadius);
+	display: flex;
+	justify-content: center;
+	padding: 0px 12px 0px 12px;
+	/* overflow: scroll; */
+	height: 350px;
+}
+.confirm-div-clock-in {
+	display: flex; 
+	flex-direction: row;
+	margin: -16px -32px;
+	padding: 16px 16px 0px 16px;
+	background-color: var(--clockInBackgroundColor);
+}
+
+.cancel-warning {
+	width: 320px; 
+	height: 152px;
+}
+
+.fs-14{
+	font-size: 14px;
+}
+
+.save-popup {
+	display: flex; 
+	height: 80px;
+	width: 288px
+}
+
+.clockin-active-machine {
+	height: 168px;
+	border: 1px solid var(--sapBrandColor);
+    border-radius: 15px;
+}
+
+.clockin-machine-ui5-card-wrapper {
+	height: 476px;
+    overflow-y: auto;
+}
+
+.dim-content {
+    opacity: .3;
+}
+
+.deselect-button {
+	margin-right: 30px;
+}
+
+.shift-container {
+	max-height: 290px;
+	overflow: scroll;
+}
+
+.activity-type-selection {
+	width: 100%;
+	margin: 0; padding: 0;
+}
+
+.machine-card-wrap {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-around;
+}
+
+.activity-selection-wrap {
+	min-height: 30px;
+	width: 88%;
+}
+
+.center-grid-wrap {
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-tag-center {
+	left: 50%;
+	transform: translateX(-50%);
+}

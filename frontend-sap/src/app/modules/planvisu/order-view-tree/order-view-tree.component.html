@@ -1,0 +1,100 @@
+<div style="height: 100%; margin:10px">
+	<ui5-bar class="mt-[10px] w-[100%] h-[40px]">
+		<ui5-title level="H5" slot="startContent" i18n>Orders</ui5-title>
+		<ui5-multi-combobox #hallRef id="hallMultiComboBox" (selectionChange)="selectHall($event)"
+			placeholder="Select Hall" i18n-placeholder class="multi-combobox">
+			<ui5-mcb-item *ngFor="let hall of halls" text="{{ hall.custom_id }} - {{ hall.name }}" [id]="hall.id" selected="{{ hall.isSelected }}">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+		<ui5-multi-combobox #machineGroupRef id="machineGroupMultiComboBox"
+			(selectionChange)="selectMachineGroup($event)" placeholder="Select Machine Group" i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item *ngFor="let machineGroup of machineGroups"
+				text="{{ machineGroup.custom_id }} - {{ machineGroup.name }}" [id]="machineGroup.id">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+		<ui5-input id="itemInput" placeholder="Select Item" [required]="true" name="customId" [value]="valueForItem"
+			(change)="onChangeItem($event)" i18n-placeholder>
+			<ui5-icon id="valueHelpIcon" class="cursor-pointer" slot="icon" name="value-help"
+				(click)="valueHelperIconClick(valueHelperType.ITEM)"></ui5-icon>
+		</ui5-input>
+		<ui5-input id=prodOrderInput placeholder="Select Prod Order" [required]="true" name="customId"
+			[value]="valueForProdOrder" (change)="onChangeProdOrder($event)" i18n-placeholder>
+			<ui5-icon id="valueHelpIcon" class="cursor-pointer" slot="icon" name="value-help"
+				(click)="valueHelperIconClick(valueHelperType.PRODORDER)"></ui5-icon>
+		</ui5-input>
+		<ui5-daterange-picker (change)="changeDate($event)" placeholder="Pick Date Range" i18n-placeholder [value]="
+				momentInstance.utc(start).local().format('DD/MM/YYYY') +
+				' - ' +
+				momentInstance.utc(end).local().format('DD/MM/YYYY')
+			" formatPattern="dd/MM/YYYY">
+		</ui5-daterange-picker>
+		<ui5-button class="" design="Emphasized" (click)="onGo()" i18n [disabled]="false">Go</ui5-button>
+		<ui5-button class="" design="Emphasized" (click)="onReset()" i18n [disabled]="false">Reset</ui5-button>
+		<ui5-input slot="" value="" change="" #searchInput hidden>
+			<ui5-icon id="valueHelpIcon" slot="icon" name="search"
+				(click)="onSearchClick(searchInput.value)"></ui5-icon>
+		</ui5-input>
+		<ui5-segmented-button accessible-name="Font style" (selection-change)="handleSegmentSelectionChange($event)">
+
+			<ui5-segmented-button-item tooltip="Active" selected id="activeSegmentButton"
+				data-value="active">Active</ui5-segmented-button-item>
+			<ui5-segmented-button-item tooltip="Closed" id="closedSegmentButton"
+				data-value="closed">Closed</ui5-segmented-button-item>
+		</ui5-segmented-button>
+		<ui5-button design="Transparent" icon="action-settings" (ui5Click)="onSettingClick()"></ui5-button>
+	</ui5-bar>
+	<div style="height: calc(100% - 57px);">
+		<app-grid-table headerTitle="" i18n-headerTitle [columns]="columns" [customUrl]="apiUrl" [isBaseVisu]="false"
+			[showDownload]="false" [showActiveButton]="false" [showEditButton]="false"
+			[customActionButtons]="actionButtons"
+			(processData)="processMainData($event)"
+			[showDeleteButton]="true" i18n-addButtonText [showNewButton]="false" [useOdataStyles]="false" [enableServerSideFiltering]="true"
+			[enableServerSideFiltering]="true" [showAction]="true" [showSearch]="true" [isBaseVisu]="true" [isCustomApiCall]="true"
+			[showTableSettingBtn]="true" [isBusy]="true" selectionMode="Single" (onLoadMoreForCustomAPI)="onLoadMoreForCustomAPI()" 
+			[onDoubleClick]="onDoubleClick"
+			keyForCacheCustomDataTableColumns="planVisuOrderTreeView"
+			[isTreeTable]="true" #orderGrid>
+		</app-grid-table>
+	</div>
+</div>
+<ui5-dialog id="dialog" [open]="isValueHelpDialog" *ngIf="isValueHelpDialog">
+	<ui5-bar slot="header" class="w-full ml-[-30px]">
+		<ui5-title level="H5" slot="startContent">
+			{{ valueHelperTitle }}
+		</ui5-title>
+	</ui5-bar>
+	<div class="h-[620px] w-[450px] mx-4 my-[-16px]">
+		<app-grid-table [headerTitle]="valueHelperTitle" [url]="valueHelperUrl" i18n-headerTitle
+			[columns]="valueHelperColumns" [showAction]="false" [showDownload]="false" [showActiveButton]="false"
+			[showNewButton]="false" [isBaseVisu]="false" [enableServerSideFiltering]="true" [isBaseVisu]="true"
+			[showSearch]="true" [showTableSettingBtn]="false" [expandQuery]="expandedQuery"
+			(processData)="processData($event)" [sortBy]="valueHelperSortBy" [customSortType]="valueHelperSortType"
+			[filterQuery]="valueHelperAdditionalFilterQuery" selectionMode="Multiple" (rowClick)="rowClick($event)"
+			#childComponentRef>
+		</app-grid-table>
+	</div>
+
+	<ui5-toolbar slot="footer">
+		<ui5-toolbar-button class="" design="Emphasized" text="Save" (click)="onSaveValueHelpDialog()">
+		</ui5-toolbar-button>
+		<ui5-toolbar-button class="" design="Transparent" text="Cancel" (click)="closeValueHelpDialog()">
+		</ui5-toolbar-button>
+	</ui5-toolbar>
+</ui5-dialog>
+
+<app-order-details-dialog #orderDetailsDialog [open]="isDialogOpen" [isLoading]="isLoading" [isBusy]="isBusy"
+	[selectedOperation]="selectedOperation" [isDialogEditable]="true" [isTEeditable]="true"
+	[dialogTitle]="dialogTitle || ''" [operationEnd]="operationEnd || ''" [operationStart]="operationStart || ''"
+	[selecteItem]="selecteItem" [isSaveButton]="true" [saveButtonEnable]="saveButtonEnable"
+	(changeTE)="changeTE($event)" [isEndBusy]="isEndBusy" (changeIsDialogOpen)="closeDialog()"
+	[opeartionMachines]="opeartionMachines" (saveEvent)="onSaveOrderViewDialog()">
+</app-order-details-dialog>
+
+
+@if (selectedOrderId) {
+	<app-operation-scheduler
+		[orderId]="selectedOrderId"
+		[closeEvent]="closeOrderReSchedule"
+		[saveEvent]="onSaveOrderReSchedule"></app-operation-scheduler>
+}

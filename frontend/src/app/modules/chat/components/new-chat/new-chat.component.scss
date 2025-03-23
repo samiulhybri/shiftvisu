@@ -1,0 +1,51 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.check-tile {
+  display: flex;
+  flex-direction: row;
+  margin: 10px;
+}
+
+.checkbox-label {
+  flex: 1;
+}
+
+kendo-label {
+  padding-bottom: 8px;
+}
+
+.multiselect-label {
+  padding-top: 16px;
+}
+
+::ng-deep {
+  .k-popup {
+    box-shadow: none;
+    border: none;
+    .k-list {
+      background-color: transparent;
+      .k-list-item {
+        border-radius: 4px;
+      }
+    }
+  }
+  .k-chip {
+    .k-button {
+      border-width: 0;
+
+      .k-button-icon {
+        height: 14px;
+      }
+    }
+    .k-chip-actions {
+      display: none;
+    }
+  }
+}
+
+kendo-dialog-actions {
+  background-color: #f9fafb;
+}

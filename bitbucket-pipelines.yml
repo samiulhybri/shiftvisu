@@ -1,0 +1,113 @@
+# This is an example Starter pipeline configuration
+# Use a skeleton to build, test and deploy using manual and parallel steps
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+
+image: shakib210/ngcf
+
+pipelines:
+  branches:
+    main:
+      - stage:
+          name: Deploy Benacchio (shopfloor-v12)
+          deployment: benacchio_quality
+          steps:
+            - step:
+                name: Build and Deploy backend v11
+                script:
+                  - bash deploy_backend.sh
+            - step:
+                name: Build and Deploy frontend v12
+                size: 2x
+                caches:
+                  - node
+                script:
+                  - bash deploy_frontend.sh
+      - stage:
+          name: Deploy FNA (fna-quality-v12)
+          deployment: fna_quality
+          steps:
+            - step:
+                name: Build and Deploy backend v11
+                script:
+                  - bash deploy_backend.sh
+            - step:
+                name: Build and Deploy frontend v12
+                size: 2x
+                caches:
+                  - node
+                script:
+                  - bash deploy_frontend.sh
+    development:
+      - parallel:
+          - step:
+              name: Version file update
+              caches:
+                - node
+              script:
+                - sh update-release.sh
+                - git add frontend-sap/src/assets/release.json
+                - git add frontend/src/app/shared/setting/general-setting.ts
+                - git commit -m "[skip ci] Updating release.json and general-setting.ts with latest build number."
+                - git push
+      - step:
+          name: Installation
+          caches:
+            - node
+          script:
+            - cd frontend
+            - npm install
+          artifacts:
+            - frontend/node_modules/** # Save modules for next steps
+      - stage:
+          name: Deploy FNA (development-v12)
+          deployment: staging
+          steps:
+            - step:
+                name: Build and Deploy backend v11
+                script:
+                  - bash deploy_backend.sh
+            - step:
+                name: Build and Deploy frontend v12
+                size: 2x
+                caches:
+                  - node
+                script:
+                  - bash deploy_frontend.sh
+      - stage:
+          name: Deploy FNA (shopfloor-v12)
+          deployment: production
+          steps:
+            - step:
+                name: Build and Deploy backend v11
+                script:
+                  - bash deploy_backend.sh
+            - step:
+                name: Build and Deploy frontend v12
+                size: 2x
+                caches:
+                  - node
+                script:
+                  - bash deploy_frontend.sh
+      - step:
+          name: Build
+          script:
+            - cd frontend
+            - cp src/environments/environment.example.ts src/environments/environment.ts
+            - npm run build
+    client/FNA-master:
+      - stage:
+          name: Deploy FNA PROD (fna-prod-v12)
+          deployment: fna-prod
+          steps:
+            - step:
+                name: Build and Deploy backend v11
+                script:
+                  - bash deploy_backend.sh
+            - step:
+                name: Build and Deploy frontend v12
+                size: 2x
+                caches:
+                  - node
+                script:
+                  - bash deploy_frontend.sh

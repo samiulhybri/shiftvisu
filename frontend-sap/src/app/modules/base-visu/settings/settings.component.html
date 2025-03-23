@@ -1,0 +1,345 @@
+<ui5-bar
+	slot="header"
+	design="Header"
+	class="mb-5">
+	<ui5-title
+		level="H5"
+		slot="startContent">
+		{{ settingPage }}
+	</ui5-title>
+
+	<ui5-button
+		*ngIf="!isEditMode && authService.isPermissionValid('BASEVISU_SETTINGS_EDIT')"
+		slot="endContent"
+		design="Emphasized"
+		(click)="onEditClick()"
+		id="editButton">
+		{{ localization.edit }}</ui5-button
+	>
+
+	<ui5-button
+		*ngIf="isEditMode && authService.isPermissionValid('BASEVISU_SETTINGS_EDIT')"
+		slot="endContent"
+		design="Emphasized"
+		(click)="onSave()"
+		id="saveButton">
+		{{ localization.save }}</ui5-button
+	>
+	<ui5-button
+		*ngIf="isEditMode && authService.isPermissionValid('BASEVISU_SETTINGS_EDIT')"
+		slot="endContent"
+		design="Transparent"
+		(click)="onResetPopUp()"
+		id="resetButton"
+		i18n>
+		Reset
+	</ui5-button>
+</ui5-bar>
+
+<div class="p-4">
+	<div class="w-full">
+		<form
+			(ngSubmit)="onSubmit(createOrUpdateForm)"
+			#createOrUpdateForm="ngForm"
+			class="w-full h-full">
+			<ui5-busy-indicator
+				size="L"
+				class="w-full"
+				[active]="isLoading">
+				<div class="grid gap-y-2.5 gap-x-2.5 w-full">
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								i18n
+								>Email UserName</ui5-label
+							>
+							<ui5-input
+								class="w-full"
+								[readonly]="!isEditMode"
+								[(ngModel)]="selectedRowValue.email_username"
+								name="email_username"
+								#nameInput="ngModel"
+								id="userName">
+							</ui5-input>
+						</div>
+	
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								i18n
+								>Email Address</ui5-label
+							>
+							<ui5-input
+								id="emailaddInput"
+								[(ngModel)]="selectedRowValue.email_address"
+								name="email_address"
+								[email]="true"
+								type="Email"
+								[valueState]="
+									email_address.valid == false && email_address.touched
+										? 'Negative'
+										: 'None'
+								"
+								class="w-full"
+								#email_address="ngModel"
+								[readonly]="!isEditMode">
+							</ui5-input>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								i18n
+								>Email Password</ui5-label
+							>
+							<ui5-input
+								id="emailPassInput"
+								#emailPassInput="ngModel"
+								[(ngModel)]="selectedRowValue.email_password"
+								name="email_password"
+								class="w-full"
+								[readonly]="!isEditMode">
+							</ui5-input>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								required
+								i18n
+								>Email Port</ui5-label
+							>
+							<ui5-input
+								class="w-full"
+								#email_port="ngModel"
+								id="emailPortInput"
+								[required]="true"
+								[readonly]="!isEditMode"
+								pattern="^[0-9]*$"
+								[(ngModel)]="selectedRowValue.email_port"
+								[valueState]="
+									email_port.valid == false && email_port.touched
+										? 'Negative'
+										: 'None'
+								"
+								name="email_port">
+							</ui5-input>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								i18n
+								>Email Host</ui5-label
+							>
+							<ui5-input
+								class="w-full"
+								#emailHostInput="ngModel"
+								[readonly]="!isEditMode"
+								id="emailHost"
+								[(ngModel)]="selectedRowValue.email_host"
+								name="email_host">
+							</ui5-input>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								required
+								i18n
+								>Email Encryption</ui5-label
+							>
+							<ui5-combobox
+								class="w-full"
+								id="emailEncryptionCombobox"
+								#emailEncryptionCombobox
+								[readonly]="!isEditMode"
+								[value]="selectedRowValue.email_encryption"
+								(change)="
+									inputInvalidEntryRestrict($event, selectedRowValue.email_encryption)
+								"
+								(selection-change)="onChangeEmailEncryption($event)">
+								<div
+									slot="valueStateMessage"
+									i18n>
+									Field is empty</div>
+								<ng-container *ngFor="let item of emailEncryptionItems">
+									<ui5-cb-item
+										id="{{ item.value }}"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ng-container>
+							</ui5-combobox>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								i18n
+								>Client Name</ui5-label
+							>
+							<ui5-input
+								id="clientName"
+								#clientInput="ngModel"
+								[readonly]="!isEditMode"
+								[(ngModel)]="selectedRowValue.client_name"
+								class="w-full"
+								name="client_name">
+							</ui5-input>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								required
+								i18n
+								>Statusboard Sidebar Type</ui5-label
+							>
+							<ui5-combobox
+								class="w-full"
+								id="statusBoardTypeComboBox"
+								#status_board_type
+								[readonly]="!isEditMode"
+								[value]="selectedRowValue.status_board_sidebar_type"
+								(change)="
+									inputInvalidEntryRestrict(
+										$event,
+										selectedRowValue.status_board_sidebar_type
+									)
+								"
+								(selection-change)="onChangeStatusBoardSidebarType($event)">
+								<div
+									slot="valueStateMessage"
+									i18n>
+									Field is empty</div>
+								<ng-container *ngFor="let item of statusBoardTypeItems">
+									<ui5-cb-item
+										id="{{ item.value }}"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ng-container>
+							</ui5-combobox>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								required
+								i18n
+								>Date To consider</ui5-label
+							>
+							<ui5-combobox
+								class="w-full"
+								id="dateToConsiderCombobox"
+								#dateToConsiderCombobox
+								[readonly]="!isEditMode"
+								[value]="selectedRowValue.date_to_consider"
+								(change)="
+									inputInvalidEntryRestrict($event, selectedRowValue.date_to_consider)
+								"
+								(selection-change)="onChangeDataToConsider($event)">
+								<div
+									slot="valueStateMessage"
+									i18n>
+									Field is empty</div>
+								<ng-container *ngFor="let item of dateToConsiderItems">
+									<ui5-cb-item
+										id="{{ item.value }}"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ng-container>
+							</ui5-combobox>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								i18n
+								>Start Of Day</ui5-label
+							>
+							<ui5-input
+								id="startOfDay"
+								#start_of_day="ngModel"
+								[readonly]="!isEditMode"
+								[(ngModel)]="selectedRowValue.start_of_day"
+								pattern="^([01]\d|2[0-3]):([0-5]\d)$"
+								[valueState]="
+									start_of_day.valid == false && start_of_day.touched
+										? 'Negative'
+										: 'None'
+								"
+								class="w-full"
+								name="start_of_day">
+							</ui5-input>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								i18n
+								>EWM Enabled</ui5-label
+							>
+							<ui5-switch
+								#is_ewn_enabled_switch
+								id="isEwnEnabledSwitch"
+								name="is_ewm_enabled"
+								[disabled]="!isEditMode"
+								[checked]="selectedRowValue.is_ewm_enabled"
+								[(ngModel)]="selectedRowValue.is_ewm_enabled"
+								class="w-full"></ui5-switch>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								i18n
+								>External DMS Enabled</ui5-label
+							>
+							<ui5-switch
+								#is_external_dms_switch
+								id="isExternalDmsEnabledSwitch"
+								name="is_external_dms_enabled"
+								[disabled]="!isEditMode"
+								[checked]="selectedRowValue.is_external_dms_enabled"
+								[(ngModel)]="selectedRowValue.is_external_dms_enabled"
+								class="w-full"></ui5-switch>
+						</div>
+						<div class="mb-2">
+							<ui5-label
+								show-colon
+								i18n
+								>Packaging Instruction Necessary For HU</ui5-label
+							>
+							<ui5-switch
+								#is_packaging_instruction_necessary_for_hu_switch
+								id="isPackagingInstructionNecessaryForHU"
+								name="is_packaging_instruction_necessary_for_hu"
+								[disabled]="!isEditMode"
+								[checked]="selectedRowValue.is_packaging_instruction_necessary_for_hu"
+								[(ngModel)]="selectedRowValue.is_packaging_instruction_necessary_for_hu"
+								class="w-full"></ui5-switch>
+						</div>
+					</div>
+				</div>
+			</ui5-busy-indicator>
+		</form>
+	</div>
+	
+	<app-dialog
+		[isDialogOpen]= "isResetDialogOpen"
+		id="resetDialog"
+		[title]="dialogTitle"
+		state="Critical">
+			<p i18n>Do you really want to reset the changes?</p>
+			<div class="flex flex-col-item">
+				<ui5-busy-indicator
+					[active]="isLoading"
+					size="M">
+				</ui5-busy-indicator>
+			</div>
+			<div
+				slot="footer"
+				class="footer-style gap-8">
+				<ui5-button
+					class="dialogSubmit"
+					design="Emphasized"
+					(click)="onReset()"
+					[disabled]="disableButtonDuringRequest"
+					>{{ localization.ok }}</ui5-button
+				>
+				<ui5-button
+					design="Transparent"
+					(click)="closeDialogReset()"
+					>{{ localization.close }}</ui5-button
+				>
+			</div>
+	</app-dialog>
+</div>

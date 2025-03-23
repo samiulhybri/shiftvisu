@@ -1,0 +1,77 @@
+<kendo-datepicker 
+    #startDate
+    [activeView]="dateTimeOptions.activeView"
+    [bottomView]="dateTimeOptions.bottomView"
+    [format]="dateTimeOptions.format"
+    [weekNumber]="selectedValue.duration == durationType.WEEK"
+    [(ngModel)]="selectedValue.startDate"
+    [style.width.px]="182"
+    style="margin-bottom: 8px;"
+></kendo-datepicker>
+<kendo-timepicker
+    format="HH"
+    [(ngModel)]="selectedValue.startDate"
+    [hidden]="selectedValue.duration != durationType.HOUR"
+    [style.width.px]="182"
+    style="margin-bottom: 8px;"
+></kendo-timepicker>
+<kendo-datepicker
+    #endDate
+    [activeView]="dateTimeOptions.activeView"
+    [bottomView]="dateTimeOptions.bottomView"
+    [format]="dateTimeOptions.format"
+    [weekNumber]="selectedValue.duration == durationType.WEEK"
+    [(ngModel)]="selectedValue.endDate"
+    [style.width.px]="182"
+    style="margin-bottom: 8px;"
+></kendo-datepicker>
+<kendo-timepicker
+    format="HH"
+    [(ngModel)]="selectedValue.endDate"
+    [hidden]="selectedValue.duration != durationType.HOUR"
+    [style.width.px]="182"
+    style="margin-bottom: 8px;"
+></kendo-timepicker>
+<kendo-dropdownlist
+    [defaultItem]="defaultItem"
+    [data]="typeItems"
+    [(ngModel)]="selectedValue.type"
+    textField="text"
+    valueField="value"
+    [valuePrimitive]="true"
+    [style.width.px]="182"
+    style="margin-bottom: 8px;"
+>
+</kendo-dropdownlist>
+<kendo-dropdownlist
+    [defaultItem]="defaultDurationItem"
+    [data]="durationItems"
+    [(ngModel)]="selectedValue.duration"
+    (selectionChange)="selectDuration($event)"
+    textField="text"
+    valueField="value"
+    [valuePrimitive]="true"
+    [style.width.px]="182"
+    style="margin-bottom: 8px;"
+>
+</kendo-dropdownlist>
+<button 
+    i18n
+    kendoButton
+    (click)="onLoadData()"
+    [themeColor]="'primary'"
+    [style.width.px]="182"
+    style="margin-bottom: 8px;"
+>
+    Apply changes
+</button>
+<kendo-button 
+    i18n
+    title="Reset"
+    (click)="onRefreshReport()"
+    [themeColor]="'primary'"
+    iconClass='k-icon icon-reset'
+    [style.width.px]="182"
+>
+    Reset
+</kendo-button>

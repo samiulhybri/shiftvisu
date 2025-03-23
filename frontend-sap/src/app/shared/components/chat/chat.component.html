@@ -1,0 +1,177 @@
+<ui5-busy-indicator [active]="isChatLoading">
+	<div class="h-[80vh] max-h-[700px] w-[80vw] max-w-[700px] flex flex-row gap-2">
+		<div class="bg-gray-100 rounded-lg shadow-lg flex flex-col chat-body w-full">
+			<div
+				class="px-[10px] bg-white border-t border-gray-300 rounded-t-lg h-[50px] w-[calc(100%-20px)] flex items-center justify-between">
+				<h3>Chat</h3>
+				<div [hidden]="closeDialog.observers.length == 0">
+					<ui5-button
+						design="Transparent"
+						(ui5Click)="onCloseClick()"
+						icon="decline"></ui5-button>
+				</div>
+			</div>
+			<!-- Messages Section with fixed height -->
+
+			<div
+				class="p-4 space-y-4 flex-grow overflow-y-auto"
+				#messageContainerRef
+				(scroll)="onScroll()">
+				<!-- Grouped chat messages go here -->
+
+				<div
+					*ngFor="let group of groupedNotes"
+					class="relative">
+					<!-- Date -->
+					<div class="text-center text-xs text-gray-500 mb-2">
+						{{ group.date | date: "dd/MM/yyyy" }}
+					</div>
+
+					<!-- Messages -->
+					<div
+						*ngFor="let note of group.notes"
+						class="flex w-full mb-2"
+						[ngClass]="{
+							'justify-end': note.sender?.id === authService.loggedInUser.id,
+							'justify-start': note.sender?.id !== authService.loggedInUser.id,
+						}">
+						<div
+							id="{{ note.created_at }}{{ note.id }}"
+							class="bg-white rounded-md shadow p-3 w-[45%] relative"
+							[ngClass]="{
+								'ml-auto': note.sender?.id === authService.loggedInUser.id,
+								'mr-auto': note.sender?.id !== authService.loggedInUser.id,
+							}">
+							<div class="flex justify-between items-center">
+								<span class="text-sm font-bold text-gray-700">
+									{{ note.sender?.name }}
+								</span>
+								<span class="text-xs text-gray-500">
+									{{ note.created_at | date: "HH:mm" }}
+								</span>
+							</div>
+
+							<div class="flex justify-between items-center">
+								<p
+									class="mt-2 text-sm text-gray-800"
+									*ngIf="!note.media"
+									[innerHTML]="formattedNote(note.content)"
+									>{{ note.content }}</p
+								>
+								<p
+									class="mt-2 text-sm text-gray-800"
+									*ngIf="note.media">
+									<img
+										src="{{ note.media.original_url }}"
+										width="200px"
+										height="200px"
+										class="cursor-pointer"
+										(click)="openInNewTab(note?.media?.original_url)" />
+								</p>
+								@if (note?.id) {
+									<ui5-button
+										design="Transparent"
+										icon="sap-icon://edit"
+										*ngIf="note.sender?.id === authService.loggedInUser.id"
+										(click)="onShowPopup(note)">
+									</ui5-button>
+								} @else {
+									<ui5-busy-indicator
+										[active]="true"
+										size="S">
+									</ui5-busy-indicator>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div
+				*ngIf="previewImagesData.length"
+				class="image-preview-container">
+				<div
+					class="preview-wrapper"
+					*ngFor="let previewImage of previewImagesData; let i = index">
+					<img
+						[src]="previewImage"
+						alt="Pasted Image"
+						class="preview-image" />
+					<ui5-button
+						icon="delete"
+						class="remove-button"
+						design="Default"
+						tooltip="Remove Image"
+						i18n-tooltip
+						(click)="removeImagePreview(i)"></ui5-button>
+				</div>
+			</div>
+			<!-- Input Area -->
+			<div class="p-3 bg-white border-t border-gray-300 rounded-b-lg">
+				<div class="flex items-center space-x-2">
+					<textarea
+						#messageTextarea
+						[(ngModel)]="newNote"
+						name="newNote"
+						(keydown)="handleKeyDown($event)"
+						(input)="onInputMessage($event)"
+						(paste)="onPaste($event)"
+						placeholder="Write your message here..."
+						[disabled]="!modelId"
+						i18n-placeholder
+						class="w-11/12 border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none"
+						required
+						[style.overflowY]="msgInputIsScrollable ? 'auto' : 'hidden'"
+						[style.maxHeight.px]="msgInputMaxHeight"
+						rows="1"></textarea>
+
+					<ui5-file-uploader
+						#fileUploader
+						hide-input
+						accept="image/*"
+						multiple
+						(change)="onFileChange($event)">
+						<ui5-button
+							design="Transparent"
+							[disabled]="!modelId"
+							icon="attachment">
+						</ui5-button>
+					</ui5-file-uploader>
+
+					<ui5-button
+						id="sendButton"
+						design="Emphasized"
+						class="w-16"
+						[disabled]="!modelId"
+						(click)="onclickSendMessage($event)"
+						i18n
+						>Send</ui5-button
+					>
+				</div>
+			</div>
+		</div>
+	</div>
+</ui5-busy-indicator>
+
+<ui5-popover
+	id="popOver"
+	[open]="showPopOver"
+	[opener]="opener"
+	(after-close)="popOverClose()">
+	<div class="w-[100px]">
+		<ui5-button
+			design="Default"
+			*ngIf="!selectedMessage?.media"
+			icon="sap-icon://edit"
+			class="w-[100px]"
+			(click)="editMessage($event)">
+			{{ localizedEditText }}
+		</ui5-button> </div
+	><ui5-button
+		design="Emphasized"
+		class="w-[100px] mt-3"
+		icon="sap-icon://delete"
+		(click)="deleteMessage($event)"
+		>{{ localizedDeleteText }}</ui5-button
+	>
+</ui5-popover>

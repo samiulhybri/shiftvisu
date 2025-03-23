@@ -1,0 +1,9 @@
+.additional-cost-details-body {
+    display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+::ng-deep .input-field .k-numerictextbox .k-input-spinner {
+	display: none;
+}

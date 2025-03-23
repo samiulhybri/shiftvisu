@@ -1,0 +1,7 @@
+<kendo-grid-component [moduleName]="'mp-offers'" [gridItems]="gridItems" [columns]="columns" [state]="state" [isLoadedEnabled]="isLoadedEnabled"
+	[isSortable]="isSortable" [isFilterable]="isFilterable" [isGroupable]="isGroupable" [isPageable]="isPageable"
+	[toolbarConfig]="toolbarConfig" [editView]="editView" (gridRefersh)="sendRequest()" (deleteDataItem)="deleteDataItem($event)"
+	(emitAllFiledSearch)="sendRequest()" (emitState)="changeState($event)" (filterState)="changeGridFilter($event)">
+</kendo-grid-component>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

@@ -1,0 +1,22 @@
+.item-details-section {
+    width: 23vw;
+    height: 15vh;
+}
+
+@media (min-width: 1951px) and (max-width: 2100px) {
+	.item-details-section {
+		height: 18vh;
+	}
+}
+
+@media (min-width: 1601px) and (max-width: 1950px) {
+	.item-details-section {
+		height: 20vh;
+	}
+}
+
+@media (max-width: 1600px) {
+	.item-details-section {
+		height: 25vh;
+	}
+}

@@ -1,0 +1,26 @@
+.gt-main {
+	height: 100%;
+	width: 100%;
+	border-radius: 9px;
+	background-color: #ffeaf4;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	position: relative;
+	overflow: hidden;
+}
+
+.gt-sub {
+	padding-top: 3px;
+	height: 90%;
+	min-height: 90%;
+	width: 6px;
+	border-radius: 9px 0px 0px 9px;
+	background-color: var(--statnstill-color);
+	display: flex;
+	flex-direction: row;
+	position: absolute;
+}
+.gt-main:hover {
+	background-color: #d1e9fd;
+}

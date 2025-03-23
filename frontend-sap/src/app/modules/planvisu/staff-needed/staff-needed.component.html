@@ -1,0 +1,49 @@
+<ui5-bar class="mt-[10px] w-[99%] ml-[10px]">
+	<ui5-combobox
+		#hallRef
+		id="hallMultiComboBox"
+		slot="endContent"
+		placeholder="Select Hall"
+		[value]="selectedHallValue"
+		(selection-change)="selectHall($event)"
+		i18n-placeholder>
+		<ui5-cb-item
+			*ngFor="let hall of halls"
+			text="{{ hall.name }}"
+			[id]="hall.id">
+		</ui5-cb-item>
+	</ui5-combobox>
+</ui5-bar>
+<div class="content">
+	<div
+		class="workload-container p-4"
+		style="height: calc(100% - 60px)">
+		<app-bar-chart
+			[chartData]="rangeList"
+			[thresholdValue]="thresholdValue"
+			[barValueUnit]="barValueUnit">
+		</app-bar-chart>
+		<div style="height: 33.4%; margin-bottom: 10px">
+			<app-grid-workload
+				[demandsData]="demandsData"
+				[gridTitle]="'Machine'"
+				[dataField]="'machine'"
+				[startDate]="startDate"
+				[endDate]="endDate"
+				[employeeWorkloadDivider]="employeeWorkloadDivider"
+				[valueFormatType]="'RAW_VALUE'">
+			</app-grid-workload>
+		</div>
+		<div style="height: 33.4%; margin-bottom: 10px">
+			<app-grid-workload
+				[demandsData]="demandsData"
+				[gridTitle]="'Item'"
+				[dataField]="'item'"
+				[startDate]="startDate"
+				[endDate]="endDate"
+				[employeeWorkloadDivider]="employeeWorkloadDivider"
+				[valueFormatType]="'RAW_VALUE'">
+			</app-grid-workload>
+		</div>
+	</div>
+</div>

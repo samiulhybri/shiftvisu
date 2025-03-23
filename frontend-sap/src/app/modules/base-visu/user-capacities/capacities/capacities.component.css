@@ -1,0 +1,20 @@
+.iconStyle {
+	color: var(--listTitleColor);
+	cursor: pointer;
+}
+
+.info-shifts-color {
+	width: var(--text-font-size);
+	height: var(--text-font-size);
+	border: var(--input-border-bottom);
+	border-radius: var(--input-border-radius);
+}
+
+#totalVsAppointedRatio::part(bar) {
+    background-color: var(--production-color);
+    z-index:5;
+}
+ 
+#totalVsAppointedRatio::part(remaining-bar) {
+    background-color: var(--fifty-percent-shift-time-color);
+}

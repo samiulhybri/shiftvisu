@@ -1,0 +1,2058 @@
+<div class="offer-pos input-field" *ngIf="isForm"  [ngClass]="{'disabled': (!isPermissionValidate()|| !hweKalkService.fromCalDetail || hweKalkService.disableTabs)}">
+    <span class="dimension-header" i18n>Finished dimensions/delivery dimensions</span>
+
+    <div class="mt-15  input-field table-view"  *ngIf="[offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE,offerPosProductType.RING_CYLINDER,offerPosProductType.DISK,offerPosProductType.BAR_ROUND,offerPosProductType.BAR_SQUARE,offerPosProductType.SOCKET,offerPosProductType.BAR_ROLLED].includes(offerPos.product_type)">
+        <ng-container style="width: 100% !important;">
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <label> </label>
+                <label class="responsive-text-break" i18n>Diameter</label>
+                <label class="responsive-text-break" i18n>Min Allowance Diameter</label>
+                <label class="responsive-text-break" i18n>Max Allowance Diameter</label>
+                <label class="responsive-text-break" i18n>Outer Tolerance</label>
+                <label class="responsive-text-break" i18n>Outer Diameter Surface</label>
+            </kendo-stacklayout>
+            <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('outer_diameter_final')">
+                <label [for]="outer_diameter_final" class="responsive-text-break" i18n>Outer Diameter Final </label>
+                <kendo-numerictextbox  #outer_diameter_final name="outer_diameter_final" [decimals]="1" format="#.##\ mm" [(ngModel)]="offerPos.outer_diameter_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_outer_diameter_final name="min_allowance_outer_diameter_final" format="#.##\ mm" decimals="4" [(ngModel)]="offerPos.min_allowance_outer_diameter_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_outer_diameter_final name="max_allowance_outer_diameter_final" format="#.##\ mm" [decimals]="4" [(ngModel)]="offerPos.max_allowance_outer_diameter_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #outer_tolerance
+                    name="outer_tolerance"
+                    [(ngModel)]="offerPos.outer_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                    [disabled]="true"
+                    >
+                </kendo-combobox>
+                <kendo-combobox
+                *ngIf="isShow('outer_diameter_surface_final')"
+                    #outer_diameter_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="offerPos.outer_diameter_surface_final"
+                    name="outer_diameter_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event, 'outer_diameter_surface_final')"
+                    [disabled]="true"
+                    >
+                </kendo-combobox>
+            </kendo-stacklayout>
+    
+            <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('inner_diameter_final')">
+                <label [for]="inner_diameter_final" class="responsive-text-break" i18n>Inner Diameter Final </label>
+                <kendo-numerictextbox #inner_diameter_final name="inner_diameter_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.inner_diameter_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_inner_diameter_final name="min_allowance_inner_diameter_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_inner_diameter_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_inner_diameter_final name="max_allowance_inner_diameter_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_inner_diameter_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #inner_tolerance
+                    name="inner_tolerance"
+                    [(ngModel)]="offerPos.inner_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                    [disabled]="true"
+                    >
+                </kendo-combobox>
+                <kendo-combobox
+                    #inner_diameter_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    name="inner_diameter_surface_final"
+                    [(ngModel)]="offerPos.inner_diameter_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event)"
+                    [disabled]="true"
+                    >
+                </kendo-combobox>
+            </kendo-stacklayout>
+            <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('side_a_final')">
+                <label [for]="side_a_final"  i18n>Side A Final </label>
+                <kendo-numerictextbox #side_a_final name="side_a_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.side_a_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_side_a_final name="min_allowance_side_a_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_side_a_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_side_a_final name="max_allowance_side_a_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_side_a_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #side_a_tolerance
+                    name="side_a_tolerance"
+                    [(ngModel)]="offerPos.side_a_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                    [disabled]="true"
+                    >
+                </kendo-combobox>
+                <kendo-combobox
+                *ngIf="isShow('side_a_surface_final')"
+                    #side_a_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="offerPos.side_a_surface_final"
+                    name="side_a_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event, 'side_a_surface_final')"
+                    [disabled]="true"
+                    >
+                </kendo-combobox>
+            </kendo-stacklayout>
+    
+            <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('side_b_final')">
+                <label [for]="side_b_final"  i18n>Side B Final </label>
+                <kendo-numerictextbox #side_b_final name="side_b_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.side_b_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_side_b_final name="min_allowance_side_b_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_side_b_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_side_b_final name="max_allowance_side_b_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_side_b_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #side_b_tolerance
+                    name="side_b_tolerance"
+                    [(ngModel)]="offerPos.side_b_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                    [disabled]="true">
+                </kendo-combobox>
+                <kendo-combobox
+                *ngIf="isShow('side_b_surface_final')"
+                    #side_b_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    name="side_b_surface_final"
+                    [(ngModel)]="offerPos.side_b_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event)"
+                    [disabled]="true">
+                </kendo-combobox>
+            </kendo-stacklayout>
+    
+            <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('height_final')">
+                <label [for]="height_final"  i18n>Height Final </label>
+                <kendo-numerictextbox #height_final name="height_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.height_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_height_final name="min_allowance_height_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_height_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_height_final name="max_allowance_height_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_height_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #height_tolerance
+                    name="height_tolerance"
+                    [(ngModel)]="offerPos.height_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                    [disabled]="true"
+                    >
+                </kendo-combobox>
+                <kendo-combobox
+                *ngIf="isShow('height_surface_final')"
+                    #height_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    name="height_surface_final"
+                    [(ngModel)]="offerPos.height_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event)"
+                    [disabled]="true"
+                    >
+                </kendo-combobox>
+            </kendo-stacklayout>
+    
+            <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9" *ngIf="isShow('length_final')">
+                <label [for]="length_final"  i18n>Length Final </label>
+                <kendo-numerictextbox #length_final name="length_final" format="#.##\ mm" [decimals]="1"  [(ngModel)]="offerPos.length_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_length_final name="min_allowance_length_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_length_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_length_final name="max_allowance_length_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_length_final" (valueChange)="calcDimensions()" [disabled]="true">
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #length_tolerance
+                    name="length_tolerance"
+                    [(ngModel)]="offerPos.length_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                    [disabled]="true">
+                </kendo-combobox>
+                <kendo-combobox
+                *ngIf="isShow('length_surface_final')"
+                    #length_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="offerPos.length_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    name="length_surface_final"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event)"
+                    [disabled]="true">
+                </kendo-combobox>
+            </kendo-stacklayout>
+        </ng-container>
+    </div>
+
+    <div class="mt-15  input-field table-view" [ngClass]="{ 'w-41p': !(isShow('shaft') || isShow('upset_part')) }">
+
+        <ng-container *ngIf="![offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE,offerPosProductType.RING_CYLINDER,offerPosProductType.DISK,offerPosProductType.BAR_ROUND,offerPosProductType.BAR_SQUARE,offerPosProductType.SOCKET,offerPosProductType.BAR_ROLLED].includes(offerPos.product_type)">
+            <kendo-stacklayout class=""  orientation="horizontal" [gap]="2" *ngIf="isShow('outer_diameter_final')">
+                <label [for]="outer_diameter_final"  i18n>Outer Diameter Final </label>
+            <kendo-numerictextbox format="#.##\ mm" #outer_diameter_final name="outer_diameter_final" [decimals]="1" [(ngModel)]="offerPos.outer_diameter_final" disabled>
+                </kendo-numerictextbox>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout  orientation="horizontal" [gap]="2" *ngIf="isShow('inner_diameter_final')">
+                <label [for]="inner_diameter_final"  i18n>Inner Diameter Final </label>
+            <kendo-numerictextbox format="#.##\ mm" #inner_diameter_final name="inner_diameter_final" [decimals]="1" [(ngModel)]="offerPos.inner_diameter_final" disabled>
+                </kendo-numerictextbox>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout  orientation="horizontal" [gap]="2" *ngIf="isShow('side_a_final')">
+                <label [for]="side_a_final"  i18n>Side A Final </label>
+            <kendo-numerictextbox format="#.##\ mm" #side_a_final name="side_a_final" [decimals]="1" [(ngModel)]="offerPos.side_a_final" disabled>
+                </kendo-numerictextbox>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout  orientation="horizontal" [gap]="2" *ngIf="isShow('side_b_final')">
+                <label [for]="side_b_final"  i18n>Side B Final </label>
+            <kendo-numerictextbox format="#.##\ mm" #side_b_final name="side_b_final" [decimals]="1" [(ngModel)]="offerPos.side_b_final" disabled>
+                </kendo-numerictextbox>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout  orientation="horizontal" [gap]="2" *ngIf="isShow('height_final')">
+                <label [for]="height_final"  i18n>Height Final </label>
+            <kendo-numerictextbox format="#.##\ mm" #height_final name="height_final" [decimals]="1" [(ngModel)]="offerPos.height_final" disabled>
+                </kendo-numerictextbox>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout  orientation="horizontal" [gap]="2" *ngIf="isShow('length_final')">
+                <label [for]="length_final"  i18n>Length Final </label>
+            <kendo-numerictextbox format="#.##\ mm" #length_final name="length_final" [decimals]="1" [(ngModel)]="offerPos.length_final" disabled>
+                </kendo-numerictextbox>
+            </kendo-stacklayout>
+        </ng-container>
+        
+
+        <ng-container *ngIf="isShow('shaft') || isShow('upset_part')">
+            <kendo-stacklayout orientation="horizontal" [gap]="2" class="mt-15">
+                <span></span>
+                <span *ngIf="![offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)"></span>
+                <span *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)">Diameter</span>
+                <span *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)">Min Allowance Diameter</span>
+                <span *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)">Max Allowance Diameter</span>
+                <span *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)">Outer Tolerance</span>
+                <span *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)">Outer Diameter Surface</span>
+                <span i18n>Encore(info)</span>
+                <span i18n>Lower tolerance</span>
+                <span i18n>Upper tolerance</span>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" [gap]="2">
+                <label [for]="max_outer_diameter" class="responsive-text-break" i18n>Outer Diameter </label>
+                <kendo-numerictextbox format="#.##\ mm" #max_outer_diameter name="max_outer_diameter" [decimals]="1" [(ngModel)]="offerPos.max_outer_diameter" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_outer_diameter_final name="min_allowance_outer_diameter_final" format="#.##\ mm" decimals="4" *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)" [(ngModel)]="offerPos.min_allowance_outer_diameter_final" (valueChange)="calcDimensions()" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_outer_diameter_final name="max_allowance_outer_diameter_final" format="#.##\ mm" [decimals]="4" *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)" [(ngModel)]="offerPos.max_allowance_outer_diameter_final" (valueChange)="calcDimensions()" disabled>
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #outer_tolerance
+                    name="outer_tolerance"
+                    [(ngModel)]="offerPos.outer_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                    disabled
+                    >
+                </kendo-combobox>
+                <kendo-combobox
+                    *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)"
+                    #outer_diameter_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="offerPos.outer_diameter_surface_final"
+                    [data]="dimensionSurfaces"
+                    name="outer_diameter_surface_final"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event, 'outer_diameter_surface_final')"
+                    disabled>
+                </kendo-combobox>
+                <kendo-numerictextbox format="#.##\ mm" #outer_diameter_encore_info name="outer_diameter_encore_info" [decimals]="1" [(ngModel)]="offerPos.outer_diameter_encore_info" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox format="#.##\ mm" #outer_diameter_lower_tolerance name="outer_diameter_lower_tolerance" [decimals]="1" [(ngModel)]="offerPos.outer_diameter_lower_tolerance" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox format="#.##\ mm" #outer_diameter_upper_tolerance name="outer_diameter_upper_tolerance" [decimals]="1" [(ngModel)]="offerPos.outer_diameter_upper_tolerance" disabled>
+                </kendo-numerictextbox>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" [gap]="2">
+                <label [for]="max_outer_diameter" class="responsive-text-break" i18n>Inner Diameter </label>
+                <kendo-numerictextbox format="#.##\ mm" #max_outer_diameter name="max_outer_diameter" [decimals]="1" [(ngModel)]="offerPos.max_inner_diameter" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_outer_diameter_final name="min_allowance_outer_diameter_final" format="#.##\ mm" decimals="4" *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)" [(ngModel)]="offerPos.min_allowance_inner_diameter_final" (valueChange)="calcDimensions()" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_outer_diameter_final name="max_allowance_outer_diameter_final" format="#.##\ mm" [decimals]="4" *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)" [(ngModel)]="offerPos.max_allowance_inner_diameter_final" (valueChange)="calcDimensions()" disabled>
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #outer_tolerance
+                    name="outer_tolerance"
+                    [(ngModel)]="offerPos.outer_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)"
+                    valueField="value"
+                    (valueChange)="setToleranceFinal($event)"
+                    disabled
+                    >
+                </kendo-combobox>
+                <kendo-combobox
+                    *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)"
+                    #outer_diameter_surface_final
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="offerPos.inner_diameter_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    name="inner_diameter_surface_final"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event, 'outer_diameter_surface_final')"
+                    disabled>
+                </kendo-combobox>
+                <kendo-numerictextbox format="#.##\ mm" #outer_diameter_encore_info name="outer_diameter_encore_info" [decimals]="1" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox format="#.##\ mm" #outer_diameter_lower_tolerance name="outer_diameter_lower_tolerance" [decimals]="1" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox format="#.##\ mm" #outer_diameter_upper_tolerance name="outer_diameter_upper_tolerance" [decimals]="1" disabled>
+                </kendo-numerictextbox>
+            </kendo-stacklayout>
+
+            <kendo-stacklayout orientation="horizontal" [gap]="2">
+                <label [for]="total_length"  i18n>Total Length </label>
+                <kendo-numerictextbox format="#.##\ mm" #total_length name="total_length" [decimals]="1" [(ngModel)]="offerPos.total_length" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #min_allowance_length_final name="min_allowance_length_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.min_allowance_length_final" *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)" (valueChange)="calcDimensions()" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox #max_allowance_length_final name="max_allowance_length_final" format="#.##\ mm" [decimals]="4"  [(ngModel)]="offerPos.max_allowance_length_final" *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)" (valueChange)="calcDimensions()" disabled>
+                </kendo-numerictextbox>
+                <kendo-combobox
+                    #length_tolerance
+                    *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)"
+                    name="length_tolerance"
+                    [(ngModel)]="offerPos.length_tolerance"
+                    [data]="tolerances"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    disabled
+                    >
+                </kendo-combobox>
+                <kendo-combobox
+                    #length_surface_final
+                    *ngIf="[offerPosProductType.SHAFT_HOLLOW,offerPosProductType.SHAFT,offerPosProductType.UPSET_PART].includes(offerPos.product_type)"
+                    [ngModelOptions]="{standalone: true}"
+                    name="length_surface_final"
+                    [(ngModel)]="offerPos.length_surface_final"
+                    [data]="dimensionSurfaces"
+                    [valuePrimitive]="true"
+                    textField="text"
+                    valueField="value"
+                    (valueChange)="surfaceFinal($event)"
+                    disabled>
+                </kendo-combobox>
+                <kendo-numerictextbox format="#.##\ mm" #length_encore_info name="length_encore_info" [decimals]="1" [(ngModel)]="offerPos.length_encore_info" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox format="#.##\ mm" #length_lower_tolerance name="length_lower_tolerance" [decimals]="1" [(ngModel)]="offerPos.length_lower_tolerance" disabled>
+                </kendo-numerictextbox>
+                <kendo-numerictextbox format="#.##\ mm" #length_upper_tolerance name="length_upper_tolerance" [decimals]="1" [(ngModel)]="offerPos.length_upper_tolerance" disabled>
+                </kendo-numerictextbox>
+            </kendo-stacklayout>
+        </ng-container>
+
+        <kendo-stacklayout [ngClass]="{ 'w-40p': (isShow('shaft') || isShow('upset_part')) }"  orientation="horizontal" [gap]="2" *ngIf="isShow('has_forged_drilling')">
+            <label [for]="has_forged_drilling" i18n>Forged drilling</label>
+            <section >
+                <input type="checkbox" kendoCheckBox [(ngModel)]="offerPos.has_forged_drilling" #has_forged_drilling />
+            </section>
+        </kendo-stacklayout>
+   </div>    
+
+    <span class="raw-header">
+        <span class="dimension-header" i18n>Blank part dimensions</span>
+
+        <div>
+            
+            <button type="button"  kendoButton themeColor="primary" [disabled]="!offerPos.product_type" i18n (click)="addCombine()"> <span class="k-icon icon-add"></span> Combine</button>
+        </div>
+        
+    </span>
+     <ng-container *ngIf="offerPos.product_type">
+        <kendo-stacklayout >
+            <kendo-stacklayout orientation="horizontal" [gap]="2">
+                <kendo-label [for]="item" i18n i18n-text text="Basismaterial">:</kendo-label>
+                <kendo-stacklayout orientation="horizontal" [gap]="2" class="!k-p-0">
+                    <div>
+                        <kendo-combobox
+                        #item
+                        [(ngModel)]="offerPos.item"
+                        name="item"
+                        [data]="items"
+                        textField="combo_view"
+                        valueField="id"
+                        [filterable]="true"
+                        (filterChange)="handleFilter($event,'item')"
+                        >
+                        </kendo-combobox>
+                    </div>
+                    <button kendoButton  type="button" (click)="showItemSearchModal(offerPos)" class="" [style.maxWidth.px]="28" >
+                        <span class="k-icon k-i-copy"></span>
+                    </button>
+                </kendo-stacklayout>
+                <kendo-stacklayout [ngClass]="{ 'w-40p': (isShow('shaft') || isShow('upset_part')) }" orientation="horizontal" [gap]="2" *ngIf="isShow('has_mechanical_drilling')">
+                    <label [for]="has_mechanical_drilling" i18n>Mechanical Drilling</label>
+                    <section >
+                        <input type="checkbox" kendoCheckBox [(ngModel)]="offerPos.has_mechanical_drilling" #has_mechanical_drilling />
+                    </section>
+                </kendo-stacklayout>
+            </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" *ngIf="offerPos.has_mechanical_drilling || offerPos.has_forged_drilling" [gap]="2" >
+                <kendo-label [for]="item" i18n i18n-text text="Drilling diameter"></kendo-label>
+               <kendo-numerictextbox format="#.##\ mm" #drilling_diameter name="drilling_diameter" [decimals]="2" [(ngModel)]="offerPos.drilling_diameter"></kendo-numerictextbox>
+            </kendo-stacklayout>
+             <kendo-stacklayout orientation="horizontal" [gap]="2"  *ngIf="isShow('is_extruded') && offerPos.has_forged_drilling">
+                 <label [for]="is_extruded" i18n>Extruded</label>
+                 <section >
+                     <input type="checkbox" kendoCheckBox [(ngModel)]="offerPos.is_extruded" #is_extruded />
+                 </section>
+             </kendo-stacklayout>
+             <kendo-stacklayout orientation="horizontal" [gap]="2"  
+             *ngIf="[offerPosProductType.DISK_PUNCHED,offerPosProductType.PIPE,offerPosProductType.PIPE,offerPosProductType.RING_CYLINDER,offerPosProductType.RING_ROLLED].includes(offerPos.product_type) ||
+             (isShow('is_hollow_punching') && offerPos.has_forged_drilling)">
+                 <label [for]="is_hollow_punching" i18n>Hollow punching</label>
+                 <section >
+                     <input type="checkbox" kendoCheckBox [(ngModel)]="offerPos.is_hollow_punching" #is_hollow_punching />
+                 </section>
+             </kendo-stacklayout>
+            <kendo-stacklayout orientation="horizontal" *ngIf="[offerPosProductType.UPSET_PART,offerPosProductType.SOCKET].includes(offerPos.product_type)" [gap]="2">
+                <kendo-label [for]="item" i18n i18n-text text="Tool">:</kendo-label>
+                <kendo-stacklayout orientation="horizontal" [gap]="2" class="!k-p-0">
+                    <div>
+                        <kendo-combobox
+                        #item
+                        [(ngModel)]="offerPos.tool"
+                        name="item"
+                        [data]="tools"
+                        textField="custom_id"
+                        valueField="id"
+                        [filterable]="true"
+                        (filterChange)="handleFilter($event,'tool')"
+                        >
+                        </kendo-combobox>
+                    </div>
+                    <button kendoButton [disabled]="!offerPos.tool.custom_id"  type="button" (click)="onOpenAttachmentDialog(offerPos.tool)" class="" [style.maxWidth.px]="28" >
+                        <span class="k-icon k-i-document-manager"></span>
+                    </button>
+                </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" *ngIf="[offerPosProductType.UPSET_PART,offerPosProductType.SOCKET].includes(offerPos.product_type)" [gap]="2" >
+                    <kendo-label [for]="item" i18n i18n-text text="Tool 2">:</kendo-label>
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" class="!k-p-0">
+                        <div>
+                            <kendo-combobox
+                                #item
+                                [(ngModel)]="offerPos.tool_2"
+                                name="item"
+                                [data]="tools"
+                                textField="custom_id"
+                                valueField="id"
+                                [filterable]="true"
+                                (filterChange)="handleFilter($event,'tool2')"
+                            >
+                            </kendo-combobox>
+                        </div>
+                        <button kendoButton [disabled]="!offerPos.tool_2.custom_id"  type="button" (click)="onOpenAttachmentDialog(offerPos.tool_2)" class="" [style.maxWidth.px]="28" >
+                            <span class="k-icon k-i-document-manager"></span>
+                        </button>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" *ngIf="[offerPosProductType.UPSET_PART,offerPosProductType.SOCKET].includes(offerPos.product_type)" [gap]="2" >
+                        <kendo-label [for]="item" i18n i18n-text text="Tool 3">:</kendo-label>
+                        <kendo-stacklayout orientation="horizontal" [gap]="2" class="!k-p-0">
+                            <div>
+                                <kendo-combobox
+                                    #item
+                                    [(ngModel)]="offerPos.tool_3"
+                                    name="item"
+                                    [data]="tools"
+                                    textField="custom_id"
+                                    valueField="id"
+                                    [filterable]="true"
+                                    (filterChange)="handleFilter($event,'tool3')"
+                                >
+                                </kendo-combobox>
+                            </div>
+                            <button kendoButton [disabled]="!offerPos.tool_3.custom_id"  type="button" (click)="onOpenAttachmentDialog(offerPos.tool_3)" class="" [style.maxWidth.px]="28" >
+                                <span class="k-icon k-i-document-manager"></span>
+                            </button>
+                        </kendo-stacklayout>
+            </kendo-stacklayout>
+        </kendo-stacklayout>
+        
+        <hr style="background-color: black;">
+        <kendo-card class="raw-body input-field" [width]="100" *ngFor="let data of  offerPos.offerPosRawDimensions; let i =index">
+            <kendo-card-header>
+                  <h3 i18n>RM - {{i+1}}</h3>
+                  <kendo-stacklayout  class="k-align-items-center" orientation="horizontal" [gap]="2">
+                        <kendo-label [for]="quantity_final_for_raw"  i18n i18n-text text="Quantity of raw parts:" class="font-medium">
+                        </kendo-label>
+                       <kendo-numerictextbox format="#.##\ Stück" title="quantity_final_for_raw" #quantity_final_for_raw  name="quantity_final_for_raw" [decimals]="0" [(ngModel)]="data.quantity_final_for_raw" >
+                        </kendo-numerictextbox>
+                 </kendo-stacklayout>
+                 <kendo-stacklayout class="k-align-items-center" orientation="horizontal" [gap]="2">
+                    <kendo-label [for]="quantity_raw_piece" class="font-medium" i18n i18n-text text="Pieces for raw part:" >
+                    </kendo-label>
+                   <kendo-numerictextbox format="#.##\ Stück" #quantity_raw_piece name="quantity_raw_piece" [decimals]="0" [(ngModel)]="data.quantity_raw_piece">
+                    </kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="k-align-items-center" orientation="horizontal" [gap]="2">
+                    <kendo-label [for]="quantity_raw_piece" class="font-medium" i18n i18n-text text="Quantity:" >
+                    </kendo-label>
+                   <kendo-numerictextbox format="#.##\ Stück" #quantity_raw_piece name="quantity"  [decimals]="0" [ngModel]="data.quantity_raw_piece * data.quantity_final_for_raw" disabled>
+                    </kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="k-align-items-center" orientation="horizontal" [gap]="2">
+                    <kendo-label [for]="single_length" class="font-medium" i18n i18n-text text="Single length:" >
+                    </kendo-label>
+                   <kendo-textbox #single_length name="single_length" [(ngModel)]="data.single_length">
+                    </kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-grid-spacer></kendo-grid-spacer>
+                <button type="button" kendoButton class="k-mr-1" *ngIf="[offerPosProductType.RING_CYLINDER].includes(offerPos.product_type) && hasCalculationPermission" themeColor="primary" (click)="onRingCalculation(i)" i18n>
+                    Calculation
+                </button>
+                <button type="button" *ngIf="i!=0" kendoButton themeColor="primary" (click)="removeCombine(i, data)"> <span class="k-icon icon-trash"></span></button>
+            </kendo-card-header>
+
+            <kendo-card-body class="table-view">
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="![offerPosProductType.SHAFT, offerPosProductType.SHAFT_HOLLOW, offerPosProductType.UPSET_PART].includes(offerPos.product_type)">
+                    <span *ngIf="![offerPosProductType.SOCKET,offerPosProductType.BAR_ROUND,offerPosProductType.BAR_SQUARE].includes(offerPos.product_type)"></span>
+                    <span *ngIf="[offerPosProductType.BAR_SQUARE,offerPosProductType.BAR_ROUND,offerPosProductType.SOCKET,offerPosProductType.BAR_ROLLED].includes(offerPos.product_type)"></span>
+                    <span *ngIf="[offerPosProductType.RING_CYLINDER,offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE,offerPosProductType.BAR_ROUND,offerPosProductType.BAR_SQUARE].includes(offerPos.product_type)" i18n>Cold dimension</span>
+                    <span i18n *ngIf="[offerPosProductType.RING_CYLINDER,offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE,offerPosProductType.BAR_ROUND,offerPosProductType.BAR_SQUARE].includes(offerPos.product_type)">Warm dimension </span>
+                    <span i18n *ngIf="[offerPosProductType.DISK].includes(offerPos.product_type) || [offerPosProductType.SOCKET].includes(offerPos.product_type)">Cold dimension </span>
+                    <span i18n *ngIf="[offerPosProductType.DISK].includes(offerPos.product_type) || [offerPosProductType.SOCKET].includes(offerPos.product_type)">Warm dimension </span>
+                    <span i18n class="font-size-12">Encore(Info) </span>
+                    <span i18n class="font-size-12">Lower Tolerance </span>
+                    <span i18n class="font-size-12">Upper Tolerance </span>
+                    <span i18n class="font-size-12">Additional Dimension </span>
+                    <span i18n class="font-size-12">Sample Allowance </span>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="2"  *ngIf="isShow('outer_diameter')">
+                    <label [for]="outer_diameter" class="responsive-text-break" i18n>Outer Diameter  </label>
+                   <kendo-numerictextbox format="#.##\ mm" #outer_diameter name="outer_diameter" [decimals]="1" [(ngModel)]="data.outer_diameter" (valueChange)="calcGrossWeight(data)">
+                    </kendo-numerictextbox>
+                    
+                    <ng-container *ngFor="let type of data.rawDimensionTypes" class="font-size-12">
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.RING_CYLINDER].includes(offerPos.product_type) && type.type=='outer_diameter'"
+                             format="#.##\ mm" #warm name="calculation_outer_diameter" [decimals]="1" [(ngModel)]="type.warm"  [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.DISK].includes(offerPos.product_type) && type.type=='outer_diameter'" format="#.##\ mm" #warm name="calculation_outer_diameter" [decimals]="2" [value]="calculateWarmValue(data, type)"  [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.SOCKET,offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE,offerPosProductType.BAR_ROUND,offerPosProductType.BAR_SQUARE].includes(offerPos.product_type) && type.type=='outer_diameter'" format="#.##\ mm" #warm name="calculation_outer_diameter_warm" [decimals]="1" [(ngModel)]="type.warm">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ mm"  class="font-size-12" *ngIf="type.type=='outer_diameter'"  name="encore_info" [decimals]="1" [(ngModel)]="type.encore_info" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  class="font-size-12" *ngIf="type.type=='outer_diameter'" name="lower_tolerance" [decimals]="1" [(ngModel)]="type.lower_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  class="font-size-12"  *ngIf="type.type=='outer_diameter'" name="upper_tolerance" [decimals]="1" [(ngModel)]="type.upper_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  class="font-size-12"  *ngIf="type.type=='outer_diameter'" name="additional_dimensions" [decimals]="1" [(ngModel)]="type.additional_dimensions" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  class="font-size-12"  *ngIf="type.type=='outer_diameter'" name="sample_allowance" [decimals]="1" [(ngModel)]="type.sample_allowance" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                        <kendo-textbox hidden #outer_diameter [(ngModel)]="type.type" name="outer_diameter">
+                        </kendo-textbox>
+                    </ng-container>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="isShow('inner_diameter')">
+                    <label [for]="inner_diameter" class="responsive-text-break" i18n>Inner Diameter  </label>
+                   <kendo-numerictextbox format="#.##\ mm" #inner_diameter name="inner_diameter" [decimals]="1" [(ngModel)]="data.inner_diameter" (valueChange)="calcGrossWeight(data)">
+                    </kendo-numerictextbox>
+                    <ng-container *ngFor="let type of data.rawDimensionTypes">
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.RING_CYLINDER].includes(offerPos.product_type) && type.type=='inner_diameter'"
+                             format="#.##\ mm" #warm name="calculation_inner_diameter_warm" [decimals]="1" [(ngModel)]="type.warm"  [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.DISK].includes(offerPos.product_type) && type.type=='inner_diameter'" format="#.##\ mm" #warm name="calculation_inner_diameter_disk_warm" [decimals]="2" [value]="calculateWarmValue(data, type)" [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.SOCKET,offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE,offerPosProductType.BAR_SQUARE,offerPosProductType.BAR_ROUND].includes(offerPos.product_type) && type.type=='inner_diameter'" format="#.##\ mm" #warm name="calculation_outer_diameter" [decimals]="1" [(ngModel)]="type.warm">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox class="font-size-12" format="#.##\ mm" *ngIf="type.type=='inner_diameter'" #encore_info name="encore_info" [decimals]="1" [(ngModel)]="type.encore_info" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"   class="font-size-12" class="font-size-12" *ngIf="type.type=='inner_diameter'" name="lower_tolerance" [decimals]="1" [(ngModel)]="type.lower_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"   class="font-size-12" class="font-size-12" *ngIf="type.type=='inner_diameter'" name="upper_tolerance" [decimals]="1" [(ngModel)]="type.upper_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"   class="font-size-12" class="font-size-12" *ngIf="type.type=='inner_diameter'" name="additional_dimensions" [decimals]="1" [(ngModel)]="type.additional_dimensions" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  class="font-size-12"  class="font-size-12" *ngIf="type.type=='inner_diameter'" name="sample_allowance" [decimals]="1" [(ngModel)]="type.sample_allowance" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                        <kendo-textbox hidden #inner_diameter [(ngModel)]="type.type" name="inner_diameter">
+                        </kendo-textbox>
+                    </ng-container>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="isShow('side_a')">
+                    <label [for]="side_a"  i18n>Side A  </label>
+                   <kendo-numerictextbox format="#.##\ mm" #side_a name="side_a" [decimals]="1" [(ngModel)]="data.side_a" (valueChange)="calcGrossWeight(data)">
+                    </kendo-numerictextbox>
+                    <ng-container *ngFor="let type of data.rawDimensionTypes" class="font-size-12">
+                        <kendo-numerictextbox style="color:red"  *ngIf="type.type=='side_a'" format="#.##\ mm" #warm name="calculation_height_warm" [decimals]="1" [(ngModel)]="type.warm"></kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm" *ngIf="type.type=='side_a'" #encore_info name="encore_info" [decimals]="1" [(ngModel)]="type.encore_info" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  *ngIf="type.type=='side_a'" name="lower_tolerance" [decimals]="1" [(ngModel)]="type.lower_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  *ngIf="type.type=='side_a'" name="upper_tolerance" [decimals]="1" [(ngModel)]="type.upper_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  *ngIf="type.type=='side_a'" name="additional_dimensions" [decimals]="1" [(ngModel)]="type.additional_dimensions" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  *ngIf="type.type=='side_a'" name="sample_allowance" [decimals]="1" [(ngModel)]="type.sample_allowance" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                        <kendo-textbox hidden #side_a [(ngModel)]="type.type" name="side_a">
+                        </kendo-textbox>
+                    </ng-container>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="isShow('side_b')">
+                    <label [for]="side_b"  i18n>Side B  </label>
+                   <kendo-numerictextbox format="#.##\ mm" #side_b name="side_b" [decimals]="1" [(ngModel)]="data.side_b" (valueChange)="calcGrossWeight(data)">
+                    </kendo-numerictextbox>
+                    <ng-container *ngFor="let type of data.rawDimensionTypes">
+                        <kendo-numerictextbox style="color:red"  *ngIf="type.type=='side_b'" format="#.##\ mm" #warm name="calculation_height_warm" [decimals]="1" [(ngModel)]="type.warm"></kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm" *ngIf="type.type=='side_b'" #encore_info name="encore_info" [decimals]="1" [(ngModel)]="type.encore_info" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  *ngIf="type.type=='side_b'" name="lower_tolerance" [decimals]="1" [(ngModel)]="type.lower_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  *ngIf="type.type=='side_b'" name="upper_tolerance" [decimals]="1" [(ngModel)]="type.upper_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm" *ngIf="type.type=='side_b'" name="additional_dimensions" [decimals]="1" [(ngModel)]="type.additional_dimensions" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  *ngIf="type.type=='side_b'" name="sample_allowance" [decimals]="1" [(ngModel)]="type.sample_allowance" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                        <kendo-textbox hidden #side_b [(ngModel)]="type.type" name="side_b">
+                        </kendo-textbox>
+                    </ng-container>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="isShow('height')">
+                    <label [for]="height"  i18n>Height  </label>
+                   <kendo-numerictextbox format="#.##\ mm" #height name="height" [decimals]="1" [(ngModel)]="data.height" (valueChange)="calcGrossWeight(data)">
+                    </kendo-numerictextbox>
+                    <ng-container *ngFor="let type of data.rawDimensionTypes" style="font-size: 12px;">
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.RING_CYLINDER].includes(offerPos.product_type) && type.type=='height'"
+                             format="#.##\ mm" #warm name="calculation_height_warm" [decimals]="1" [(ngModel)]="type.warm"  [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.DISK].includes(offerPos.product_type) && type.type=='height'" format="#.##\ mm" #warm name="calculation_height_warm" [decimals]="2" [value]="calculateWarmValue(data, type)"  [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.SOCKET,offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE].includes(offerPos.product_type) && type.type=='height'" format="#.##\ mm" #warm name="calculation_height_warm" [decimals]="1" [(ngModel)]="type.warm">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm"  class="font-size-12" *ngIf="type.type=='height'" #encore_info name="encore_info" [decimals]="1" [(ngModel)]="type.encore_info" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  class="font-size-12" *ngIf="type.type=='height'" name="lower_tolerance" [decimals]="1" [(ngModel)]="type.lower_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  class="font-size-12" *ngIf="type.type=='height'" name="upper_tolerance" [decimals]="1" [(ngModel)]="type.upper_tolerance">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  class="font-size-12" *ngIf="type.type=='height'" name="additional_dimensions" [decimals]="1" [(ngModel)]="type.additional_dimensions" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"  class="font-size-12" *ngIf="type.type=='height'" name="sample_allowance" [decimals]="1" [(ngModel)]="type.sample_allowance" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                        <kendo-textbox hidden #height [(ngModel)]="type.type" name="height">
+                        </kendo-textbox>
+                    </ng-container>
+                </kendo-stacklayout>
+                <kendo-stacklayout  orientation="horizontal" [gap]="2" *ngIf="isShow('length')">
+                    <label [for]="length"  i18n>Length  </label>
+                   <kendo-numerictextbox format="#.##\ mm" #length name="length" [decimals]="1" [(ngModel)]="data.length" (valueChange)="calcGrossWeight(data)">
+                    </kendo-numerictextbox>
+                    <ng-container *ngFor="let type of data.rawDimensionTypes">
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.SOCKET,offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE,offerPosProductType.BAR_ROUND,offerPosProductType.BAR_SQUARE].includes(offerPos.product_type) && type.type=='length'" format="#.##\ mm" #warm name="calculation_length_warm" [decimals]="2" [(ngModel)]="type.warm">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox style="color:red"  *ngIf="[offerPosProductType.DISK].includes(offerPos.product_type) && type.type=='length'" format="#.##\ mm" #warm name="calculation_length_disk_warm" [decimals]="2" [value]="calculateWarmValue(data, type)"  [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" *ngIf="type.type=='length'" #encore_info name="encore_info" [decimals]="1" [(ngModel)]="type.encore_info" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #lower_tolerance *ngIf="type.type=='length'" name="lower_tolerance" [decimals]="1" [(ngModel)]="type.lower_tolerance">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #upper_tolerance *ngIf="type.type=='length'" name="upper_tolerance" [decimals]="1" [(ngModel)]="type.upper_tolerance">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #additional_dimensions *ngIf="type.type=='length'" name="additional_dimensions" [decimals]="1" [(ngModel)]="type.additional_dimensions" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #sample_allowance *ngIf="type.type=='length'" name="sample_allowance" [decimals]="1" [(ngModel)]="type.sample_allowance" (valueChange)="calcRawMeasurement(data)">
+                        </kendo-numerictextbox>
+                        <kendo-textbox hidden #length [(ngModel)]="type.type" name="length">
+                        </kendo-textbox>
+                    </ng-container>
+
+                </kendo-stacklayout>
+
+                <kendo-stacklayout style="width:38% !important"  orientation="horizontal" [gap]="2" *ngIf="[offerPosProductType.SOCKET,offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE].includes(offerPos.product_type)" class="input-box-width">
+                    <label [for]="length"  i18n>Ring cylinder</label>
+                   <kendo-numerictextbox style="width: 100% !important;"  format="#.##\ mm" #length name="ring_cylinder_value_cold" [decimals]="2" [value]="calculateRingCylinder(data)" [disabled]="true">
+                    </kendo-numerictextbox>
+                    <ng-container >
+                        <kendo-numerictextbox style="width: 100% !important;"  format="#.##\ mm" #length name="ring_cylinder_value_warm" [decimals]="2" [value]="calculateRingCylinderTypeWarm(data)" [disabled]="true">
+                        </kendo-numerictextbox>
+                    </ng-container>
+                </kendo-stacklayout>
+
+                <ng-container *ngIf="[offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)">
+                    <hr style="background: black;">
+                    <div class="second_part">
+                        <kendo-stacklayout orientation="horizontal" [gap]="2" [ngStyle]="{ 'margin-top': '10px' }">
+                            <span i18n style="max-width: 12.5% !important;">Punching</span>
+                            <span i18n style="max-width: 12.5% !important;">Pre Punching 1</span>
+                            <span i18n style="max-width: 12.5% !important;">Pre Punching 2</span>
+                            <span i18n style="max-width: 12.5% !important;">Pre Punching 3</span>
+                            <span i18n style="max-width: 12.5% !important;">Slug Diameter</span>
+                            <span i18n style="max-width: 12.5% !important;">Slug Height</span>
+                            <span i18n style="max-width: 12.5% !important;">Slug Weight</span>
+                        </kendo-stacklayout>
+    
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2"> 
+    
+                            <span i18n style="max-width: 12.2% !important;"> Data</span> 
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #pre_punching_1 name="pre_punching_1" [decimals]="2" [(ngModel)]="data.pre_punching_1">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #pre_punching_2 name="pre_punching_2" [decimals]="2" [(ngModel)]="data.pre_punching_2">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #pre_punching_3 name="pre_punching_3" [decimals]="2" [(ngModel)]="data.pre_punching_3">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #slug_dm name="slug_dm" [decimals]="2" [(ngModel)]="data.slug_dm">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #slug_height name="slug_height" [decimals]="2" [(ngModel)]="data.slug_height">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ kg" style="max-width: 12.5% !important;" #slug_weight name="slug_weight" [decimals]="2" [(ngModel)]="data.slug_weight">
+                            </kendo-numerictextbox>
+                        </kendo-stacklayout>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="[offerPosProductType.SOCKET,offerPosProductType.DISK,offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)">
+                    <div [ngClass]="{'second_part': offerPos.product_type == offerPosProductType.DISK_PUNCHED}">
+                        <kendo-stacklayout orientation="horizontal" [gap]="2" [ngStyle]="{ 'margin-top': '10px' }">
+                            <span i18n style="max-width: 12.5% !important;">Additional Info</span>
+                            <span i18n style="max-width: 12.5% !important;">Gross Weight </span>
+                            <span i18n *ngIf="![offerPosProductType.DISK,offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)">Butzend</span>
+                            <span i18n *ngIf="![offerPosProductType.DISK,offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)">Butzenhöhe</span>
+                            <span i18n *ngIf="![offerPosProductType.DISK,offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)">Butzengewicht</span>
+                            <span i18n *ngIf="![offerPosProductType.DISK,offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)">Einlage</span>
+                            <span *ngIf="[offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" i18n>Auβend. n.St.</span>
+                            <span *ngIf="[offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" i18n>H / Rad.B. </span>
+                            <span i18n style="max-width: 12.5% !important;">Aggregat </span>
+                            <span *ngIf="![offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" i18n>alt. Aggre </span>
+                            <span style="max-width: 12.5% !important;" *ngIf="[offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" i18n>alt. Aggre 1</span>
+                            <span *ngIf="[offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" i18n>alt. Aggre 2</span>
+                            <span i18n> </span>
+                        </kendo-stacklayout>
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2"> 
+                            <span i18n style="max-width: 12.2% !important;">Values</span> 
+                            <kendo-numerictextbox format="#.##\ kg" style="max-width: 12.5% !important;" #gross_weight name="gross_weight" [decimals]="2" [(ngModel)]="data.gross_weight">
+                            </kendo-numerictextbox>
+                            <kendo-numerictextbox format="#.##\ mm" *ngIf="![offerPosProductType.DISK,offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" #slug_dm name="slug_dm" [decimals]="2" [(ngModel)]="data.slug_dm" [disabled]="true">
+                            </kendo-numerictextbox>
+                            <kendo-numerictextbox format="#.##\ mm" *ngIf="![offerPosProductType.DISK,offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" #slug_height name="slug_height" [(ngModel)]="data.slug_height" [decimals]="2" [disabled]="true">
+                            </kendo-numerictextbox>
+                            <kendo-numerictextbox format="#.##\ kg" *ngIf="![offerPosProductType.DISK,offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" #slug_weight name="slug_weight" [decimals]="2" [(ngModel)]="data.slug_weight" [disabled]="true">
+                            </kendo-numerictextbox>
+                            <kendo-numerictextbox format="#.##\ mm" *ngIf="![offerPosProductType.DISK,offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" #height_to_radial_width_pre_1 name="height_to_radial_width_pre_1" [decimals]="2" [(ngModel)]="data.insert">
+                            </kendo-numerictextbox>
+                            
+                            <kendo-textbox  format="#.##\ " #shape name="outer_end" *ngIf="[offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" [(ngModel)]="data.outer_end">
+                            </kendo-textbox >
+    
+                            <kendo-numerictextbox format="#.##\ " #height_to_radial_width name="height_to_radial_width" [decimals]="2" *ngIf="[offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" [(ngModel)]="data.height_to_radial_width" [disabled]="true">
+                            </kendo-numerictextbox>
+                            <kendo-combobox style="max-width: 12.5% !important;" #machine_id_3 name="machine_id_3" [ngModelOptions]="{standalone: true}"
+                                           [(ngModel)]="data.machine_id_3" [data]="machines" textField="custom_id"
+                                           valueField="id" [valuePrimitive]="true" [disabled]="true">
+                            </kendo-combobox>
+                            <kendo-combobox style="max-width: 12.5% !important;" #machine_id_4 name="machine_id_4" [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="data.machine_id_4" [data]="machines" textField="custom_id"
+                                            valueField="id" [valuePrimitive]="true" [disabled]="true">
+                            </kendo-combobox>
+                            <kendo-combobox style="max-width: 12.5% !important;" #machine_id_4 name="machine_id_4" *ngIf="[offerPosProductType.DISK_PUNCHED].includes(offerPos.product_type)" [ngModelOptions]="{standalone: true}" [(ngModel)]="data.machine_id_4" [data]="machines" textField="custom_id" valueField="id" [valuePrimitive]="true" [disabled]="true">
+                            </kendo-combobox>
+                            <span></span>
+                        </kendo-stacklayout>
+                    </div> 
+                </ng-container>
+
+                <ng-container *ngIf="[offerPosProductType.RING_ROLLED].includes(offerPos.product_type)">
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" [ngStyle]="{ 'margin-top': '10px' }">
+                        <span i18n style="max-width: 12.5% !important;">Info</span>
+                        <span i18n style="max-width: 12.5% !important;">Gross Weight </span>
+                        <span style="max-width: 12.5% !important;" i18n>Rolling pin 1</span>
+                        <span style="max-width: 12.5% !important;" i18n>Rolling pin 2</span>
+                        <span style="max-width: 12.5% !important;" i18n>Rolling length</span>
+                        <span style="max-width: 12.5% !important;" i18n>Aggregat </span>
+                        <span style="max-width: 12.5% !important;" i18n>alt. Aggre </span>
+                        <span style="max-width: 12.5% !important;" i18n>Rollback</span>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout  orientation="horizontal" [gap]="2">
+
+                        <span i18n style="max-width: 12.2% !important;"> Data</span> 
+
+                        <kendo-numerictextbox format="#.##\ kg" style="max-width: 12.5% !important;" #gross_weight name="gross_weight" [decimals]="2" [(ngModel)]="data.gross_weight">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #rolling_pin_1 name="rolling_pin_1" [decimals]="2" [(ngModel)]="data.rolling_pin_1">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #rolling_pin_2 name="rolling_pin_2" [decimals]="2" [(ngModel)]="data.rolling_pin_2">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #rolling_length name="rolling_length" [decimals]="2" [(ngModel)]="data.rolling_length">
+                        </kendo-numerictextbox>
+
+                        <kendo-combobox style="max-width: 12.5% !important;" #machine_id_3 name="machine_id_3" [ngModelOptions]="{standalone: true}"
+                                       [(ngModel)]="data.machine_id_3" [data]="machines" textField="custom_id"
+                                       valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+
+                        <kendo-combobox style="max-width: 12.5% !important;" #machine_id_4 name="machine_id_4" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="data.machine_id_4" [data]="machines" textField="custom_id"
+                                        valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+
+                        <kendo-textbox  format="#.##\ " #rollback name="rollback" [(ngModel)]="data.rollback">
+                        </kendo-textbox >
+                    </kendo-stacklayout>
+                </ng-container>
+
+                <ng-container *ngIf="[offerPosProductType.PIPE].includes(offerPos.product_type)">
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" [ngStyle]="{ 'margin-top': '10px' }">
+                        <span i18n style="max-width: 12.5% !important;">Info</span>
+                        <span i18n style="max-width: 12.5% !important;">Excess length total</span>
+                        <span style="max-width: 12.5% !important;" i18n>Gross Weight </span>
+                        <span style="max-width: 18% !important;" i18n>Stretching pin value</span>
+                        <span style="max-width: 18.5% !important;" i18n>Stretching path</span>
+                        <span style="max-width: 12.5% !important;" i18n>Aggregat </span>
+                        <span style="max-width: 12.5% !important;" i18n>alt. Aggre </span>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout  orientation="horizontal" [gap]="2">
+                        <span i18n style="max-width: 12.2% !important;"> Data</span>
+
+                        <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #excess_total_length name="excess_total_length" [decimals]="2" [(ngModel)]="data.excess_total_length">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ kg" style="max-width: 12.5% !important;" #gross_weight name="gross_weight" [decimals]="2" [(ngModel)]="data.gross_weight">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ mm" #stretching_pin_value name="stretching_pin_value" [decimals]="1" [(ngModel)]="data.stretching_pin_value">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ mm" #stretching_path name="stretching_path" [decimals]="1" [(ngModel)]="data.stretching_path">
+                        </kendo-numerictextbox>
+
+                        <kendo-combobox style="max-width: 12.5% !important;" #machine_id_3 name="machine_id_3" [ngModelOptions]="{standalone: true}"
+                                       [(ngModel)]="data.machine_id_3" [data]="machines" textField="custom_id"
+                                       valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+
+                        <kendo-combobox style="max-width: 12.5% !important;" #machine_id_4 name="machine_id_4" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="data.machine_id_4" [data]="machines" textField="custom_id"
+                                        valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                </ng-container>
+
+
+                <ng-container *ngIf="[offerPosProductType.BAR_SQUARE,offerPosProductType.BAR_ROUND].includes(offerPos.product_type)">
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" [ngStyle]="{ 'margin-top': '10px' }">
+                        <span i18n style="max-width: 12.5% !important;">Info</span>
+                        <span i18n style="max-width: 12.5% !important;">Excess length total</span>
+                        <span style="max-width: 12.5% !important;" i18n>Gross Weight </span>
+                        <span style="max-width: 12.5% !important;" i18n>Aggregat </span>
+                        <span style="max-width: 12.5% !important;" i18n>alt. Aggre </span>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout  orientation="horizontal" [gap]="2">
+                        <span i18n style="max-width: 12.2% !important;"> Data</span>
+
+                        <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #excess_total_length name="excess_total_length" [decimals]="2" [(ngModel)]="data.excess_total_length">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ kg" style="max-width: 12.5% !important;" #gross_weight name="gross_weight" [decimals]="2" [(ngModel)]="data.gross_weight">
+                        </kendo-numerictextbox>
+
+                        <kendo-combobox style="max-width: 12.5% !important;" #machine_id_3 name="machine_id_3" [ngModelOptions]="{standalone: true}"
+                                       [(ngModel)]="data.machine_id_3" [data]="machines" textField="custom_id"
+                                       valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+
+                        <kendo-combobox style="max-width: 12.5% !important;" #machine_id_4 name="machine_id_4" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="data.machine_id_4" [data]="machines" textField="custom_id"
+                                        valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                </ng-container>
+
+                <ng-container *ngIf="[offerPosProductType.RING_CYLINDER].includes(offerPos.product_type)">
+                    <kendo-stacklayout orientation="horizontal" [gap]="2">
+                        <span i18n> Rad. Breite</span>   
+                        <kendo-numerictextbox format="#.##\ mm" #radial_with_cold name="radial_with_cold" [decimals]="2" [(ngModel)]="data.radial_width" [disabled]="true">
+                        </kendo-numerictextbox>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <kendo-numerictextbox style="color:red"  *ngIf="type.type=='radial_width'"
+                                 format="#.##\ mm" #warm name="radial_width" [decimals]="1" [(ngModel)]="type.warm"  [disabled]="true">
+                            </kendo-numerictextbox>
+                        </ng-container> 
+                            <kendo-stacklayout></kendo-stacklayout>
+                            <kendo-stacklayout></kendo-stacklayout>
+                            <kendo-stacklayout></kendo-stacklayout>
+                            <kendo-stacklayout></kendo-stacklayout>
+                            <kendo-stacklayout></kendo-stacklayout>
+                    </kendo-stacklayout>
+                </ng-container>
+                <ng-container *ngIf="[offerPosProductType.RING_CYLINDER].includes(offerPos.product_type)">    
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" class="font-size-12">
+                        <span i18n class="font-size-12">Info</span>
+                        <span i18n class="font-size-12">Gross Weight</span>
+                        <span i18n class="font-size-12">Rolling pin</span>
+                        <span i18n class="font-size-12">Walzweg</span>
+                        <span i18n class="font-size-12">Axialdifferenz</span>
+                        <span i18n class="font-size-12">Rad.100mm/Ww</span>
+                        <span i18n class="font-size-12">H / Rad.B. </span>
+                        <span i18n class="font-size-12">Walzform </span>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout  orientation="horizontal" [gap]="2" class="font-size-12"> 
+                        <span i18n  class="font-size-12"> Data</span>   
+                        <kendo-numerictextbox format="#.##\ kg"  class="font-size-12" #gross_weight name="gross_weight" [decimals]="2" [(ngModel)]="data.gross_weight">
+                        </kendo-numerictextbox>
+                        <kendo-combobox
+                            #rolling_pin
+                            [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="data.rolling_pin"
+                            [data]="rollingPins"
+                            [valuePrimitive]="true"
+                            textField="text"
+                            valueField="value"
+                            class="font-size-12"
+                            >
+                        </kendo-combobox>
+                        <kendo-numerictextbox  class="font-size-12" format="#.##\ " #rolling_path name="rolling_path" [decimals]="2" [disabled]="true" [(ngModel)]="data.rolling_path">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox  class="font-size-12" format="#.##\ " #axial_difference name="axial_difference" [decimals]="2" [(ngModel)]="data.axial_difference" [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox  class="font-size-12" format="#.##\ " #radial_width_per_100_mm name="radial_width_per_100_mm" [decimals]="2" [(ngModel)]="data.radial_width_per_100_mm" [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox  class="font-size-12" format="#.##\ " #height_to_radial_width name="height_to_radial_width" [decimals]="2" [(ngModel)]="data.height_to_radial_width" [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-textbox  class="font-size-12" format="#.##\ " #shape name="shape" [decimals]="2" [(ngModel)]="data.shape" [disabled]="true">
+                        </kendo-textbox >
+                    </kendo-stacklayout>
+                </ng-container>
+                <div class="second_part" *ngIf="[offerPosProductType.RING_CYLINDER].includes(offerPos.product_type)">
+                    <hr style="background: black;">
+                    <kendo-stacklayout orientation="horizontal" [gap]="2">
+                        <span i18n> <b>Pre Disk punched</b></span>   
+                        <span i18n> Cold dimension</span>   
+                        <span i18n> Warm dimension </span>
+                        <kendo-stacklayout></kendo-stacklayout>
+                        <kendo-stacklayout></kendo-stacklayout>   
+                        <kendo-stacklayout></kendo-stacklayout>   
+                        <kendo-stacklayout></kendo-stacklayout>   
+                        <kendo-stacklayout></kendo-stacklayout>   
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="2">
+                        <span i18n>Outer Diameter Pre 1</span>
+                        <kendo-numerictextbox format="#.##\ mm" #outer_diameter_pre_1 name="outer_diameter_pre_1" [decimals]="1" [(ngModel)]="data.outer_diameter_pre_1">
+                        </kendo-numerictextbox>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <kendo-numerictextbox style="color:red"  *ngIf="type.type=='outer_diameter_pre_1'"
+                                 format="#.##\ mm" #warm name="calculation_outer_diameter" [decimals]="1" [(ngModel)]="type.warm" [value]="55"  [disabled]="true">
+                            </kendo-numerictextbox>
+                        </ng-container>    
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="2">
+                        <span i18n>Inner Diameter Pre 1</span>
+                        <kendo-numerictextbox format="#.##\ mm" #inner_diameter_pre_1 name="inner_diameter_pre_1" [decimals]="1" [(ngModel)]="data.inner_diameter_pre_1">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox style="color:red" format="#.##\ mm" #inner_diameter_pre_1 name="inner_diameter_pre_1" [decimals]="1" [(ngModel)]="data.inner_diameter_pre_1">
+                        </kendo-numerictextbox>
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="2">
+                        <span i18n>Height Pre 1</span>
+                        <kendo-numerictextbox format="#.##\ mm" #height_pre_1 name="height_pre_1" [decimals]="1" [(ngModel)]="data.height_pre_1">
+                        </kendo-numerictextbox>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <kendo-numerictextbox style="color:red"  *ngIf="type.type=='height_pre_1'"
+                                 format="#.##\ mm" #warm name="calculation_outer_diameter" [decimals]="1" [(ngModel)]="type.warm" [value]="55"  [disabled]="true">
+                            </kendo-numerictextbox>
+                        </ng-container>
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                        <kendo-stacklayout></kendo-stacklayout>  
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="2">
+                        <span i18n> Rad. Breite 1</span>   
+                        <kendo-numerictextbox format="#.##\ mm" #radial_with_cold name="radial_with_cold" [decimals]="2" [(ngModel)]="data.radial_width_pre_1" [disabled]="true">
+                        </kendo-numerictextbox>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <kendo-numerictextbox style="color:red"  *ngIf="type.type=='radial_width_pre_1'"
+                                 format="#.##\ mm" #warm name="radial_width_pre_1" [decimals]="1" [(ngModel)]="type.warm"  [disabled]="true">
+                            </kendo-numerictextbox>
+                        </ng-container>
+                            <kendo-stacklayout></kendo-stacklayout>
+                            <kendo-stacklayout></kendo-stacklayout>
+                            <kendo-stacklayout></kendo-stacklayout>
+                            <kendo-stacklayout></kendo-stacklayout>
+                            <kendo-stacklayout></kendo-stacklayout>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" >
+                        <span i18n>Info</span>
+                        <span i18n>Butzend</span>
+                        <span i18n>Butzenhöhe</span>
+                        <span i18n>Butzengewicht</span>
+                        <span i18n>H / Rad.B.</span>
+                        <span i18n>Aggregat </span>
+                        <span i18n>alt. Aggre </span>
+                        <span i18n> </span>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout  orientation="horizontal" [gap]="2"> 
+                        <span i18n> Data</span> 
+                          <kendo-numerictextbox format="#.##\ mm" #slug_dm name="slug_dm" [decimals]="2" [(ngModel)]="data.slug_dm" [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #slug_height name="slug_height" [(ngModel)]="data.slug_height" [decimals]="2" [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ kg" #slug_weight name="slug_weight" [decimals]="2" [(ngModel)]="data.slug_weight" [disabled]="true">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #height_to_radial_width_pre_1 name="height_to_radial_width_pre_1" [decimals]="2" [(ngModel)]="data.height_to_radial_width_pre_1" [disabled]="true">
+                        </kendo-numerictextbox>
+                       <kendo-combobox #machine_id [ngModelOptions]="{standalone: true}"
+                                       [(ngModel)]="data.machine_id_3" [data]="machines" textField="custom_id"
+                                       valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+                        <kendo-combobox #machine_id [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="data.machine_id_4" [data]="machines" textField="custom_id"
+                                        valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+                        <span></span>
+                    </kendo-stacklayout>
+                </div>
+                <div class="third" *ngIf="[offerPosProductType.RING_CYLINDER].includes(offerPos.product_type)">
+                    <hr style="background-color: black;">
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="[offerPosProductType.BAR_ROLLED ,offerPosProductType.RING_CYLINDER,offerPosProductType.PIPE,offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)"[class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+                        <label [for]="is_rolled"  i18n>Is Rolled </label>
+                        <div>
+                            <input type="checkbox" kendoCheckBox
+                                [(ngModel)]="data.is_rolled"
+                                name="is_rolled" #is_rolled />
+                        </div>
+                        <br>
+                    </kendo-stacklayout> 
+                  
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <ng-container *ngIf="data.is_rolled">
+                        <kendo-stacklayout orientation="horizontal" [gap]="2">
+                            <span i18n> <b>Pre Disk punched 2</b></span>   
+                            <span i18n> Cold dimension</span>   
+                            <span i18n> warm dimension </span>
+                            <kendo-stacklayout></kendo-stacklayout>
+                            <kendo-stacklayout></kendo-stacklayout>   
+                            <kendo-stacklayout></kendo-stacklayout>   
+                            <kendo-stacklayout></kendo-stacklayout>   
+                            <kendo-stacklayout></kendo-stacklayout>   
+                        </kendo-stacklayout>
+                        <kendo-stacklayout orientation="horizontal" [gap]="2">
+                            <span i18n>Outer Diameter Pre 2</span>
+                            <kendo-numerictextbox format="#.##\ mm" #outer_diameter_pre_1 name="outer_diameter_pre_2" [decimals]="1" [(ngModel)]="data.outer_diameter_pre_2">
+                            </kendo-numerictextbox>
+                            <kendo-numerictextbox style="color: red;" format="#.##\ mm" #outer_diameter_pre_1 name="calculation_outer_diameter_pre_2" [decimals]="1" [(ngModel)]="data.calculation_outer_diameter_pre_2" [disabled]="true">
+                            </kendo-numerictextbox>
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                        </kendo-stacklayout>
+                        <kendo-stacklayout orientation="horizontal" [gap]="2">
+                            <span i18n>Inner Diameter Pre 2</span>
+                            <kendo-numerictextbox format="#.##\ mm" #inner_diameter_pre_1 name="inner_diameter_pre_2" [decimals]="1" [(ngModel)]="data.inner_diameter_pre_2">
+                            </kendo-numerictextbox>
+                            <kendo-numerictextbox style="color: red;"  format="#.##\ mm" #inner_diameter_pre_1 name="calculation_inner_diameter_pre_2" [decimals]="1" [(ngModel)]="data.calculation_inner_diameter_pre_2" [disabled]="true">
+                            </kendo-numerictextbox>
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                        </kendo-stacklayout>
+                        <kendo-stacklayout orientation="horizontal" [gap]="2">
+                            <span i18n>Height Pre 2</span>
+                            <kendo-numerictextbox format="#.##\ mm" #height_pre_1 name="height_pre_2" [decimals]="1" [(ngModel)]="data.height_pre_2">
+                            </kendo-numerictextbox>
+                            <kendo-numerictextbox style="color: red;" format="#.##\ mm" #height_pre_1 name="calculation_height_pre_2" [decimals]="1" [(ngModel)]="data.calculation_height_pre_2" [disabled]="true">
+                            </kendo-numerictextbox>
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                            <kendo-stacklayout></kendo-stacklayout>  
+                        </kendo-stacklayout>
+                        <kendo-stacklayout orientation="horizontal" [gap]="2">
+                            <span i18n> Rad. Breite 2</span>   
+                            <kendo-numerictextbox format="#.##\ mm" #radial_with_cold name="radial_with_cold" [decimals]="2" [(ngModel)]="data.radial_width_pre_2" [disabled]="true">
+                            </kendo-numerictextbox>
+                            <ng-container *ngFor="let type of data.rawDimensionTypes">
+                                <kendo-numerictextbox style="color:red"  *ngIf="type.type=='radial_width_pre_2'"
+                                     format="#.##\ mm" #warm name="radial_width_pre_2" [decimals]="1" [(ngModel)]="type.warm"  [disabled]="true">
+                                </kendo-numerictextbox>
+                            </ng-container>
+                                <kendo-stacklayout></kendo-stacklayout>
+                                <kendo-stacklayout></kendo-stacklayout>
+                                <kendo-stacklayout></kendo-stacklayout>
+                                <kendo-stacklayout></kendo-stacklayout>
+                                <kendo-stacklayout></kendo-stacklayout>
+                        </kendo-stacklayout>
+                        <kendo-stacklayout orientation="horizontal" [gap]="2" >
+                            <span i18n>Zusatz Info</span>
+                            <span i18n>Rolling pin value</span>
+                            <span i18n>machine</span>
+                            <span i18n>2nd machine</span>
+                            <span i18n></span>
+                            <span i18n> </span>
+                            <span i18n></span>
+                            <span i18n> </span>
+                        </kendo-stacklayout>
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2"> 
+                            <span i18n> Werte</span> 
+                            <kendo-numerictextbox format="#.##\ mm" #height_to_radial_width name="height_to_radial_width" [decimals]="1" [(ngModel)]="data.height_to_radial_width">
+                            </kendo-numerictextbox>
+                            <kendo-combobox  [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="data.machine_id" [data]="machines" textField="custom_id"
+                            valueField="id"  [disabled]="true" [valuePrimitive]="true" >
+                        </kendo-combobox>
+                        <kendo-combobox #machine_id [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="data.machine_id_2" [data]="machines" textField="custom_id"
+                            valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </kendo-stacklayout>
+                    </ng-container>
+                </div>
+            
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="isShow('outer_diameter_disk_punched')"  class="input-box-width">
+                    <label [for]="outer_diameter_disk_punched"  i18n>Outer Diameter Disk Punched </label>
+                   <kendo-numerictextbox format="#.##\ mm" #outer_diameter_disk_punched name="outer_diameter_disk_punched" [decimals]="1" [(ngModel)]="data.outer_diameter_disk_punched">
+                    </kendo-numerictextbox>
+
+                </kendo-stacklayout>
+                <ng-container *ngIf="[offerPosProductType.SHAFT, offerPosProductType.SHAFT_HOLLOW, offerPosProductType.UPSET_PART].includes(offerPos.product_type)">
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" [class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'k-w-2/5'">
+                        <kendo-stacklayout orientation="horizontal" [gap]="2">
+                             <label [for]="section" i18n>Section </label>
+                                <kendo-numerictextbox format="#.##\ mm" #section name="section"  [min]="1" [max]="20" format="0" (keyup.enter)="changeSection(data)" [(ngModel)]="data.section">
+                        </kendo-numerictextbox>
+                        </kendo-stacklayout>
+                         <kendo-stacklayout  orientation="horizontal" [gap]="2" *ngIf="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW" [ngStyle]="{'background-color': 'white'}" >
+                            <label [for]="inner_diameter_hollow" i18n>Inner Diameter</label>
+                           <kendo-numerictextbox format="#.##\ mm" #inner_diameter_hollow name="inner_diameter_hollow" [decimals]="2" [(ngModel)]="data.inner_diameter_hollow"></kendo-numerictextbox>
+                        </kendo-stacklayout>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="data?.offerPosDimensionShaftUpsetParts?.length">
+                        <label *ngIf="![offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)"></label>
+                        <label *ngIf="[offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)"> Hollow Shaft Diameter</label>
+                        <ng-container *ngIf="offerPos.product_type === offerPosProductType.UPSET_PART">
+                            <label [for]="" i18n>Outer Diameter start</label>
+                            <label [for]="" i18n>Outer Diameter end</label>
+                        </ng-container>
+                        <label [for]="" *ngIf="offerPos.product_type !== offerPosProductType.UPSET_PART" i18n>Outer Diameter</label>
+                        <label [for]="" *ngIf="offerPos.product_type == offerPosProductType.SHAFT" i18n>Side</label>
+                        <label [for]="" i18n>Length</label>
+                          <ng-container *ngIf="[offerPosProductType.SHAFT, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                             <label [for]="" i18n>Oversize</label>
+                          </ng-container>
+                        <label [for]="" i18n>Sample</label>
+                        <label *ngIf="[offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)" i18n>Cold Outer Diameter</label>
+                        <label *ngIf="[offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)" i18n>Warm Length</label>
+                         <ng-container *ngIf="[offerPosProductType.SHAFT, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                            <label [for]="" i18n>Weight</label>
+                            <label [for]="" i18n>Beam</label>
+                         </ng-container>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" *ngFor="let parts of data.offerPosDimensionShaftUpsetParts;let i = index" [style.width]="'100%'">
+                        <label>{{ i + 1 }}</label>
+                        <kendo-numerictextbox format="#.##\ mm" #outer_diameter_start name="outer_diameter_start" [decimals]="1" [(ngModel)]="parts.outer_diameter_start" (valueChange)="calcGrossWeight(data)"></kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #outer_diameter_end name="outer_diameter_end" [decimals]="1" [(ngModel)]="parts.outer_diameter_end" (valueChange)="calcGrossWeight(data)" *ngIf="offerPos.product_type == offerPosProductType.UPSET_PART"></kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #side name="side" [decimals]="1" [(ngModel)]="parts.side" (valueChange)="calcGrossWeight(data)" *ngIf="offerPos.product_type == offerPosProductType.SHAFT"></kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #length name="length" [decimals]="1" [(ngModel)]="parts.length" (valueChange)="calcGrossWeight(data)"></kendo-numerictextbox>
+                         <ng-container *ngIf="[offerPosProductType.SHAFT, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                            <kendo-numerictextbox format="#.##\ mm"   name="oversize" [decimals]="1" [(ngModel)]="parts.oversize">
+                            </kendo-numerictextbox>
+                         </ng-container>
+                        <kendo-checkbox type="checkbox" >
+                            <input type="checkbox" #kendoCheckBox class="ng-pristine k-checkbox k-checkbox-md k-rounded-md" name="is_sample" [(ngModel)]="parts.is_sample" />
+                        </kendo-checkbox>
+                        <kendo-numerictextbox format="#.##\ mm" *ngIf="[offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)"  name="cold_outer_diameter" [decimals]="1" [(ngModel)]="parts.cold_outer_diameter">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" *ngIf="[offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)"  name="warm_length" [decimals]="1" [(ngModel)]="parts.warm_length">
+                        </kendo-numerictextbox>
+                         <ng-container *ngIf="[offerPosProductType.SHAFT, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                            <kendo-numerictextbox format="#.##\ mm" #weight [disabled]="true" [decimals]="4"  name="weight" [decimals]="1" placeholder="{{parts.getWeight(offerPos?.material?.density)}}">
+                            </kendo-numerictextbox>
+                           <kendo-numerictextbox format="#.##\ mm" #beam [disabled]="true" [decimals]="4"  name="beam" [decimals]="1" placeholder="{{parts.getBeam(data.offerPosDimensionShaftUpsetParts)}}">
+                            </kendo-numerictextbox>
+                         </ng-container>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout *ngIf="[offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                        <span></span>
+                        <span></span>
+                        <div style="display: flex; align-items: center;">
+                            <label style="margin-right:0.5rem;" i18n>Total length: </label>
+                            <label>{{calculateHollowShaftTotalLength(data.offerPosDimensionShaftUpsetParts)}}</label> 
+                        </div>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <div style="display: flex; align-items: center;">
+                            <label style="max-width: 90%; margin-right:0.5rem;" i18n>Total Warm length: </label>
+                            <label>{{calculateHollowShaftTotalWarmLength(data.offerPosDimensionShaftUpsetParts)}}</label> 
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <label style="max-width: 90%; margin-right:0.5rem;" i18n>Total Weight: </label>
+                            <label>{{calculateHollowShaftTotalWeight(data)}}</label> 
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <label style="max-width: 90%;margin-right:0.5rem;" i18n>Total Beam: </label>
+                            <label>{{calculateHollowShaftTotalBeam(data.offerPosDimensionShaftUpsetParts)}}</label> 
+                        </div>
+
+                    </kendo-stacklayout>
+                </ng-container>
+
+                <ng-container *ngIf="[offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" [ngStyle]="{ 'margin-top': '10px' }">
+                        <span i18n style="max-width: 12.5% !important;">Info</span>
+                        <span i18n style="max-width: 12.5% !important;">Excess length total</span>
+                        <span style="max-width: 12.5% !important;" i18n>Gross Weight </span>
+                        <span style="max-width: 18% !important;" i18n>Stretching pin value</span>
+                        <span style="max-width: 18.5% !important;" i18n>Stretching path</span>
+                        <span style="max-width: 12.5% !important;" i18n>Aggregat </span>
+                        <span style="max-width: 12.5% !important;" i18n>alt. Aggre </span>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout  orientation="horizontal" [gap]="2">
+                        <span i18n style="max-width: 12.2% !important;"> Data</span>
+
+                        <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #excess_total_length name="excess_total_length" [decimals]="2" [(ngModel)]="data.excess_total_length">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ kg" style="max-width: 12.5% !important;" #gross_weight name="gross_weight" [decimals]="2" [(ngModel)]="data.gross_weight">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ mm" #stretching_pin_value name="stretching_pin_value" [decimals]="1" [(ngModel)]="data.stretching_pin_value">
+                        </kendo-numerictextbox>
+
+                        <kendo-numerictextbox format="#.##\ mm" #stretching_path name="stretching_path" [decimals]="1" [(ngModel)]="data.stretching_path">
+                        </kendo-numerictextbox>
+
+                        <kendo-combobox style="max-width: 12.5% !important;" #machine_id_3 name="machine_id_3" [ngModelOptions]="{standalone: true}"
+                                       [(ngModel)]="data.machine_id_3" [data]="machines" textField="custom_id"
+                                       valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+
+                        <kendo-combobox style="max-width: 12.5% !important;" #machine_id_4 name="machine_id_4" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="data.machine_id_4" [data]="machines" textField="custom_id"
+                                        valueField="id" [valuePrimitive]="true" [disabled]="true">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                </ng-container>
+
+                <ng-container *ngIf="offerPos.product_type == offerPosProductType.UPSET_PART">
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" class="k-w-2/5">
+                        <label [for]="forged_beam_section" i18n>Forged Beam Section</label>
+                       <kendo-numerictextbox format="#.##\ mm" #forged_beam_section name="forged_beam_section" [min]="1" [max]="20" format="0" (keyup.enter)="changeForgedBeamSection(data)" [(ngModel)]="data.forged_beam_section">
+                        </kendo-numerictextbox>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="data?.offerPosDimensionUpsetPartForgedBeams?.length">
+                        <label></label>
+                        <label [for]="" i18n>Forged Beam Outer Diameter</label>
+                        <label [for]="" i18n>Forged Beam Length</label>
+                         <label [for]="" i18n>Oversize</label>
+                        <label [for]="" i18n>Weight</label>
+                        <label [for]="" i18n>Beam</label>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" *ngFor="let parts of data.offerPosDimensionUpsetPartForgedBeams;let i = index" [style.width]="'100%'">
+                        <label>{{ i + 1 }}</label>
+                       <kendo-numerictextbox format="#.##\ mm" #outer_diameter_forged_beam name="outer_diameter_forged_beam" [decimals]="1" [(ngModel)]="parts.outer_diameter"></kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm" #length_forged_beam name="length_forged_beam" [decimals]="1" [(ngModel)]="parts.length" ></kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm"   name="oversize" [decimals]="1" [(ngModel)]="parts.oversize">
+                        </kendo-numerictextbox>
+                        <kendo-numerictextbox format="#.##\ mm" #weight [disabled]="true" [decimals]="4"  name="weight" [decimals]="1" placeholder="{{parts.getWeight(offerPos?.material?.density)}}">
+                        </kendo-numerictextbox>
+                       <kendo-numerictextbox format="#.##\ mm" #beam [disabled]="true" [decimals]="4"  name="beam" [decimals]="1" placeholder="{{parts.getBeam(data.offerPosDimensionUpsetPartForgedBeams)}}">
+                        </kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </ng-container>
+
+                <ng-container *ngIf="[offerPosProductType.RING_ROLLED, offerPosProductType.PIPE, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                    <div [ngClass]="{'second_part':[offerPosProductType.RING_ROLLED,offerPosProductType.PIPE].includes(offerPos.product_type)}">
+                        <hr style="background: black;">
+                        <kendo-stacklayout orientation="horizontal" [gap]="2" [ngStyle]="{ 'margin-top': '10px' }">
+                            <span i18n style="max-width: 12.5% !important;" *ngIf="[offerPosProductType.RING_ROLLED].includes(offerPos.product_type)">Pre Piece (disk punched)</span>
+                            <span i18n style="max-width: 12.5% !important;" *ngIf="[offerPosProductType.PIPE, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">Pre 1</span>
+                            <span i18n style="max-width: 12.5% !important;">Cold dimension</span>
+                            <span style="max-width: 12.5% !important;" i18n>Warm dimension</span>
+                        </kendo-stacklayout>
+    
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2">
+    
+                            <span i18n style="max-width: 12.2% !important;">Outer Diameter Pre 1</span> 
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #outer_diameter_pre_1 name="outer_diameter_pre_1" [decimals]="2" [(ngModel)]="data.outer_diameter_pre_1">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #outer_diameter_pre_1_warm name="outer_diameter_pre_1_warm" [decimals]="2" [(ngModel)]="data.outer_diameter_pre_1_warm">
+                            </kendo-numerictextbox>
+                        </kendo-stacklayout>
+    
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2">
+    
+                            <span i18n style="max-width: 12.2% !important;">Inner Diameter Pre 1</span> 
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #inner_diameter_pre_1 name="inner_diameter_pre_1" [decimals]="2" [(ngModel)]="data.inner_diameter_pre_1">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #inner_diameter_pre_1_warm name="inner_diameter_pre_1_warm" [decimals]="2" [(ngModel)]="data.inner_diameter_pre_1_warm">
+                            </kendo-numerictextbox>  
+                        </kendo-stacklayout>
+    
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2">
+    
+                            <span i18n style="max-width: 12.2% !important;">Height Pre 1</span> 
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #height_pre_1 name="height_pre_1" [decimals]="2" [(ngModel)]="data.height_pre_1">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #height_pre_1_warm name="height_pre_1_warm" [decimals]="2" [(ngModel)]="data.height_pre_1_warm">
+                            </kendo-numerictextbox>  
+                        </kendo-stacklayout>
+    
+                        <kendo-stacklayout style="width: 100% !important;"   orientation="horizontal" [gap]="2" class="input-box-width">
+                            <label [for]="ring_cylinder" style="max-width: 12.2% !important;"  i18n>Ring cylinder</label>
+                           <kendo-numerictextbox style="max-width: 12.5% !important;"  format="#.##\ mm" #length name="ring_cylinder_pre_1" [decimals]="2" [value]="calculateRingCylinderDiameterPre1(data)" [disabled]="true">
+                            </kendo-numerictextbox>
+                            
+                            <kendo-numerictextbox style="max-width: 12.5% !important;"  format="#.##\ mm" #length name="ring_cylinder_pre_1_warm" [decimals]="2" [value]="calculateRingCylinderDiameterPre1Warm(data)" [disabled]="true">
+                            </kendo-numerictextbox>
+                     
+                        </kendo-stacklayout>
+                    </div>
+                    
+                </ng-container>
+
+                <ng-container *ngIf="[offerPosProductType.RING_ROLLED,offerPosProductType.PIPE, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                    <div [ngClass]="{'second_part':[offerPosProductType.RING_ROLLED,offerPosProductType.PIPE].includes(offerPos.product_type)}">
+                        <kendo-stacklayout [ngStyle]="{ 'margin-top': '10px' }" orientation="horizontal" [gap]="2" >
+                            <span i18n>Info</span>
+                            <span i18n>Butzend</span>
+                            <span i18n>Butzenhöhe</span>
+                            <span i18n>Butzengewicht</span>
+                            <span i18n>Aggregat </span>
+                            <span i18n>alt. Aggre </span>
+                        </kendo-stacklayout>
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2"> 
+                            <span i18n> Data</span> 
+    
+                            <kendo-numerictextbox format="#.##\ mm" #slug_dm name="slug_dm" [decimals]="2" [(ngModel)]="data.slug_dm">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" #slug_height name="slug_height" [(ngModel)]="data.slug_height" [decimals]="2">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ kg" #slug_weight name="slug_weight" [decimals]="2" [(ngModel)]="data.slug_weight">
+                            </kendo-numerictextbox>
+    
+                            <kendo-combobox #machine_id [ngModelOptions]="{standalone: true}"
+                                           [(ngModel)]="data.machine_id_3" [data]="machines" textField="custom_id"
+                                           valueField="id" [valuePrimitive]="true" [disabled]="true">
+                            </kendo-combobox>
+    
+                            <kendo-combobox #machine_id [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="data.machine_id_4" [data]="machines" textField="custom_id"
+                                            valueField="id" [valuePrimitive]="true" [disabled]="true">
+                            </kendo-combobox>
+                        </kendo-stacklayout>
+                    </div>
+                    
+                </ng-container>
+
+
+                <kendo-stacklayout orientation="horizontal" *ngIf="![offerPosProductType.RING_CYLINDER, offerPosProductType.SOCKET, offerPosProductType.DISK,  offerPosProductType.SHAFT, offerPosProductType.DISK_PUNCHED,offerPosProductType.RING_ROLLED,offerPosProductType.PIPE,offerPosProductType.SHAFT_HOLLOW,offerPosProductType.BAR_ROUND,offerPosProductType.BAR_SQUARE].includes(offerPos.product_type)" [gap]="2" [class]="[offerPosProductType.SHAFT, offerPosProductType.UPSET_PART].includes(offerPos.product_type) ? 'k-w-2/5' : (offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width')">
+                    <label [for]="gross_weight"  i18n>Gross Weight </label>
+
+                   <kendo-numerictextbox format="#.##\ kg" #gross_weight name="gross_weight" [decimals]="2" [(ngModel)]="data.gross_weight">
+                    </kendo-numerictextbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout style="width:51% !important" orientation="horizontal" *ngIf="[offerPosProductType.SHAFT].includes(offerPos.product_type)" [gap]="2" [class]="[offerPosProductType.SHAFT, offerPosProductType.UPSET_PART].includes(offerPos.product_type) ? 'k-w-2/5' : (offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width')">
+                    <label [for]="gross_weight"  i18n>Gross Weight </label>
+
+                   <kendo-numerictextbox style="margin-right: 7% !important;" format="#.##\ kg" #gross_weight name="gross_weight" [decimals]="2" [(ngModel)]="data.gross_weight">
+                    </kendo-numerictextbox>
+
+                    <kendo-numerictextbox style="margin-left: 18%; padding-left: 0.45rem; margin-right:0.16rem" format="#.##\ mm" #gross_weight name="max_length_for_shaft" [decimals]="2" *ngIf="data?.offerPosDimensionShaftUpsetParts?.length" [value]="calculateMaxLengthForShaft(data)">
+                    </kendo-numerictextbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="isShow('outer_diameter_pre_1')  && (offerPos.product_type != offerPosProductType.RING_CYLINDER && offerPos.product_type != offerPosProductType.RING_ROLLED && offerPos.product_type != offerPosProductType.PIPE && offerPos.product_type != offerPosProductType.SHAFT_HOLLOW)"  [class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+                    <label [for]="outer_diameter_pre_1"  i18n>Outer Diameter Pre 1 </label>
+                   <kendo-numerictextbox format="#.##\ mm" #outer_diameter_pre_1 name="outer_diameter_pre_1" [decimals]="1" [(ngModel)]="data.outer_diameter_pre_1">
+                    </kendo-numerictextbox>
+
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="isShow('inner_diameter_pre_1') && (offerPos.product_type !== offerPosProductType.RING_CYLINDER && offerPos.product_type != offerPosProductType.RING_ROLLED && offerPos.product_type != offerPosProductType.PIPE && offerPos.product_type != offerPosProductType.SHAFT_HOLLOW)"  [class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+                    <label [for]="inner_diameter_pre_1"  i18n>Inner Diameter Pre 1 </label>
+                   <kendo-numerictextbox format="#.##\ mm" #inner_diameter_pre_1 name="inner_diameter_pre_1" [decimals]="1" [(ngModel)]="data.inner_diameter_pre_1">
+                    </kendo-numerictextbox>
+
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="isShow('height_pre_1')  && (offerPos.product_type !== offerPosProductType.RING_CYLINDER && offerPos.product_type != offerPosProductType.RING_ROLLED && offerPos.product_type != offerPosProductType.PIPE && offerPos.product_type != offerPosProductType.SHAFT_HOLLOW)"  [class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+                    <label [for]="height_pre_1"  i18n>Height Pre 1 </label>
+                   <kendo-numerictextbox format="#.##\ mm" #height_pre_1 name="height_pre_1" [decimals]="1" [(ngModel)]="data.height_pre_1">
+                    </kendo-numerictextbox>
+
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="2" *ngIf="[offerPosProductType.BAR_ROLLED].includes(offerPos.product_type)"[class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+                    <kendo-label [for]="rolling_pin" i18n i18n-text text="Rolling Pin">
+                    </kendo-label>
+                    <kendo-combobox
+                        #rolling_pin
+                        [ngModelOptions]="{standalone: true}"
+                        [(ngModel)]="data.rolling_pin"
+                        [data]="rollingPins"
+                        [valuePrimitive]="true"
+                        textField="text"
+                        valueField="value"
+                        >
+                    </kendo-combobox>
+                </kendo-stacklayout>
+             
+                <kendo-stacklayout orientation="horizontal" [ngStyle]="{ 'margin-top': '10px' }" [gap]="2" *ngIf="[offerPosProductType.BAR_ROLLED, offerPosProductType.PIPE,offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)"[class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+                    <label [for]="is_rolled"  i18n>Is Rolled </label>
+                    <div>
+						<input type="checkbox" kendoCheckBox
+							[(ngModel)]="data.is_rolled"
+							name="is_rolled" #is_rolled />
+					</div>
+
+                </kendo-stacklayout>
+
+                <ng-container *ngIf="isShow('outer_diameter_pre_2') && [offerPosProductType.RING_ROLLED, offerPosProductType.PIPE, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type) && data.is_rolled">
+                    <div class="fourth_part">
+                        <hr style="background: black;">
+                        <kendo-stacklayout orientation="horizontal" [gap]="2" [ngStyle]="{ 'margin-top': '10px' }">
+                            <span i18n style="max-width: 12.5% !important;" *ngIf="[offerPosProductType.RING_ROLLED].includes(offerPos.product_type)">Pre Piece (disk punched)</span>
+                            <span i18n style="max-width: 12.5% !important;" *ngIf="[offerPosProductType.PIPE, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">Pre 2</span>
+                            <span i18n style="max-width: 12.5% !important;">Cold dimension</span>
+                            <span style="max-width: 12.5% !important;" i18n>Warm dimension</span>
+                        </kendo-stacklayout>
+    
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2">
+    
+                            <span i18n style="max-width: 12.2% !important;">Outer Diameter Pre 2</span> 
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #outer_diameter_pre_2 name="outer_diameter_pre_2" [decimals]="2" [(ngModel)]="data.outer_diameter_pre_2">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #outer_diameter_pre_1_warm name="outer_diameter_pre_1_warm" [decimals]="2" [(ngModel)]="data.outer_diameter_pre_2_warm">
+                            </kendo-numerictextbox>
+                        </kendo-stacklayout>
+    
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2">
+    
+                            <span i18n style="max-width: 12.2% !important;">Inner Diameter Pre 2</span> 
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #inner_diameter_pre_2 name="inner_diameter_pre_2" [decimals]="2" [(ngModel)]="data.inner_diameter_pre_2">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #inner_diameter_pre_1_warm name="inner_diameter_pre_1_warm" [decimals]="2" [(ngModel)]="data.inner_diameter_pre_2_warm">
+                            </kendo-numerictextbox>  
+                        </kendo-stacklayout>
+    
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2">
+    
+                            <span i18n style="max-width: 12.2% !important;">Height Pre 2</span> 
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #height_pre_2 name="height_pre_2" [decimals]="2" [(ngModel)]="data.height_pre_2">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" style="max-width: 12.5% !important;" #height_pre_2_warm name="height_pre_2_warm" [decimals]="2" [(ngModel)]="data.height_pre_2_warm">
+                            </kendo-numerictextbox>  
+                        </kendo-stacklayout>
+    
+                        <kendo-stacklayout style="width: 100% !important;"   orientation="horizontal" [gap]="2" class="input-box-width">
+                            <label [for]="ring_cylinder" style="max-width: 12.2% !important;"  i18n>Ring cylinder</label>
+                           <kendo-numerictextbox style="max-width: 12.5% !important;"  format="#.##\ mm" #length name="ring_cylinder_pre_2" [decimals]="2" [value]="calculateRingCylinderDiameterPre2(data)" [disabled]="true">
+                            </kendo-numerictextbox>
+                            
+                            <kendo-numerictextbox style="max-width: 12.5% !important;"  format="#.##\ mm" #length name="ring_cylinder_pre_2_warm" [decimals]="2" [value]="calculateRingCylinderDiameterPre2Warm(data)" [disabled]="true">
+                            </kendo-numerictextbox>
+                     
+                        </kendo-stacklayout>
+                    </div>
+                    
+                </ng-container>
+
+                <ng-container *ngIf="[offerPosProductType.PIPE, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                    <div [ngClass]="{'fourth_part' : offerPos.product_type == offerPosProductType.PIPE}" *ngIf="data.is_rolled">
+                        <hr  style="background: black;">
+                        <kendo-stacklayout [ngStyle]="{ 'margin-top': '10px' }" orientation="horizontal" [gap]="2" >
+                            <span i18n>Info</span>
+                            <span i18n>Rollweg</span>
+                            <span i18n>Rolling pin value </span>
+                            <span i18n>Rolling pin value 1</span>
+                            <span i18n>Aggregat </span>
+                            <span i18n>Aggregate 1 </span>
+                            <span i18n>alt. Aggre </span>
+                        </kendo-stacklayout>
+                        <kendo-stacklayout  orientation="horizontal" [gap]="2"> 
+                            <span i18n> Data</span> 
+    
+                            <kendo-numerictextbox format="#.##\ mm" #rollweg name="rollweg" [decimals]="2" [(ngModel)]="data.rollweg">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ mm" #rolling_pin_value name="rolling_pin_value" [(ngModel)]="data.rolling_pin_value" [decimals]="2">
+                            </kendo-numerictextbox>
+    
+                            <kendo-numerictextbox format="#.##\ kg" #rolling_pin_1 name="rolling_pin_1" [decimals]="2" [(ngModel)]="data.rolling_pin_1">
+                            </kendo-numerictextbox>
+    
+                            <kendo-combobox #machine_id [ngModelOptions]="{standalone: true}"
+                                           [(ngModel)]="data.machine_id" [data]="machines" textField="custom_id"
+                                           valueField="id" [valuePrimitive]="true" [disabled]="true">
+                            </kendo-combobox>
+    
+                            <kendo-combobox #machine_id [ngModelOptions]="{standalone: true}"
+                                           [(ngModel)]="data.machine_id_2" [data]="machines" textField="custom_id"
+                                           valueField="id" [valuePrimitive]="true" [disabled]="true">
+                            </kendo-combobox>
+    
+                            <kendo-combobox #machine_id [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="data.machine_id_3" [data]="machines" textField="custom_id"
+                                            valueField="id" [valuePrimitive]="true" [disabled]="true">
+                            </kendo-combobox>
+                        </kendo-stacklayout>
+                    </div>
+                </ng-container>
+
+				<kendo-stacklayout orientation="horizontal" [gap]="2"  *ngIf="isShow('outer_diameter_pre_2') && [offerPosProductType.BAR_ROLLED].includes(offerPos.product_type) && data.is_rolled"  [class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+					<label [for]="outer_diameter_pre_2"  i18n>Outer Diameter Pre 2 </label>
+					<kendo-numerictextbox format="#.##\ mm" #outer_diameter_pre_2 name="outer_diameter_pre_2" [decimals]="1" [(ngModel)]="data.outer_diameter_pre_2">
+					</kendo-numerictextbox>
+
+				</kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="2"  *ngIf="isShow('inner_diameter_pre_2') && [offerPosProductType.BAR_ROLLED].includes(offerPos.product_type) && data.is_rolled"  [class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+                    <label [for]="inner_diameter_pre_2"  i18n>Inner Diameter Pre 2 </label>
+                   <kendo-numerictextbox format="#.##\ mm" #inner_diameter_pre_2 name="inner_diameter_pre_2" [decimals]="1" [(ngModel)]="data.inner_diameter_pre_2">
+                    </kendo-numerictextbox>
+
+                </kendo-stacklayout>
+
+                <!-- <kendo-stacklayout orientation="horizontal" [gap]="2"  *ngIf="isShow('height_pre_2') && [offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type) && data.is_rolled"  [class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+                    <label [for]="height_pre_2"  i18n>Height Pre 2 </label>
+                   <kendo-numerictextbox format="#.##\ mm" #height_pre_2 name="height_pre_2" [decimals]="1" [(ngModel)]="data.height_pre_2">
+                    </kendo-numerictextbox>
+
+                </kendo-stacklayout> -->
+                <kendo-stacklayout orientation="horizontal" *ngIf="[offerPosProductType.BAR_ROLLED].includes(offerPos.product_type) && data.is_rolled" [gap]="2" [class]="offerPos.product_type == offerPosProductType.SHAFT_HOLLOW ? 'k-w-1/2' : 'input-box-width'">
+                    <label [for]="rolling_pin_value"  i18n>Rolling pin value </label>
+                   <kendo-numerictextbox format="#.##\ mm" #rolling_pin_value name="rolling_pin_value" [decimals]="1" [(ngModel)]="data.rolling_pin_value">
+                    </kendo-numerictextbox>
+
+                </kendo-stacklayout>
+
+        <div class="k-mt-8" *ngIf="[offerPosProductType.UPSET_PART,offerPosProductType.SHAFT].includes(offerPos.product_type)">
+           <p i18n>Forged beam</p>
+            <div class="forged-part">
+                <div>
+                    <kendo-textarea [rows]="5"  #forged_beam_text_1 name="forged_beam_text_1"  [(ngModel)]="data.forged_beam_text_1"></kendo-textarea>
+                </div>
+               <div>
+                <table class="diagram-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <kendo-numerictextbox class="numeric-textbox" format="#.##\ Φ"  [(ngModel)]="data.forged_beam_value_1" #forged_beam_value_1 name="forged_beam_value_1" [decimals]="1">
+                                </kendo-numerictextbox>
+                                <br>
+                                <kendo-numerictextbox class="numeric-textbox-red"  format="#.##\ Φ" [(ngModel)]="data.forged_beam_value_2" #forged_beam_value_2 name="forged_beam_value_2" [decimals]="1">
+                                </kendo-numerictextbox>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span class="flex-row">
+                                    <hr class="hr-line">
+                                    <kendo-numerictextbox [(ngModel)]="data.forged_beam_value_3" #forged_beam_value_3 name="forged_beam_value_3" [decimals]="1"></kendo-numerictextbox>
+                                    <hr class="hr-line">
+                                </span>
+                                <span class="flex-row-small">
+                                    <hr class="hr-line">
+                                    <kendo-numerictextbox class="numeric-textbox-red" [(ngModel)]="data.forged_beam_value_4" #forged_beam_value_4 name="forged_beam_value_4" [decimals]="1"></kendo-numerictextbox>
+                                    <hr class="hr-line">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="flex-row">
+                                    <hr class="hr-line">
+                                    <kendo-numerictextbox [(ngModel)]="data.forged_beam_value_5" #forged_beam_value_5 name="forged_beam_value_5" [decimals]="1"></kendo-numerictextbox>
+                                    <hr class="hr-line">
+                                </span>
+                                <span class="flex-row-small">
+                                    <hr class="hr-line">
+                                    <kendo-numerictextbox class="numeric-textbox-red" [(ngModel)]="data.forged_beam_value_6" #forged_beam_value_6 name="forged_beam_value_6" [decimals]="1"></kendo-numerictextbox>
+                                    <hr class="hr-line">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="flex-row">
+                                    <hr class="hr-line">
+                                    <kendo-numerictextbox [(ngModel)]="data.forged_beam_value_7" #forged_beam_value_7 name="forged_beam_value_7" [decimals]="1"></kendo-numerictextbox>
+                                    <hr class="hr-line">
+                                </span>
+                                <span class="flex-row-small">
+                                    <hr class="hr-line">
+                                    <kendo-numerictextbox class="numeric-textbox-red" [(ngModel)]="data.forged_beam_value_8" #forged_beam_value_8 name="forged_beam_value_8" [decimals]="1"></kendo-numerictextbox>
+                                    <hr class="hr-line">
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+               </div>
+                <div>
+                    <kendo-textarea [rows]="5" #forged_beam_text_2 name="forged_beam_text_2"  [(ngModel)]="data.forged_beam_text_2"></kendo-textarea>
+                </div>
+            </div>
+        </div>
+                <h4 i18n>Material Usage</h4>                
+                <table class="k-w-full bordered-table">
+                    <tr>
+                        <td i18n>Material</td>
+                        <td i18n>Operating Weight <span class="k-text-error k-pl-1" *ngIf="![offerPosProductType.DISK].includes(offerPos.product_type)">*</span></td>
+                        <td i18n>Semi Finished Product</td>
+                        <td i18n width="300px"> Choose Semi Finished Product Type</td>
+                        <td i18n>Ges. Verfomung</td>
+                    </tr>
+                    <tr>
+                        <td i18n>Data</td>
+                        <td>
+                       
+                                <div *ngIf="[offerPosProductType.DISK].includes(offerPos.product_type)">
+                                    <kendo-numerictextbox format="#.##\ kg" #operating_weight name="operating_weight" [decimals]="2" [value]="calculateAndAssignOperatingWeight(data)" [(ngModel)]="data.operating_weight">
+                                    </kendo-numerictextbox>
+                                </div>
+
+                                <div *ngIf="![offerPosProductType.DISK].includes(offerPos.product_type)">
+                                    <kendo-numerictextbox format="#.##\ kg" #operating_weight name="operating_weight" [decimals]="2" [(ngModel)]="data.operating_weight" (valueChange)="calcSemiFinishedProductTypes(data)">
+                                     </kendo-numerictextbox>
+                                     <div *ngIf="submitted && !data.operating_weight" class="k-text-error k-fs-sm" i18n>
+                                        Operating weight required fields.
+                                    </div>
+                                 </div>
+                        </td>
+                        <td>
+                                
+                                   <kendo-numerictextbox format="#.##\ mm" #semi_finished_product name="semi_finished_product" [decimals]="1" [(ngModel)]="data.semi_finished_product">
+                                    </kendo-numerictextbox>
+                        </td>
+                        <td>
+                           
+                                <kendo-combobox
+                                    #semi_finished_product_type
+                                    [ngModelOptions]="{standalone: true}"
+                                    [(ngModel)]="data.semi_finished_product_type"
+                                    [data]="semiFinishedProducts"
+                                    [valuePrimitive]="true"
+                                    textField="text"
+                                    valueField="value"
+                                    >
+                                </kendo-combobox>
+                        </td>
+                        <td>
+                          
+                               <kendo-numerictextbox  #deformation name="deformation" [decimals]="1" [(ngModel)]="data.material_forging_degree_total">
+                                </kendo-numerictextbox>
+                        </td>
+                    </tr>
+                
+                </table>
+                <ng-container *ngIf="![offerPosProductType.SHAFT, offerPosProductType.UPSET_PART, offerPosProductType.BAR_SQUARE, offerPosProductType.BAR_ROUND, offerPosProductType.SHAFT_HOLLOW].includes(offerPos.product_type)">
+                    <table class="k-w-full bordered-table">
+                        <tr>
+                            <td i18n>Semi Finished Product Type</td>
+                            <td i18n>A min</td>
+                            <td i18n>Length min</td>
+                            <td i18n>A max</td>
+                            <td i18n>Length max</td>
+                        </tr>
+                        <tr>
+                            <td i18n>SQUARE</td>
+                            <td>{{data.a_min | kendoNumber}} {{data.a_min?'mm': ''}}</td>
+                            <td>{{data.a_length_min | kendoNumber}} {{data.a_length_min?'mm': ''}}</td>
+                            <td>{{data.a_max | kendoNumber}} {{data.a_max?'mm': ''}}</td>
+                            <td>{{data.a_length_max | kendoNumber}} {{data.a_length_max?'mm': ''}}</td>
+                        </tr>
+                        <tr>
+                            <td i18n>ROUND</td>
+                            <td>{{data.d_min | kendoNumber}} {{data.d_min?'mm': ''}}</td>
+                            <td>{{data.d_length_min | kendoNumber}} {{data.d_length_min?'mm': ''}}</td>
+                            <td>{{data.d_max | kendoNumber}} {{data.d_max?'mm': ''}}</td>
+                            <td>{{data.d_length_max | kendoNumber}} {{data.d_length_max?'mm': ''}}</td>
+                        </tr>
+                        <tr>
+                            <td i18n>OCTAGON</td>
+                            <td>{{data.w_min | kendoNumber}} {{data.w_min?'mm': ''}}</td>
+                            <td>{{data.w_length_min | kendoNumber}} {{data.w_length_min?'mm': ''}}</td>
+                            <td>{{data.w_max | kendoNumber}} {{data.w_max?'mm': ''}}</td>
+                            <td>{{data.w_length_max | kendoNumber}} {{data.w_length_max?'mm': ''}}</td>
+                        </tr>
+                    </table>
+                <div style="display: none;">    
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" class="semi-product-type">
+                        <kendo-stacklayout orientation="horizontal" [gap]="2">
+                            <kendo-label i18n i18n-text text="Semi Finished Product Type:"></kendo-label>
+                            <kendo-label i18n class="k-font-medium">SQUARE</kendo-label>
+                        </kendo-stacklayout>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="2">
+                        <kendo-stacklayout class="k-align-items-center" orientation="horizontal" [gap]="2">
+                            <label [for]="" i18n>A min: </label>
+                            <label [for]="" i18n>{{data.a_min | kendoNumber}} {{data.a_min?'mm': ''}}</label>
+                            <label [for]="" i18n>Length min: </label>
+                            <label [for]="" i18n>{{data.a_length_min | kendoNumber}} {{data.a_length_min?'mm': ''}}</label>
+                            <label [for]="" i18n>A max: </label>
+                            <label [for]="" i18n>{{data.a_max | kendoNumber}} {{data.a_max?'mm': ''}}</label>
+                            <label [for]="" i18n>Length max: </label>
+                            <label [for]="" i18n>{{data.a_length_max | kendoNumber}} {{data.a_length_max?'mm': ''}}</label>
+                        </kendo-stacklayout>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" class="semi-product-type">
+                        <kendo-stacklayout orientation="horizontal" [gap]="2">
+                            <kendo-label i18n i18n-text text="Semi Finished Product Type:"></kendo-label>
+                            <kendo-label i18n class="k-font-medium">ROUND</kendo-label>
+                        </kendo-stacklayout>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="2">
+                        <kendo-stacklayout class="k-align-items-center" orientation="horizontal" [gap]="2">
+                            <label [for]="" i18n>D min : </label>
+                            <label [for]="" i18n>{{data.d_min | kendoNumber}} {{data.d_min?'mm': ''}}</label>
+                            <label [for]="" i18n>Length min: </label>
+                            <label [for]="" i18n>{{data.d_length_min  | kendoNumber}} {{data.d_length_min?'mm': ''}}</label>
+                            <label [for]="" i18n>D max: </label>
+                            <label [for]="" i18n>{{data.d_max }} {{data.d_max?'mm': ''}}</label>
+                            <label [for]="" i18n>Length max: </label>
+                            <label [for]="" i18n>{{data.d_length_max | kendoNumber}} {{data.d_length_max?'mm': ''}}</label>
+                        </kendo-stacklayout>
+                    </kendo-stacklayout>
+
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="2" class="semi-product-type">
+                        <kendo-stacklayout orientation="horizontal" [gap]="2">
+                            <kendo-label i18n i18n-text text="Semi Finished Product Type:"></kendo-label>
+                            <kendo-label i18n class="k-font-medium">OCTAGON</kendo-label>
+                        </kendo-stacklayout>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="2">
+                        <kendo-stacklayout class="k-align-items-center" orientation="horizontal" [gap]="2">
+                            <label [for]="" i18n>W min: </label>
+                            <label [for]="" i18n>{{data.w_min | kendoNumber}} </label>
+                            <label [for]="" i18n>Length min: </label>
+                            <label [for]="" i18n>{{data.w_length_min | kendoNumber}} </label>
+                            <label [for]="" i18n>W max </label>
+                            <label [for]="" i18n>{{data.w_max | kendoNumber}} </label>
+                            <label [for]="" i18n>Length max: </label>
+                            <label [for]="" i18n>{{data.w_length_max | kendoNumber}}</label>
+                        </kendo-stacklayout>
+                    </kendo-stacklayout>
+                </div>    
+                </ng-container>
+            </kendo-card-body>
+        </kendo-card>
+     </ng-container>
+</div>
+<div class="dimensions" *ngIf="!isForm">
+    <h3>Dimensions/Material Usage</h3>
+    <div class="finished">
+        <p i18n>Finished dimensions/delivery dimensions:</p>
+
+        <table >
+            <tr *ngIf="isShow('outer_diameter_final')">
+                <td i18n>Outer Diameter Final:</td>
+                <td class="k-text-center">{{offerPos.outer_diameter_final| kendoNumber}}</td>
+                <td i18n>Surface:</td>
+                <td class="k-text-center">{{dimensionSurfaceClass.getStateTranslate(offerPos.outer_diameter_surface_final)}}</td>
+            </tr>
+            <tr *ngIf="isShow('side_a_final')">
+                <td i18n>Side A Final:</td>
+                <td class="k-text-center">{{offerPos.side_a_final| kendoNumber}}</td>
+                <td i18n>Surface:</td>
+                <td class="k-text-center">{{dimensionSurfaceClass.getStateTranslate(offerPos.side_a_surface_final)}}</td>
+            </tr>
+            <tr *ngIf="isShow('side_b_final')">
+                <td i18n>Side B Final:</td>
+                <td class="k-text-center">{{offerPos.side_b_final| kendoNumber}}</td>
+                <td i18n>Surface:</td>
+                <td class="k-text-center">{{dimensionSurfaceClass.getStateTranslate(offerPos.side_b_surface_final)}}</td>
+            </tr>
+            <tr *ngIf="isShow('inner_diameter_final')">
+                <td i18n>Inner Diameter Final:</td>
+                <td class="k-text-center">{{offerPos.inner_diameter_final| kendoNumber}}</td>
+                <td i18n>Surface:</td>
+                <td class="k-text-center">{{dimensionSurfaceClass.getStateTranslate(offerPos.inner_diameter_surface_final)}}</td>
+            </tr>
+            <tr *ngIf="isShow('height_final')">
+                <td i18n>Height Final:</td>
+                <td class="k-text-center">{{offerPos.height_final| kendoNumber}}</td>
+                <td i18n>Surface:</td>
+                <td class="k-text-center">{{dimensionSurfaceClass.getStateTranslate(offerPos.height_surface_final)}}</td>
+            </tr>
+            <tr *ngIf="isShow('length_final')">
+                <td i18n>Length Final:</td>
+                <td class="k-text-center">{{offerPos.length_final| kendoNumber}}</td>
+                <td i18n>Surface:</td>
+                <td class="k-text-center">{{dimensionSurfaceClass.getStateTranslate(offerPos.length_surface_final)}}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="blank">
+        <kendo-card [width]="49" class="raw-table" *ngFor="let data of offerPos.offerPosRawDimensions; let i = index">
+            <kendo-card-header>
+                <p i18n>Blank part dimensions - {{i+1}}</p>
+            </kendo-card-header>
+            <kendo-card-body>
+                <table >
+                    <tr>
+                        <td>  </td>
+                        <td>  </td>
+                        <td class="k-text-center" i18n>Encore(Info) </td>
+                        <td class="k-text-center" i18n>Lower Tolerance </td>
+                        <td class="k-text-center" i18n>Upper Tolerance </td>
+                        <td class="k-text-center" i18n>Additional Dimension </td>
+                        <td class="k-text-center" i18n>Sample Allowance </td>
+                    </tr>
+                    <tr *ngIf="isShow('inner_diameter')">
+                        <td i18n>Inner Diameter :</td>
+                        <td class="k-text-center">{{data.inner_diameter| kendoNumber}}</td>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <td *ngIf="type.type=='inner_diameter'" class="k-text-center">{{type.encore_info| kendoNumber}}</td>
+                            <td *ngIf="type.type=='inner_diameter'" class="k-text-center">{{type.lower_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='inner_diameter'" class="k-text-center">{{type.upper_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='inner_diameter'" class="k-text-center">{{type.additional_dimensions| kendoNumber}}</td>
+                            <td *ngIf="type.type=='inner_diameter'" class="k-text-center">{{type.sample_allowance| kendoNumber}}</td>
+                        </ng-container>
+                    </tr>
+                    <tr *ngIf="isShow('outer_diameter')">
+                        <td i18n>Outer Diameter :</td>
+                        <td class="k-text-center">{{data.outer_diameter| kendoNumber}}</td>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <td *ngIf="type.type=='outer_diameter'" class="k-text-center">{{type.encore_info| kendoNumber}}</td>
+                            <td *ngIf="type.type=='outer_diameter'" class="k-text-center">{{type.lower_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='outer_diameter'" class="k-text-center">{{type.upper_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='outer_diameter'" class="k-text-center">{{type.additional_dimensions| kendoNumber}}</td>
+                            <td *ngIf="type.type=='outer_diameter'" class="k-text-center">{{type.sample_allowance| kendoNumber}}</td>
+                        </ng-container>
+                    </tr>
+
+                    <tr *ngIf="isShow('side_a')">
+                        <td i18n>Side B :</td>
+                        <td class="k-text-center">{{data.side_a| kendoNumber}}</td>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <td *ngIf="type.type=='side_a'" class="k-text-center">{{type.encore_info| kendoNumber}}</td>
+                            <td *ngIf="type.type=='side_a'" class="k-text-center">{{type.lower_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='side_a'" class="k-text-center">{{type.upper_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='side_a'" class="k-text-center">{{type.additional_dimensions| kendoNumber}}</td>
+                            <td *ngIf="type.type=='side_a'" class="k-text-center">{{type.sample_allowance| kendoNumber}}</td>
+                        </ng-container>
+                    </tr>
+                    <tr *ngIf="isShow('side_b')">
+                        <td i18n>Side B :</td>
+                        <td class="k-text-center">{{data.side_b| kendoNumber}}</td>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <td *ngIf="type.type=='side_b'" class="k-text-center">{{type.encore_info| kendoNumber}}</td>
+                            <td *ngIf="type.type=='side_b'" class="k-text-center">{{type.lower_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='side_b'" class="k-text-center">{{type.upper_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='side_b'" class="k-text-center">{{type.additional_dimensions| kendoNumber}}</td>
+                            <td *ngIf="type.type=='side_b'" class="k-text-center">{{type.sample_allowance| kendoNumber}}</td>
+                        </ng-container>
+                    </tr>
+                    <tr *ngIf="isShow('height')">
+                        <td i18n>Height :</td>
+                        <td class="k-text-center">{{data.height| kendoNumber}}</td>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <td *ngIf="type.type=='height'" class="k-text-center">{{type.encore_info| kendoNumber}}</td>
+                            <td *ngIf="type.type=='height'" class="k-text-center">{{type.lower_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='height'" class="k-text-center">{{type.upper_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='height'" class="k-text-center">{{type.additional_dimensions| kendoNumber}}</td>
+                            <td *ngIf="type.type=='height'" class="k-text-center">{{type.sample_allowance| kendoNumber}}</td>
+                        </ng-container>
+                    </tr>
+                    <tr *ngIf="isShow('length')">
+                        <td i18n>Length :</td>
+                        <td class="k-text-center">{{data.length| kendoNumber}}</td>
+                        <ng-container *ngFor="let type of data.rawDimensionTypes">
+                            <td *ngIf="type.type=='length'" class="k-text-center">{{type.encore_info| kendoNumber}}</td>
+                            <td *ngIf="type.type=='length'" class="k-text-center">{{type.lower_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='length'" class="k-text-center">{{type.upper_tolerance| kendoNumber}}</td>
+                            <td *ngIf="type.type=='length'" class="k-text-center">{{type.additional_dimensions| kendoNumber}}</td>
+                            <td *ngIf="type.type=='length'" class="k-text-center">{{type.sample_allowance| kendoNumber}}</td>
+                        </ng-container>
+                    </tr>
+
+                    <tr *ngIf="isShow('outer_diameter_disk_punched')">
+                        <td i18n>Outer Diameter Disk Punched :</td>
+                        <td   class="k-text-center">{{data.outer_diameter_disk_punched| kendoNumber}}</td>
+                    </tr>
+                    <tr *ngIf="isShow('inner_diameter_pre_1')">
+                        <td i18n>Inner Diameter Pre 1 :</td>
+                        <td  class="k-text-center">{{data.inner_diameter_pre_1| kendoNumber}}</td>
+                    </tr>
+                    <tr *ngIf="isShow('height_pre_1')">
+                        <td i18n>Height Pre 1 :</td>
+                        <td  class="k-text-center">{{data.height_pre_1| kendoNumber}}</td>
+                    </tr>
+                    <tr *ngIf="isShow('inner_diameter_pre_2')">
+                        <td i18n>Inner Diameter Pre 2 :</td>
+                        <td  class="k-text-center">{{data.inner_diameter_pre_2| kendoNumber}}</td>
+                    </tr>
+                    <tr *ngIf="isShow('height_pre_2')">
+                        <td i18n>Height Pre 2 :</td>
+                        <td  class="k-text-center">{{data.height_pre_2| kendoNumber}}</td>
+
+                    </tr>
+                    <tr>
+                        <td i18n>Gross Weight </td>
+                        <td  class="k-text-center">{{data.gross_weight | kendoNumber}}</td>
+                    </tr>
+
+                <h4  i18n>Material Usage:</h4>
+                <tr>
+                    <td  i18n>Operating Weight: </td>
+                    <td class="k-text-center">{{data.operating_weight}}</td>
+                </tr>
+                <tr>
+                    <td i18n>Semi Finished Product: </td>
+                    <td class="k-text-center">{{data.semi_finished_product}}</td>
+                    <td i18n>Deformation: </td>
+                    <td class="k-text-center">{{data.deformation}}</td>
+                </tr>
+                <!-- <tr>
+                    <td i18n>Semi Finished Product Type </td>
+                    <td  class="k-text-center">{{data.semi_finished_product_type}}</td>
+                </tr> -->
+                </table>
+              </kendo-card-body>
+        </kendo-card>
+    </div>
+</div>
+<app-filter-dialog
+    (closeEventEmiter)="closeComboSearchModal($event)"
+    (selectEventEmiter)="selectComboSearchData($event)"
+    *ngIf="showItemModal"
+    [items]="items"
+    [isWindowLoaderEnabled]="isWindowLoaderEnabled"
+    [currentItem]="offerPos.item"
+    [columns]="columns"
+    [settings]="settings"
+    [buttonText]="basisMaterialTuttonText"
+    (buttonEvent)="filterWithOrWithoutZero($event)"
+>
+</app-filter-dialog>
+
+<kendo-dialog
+	style="z-index: 99999999"
+	i18n-title
+	title="Attachments"
+	*ngIf="isAttachmentDialogOpen"
+	(close)="closeAttachmentDialog()"
+	[minWidth]="'80vw'"
+	[minHeight]="'800px'">
+    <app-attachment-preview [filePreviewHeight]="'800'"  [attachmentFiles]="attachmentFiles" [isLoading]="attachmentLoader"></app-attachment-preview>
+</kendo-dialog>
+
+<app-ring-calculation [machines]="machines" [ringCalculationDialogOpened]="ringCalculationDialogOpen" [rawDimentionIndex]="rawDimentionIndex" [offerPos]="offerPos" (onCloseRingCalculationDialog)="onCloseRingCalculationDialog()"></app-ring-calculation>

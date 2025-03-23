@@ -1,0 +1,15 @@
+.card-width-adjustment{
+  width: -webkit-fill-available;
+}
+
+.goodPartColor {
+  color: var(--goodPartColor)
+}
+
+.badPartColor {
+  color: var(--badPartColor)
+}
+
+.reworkPartColor {
+  color: var(--reworkPartColor)
+}

@@ -1,0 +1,23 @@
+<app-dialog
+	[isDialogOpen]="isDialogOpen"
+	title="Switch Machine"
+    (onBeforeClose)="closeDialog()"
+	i18n-title>
+    <ui5-busy-indicator [active]="isBusy" class="h-64 w-64">
+	<div class="h-64 w-64">
+            <ui5-list class="w-64" selectionMode="Single" (selectionChange)="selectMachine($event)">
+                <ui5-li
+				*ngFor="let machine of machines"
+				[id]="machine.id"
+                class="w-64"
+				>{{ machine.custom_id }} - {{ machine.name }}</ui5-li
+                >
+            </ui5-list>
+        </div>
+    </ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="w-64 justify-end items-center div-row">
+		<ui5-button i18n design="Transparent" (click)="closeDialog()">Close</ui5-button>
+	</div>
+</app-dialog>

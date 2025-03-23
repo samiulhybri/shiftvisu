@@ -1,0 +1,12 @@
+ui5-dialog::part(header) {
+	padding-inline: 0;
+	padding: 0;
+}
+
+ui5-dialog::part(footer) {
+	padding-inline: 1rem;
+}
+
+ui5-dialog::part(content) {
+	padding-inline: 2rem;
+}

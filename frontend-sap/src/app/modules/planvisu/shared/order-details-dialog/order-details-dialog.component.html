@@ -1,0 +1,485 @@
+<ui5-dialog
+	id="dialog"
+	[open]="open"
+	(beforeClose)="closeDialog()">
+	<ui5-bar
+		slot="header"
+		class="w-full ml-[-30px]">
+		<ui5-title
+			level="H5"
+			slot="startContent">
+			{{ dialogTitle }}
+		</ui5-title>
+	</ui5-bar>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L">
+		<div class="form">
+			<form
+				(ngSubmit)="onSubmitForm(createOrUpdateForm)"
+				#createOrUpdateForm="ngForm">
+				<div class="flex flex-col">
+					<div class="flex flex-space-between gap-10 w-150">
+						<div class="flex flex-col">
+							<div class="flex flex-row">
+								<div class="flex flex-col w-[90%]">
+									<ui5-label
+										for="orderNumber"
+										show-colon
+										i18n
+										>Order</ui5-label
+									>
+									<ui5-input
+										id="prodOrder"
+										class="w-[265px]"
+										name="prodOrder"
+										#prodOrder="ngModel"
+										disabled
+										[(ngModel)]="
+											(selectedOperation.prodOrderPos?.prodOrder)!.custom_id
+										"></ui5-input>
+								</div>
+								<div class="flex flex-col w-[10%] mt-1">
+									<ui5-label
+										for="copy"
+										></ui5-label>
+									<ui5-button icon="copy" (click)="copyToClipboard()"></ui5-button>
+								</div>
+							</div>
+							<div class="flex flex-col mt-2">
+								<ui5-label
+									for="machine"
+									show-colon
+									i18n
+									>Machine</ui5-label
+								>
+								<ui5-combobox
+									id="machineComboBox"
+									class="w-[300px]"
+									#machineComboBox
+									[value]="
+										(selectedOperation.machine?.custom_id || '') +
+										' - ' +
+										(selectedOperation.machine?.name || '')
+									"
+									[readonly]="isDialogEditable"
+									(selection-change)="onChangeMachine($event)"
+									(input)="onMachineInputChange($event)">
+									<ng-container *ngFor="let machine of opeartionMachines">
+										<ui5-cb-item
+											id="{{ machine.machine.id }}"
+											[additionalText]="machine.machine.name"
+											text="{{ machine.machine.custom_id }}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex flex-col mt-2">
+								<ui5-label
+									for="start"
+									show-colon
+									i18n
+									>Start</ui5-label
+								>
+								<ui5-datetime-picker
+									id="startDatePicker"
+									name="start"
+									[(ngModel)]="operationStart"
+									(change)="onChangeStartDate()"
+									[readonly]="isDialogEditable"
+									#startInput="ngModel"
+									[valueState]="
+										startInput.valid == false &&
+										(startInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									class="w-[300px]"
+									format-pattern="dd.MM.yyyy, HH:mm">
+								</ui5-datetime-picker>
+							</div>
+							<div class="flex flex-col mt-2">
+								<ui5-label
+									for="end"
+									show-colon
+									i18n
+									>End</ui5-label
+								>
+								<ui5-busy-indicator [active]="isEndBusy">
+									<ui5-datetime-picker
+										id="endDatePicker"
+										name="end"
+										[(ngModel)]="operationEndValue"
+										readonly
+										#endInput="ngModel"
+										[valueState]="
+											endInput.valid == false &&
+											(endInput.touched || createOrUpdateForm.submitted)
+												? 'Negative'
+												: 'None'
+										"
+										class="w-[300px]"
+										format-pattern="dd.MM.yyyy, HH:mm"
+										(change)="onChangeStartDate()">
+									</ui5-datetime-picker>
+								</ui5-busy-indicator>
+							</div>
+                            <div class="flex flex-col">
+                                <div class="flex flex-col mt-2">
+                                    <ui5-label
+                                        show-colon
+                                        i18n
+                                        >Due Date</ui5-label
+                                    >
+                                    <ui5-text class="mt-1.5 mb-1.5">{{ getDueDate() || "" }}</ui5-text>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <div class="flex flex-col mt-2">
+                                    <ui5-label
+                                    for="constraint"
+									show-colon
+									i18n
+									>Constraint Type</ui5-label
+								>
+								<ui5-combobox
+									id="constraintComboBox"
+									class="w-100"
+									#constraintComboBox
+									[value]="getConstraintText(selectedOperation.constraint_type)"
+									(selection-change)="onConstraintChange($event)"
+                                    >
+                                    >
+									<ng-container
+										*ngFor="let constraint of machineConstraints">
+										<ui5-cb-item
+											id="{{ constraint.value }}"
+											text="{{
+												constraint.text
+											}}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+                                </div>
+                            </div>
+						</div>
+						<div class="flex flex-col">
+							<div class="flex flex-col">
+								<ui5-label
+									for="status"
+									show-colon
+									i18n
+									>Status</ui5-label
+								>
+								<ui5-combobox
+									id="statusComboBox"
+									class="w-100"
+									#machineComboBox
+									[value]="getStatusText(selectedOperation.status)"
+									[disabled]="
+										selectedOperation.status != 'TERMINATED' && !isStatusChanged
+									"
+									(selection-change)="onStatusChange($event)">
+									<ng-container
+										*ngFor="let status of prodOrderPosOperationStatusData">
+										<ui5-cb-item
+											id="{{ status.value }}"
+											text="{{
+												statusTextChange(status.text)
+											}}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex flex-col mt-2">
+								<ui5-label
+									for="te"
+									show-colon
+									i18n
+									>TE</ui5-label
+								>
+								<ui5-input
+								id="te"
+								class="w-100"
+								name="te"
+								[readonly]="isTEeditable ? false : isDialogEditable"
+									#teInput
+									[value]="selectedOperation.te?.toString() ?? ''"
+									(change)="onChangeTE($event)"></ui5-input>
+							</div>
+							<div class="flex flex-col mt-2">
+								<ui5-label
+									show-colon
+									i18n
+									>Total</ui5-label
+								>
+								<ui5-input
+									id="total"
+									class="w-100"
+									name="operationTotal"
+									#operationTotal="ngModel"
+									(change)="calculateEndValue()"
+									[readonly]="isDialogEditable"
+									[(ngModel)]="
+										selectedOperation?.prodOrderPos!.quantity
+									"></ui5-input>
+							</div>
+                            <div class="flex flex-row">
+                                <div class="flex flex-col mt-2">
+                                    <ui5-label
+                                        for="cavity"
+                                        show-colon
+                                        i18n
+                                        >Qty/Shot</ui5-label
+                                    >
+                                    <ui5-input
+                                        id="cavity"
+                                        class="w-[120px]"
+                                        name="cavity"
+                                        #cavity="ngModel"
+                                        type="Number"
+                                        [readonly]="isDialogEditable"
+                                        [(ngModel)]="selectedOperation.cavity"
+                                        (change)="calculateEndValue()"></ui5-input>
+                                </div>
+                                <div class="flex flex-col mt-2 ml-[10px]">
+                                    <ui5-label
+                                        for="cavity"
+                                        show-colon
+                                        i18n
+                                        >POS</ui5-label
+                                    >
+                                    <ui5-input
+                                        id="pos"
+                                        class="w-[120px]"
+                                        name="pos"
+                                        [readonly]="true"
+                                        [value]="selectedOperation.pos"></ui5-input>
+                                </div>
+                            </div>
+                             <div class="flex flex-col mt-2">
+								<ui5-label
+									show-colon
+									i18n
+									>Release Date</ui5-label
+								>
+								<ui5-text class="mt-1.5 mb-1.5">{{ getReleasedDate() || "" }}</ui5-text>
+							</div>
+						</div>
+						<div class="flex flex-col">
+							<div class="flex flex-col">
+								<ui5-label
+									for="item"
+									show-colon
+									i18n
+									>Item</ui5-label
+								>
+								<ui5-text class="mt-1.5 mb-1.5">{{ selecteItem }}</ui5-text>
+							</div>
+							<div class="flex flex-col mt-3">
+								<div class="flex flex-row justify-between">
+									<ui5-label
+										for="tool"
+										show-colon
+										i18n
+										>Tool</ui5-label
+									>
+
+									<ui5-text
+										class="text-red-600"
+										i18n
+										#maintenanceText>
+										Tool is not ready for Production</ui5-text
+									>
+								</div>
+								<ui5-combobox
+									id="toolsComboBox"
+									class="w-[500px]"
+									#toolsComboBox
+									[value]="
+										(selectedOperation.tool?.custom_id || '') +
+										' - ' +
+										(selectedOperation.tool?.name || '')
+									"
+									(selection-change)="onChangeTool($event)">
+									<ng-container
+										*ngFor="
+											let tool of selectedOperation.prodOrderPosOperationResources
+										">
+										<ui5-cb-item
+											id="{{ tool.item?.id }}"
+											[additionalText]="tool.item?.name"
+											text="{{ tool.item?.custom_id }}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex flex-row">
+								<div class="flex flex-col mt-2">
+									<ui5-label
+										for="total"
+										show-colon
+										i18n
+										>Produced</ui5-label
+									>
+									<ui5-input
+										id="total"
+										class="w-[163px]"
+										name="total"
+										readonly
+										[value]="selectedOperation.produced_quantity??0"></ui5-input>
+								</div>
+								<div class="flex flex-col mt-2 ml-[10px]">
+									<ui5-label
+										for="total"
+										show-colon
+										i18n
+										>TR</ui5-label
+									>
+									<ui5-input
+										id="total"
+										class="w-[163px]"
+										name="tr"
+										#total="ngModel"
+										type="Number"
+										[readonly]="isDialogEditable"
+										[(ngModel)]="selectedOperation.tr"
+										(change)="calculateEndValue()"></ui5-input>
+								</div>
+								<div class="flex flex-col mt-2 ml-[10px]">
+									<ui5-label
+										for="tearDownTime"
+										show-colon
+										i18n
+										>Teardown time</ui5-label
+									>
+									<ui5-input
+										id="total"
+										class="w-[155px]"
+										name="teardown_time"
+										#total="ngModel"
+										type="Number"
+										[(ngModel)]="selectedOperation.teardown_time"
+                                        [readonly]="isDialogEditable"
+                                        (change)="calculateEndValue()"
+                                        ></ui5-input>
+								</div>
+							</div>
+							<div class="flex flex-col mt-[10px]" *ngIf="clientName == 'volaplast'">
+								<div class="flex flex-col">
+									<ui5-label></ui5-label>
+									<ui5-button
+										class="w-[500px]"
+										design="Emphasized"
+										[disabled]="isDialogEditable"
+										*ngIf="isOperationReadyRealease"
+										(click)="onPlanOperation()"
+										i18n
+										>UnRelease Operation</ui5-button
+									>
+								</div>
+							</div>
+                            @if(clientName == 'ict' && selectedOperation.status == prodOrderPosOperationStatus.IN_PRODUCTION) {
+                                <div class="flex flex-col mt-[10px]">
+                                    <div class="flex flex-col">
+                                        <ui5-label></ui5-label>
+                                        <ui5-button
+                                            class="w-[500px]"
+                                            design="Emphasized"
+                                            [disabled]="isDialogEditable"
+                                            (click)="onReCalculateOperation()"
+                                            i18n
+                                            >Recalculate Operation</ui5-button
+                                        >
+                                    </div>
+                                </div>
+                            }
+                            <div class="flex flex-row items-center mt-2 justify-between">
+                            <div class="flex flex-col ">
+                                    <ui5-label
+									show-colon
+									i18n
+									>Usage Factor</ui5-label
+								>
+								<ui5-text class="mt-1.5 mb-1.5">{{ getUsageFactor() }}</ui5-text>
+                                </div>
+                                <div class="flex flex-col ">
+                                    <ui5-label
+									show-colon
+									i18n
+									>Is Component Available</ui5-label
+								>
+								<ui5-switch name="selectedOperation.component_availability"
+                                        [checked]="selectedOperation.component_availability == 'FULL'"
+                                        (change) = "onChangeComponentAvailability($event)"
+                                        ></ui5-switch>
+                                </div>
+							</div>
+							<div class="flex flex-row">
+								<ui5-label for="customerName" show-colon i18n>Customer Name</ui5-label>
+								<ui5-text
+									id="customer" 
+									>
+									{{ selectedOperation?.prodOrderPos?.item?.customers?.length 
+									? (selectedOperation.prodOrderPos?.item?.customers[0].name)
+									:'' }}
+								</ui5-text>
+							</div>
+						</div>
+
+					</div>
+					<div class="flex flex-col mt-2">
+						<ui5-label
+							show-colon
+							i18n
+							>Alternative Machines</ui5-label
+						>
+						<ui5-text>{{ getAlternativeMachines() ?? "" }}</ui5-text>
+					</div>
+				</div>
+                <div>
+                    @if(selectedOperation?.restrictions?.tool_restriction?.status){
+                        <ui5-text i18n class="text-red-700 mt-1">Usage of tools at the same time in different operations ( {{selectedOperation?.restrictions?.tool_restriction.data.prodOrderPos.prodOrder.custom_id}}  |  {{selectedOperation?.restrictions?.tool_restriction.data.pos}} )</ui5-text>
+                    }
+                    @if(selectedOperation?.restrictions?.due_date_restriction?.status){
+                        <ui5-text i18n class="text-red-700 mt-1">Conflict between Due date and end date of the last operation</ui5-text>
+                    }
+                    @if(selectedOperation?.restrictions?.overlapping_restriction?.status){
+                        <ui5-text i18n class="text-red-700 mt-1">Following operations have start date before end date of the previous operation</ui5-text>
+                    }
+                    @if(selectedOperation?.restrictions?.tool_status?.sampling_required){
+                        <ui5-text i18n class="text-red-700 mt-1">Sampling for this tool required</ui5-text>
+                    }
+                </div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+	<ui5-toolbar slot="footer">
+		<ui5-toolbar-button
+			#saveButton
+			class=""
+			design="Emphasized"
+			text="Save"
+			(click)="onSave()"
+			i18n-text
+			[disabled]="
+				(isSaveButton && !isPlanVisuGanttRestrictionRemove) ||
+				isEndBusy ||
+				isBusy ||
+				isDialogEditable ||
+				(!isToolPreparedForRelease &&
+					selectedOperation.status == prodOrderPosOperationStatus.PLANNED) || selectedOperation.status == prodOrderPosOperationStatus.IN_PRODUCTION
+			">
+		</ui5-toolbar-button>
+		<ui5-toolbar-button
+			class=""
+			design="Transparent"
+			text="Cancel"
+			i18n-text
+			(click)="closeDialog()">
+		</ui5-toolbar-button>
+	</ui5-toolbar>
+</ui5-dialog>
+
+<ui5-toast
+	*ngIf="toastMessage"
+	[open]="true"
+	(ui5Close)="toastMessage = ''"
+	>{{ toastMessage }}</ui5-toast
+>

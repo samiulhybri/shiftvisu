@@ -1,0 +1,22 @@
+#reportDialog::part(header),
+#reportDialog::part(footer) {
+	padding-inline: 1rem;
+}
+
+#reportDialog::part(content) {
+	padding-inline: 2rem;
+}
+
+#chat::part(content) {
+	padding-inline: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+ui5-tabcontainer::part(content) {
+	padding: 1rem;
+}
+
+ui5-tabcontainer::part(tabstrip) {
+	padding: 0;
+}

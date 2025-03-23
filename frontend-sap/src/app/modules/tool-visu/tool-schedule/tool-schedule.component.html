@@ -1,0 +1,183 @@
+<div class="flex h-full" cdkDropListGroup>
+	<div class="shellbar">
+		<div class="h-11 bb-[1px] border-solid border-x-0 border-color shadow-md rounded-md rounded-b-none overflow-x-hidden overflow-y-hidden bg-white pl-3 flex flex-row justify-start items-center content-center">
+				<ui5-title level="H5" class="noselect" i18n>Tool Repair Backlog</ui5-title> 
+		</div>
+		<div class="h-full overflow-y-auto overflow-x-hidden">
+			<ui5-list *ngFor="let list of backlogItems" class="w-full" growing="Scroll" cdkDropList id="backlogList"
+				[cdkDropListData]="list.prodOrderPos" [cdkDropListConnectedTo]="['orderList']" cdkScrollable>
+				<ui5-li class="w-full h-16">
+					<div class="w-full flex flex-row justify-between">
+						<ui5-title level="H5" class="noselect mr-[30px]" i18n>Backlog of {{ list.name || "" |
+							truncate: 25}}</ui5-title>
+					</div>
+				</ui5-li>
+				@for (prodOrderPos of list.prodOrderPos; track $index) {
+				<div class="mx-4 mt-2 shadow-md rounded-xl">
+					<app-generic-tag id="{{ prodOrderPos.id }}" cdkDrag [type]="
+								prodOrderPos.is_production_possible == true
+									? type.Success
+									: type.ProductionError
+							" (dblclick)="orderDetails(prodOrderPos)">
+						<div class="ml-[11px] mr-[11px] flex direction-row items-center w-full">
+							<div class="ml-[11px] mr-[11px] flex flex-col">
+								<ui5-title level="H6" class="noselect" i18n>Order:
+									{{ prodOrderPos.prodOrder?.custom_id }}
+								</ui5-title>
+								<ui5-title level="H6" class="noselect" i18n>
+									Date:
+									{{ prodOrderPos?.start | date: "dd.MM.yyyy" }}
+								</ui5-title>
+								<ui5-title level="H6" class="noselect" i18n>
+									Production:
+									{{ prodOrderPos?.release_date | date: "dd.MM.yyyy" }}
+								</ui5-title>
+							</div>
+							<div class="flex justify-end flex-1">
+								<ui5-label i18n class="noselect" [ngClass]="
+											prodOrderPos.is_production_possible == true
+												? 'sapPositiveColor'
+												: 'sapNegativeColor'
+										">
+									{{ prodOrderPos.estimated_hours }}
+									Hours</ui5-label>
+							</div>
+						</div>
+					</app-generic-tag>
+				</div>
+				}
+			</ui5-list>
+		</div>
+		<div
+			class="h-9 w-full bg-white rounded-br-lg bt-[1px] border-x-0 border-b-0 border-color border-solid flex flex-row justify-end items-center content-center">
+			<div class="flex h-5 rounded-lg items-center justify-center mr-2 sapNegBackgroundColor">
+				<ui5-title level="H6" class="noselect text-white my-2 mx-[5px]" i18n>Not Possible</ui5-title>
+			</div>
+			<div class="h-5 sapPossibleBackgroundColor rounded-lg flex items-center justify-center mr-2">
+				<ui5-title class="noselect text-white my-2 mx-[5px]" level="H6" i18n>Possible</ui5-title>
+			</div>
+		</div>
+	</div>
+	<div class="h-full border-solid border-x-0 border-b-0 border-color shadow-md rounded-md overflow-y-hidden bg-white">
+		<div class="flex flex-row justify-between h-11 rounded-tr-2xl items-center pl-4 border-y">
+			<div>
+				<ui5-title level="H5" class="noselect" i18n>Tool Repair Schedule</ui5-title>
+			</div>
+			<div class="flex flex-row items-center justify-end space-x-2 mr-2">
+				<ui5-input id="searchInput" class="noselect mr-4" slot="searchField" i18n-placeholder
+					placeholder="Search" [(ngModel)]="searchedValue" (input)="onSearchInput($event)">
+					<ui5-icon name="search" slot="icon" ui5-icon=""></ui5-icon>
+				</ui5-input>
+				<ui5-label class="noselect mr-1" i18n show-colon>Date Until</ui5-label>
+				<ui5-date-picker id="endDatePicker" class="mr-2 w-[220px]" format-pattern="dd.MM.yyyy" class="noselect"
+					[value]="formatedEndDate" (change)="changeEndDate($event)" [minDate]="formatedCurrentDate"
+					[maxDate]="lastDayOfMonth">
+				</ui5-date-picker>
+				<ui5-button design="Emphasized" (click)="dateFilter()" i18n>
+					Refresh
+				</ui5-button>
+			</div>
+		</div>
+		<div class="h-[93.5%] overflow-auto">
+			<ui5-table [loading]="isLoading" mode="None" overflow-mode="Scroll" class="h-[99%] rounded-bl-2xl">
+				<ui5-table-header-row slot="headerRow" sticky>
+					<ui5-table-header-cell class="schedule-table-header sticky-cell overflow-hidden"
+						min-width="210px">
+						<ui5-title level="H5" i18n class="noselect">Date</ui5-title>
+					</ui5-table-header-cell>
+					<ui5-table-header-cell *ngFor="let date of dates"
+						class="schedule-table-header noselect" min-width="300px">
+						<ui5-title level="H5">{{ date | date: "dd.MM.yyyy" }}</ui5-title>
+					</ui5-table-header-cell>
+				</ui5-table-header-row>
+				<ui5-table-row *ngFor="let item of filteredItems" class="h-[175px]">
+					<ui5-table-cell sticky class="sticky-cell border-solid border-color border-y-0 border-l-0 p-0">
+						<div class="w-full flex flex-col justify-center">
+							<ui5-title level="H5" class="noselect ml-4">{{ item.custom_id }} - {{ item.name || "" |
+								truncate: 45}}</ui5-title>
+						</div>
+					</ui5-table-cell>
+					<ui5-table-cell *ngFor="let date of dates"
+						class="schedule-table-cell p-0">
+						<div class="w-full flex flex-col justify-between">
+							<div
+								class="flex flex-row w-full h-8 border-x-0 border-t-0 border-color border-solid justify-end">
+								<div class="flex items-center mr-[16px]">
+									<ui5-text i18n class="noselect">{{
+										getTotalHours(
+										item.prodOrderPos || [],
+										date | date: "dd.MM.yyyy"
+										)
+										}}h Used</ui5-text>
+								</div>
+							</div>
+							<div class="ml-4 mr-4 h-[120px] overflow-auto mb-2">
+								<ui5-list class="h-full" cdkDropList id="orderList"
+									(cdkDropListDropped)="dropOrder($event, date)"
+									[cdkDropListConnectedTo]="['backlogList']" [cdkDropListData]="item.prodOrderPos"
+									cdkScrollable>
+									@for (prodOrderPos of item.prodOrderPos; track $index) {
+									@if (
+									(date | date: "dd.MM.yyyy") ==
+									(prodOrderPos.start | date: "dd.MM.yyyy")
+									) {
+									<div cdkDrag id="{{ prodOrderPos.id }}"
+										class="h-[54px] overflow-auto mr-[10px] mb-1.5 shadow-md rounded-xl">
+										<app-generic-tag [type]="
+														prodOrderPos.is_production_possible == true
+															? type.Success
+															: type.ProductionError
+													" (dblclick)="orderDetails(prodOrderPos)">
+											<div class="ml-[11px] mr-[11px] flex direction-row items-center w-full">
+												<div class="ml-[11px] mr-[11px] flex flex-col">
+													<ui5-title level="H6" class="noselect">Order:
+														{{
+														prodOrderPos.prodOrder
+														?.custom_id
+														}}
+													</ui5-title>
+													<ui5-title level="H6" class="noselect">
+														Date:
+														{{
+														prodOrderPos?.start
+														| date: "dd.MM.yyyy"
+														}}
+													</ui5-title>
+													<ui5-title level="H6" class="noselect" i18n>
+														Production:
+														{{
+														prodOrderPos?.release_date
+														| date: "dd.MM.yyyy"
+														}}
+													</ui5-title>
+												</div>
+												<div class="flex justify-end flex-1">
+													<ui5-label i18n class="noselect" [ngClass]="
+																	prodOrderPos.is_production_possible ==
+																	true
+																		? 'sapPositiveColor'
+																		: 'sapNegativeColor'
+																">
+														{{ prodOrderPos.estimated_hours }}
+														Hours</ui5-label>
+												</div>
+											</div>
+										</app-generic-tag>
+									</div>
+									}
+									}
+								</ui5-list>
+							</div>
+						</div>
+					</ui5-table-cell>
+				</ui5-table-row>
+			</ui5-table>
+		</div>
+	</div>
+</div>
+<div *ngIf="isViewDialogOpen">
+	<app-repair-details [modalType]="'view'" [modalHeight]="'87%'" [selectedProdOrderPos]="selectedOrder"
+		[isDialogOpen]="isViewDialogOpen" (isCloseClicked)="closeViewDialog()" [repairId]="itemId || 0"
+		#repairDetailsTable>
+	</app-repair-details>
+</div>

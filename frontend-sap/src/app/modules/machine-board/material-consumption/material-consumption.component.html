@@ -1,0 +1,417 @@
+<ui5-dialog
+	#materialConsumptionModalRef
+	[open]="true"
+	(beforeClose)="closeMaterialConsumptionDialog()"
+	[headerText]="!fromProductionPlan ? dialogTitle : ''"
+	[ngStyle]="{
+		display: fromTransportOrder ? 'none' : 'flex',
+	}"
+	class="bg-gray-100 flex"
+	[ngClass]="fromProductionPlan ? 'w-[70vw]' : 'w-[95vw]'">
+	<div
+		slot="header"
+		class="w-full"
+		*ngIf="!fromProductionPlan">
+		<div class="w-full">
+			<ui5-tabcontainer
+				(tab-select)="onTabSelect($event)"
+				class="w-full"
+				fixed
+				collapsed>
+				<ui5-tab
+					id="Bom"
+					i18n-text
+					text="Bill of Material">
+				</ui5-tab>
+				<ui5-tab
+					id="TransportOrder"
+					i18n-text
+					text="Transport Order"></ui5-tab>
+				<ui5-tab
+					id="productionSalesArea"
+					i18n-text
+					text="Production Supply Area"></ui5-tab>
+			</ui5-tabcontainer>
+		</div>
+	</div>
+	<div class="main-div flex flex-grow items-center">
+		<div class="w-full">
+			<ui5-card class="flex h-[65vh]">
+				<div
+					class="flex-grow overflow-auto"
+					*ngIf="selectedTab === 'Bom'">
+					<app-bill-of-material
+						#billOfMaterialRef
+						(isOrderCreateDialogOpen)="onOrderCreateDialogChange($event)"
+						(bomSelectedRowsEmit)="onBomSelectedRowsChange($event)"
+						(shippingRowDataEmit)="onShippingRowDataChange($event)"
+						(isMultipleOrderEmit)="onMultipleOrderEmitChange($event)"
+						(isCustomIdBusyEmit)="onIsCustomIdBusyChange($event)"
+						[setFromTransportOrder]="fromTransportOrder"
+						[machine]="machine"
+						(transportOrderNoDataEmitter)="transportOrderNoDataEmitter($event)"
+						[prodOrderPosId]="prodOrderPosId"
+						[setting]="setting"
+						[posSelectedRowId]="posSelectedRowId"
+						[bomSelectedRows]="bomSelectedRowData">
+					</app-bill-of-material>
+				</div>
+				<div
+					*ngIf="selectedTab === 'TransportOrder'"
+					class="p-3 overflow-auto flex-grow">
+					<app-transport-order #transportOrder></app-transport-order>
+				</div>
+				<div
+					*ngIf="selectedTab === 'productionSalesArea'"
+					class="p-3 overflow-auto flex-grow">
+					<app-staging-area
+						#stagingArea
+						[isFromQuantity]="false"></app-staging-area>
+				</div>
+			</ui5-card>
+		</div>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			i18n
+			design="Transparent"
+			class="mr-[-1.7vw] pr-[20px] pl-[20px]"
+			(click)="closeMaterialConsumptionDialog()">
+			Close
+		</ui5-button>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	class="w-[90vw]"
+	[style.maxHeight.px]="isMultiOrder ? 710 : 580"
+	id="dialog"
+	*ngIf="orderCreateDialog"
+	[open]="orderCreateDialog"
+	header-text="Transport Order"
+	i18n-header-text>
+	<ui5-busy-indicator
+		[active]="isDataSaving"
+		class="w-full h-full">
+		<div
+			*ngIf="isMultiOrder"
+			class="h-[60vh] max-h-[500px] w-full min-w-[620px] flex justify-between gap-1">
+			<div class="max-w-[450px]">
+				<div
+					class="grid mr-3 py-4 h-[250px]"
+					*ngIf="!setting.is_ewm_enabled">
+					<div class="flex flex-row justify-end gap-2"
+						><ui5-label
+							for="orderNo"
+							class="items-center w-fit"
+							show-colon
+							required
+							i18n
+							>Order Id</ui5-label
+						>
+						<ui5-busy-indicator
+							class="flex justify-end w-[250px]"
+							[active]="loading">
+							<ui5-input
+								id="orderNo"
+								class="w-[250px]"
+								[(ngModel)]="custom_id"
+								[valueState]="!loading && !custom_id ? 'Negative' : 'None'"
+								[value]="custom_id"
+								><div
+									slot="valueStateMessage"
+									i18n
+									>Order Id required</div
+								></ui5-input
+							>
+						</ui5-busy-indicator></div
+					>
+					<div class="flex flex-row justify-end gap-2">
+						<ui5-label
+							for="machineNo"
+							class="items-center w-fit"
+							show-colon
+							i18n
+							>Machine Id</ui5-label
+						>
+						<div class="flex justify-end items-center w-[250px]">
+							<ui5-input
+								id="machineNo"
+								[readonly]="true"
+								class="w-full"
+								[value]="machine?.custom_id"></ui5-input>
+						</div>
+					</div>
+					<div class="flex flex-row justify-end gap-2">
+						<ui5-label
+							for="deliveryDate"
+							class="items-center w-fit"
+							show-colon
+							i18n
+							>Delivery Date</ui5-label
+						>
+						<div class="flex justify-end items-center w-[250px]">
+							<ui5-datetime-picker
+								id="deliveryDate"
+								#deliveryDateInput="ngModel"
+								name="deliveryDate"
+								class="w-full"
+								[(ngModel)]="deliveryDate">
+							</ui5-datetime-picker>
+						</div>
+					</div>
+					<ui5-checkbox
+						id="urgent"
+						class="items-center justify-self-center mr-[3rem]"
+						text="Urgent"
+						(change)="urgentCheckbox($event)"
+						i18n-text>
+					</ui5-checkbox>
+				</div>
+			</div>
+			<ui5-card class="min-w-[20%] flex-grow mt-1">
+				<div class="h-[calc(50vh-25px)] max-h-[435px] w-full">
+					<ui5-bar
+						slot="header"
+						design="Header">
+						<ui5-title
+							level="H5"
+							slot="startContent"
+							i18n
+							>Selected Materials</ui5-title
+						>
+
+						<ui5-label
+							level="H5"
+							slot="endContent">
+							<ui5-button
+								id="add-row-btn"
+								design="Transparent"
+								*ngIf="!setting.is_ewm_enabled && fromTransportOrder"
+								[disabled]="!bomSelectedRowData?.length"
+								(click)="onAddPackagingMaterial()"
+								i18n
+								>Add Packaging Material</ui5-button
+							>
+						</ui5-label>
+					</ui5-bar>
+					<app-grid-table
+						headerTitle=""
+						[columns]="filteredTransportOrderColumns"
+						keyForCacheCustomDataTableColumns="BOM-transportOrderSelectedMaterial"
+						i18n-headerTitle
+						[showAction]="false"
+						[showSearch]="false"
+						[showDownload]="false"
+						[showActiveButton]="false"
+						selectionMode="None"
+						[showNewButton]="false"
+						[enableServerSideFiltering]="false"
+						[data]="bomSelectedRowData"
+						[customData]="true"
+						[isBusy]="true"
+						#multipleItemChildComponentRef>
+					</app-grid-table>
+				</div>
+			</ui5-card>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-end">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				id="closeOrderCreateDialog"
+				design="Transparent"
+				(click)="closeOrderCreateDialog()"
+				i18n
+				>Close</ui5-button
+			>
+			<ui5-button
+				id="onClickCreateOrder"
+				class="mr-1 mb-1"
+				design="Emphasized"
+				[disabled]="
+					loading ||
+					custom_id.length < 1 ||
+					isCreateOrderButtonDisabled() ||
+					isDataSaving ||
+					bomSelectedRowData.length < 1
+				"
+				(click)="createTransportOrder()"
+				i18n
+				>Create Order</ui5-button
+			>
+		</div>
+	</div>
+</ui5-dialog>
+
+<ng-template #showBusyIndicator>
+	<ui5-busy-indicator
+		[active]="true"
+		class="w-full h-full flex justify-center items-center"></ui5-busy-indicator>
+</ng-template>
+
+<ui5-toast
+	#statusToastTools
+	id="statusToastTools"
+	placement="BottomCenter"
+	>{{ toasterStatus }}</ui5-toast
+>
+
+<ui5-toast
+	#successRecordSav
+	id="statusToastTools"
+	placement="BottomCenter"
+	>{{ localization.recordSavedSuccessfully }}</ui5-toast
+>
+
+<!-- Next Packaging logics -->
+<ui5-dialog
+	[open]="isShowPackagingPopup"
+	i18n-header-text
+	header-text="Packaging Instruction"
+	(beforeClose)="closeDialog()">
+	<ui5-busy-indicator
+		[active]="isInstructionLoading"
+		size="L">
+		<div style="display: flex; flex-direction: row">
+			<div class="w-[500px] p-8">
+				<div>
+					<div class="input-selection-grid">
+						<ui5-label
+							class="label-flex-end"
+							for="packagingInstruction"
+							show-colon
+							i18n
+							>Packaging Instruction</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="loading"
+							class="w-full busy-indicator-flex">
+							<ui5-multi-input
+								id="itemsMultiInput"
+								class="w-full"
+								#instructionInputRef
+								[disabled]="!packagingInstructions.length && !loading"
+								[showValueHelpIcon]="packagingInstructions.length"
+								[(ngModel)]="instructionCustomID"
+								(ui5ValueHelpTrigger)="onOpenInstructions()"></ui5-multi-input>
+						</ui5-busy-indicator>
+					</div>
+					<div class="input-selection-grid">
+						<ui5-label
+							class="label-flex-end"
+							for="quantityProduced"
+							[required]="true"
+							[showColon]="true"
+							i18n
+							>Item</ui5-label
+						>
+						<ui5-busy-indicator class="w-full busy-indicator-flex">
+							<ui5-multi-input
+								id="itemsMultiInput"
+								class="w-full"
+								#itemsMultiInputRef
+								[disabled]="true"
+								[(ngModel)]="selectedItemName"></ui5-multi-input>
+						</ui5-busy-indicator>
+					</div>
+				</div>
+				<div
+					class="mt-5"
+					*ngIf="selectedItem.id">
+					<app-item-image
+						[height]="'340px'"
+						[itemId]="selectedItem.id"
+						[itemCustomId]="selectedItem.custom_id"
+						class="w-full"
+						[isCard]="true"
+						[isSingleImage]="true"></app-item-image>
+				</div>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			class="ml-8"
+			design="Emphasized"
+			[disabled]="selectedItemName == '' || isInstructionLoading ? true : false"
+			(click)="saveNextPackaging()">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			(click)="closeDialog()">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</ui5-dialog>
+
+<ui5-popover
+	#packagingInstructionPopover
+	class="w-[500px] h-[500px]"
+	[placement]="'Bottom'"
+	header-text="Packaging Instruction"
+	i18n-header-text>
+	<div>
+		<ui5-list
+			[loading]="loading"
+			[growing]="'Scroll'"
+			(ui5ItemClick)="onInstructionSelect($event)">
+			<ng-container *ngFor="let instruction of packagingInstructions">
+				<ui5-li
+					style="height: 150px"
+					[id]="instruction.packaging_instruction_id_child"
+					[attr.data-customid]="
+						instruction.packaging_instruction_custom_id_parent ??
+						instruction.packaging_instruction_custom_id_child
+					"
+					[attr.data-childid]="instruction.packaging_instruction_id_child"
+					[attr.data-parentid]="instruction.packaging_instruction_id_parent"
+					[selected]="
+						selectedPackagingInstruction?.packaging_instruction_id_child ==
+							instruction.packaging_instruction_id_child &&
+						selectedPackagingInstruction?.packaging_instruction_id_parent ==
+							instruction.packaging_instruction_id_parent
+					">
+					<div class="packaging-instruction-container">
+						<div class="packaging-instruction-info">
+							<app-item-image
+								class="w-[130px]"
+								[height]="'110px'"
+								[itemId]="instruction?.item_id_container_child"
+								[itemCustomId]="instruction?.item_custom_id_container"
+								[isCard]="false"
+								[isSingleImage]="true"></app-item-image>
+							<div>
+								<ui5-title level="H4">{{
+									instruction.packaging_instruction_custom_id_parent ||
+										instruction.packaging_instruction_custom_id_child
+								}}</ui5-title>
+								<p class="description-text-color">{{
+									instruction.item_custom_id_container
+								}}</p>
+								<p class="description-text-color"
+									><span i18n>Target Quantity:</span>
+									{{ instruction.target_quantity }}</p
+								>
+							</div>
+						</div>
+						<ui5-tag
+							*ngIf="instruction.is_default"
+							design="Set1"
+							color-scheme="4"
+							><span i18n>Default</span></ui5-tag
+						>
+					</div>
+				</ui5-li>
+			</ng-container>
+		</ui5-list>
+	</div>
+</ui5-popover>

@@ -1,0 +1,29 @@
+.response-table-container {
+	height: 100%;
+	overflow-y: auto;
+}
+
+.calculation-details-body {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.grid-style {
+	display: grid;
+	grid-template-columns: auto auto auto;
+	gap: 15px;
+}
+
+.flex-container {
+  display: flex;
+}
+
+.flex-container p {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.flex-container ng-container {
+  flex-grow: 1;
+}

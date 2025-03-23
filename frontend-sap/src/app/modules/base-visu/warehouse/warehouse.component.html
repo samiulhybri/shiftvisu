@@ -1,0 +1,211 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Warehouses"
+		url="/Warehouses"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_WAREHOUSE_EDIT')"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		[showSearch]="true"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+	<ui5-dialog
+		id="deleteDialogWarehouse"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+	
+	<ui5-dialog
+		#deleteErrorDialogWarehouse
+		id="deleteErrorDialogWarehouse"
+		state="Negative"
+		header-text="Error">
+		<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+		<div
+			slot="footer"
+			class="deleteErrorDialogFooter">
+			<ui5-button
+				class="dialogCloser"
+				design="Transparent"
+				(click)="closeDeleteErrorDialog()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+<app-dialog
+	id="warehouseDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div>
+			<ui5-title
+				class="pd-10 ml-[-10px]"
+				level="H5"
+				>{{ dialogTitle }}
+			</ui5-title>
+		</div>
+
+	</div>
+	<form
+		(ngSubmit)="onSubmit(create0rUpdateForm)"
+		#create0rUpdateForm="ngForm"
+		class="w-[418px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			class="w-full"
+			size="L">
+			<div
+			class="w-full">
+			<div class="flex flex-col gap-[5rem] w-full">
+					<div class="flex flex-col">
+						<ui5-label show-colon>{{ localization.active }}</ui5-label>
+						<ui5-switch
+							id="activeSwitch"
+							name="is_active"
+							[checked]="selectedWarehouse.is_active"
+							[(ngModel)]="selectedWarehouse.is_active">
+						</ui5-switch>
+					</div>
+				</div>
+				<div class="flex flex-col w-full gap-2 mt-3">
+					<div class="flex flex-col h-full w-full">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								#customId="ngModel"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || create0rUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								[(ngModel)]="selectedWarehouse.custom_id"
+								(input)="onChangeCustomId()"
+								class="w-full"
+								id="customIdInput"
+								name="custom_id"
+								[required]="true">
+								<div
+									slot="valueStateMessage"
+									>
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+
+					<div class="flex flex-col h-full">
+						<ui5-label
+					    	show-colon
+							required
+							>{{ localization.name }}</ui5-label
+						>
+						<ui5-input
+							id="warehouseNameInput"
+							class="w-full"
+							#nameInput="ngModel"
+							[required]="true"
+							[(ngModel)]="selectedWarehouse.name"
+							(change)="onChangeName($event)"
+							[valueState]="
+								nameInput.valid == false &&
+								(nameInput.touched || create0rUpdateForm.submitted)
+									? 'Negative'
+									: 'None'
+							"
+							name="name"></ui5-input>
+					</div>
+				</div>
+			</div>
+		</ui5-busy-indicator>
+	</form>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogWarehouses
+	id="errorDialogWarehouses"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

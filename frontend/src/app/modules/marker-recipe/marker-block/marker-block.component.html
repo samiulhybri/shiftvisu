@@ -1,0 +1,127 @@
+<kendo-card width="100%" height="100%">
+    <kendo-card-header>
+        <div class="block-header-container">
+            <div class="header-title">
+                <span i18n>Blocks</span>
+            </div>
+            <button kendoButton [primary]="true" icon="add" (click)="addNewBlock()" [disabled]="isNewBtnDisable || !isMachineMatched || !hasUpdatePermission" i18n>
+                New
+            </button>
+        </div>
+    </kendo-card-header>
+    <kendo-card-body [ngClass]="!isGridVisible ? 'block-card-body' : ''">
+        <div class="pos-block-grid-layout" *ngIf="isGridVisible">
+            <kendo-grid-component 
+                [moduleName]="'marker-recipe-pos-block'" 
+                [gridItems]="gridItems" [columns]="columns"
+                [state]="state" [isLoadedEnabled]="isLoadedEnabled" [isSortable]="false" 
+                [isFilterable]="false" [isGroupable]="false" [isPageable]="isPageable" 
+                [editView]="editView"
+                [initialSelection]="rowSelected"
+                [isEditDisabled]="isEditDisabled || !hasUpdatePermission"
+                [isDeleteDisabled]="isDeleteDisabled || !hasUpdatePermission"
+                (gridRefersh)="sendRequest()" 
+                (filterState)="changeGridFilter($event)"
+                (deleteDataItem)="deleteDataItem($event)"
+                (emitSelectedItem)="onSelectedBlock($event)">
+                <ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+                    <ng-container *ngIf="column.name == 'marker_block_type'">
+                        <div>{{ getEnumTranslateGrid(dataItem.marker_block_type) }}</div>
+                    </ng-container>
+                    <ng-container *ngIf="column.name == 'custom_column'">
+                        <div>{{ getCustomColumnData(dataItem) }}</div>
+                    </ng-container>
+                </ng-template>
+            </kendo-grid-component>
+        </div>
+    </kendo-card-body>
+</kendo-card>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>
+
+<kendo-dialog i18n-title [title]="modalTitle" *ngIf="isOpenAddBlockModal" [width]="450" (close)="closeBlockModal()" 
+    [minWidth]="585" [minHeight]="354" [maxHeight]="380">
+    <kendo-card width="100%">
+        <kendo-card-body class="block-form-body">
+            <form novalidate class="k-form" [formGroup]="form">
+                <div class="form-sections">
+                    <div class="label-input-section">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Sequence" i18n>:</kendo-label>
+                        <kendo-numerictextbox #order formControlName="order" [(ngModel)]="blockData.order" class="number-right-align" format="##" 
+                            [min]="1"  [decimals]="0"
+                            [spinners]="false" i18n-placeholder placeholder="Enter block order"
+                            required [class.formError]="form.get('order').invalid"></kendo-numerictextbox>
+                    </div>
+                    <div class="label-input-section" [ngStyle]="{ 'margin-left': '10px' }">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Data Type" i18n>:</kendo-label>
+                        <kendo-combobox #marker_block_type formControlName="marker_block_type" [data]="blockTypeList" 
+                            [(ngModel)]="blockData.marker_block_type" textField="text" valueField="value" [filterable]="false" 
+                            (valueChange)="OnChangeBlockType($event)" i18n-placeholder placeholder="Select block type"
+                            [valuePrimitive]="true" required [class.formError]="form.get('marker_block_type').invalid">
+                        </kendo-combobox>
+                    </div>
+                </div>
+                <div class="form-sections" *ngIf="blockData.marker_block_type == 'TEXT'">
+                    <div class="label-input-section custom_id_field">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Text" i18n>:</kendo-label>
+                        <kendo-textbox #text formControlName="text" [(ngModel)]="blockData.text" 
+                            i18n-placeholder placeholder="Insert text" required 
+                            (valueChange)="onChangeTextType()"
+                            [class.formError]="form.get('text').invalid" [maxLength]="80"></kendo-textbox>
+                    </div>
+                </div>
+                <div class="form-sections" *ngIf="blockData.marker_block_type == 'ASCII_CHARACTER'">
+                    <div class="label-input-section">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Enter ASCII character" i18n>:</kendo-label>
+                        <kendo-numerictextbox #ascii_dec formControlName="ascii_dec" [(ngModel)]="blockData.ascii_dec"
+                            class="number-right-align" format="###" [spinners]="false"
+                            i18n-placeholder placeholder="Enter Number" [min]="16" [max]="255" [decimals]="0"
+                            required [class.formError]="form.get('ascii_dec').invalid"></kendo-numerictextbox>
+                    </div>
+                    <div class="label-input-section" [ngStyle]="{ 'margin-left': '10px' }">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Content" i18n>:</kendo-label>
+                        <kendo-textbox [value]="onChangeAscii(blockData.ascii_dec)" [readonly]="true"></kendo-textbox>
+                    </div>
+                </div>
+                <div class="form-sections" *ngIf="blockData.marker_block_type == 'DAY_COUNTER' || blockData.marker_block_type == 'ORDER_COUNTER'">
+                    <div class="label-input-section custom_id_field">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Counter Length" i18n>:</kendo-label>
+                        <kendo-numerictextbox #shot_counter_length formControlName="shot_counter_length" [(ngModel)]="blockData.shot_counter_length"
+                            class="number-right-align" format="##" [spinners]="false" 
+                            i18n-placeholder placeholder="Enter counter length" [min]="1" [max]="10" [decimals]="0"
+                            required [class.formError]="form.get('shot_counter_length').invalid">
+                        </kendo-numerictextbox>
+                    </div>
+                </div>
+                <div class="form-sections" *ngIf="blockData.marker_block_type == 'DATETIME'">
+                    <div class="label-input-section custom_id_field">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Format" i18n>:</kendo-label>
+                        <kendo-combobox #date_time_format_string formControlName="date_time_format_string" 
+                            [data]="dateTimeList" [(ngModel)]="blockData.date_time_format_string" 
+                            i18n-placeholder placeholder="Select datetime format"
+                            textField="text" valueField="value" [filterable]="false" [valuePrimitive]="true" 
+                            required [class.formError]="form.get('date_time_format_string').invalid">
+                        </kendo-combobox>
+                    </div>
+                </div>
+                <div class="form-sections">
+                    <div class="label-input-section custom_id_field">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Note" i18n>:</kendo-label>
+                        <kendo-textarea #notes formControlName="notes" 
+                            [(ngModel)]="blockData.notes" i18n-placeholder placeholder="Insert note"
+                            [cols]="150" [rows]="3" resizable="none"></kendo-textarea>
+                    </div>
+                </div>
+            </form>
+        </kendo-card-body>
+    </kendo-card>
+    <kendo-dialog-actions class="block-modal-action" [layout]="end">
+        <button class="block-modal-cancel-btn" kendoButton iconClass="k-icon k-i-close" (click)="closeBlockModal()" 
+            i18n>Close
+        </button>
+        <button class="block-modal-action-btn" kendoButton iconClass="k-icon icon-save" (click)="checkSavingDataValidity()" themeColor="primary">
+            <span *ngIf="isNewBlock" i18n>Save</span>
+            <span *ngIf="!isNewBlock" i18n>Update</span>
+        </button>
+    </kendo-dialog-actions>
+</kendo-dialog>

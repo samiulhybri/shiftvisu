@@ -1,0 +1,181 @@
+<app-grid-table
+	headerTitle="Machine Classifications"
+	url="/MachineClassifications"
+	i18n-headerTitle
+	[showRowDataCount]="true"
+	[columns]="column"
+	[showAction]="true"
+	[showSearch]="true"
+	[showDownload]="false"
+	[showActiveButton]="true"
+	button1Text="All"
+	button2Text="Inactive"
+	button3Text="Active"
+	addButtonText="New"
+	i18n-addButtonText
+	i18n-button1Text
+	i18n-button2Text
+	i18n-button3Text
+	[isBaseVisu]="true"
+	[enableServerSideFiltering]="true"
+	[showNewButton]="true"
+    (newButtonClick)="newButtonClick()"
+	[editPermission]="authService.isPermissionValid('BASEVISU_MACHINE_CLASSIFICATIONS_EDIT')"
+	(deleteClick)="deleteClick($event)"
+	(editClick)="editClick($event)"
+	selectionMode="Single"
+	#childComponentRef>
+</app-grid-table>
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()"
+	[title]="dialogTitle">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L">
+		<div
+			class="form w-[418px] h-full"
+			*ngIf="selectedMachineClassifications">
+			<form
+			(ngSubmit)="onSubmit(createOrUpdateForm)"
+			#createOrUpdateForm="ngForm">
+				<div class="flex">
+					<div class="flex flex-col">
+						<ui5-label show-colon>{{ localization.active }}</ui5-label>
+						<ui5-switch
+							[(ngModel)]="selectedMachineClassifications.is_active"
+							name="is_active"
+							id="is_active"></ui5-switch>
+					</div>
+				</div>
+				<div class="w-full">
+					<div class="flex-col gap-[5px] mt-2">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								#customId="ngModel"
+								[(ngModel)]="selectedMachineClassifications.custom_id"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || createOrUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								class="w-full"
+								(input)="onChangeCustomId()"
+								id="customIdInput"
+								[required]="true"
+								name="custom_id">
+								<div
+									slot="valueStateMessage"
+									>
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+					<div class="flex-col gap-[5px] mt-2">
+						<ui5-label show-colon required>{{ localization.name }}</ui5-label>
+						<ui5-input
+						    [required]="true"
+							[(ngModel)]="selectedMachineClassifications.name"
+							id="name"
+							#name="ngModel"
+							class="w-full"
+							[valueState]="name.valid == false &&
+							(name.touched || createOrUpdateForm.submitted)
+							   ? 'Negative': 'None'"
+							name="name"></ui5-input>
+					</div>
+					<div class="flex-col gap-[5px] mt-2">
+						<ui5-label
+							show-colon
+							i18n
+							>Sort Order</ui5-label
+						>
+						<ui5-input
+							id="sort_order"
+							class="w-full"
+							pattern="^[0-9]*$"
+							type="Number"
+							[(ngModel)]="selectedMachineClassifications.sort_order"
+							name="sort_order"></ui5-input>
+					</div>
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="flex items-center justify-end flex-row w-full">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	id="deleteDialog"
+	header-text="Warning"
+	state="Critical">
+	<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteSubmit()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+<ui5-dialog
+	#errorDialogMachineClassifications
+	id="errorDialogMachineClassifications"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
