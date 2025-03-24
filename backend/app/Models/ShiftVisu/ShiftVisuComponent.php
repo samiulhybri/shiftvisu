@@ -17,9 +17,4 @@ class ShiftVisuComponent extends Model
     {
         return $this->hasMany(ShiftVisuComponentOption::class);
     }
-
-    public function modelInstance()
-    {
-        return $this->morphTo();
-    }
 }

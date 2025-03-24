@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ShiftVisu\ShiftVisuIssueType;
 use Exception;
 use Illuminate\Http\Request;
+use DB;
 
 class ShiftVisuController extends Controller
 {
@@ -71,6 +72,46 @@ class ShiftVisuController extends Controller
                 'message' => 'Update failed.',
                 'errors' => $e->getMessage()
             ]);
+        }
+    }
+
+    function updateComponentModelType(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+    
+            if (!$request->input('shiftVisuIssueType.id')) {
+                return response()->json(['message' => 'Shift visu issue Type id is required.'], 400);
+            }
+    
+            $shiftVisuIssueTypeId = $request->input('shiftVisuIssueType.id');
+    
+            $shiftVisuIssueType = ShiftVisuIssueType::findOrFail($shiftVisuIssueTypeId);
+    
+            $components = array_merge(
+                $request->input('shiftVisuModelComponents', []),
+                $request->input('shiftVisuGeneralComponents', [])
+            );
+    
+            $syncData = [];
+            foreach ($components as $component) {
+                if (isset($component['id'], $component['is_mandatory'])) {
+                    $syncData[$component['id']] = ['is_mandatory' => $component['is_mandatory']];
+                }
+            }
+    
+            $shiftVisuIssueType->components()->sync($syncData);
+    
+            DB::commit();
+    
+            return response()->json(['message' => 'Data saved successfully.'], 201);
+    
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'An error occurred while saving data.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

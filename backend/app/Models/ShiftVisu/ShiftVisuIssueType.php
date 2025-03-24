@@ -18,4 +18,12 @@ class ShiftVisuIssueType extends Model
     {
         return $this->belongsToMany(Hall::class, 'hall_shift_visu_issue_type');
     }
+
+    public function components()
+    {
+        return $this->belongsToMany(
+            ShiftVisuComponent::class, 
+            'shift_visu_issue_type_shift_visu_components'
+        )->withPivot('is_mandatory');
+    }
 }
