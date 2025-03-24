@@ -75,7 +75,7 @@ class ShiftVisuController extends Controller
         }
     }
 
-    function updateComponentModelType(Request $request)
+    function updateComponentIssueType(Request $request)
     {
         try {
             DB::beginTransaction();
