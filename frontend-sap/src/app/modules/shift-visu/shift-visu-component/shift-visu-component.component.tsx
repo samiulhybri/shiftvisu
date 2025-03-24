@@ -184,6 +184,8 @@ export class ShiftVisuComponentComponent implements OnInit {
 		if (!selectedType) {
 			this.selectedModelType = "";
 			this.modalComponent.model_type = "";
+		} else {
+			this.modalComponent.model_type = selectedType.modelType;
 		}
 	}
 
@@ -286,5 +288,9 @@ export class ShiftVisuComponentComponent implements OnInit {
 		this.selectedComponent = new ShiftVisuComponentModel().deserialize({
 			...this.componentDefaultValue,
 		});
+	}
+
+	getModelName(model_type: string): string {
+		return model_type.split("\\").pop() || model_type;
 	}
 }
