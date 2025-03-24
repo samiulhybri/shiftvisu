@@ -39,7 +39,7 @@ export class ShiftVisuModelComponentComponent implements OnChanges {
 			isSelected: true,
 		},
 		{
-			Header: $localize`Model Type1`,
+			Header: $localize`Model Type`,
 			accessor: "model_type",
 			disableFilters: false,
 			disableGroupBy: true,
