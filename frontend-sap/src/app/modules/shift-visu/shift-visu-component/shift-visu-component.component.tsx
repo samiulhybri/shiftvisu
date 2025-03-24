@@ -62,6 +62,8 @@ export class ShiftVisuComponentComponent implements OnInit {
 	deleteId: number | null = null;
 	isLoadingCustomId: boolean = false;
 	customId?: string = "";
+	model_type: any;
+	isDisabled: boolean = true;
 
 	get shiftVisuAdminPermission() {
 		return PermissionEnum.SHIFTVISU_ADMIN;
@@ -150,15 +152,22 @@ export class ShiftVisuComponentComponent implements OnInit {
 	}
 
 	getModelTypes(): void {
-		this.modelTypeItems = BackendModelTypeClass.getEnumArrayShiftVisu().map(value => ({
-			modelType: value.modelType,
-			value: value.text,
-		}));
+		this.modelTypeItems = BackendModelTypeClass.getEnumArrayShiftVisu().map(value => {
+			const model = BackendModelTypeClass.getStateTranslate(value.modelType);
+			return {
+				modelType: value.modelType,
+				value: model?.text || this.getModelName(value.modelType),
+			};
+		});
 	}
 
-	updateModelTypeValues(data: any) {
-		this.modalComponent.model_type = data.detail.item.id;
-		this.modalComponent.component_type = ShiftVisuComponentTypeEnum.DROPDOWN_SINGLE;
+	updateModelTypeValues(event: any) {
+		const selectedItem = this.modelTypeItems.find(
+			item => this.getModelName(item.modelType) === event.detail.item.text
+		);
+		if (selectedItem) {
+			this.selectedModelType = selectedItem.modelType;
+		}
 	}
 
 	onModelTypeBlur() {
@@ -272,7 +281,8 @@ export class ShiftVisuComponentComponent implements OnInit {
 		});
 	}
 
-	getModelName(model_type: string): string {
-		return model_type.split("\\").pop() || model_type;
+	getModelName(modelType: string | null): string {
+		if (!modelType) return "";
+		return modelType.split("\\").pop() || modelType;
 	}
 }

@@ -80,19 +80,21 @@
 					i18n
 					>Model Type</ui5-label
 				>
+
 				<ui5-combobox
 					id="modelTypeCombobox"
 					class="w-full"
-					[(ngModel)]="selectedModelType"
+					[ngModel]="getModelName(selectedModelType)"
 					name="model_type"
-					i18n-placeholder
+					(selection-change)="updateModelTypeValues($event)"
+					(blur)="onModelTypeBlur()"
 					placeholder="Select model"
 					show-clear-icon
-					(selection-change)="updateModelTypeValues($event)"
-					(blur)="onModelTypeBlur()">
+					[disabled]="isDisabled">
+					>
 					@for (item of modelTypeItems; track $index) {
 						<ui5-cb-item
-							[text]="item.value"
+							[text]="getModelName(item.modelType)"
 							[id]="item.modelType">
 						</ui5-cb-item>
 					}
