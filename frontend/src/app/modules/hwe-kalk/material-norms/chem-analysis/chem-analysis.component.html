@@ -1,0 +1,123 @@
+<form class="k-form" [formGroup]="form" *ngIf="data">
+	<kendo-stacklayout orientation="horizontal" [gap]="12">
+		<kendo-card [style.flex]="4">
+			<kendo-card-header i18n>
+			  Material Norm Data
+			</kendo-card-header>
+			<kendo-card-body class="chem-details-body">
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="custom_id" i18n i18n-text text="Material Morm"> <span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+						<kendo-textbox #custom_id 
+							formControlName="custom_id"
+							[(ngModel)]="data.custom_id"
+						>
+						</kendo-textbox>
+						<div *ngIf="form.controls['custom_id'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+							Material norm is required.
+						</div>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="material_id" i18n i18n-text text="Materials"><span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+						<kendo-combobox 
+							#material_id 
+							[(ngModel)]="data.material" 
+							formControlName="material_id"
+							[data]="materials"
+							textField="custom_id" 
+							valueField="id"
+							[filterable]="true"
+							name="material"
+                            (filterChange)="handleFilter($event,'material')"
+						>
+					   </kendo-combobox>
+					<div *ngIf="form.controls['material_id'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+						Material is required.
+					</div>
+					</div>
+				</kendo-stacklayout>
+					
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+					<kendo-textbox #name formControlName="name"
+					[(ngModel)]="data.name"
+					>
+					</kendo-textbox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="note" i18n i18n-text text="Note"></kendo-label>
+					<kendo-textarea #note 
+						formControlName="note"  
+						[style.width]="'50%'"
+						[(ngModel)]="data.note"
+					>
+					</kendo-textarea>
+				</kendo-stacklayout>
+			</kendo-card-body>	
+		</kendo-card>
+		<kendo-card [style.flex]="8">
+			<kendo-card-header>
+				 <span>Property</span>
+				<kendo-grid-spacer></kendo-grid-spacer>
+				<button kendoButton themeColor="primary" (click)="addchemAnalysis([], true)" i18n>
+					<span class="k-icon icon-add"></span> New
+				</button>
+			</kendo-card-header>
+			<kendo-card-body class="chem-analyses">
+				<table formArrayName="chemAnalyses" [width]="'100%'">
+					<thead *ngIf="chemAnalyses.controls.length">
+						<tr>
+							<th i18n>Element <span class="k-text-error k-pl-1">*</span> </th>
+							
+							<th i18n>Min <span class="k-text-error k-pl-1">*</span></th>
+							<th i18n>Max <span class="k-text-error k-pl-1">*</span></th>
+							<th i18n>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let data of data.chemAnalyses;let i = index" [formGroupName]="i">
+							<td>
+								<kendo-textbox 
+									formControlName="name"
+									[(ngModel)]="data.name"
+								>
+							</kendo-textbox>
+							</td>
+							<td>
+								<kendo-numerictextbox 
+									formControlName="min"
+									[(ngModel)]="data.min"
+									format="n4"
+								>
+							    </kendo-numerictextbox>
+							</td>
+							<td>
+								<kendo-numerictextbox 
+								   formControlName="max"
+								   [(ngModel)]="data.max"
+								   format="n4"
+								>
+							    </kendo-numerictextbox>
+							</td>
+							<td>
+								<button kendoButton
+									themeColor="primary"
+									(click)="removeChemAnalyses(data,i)"
+									>
+									<span class="k-icon icon-trash"></span>
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div *ngIf="chemAnalyses.length && form.controls['chemAnalyses'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+					Element, Min and Max is required.
+				</div>
+			</kendo-card-body>
+		</kendo-card>
+    </kendo-stacklayout>
+</form>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

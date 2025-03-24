@@ -1,0 +1,7 @@
+.outset-border {
+	border-style: outset;
+}
+
+:host ::ng-deep .ck-content {
+	height: 50vh;
+}

@@ -1,0 +1,18 @@
+<kendo-grid-component 
+    [gridItems]="gridItems"
+    [columns]="columns"
+    [state]="state"
+    [isLoadedEnabled]="isLoadedEnabled"
+    [isSortable]="isSortable"
+    [isFilterable]="isFilterable"
+    [isGroupable]="isGroupable"
+    [isPageable]="isPageable"
+    [toolbarConfig]="toolbarConfig"
+    (emitState)="changeState($event)"
+    (emitData)="changeState($event)"
+    (gridRefersh)="sendRequest()"
+    (deleteDataItem)="deleteDataItem($event)"
+    [editView]="editView"
+    (filterState)="changeGridFilter($event)"
+>
+</kendo-grid-component>

@@ -1,0 +1,39 @@
+.legend-card {
+	height: 100%;
+	width: 100%;
+	gap: 4px;
+	border-radius: var(--legendCardRadius);
+
+	position: sticky;
+}
+
+.legend-card-sub {
+	height: 100%;
+	justify-items: center;
+	align-items: center;
+	width: auto;
+	justify-content: space-between;
+	margin-left: 16px;
+	margin-right: 16px;
+}
+
+.machine-production {
+	background: var(--production-color);
+}
+
+.machine-standstill {
+	background: var(--statnstill-color);
+}
+
+.machine-setup {
+	background: var(--setup-color);
+}
+
+.machine-off {
+	border: 1px solid red;
+	border-color: var(--blackBorderColor);
+}
+
+.machine-ready {
+	background: var(--ready-color);
+}

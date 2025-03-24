@@ -1,0 +1,72 @@
+<kendo-grid-component 
+    [gridItems]="gridItems"
+    [columns]="columns"
+    [state]="state"
+    [isLoadedEnabled]="isLoadedEnabled"
+    [isSortable]="isSortable"
+    [isFilterable]="isFilterable"
+    [isGroupable]="isGroupable"
+    [isPageable]="isPageable"
+    [toolbarConfig]="toolbarConfig"
+    (emitState)="changeState($event)"
+    (emitData)="changeState($event)"
+    (gridRefersh)="sendRequest()"
+    (deleteDataItem)="deleteDataItem($event)"
+    [editView]="editView"
+    (filterState)="changeGridFilter($event)"
+    [addWindowEvent]="addWindowEvent"
+>
+<ng-template #actionColumnContent let-dataItem>
+    <button kendoButton (click)="exportOffer(dataItem)"  *ngIf="authService.isPermissionValidate('HWEKALK_OFFER_CRM_UPLOAD')">
+        <span class="k-icon icon-cloud-upload"></span>
+    </button>
+    <button kendoButton (click)="downloadOfferPos(dataItem)"  *ngIf="authService.isPermissionValidate('HWEKALK_OFFER_POS_DOWNLOAD')">
+      <span class="k-icon k-i-download"></span>
+  </button>
+    <button kendoButton (click)="openLog(dataItem)"  *ngIf="authService.isPermissionValidate('HWEKALK_OFFER_LOG_VIEW')">
+      <span class="k-icon k-i-info"></span>
+  </button>
+</ng-template>
+<ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+    <ng-container *ngIf="column.name == 'status'">
+        <div>{{ getEnumTranslateGrid('status', dataItem.status) }}</div>
+    </ng-container>
+    <ng-container *ngIf="column.name == 'phase'">
+        <div>{{ getEnumTranslateGrid('phase', dataItem.phase) }}</div>
+    </ng-container>
+</ng-template>
+<ng-template #toolBarAfterSearchContent>
+    <button kendoButton [primary]="true" (click)="statusArchived()"  *ngIf="authService.isPermissionValidate('HWEKALK_OFFER_ARCHIVED_BUTTON_VIEW')">
+        <span class="k-icon icon-archive-nav"></span>  
+        <span *ngIf="!isStatusArchived" i18n>Archived</span>
+        <span *ngIf="isStatusArchived" i18n>Unarchived</span>
+    </button>
+</ng-template>
+</kendo-grid-component>
+
+<div class="example-wrapper">
+    <kendo-dialog
+      i18n-title
+      title="User Logs"
+      *ngIf="logDialogOpened"
+      (close)="close()"
+      [minWidth]="450"
+      [width]="650"
+      [minHeight]="200"
+    >
+    <!-- Display a list of logs -->
+     <div  style="margin: 20px; height: 50vh;overflow: auto;">
+        <ul>
+          <li *ngFor="let logEntry of offerLogs">
+            <p i18n><b>{{ actionByUser(logEntry.event)}}</b> {{logEntry.user?.name}}  at {{ logEntry.created_at|date:'dd.MM.yyyy HH:mm':'utcTimestamp':'en-US' }}</p>
+              <p ><span i18n><b> Changing remark:</b> </span> {{logEntry.changing_remark}} </p>
+          </li>
+        </ul>
+      </div>
+
+      <div *ngIf="!offerLogs.length">
+        <p i18n> No User Log Found </p>
+      </div>
+  
+    </kendo-dialog>
+</div>

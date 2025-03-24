@@ -1,0 +1,7 @@
+.sapField_placeholdertextColor {
+	color: var(--list-description-text-color);
+}
+
+.sapShell_InteractiveBorderColor {
+	color: var(--progressbar-machine-card-remaining-bar-color);
+}

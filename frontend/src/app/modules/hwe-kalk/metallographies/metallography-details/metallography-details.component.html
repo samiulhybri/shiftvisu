@@ -1,0 +1,289 @@
+<form novalidate class="k-form" *ngIf="metallography">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="metallography-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #custom_id name="custom_id" [disabled]="isAllDisabled ||disabledCustomId" [(ngModel)]="metallography.custom_id"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+                    <kendo-textbox #name name="name" [disabled]="isAllDisabled" [(ngModel)]="metallography.name"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="regulation" i18n i18n-text text="Regulation"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #regulation name="regulation" [disabled]="isAllDisabled" [(ngModel)]="metallography.regulation"><span class="k-text-error k-pl-1">*</span></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="issue_revision" i18n i18n-text text="Issue / Revision"> <span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #issue_revision name="issue_revision"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.issue_revision"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="cleanliness_determination_according_to" i18n i18n-text
+                                 text="Cleanliness determination according to"></kendo-label>
+                    <kendo-multiselect
+                        #cleanliness_determination_according_to
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.cleanlinessDeterminationAccordingTo"
+                        [data]="cleanlinessAccordingToDeterminationDataSource"
+                        [filterable]="false"
+                        textField="text"
+                        valueField="value"
+                        name="cleanliness_determination_according_to">
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="a_fine" i18n i18n-text text="A fine"></kendo-label>
+                        <kendo-numerictextbox #a_fine name="a_fine" [disabled]="isAllDisabled" [(ngModel)]="metallography.a_fine" [min]="0"
+                            [max]="4" [autoCorrect]="true" [step]="0.5"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="a_coarse" i18n i18n-text text="A coarse"></kendo-label>
+                        <kendo-numerictextbox #a_coarse name="a_coarse" [disabled]="isAllDisabled" [(ngModel)]="metallography.a_coarse" [min]="0"
+                            [max]="4" [autoCorrect]="true" [step]="0.5"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="b_fine" i18n i18n-text text="B fine"></kendo-label>
+                        <kendo-numerictextbox #b_fine name="b_fine" [disabled]="isAllDisabled" [(ngModel)]="metallography.b_fine" [min]="0"
+                            [max]="4" [autoCorrect]="true" [step]="0.5"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="b_coarse" i18n i18n-text text="B coarse"></kendo-label>
+                        <kendo-numerictextbox #b_coarse name="b_coarse" [disabled]="isAllDisabled" [(ngModel)]="metallography.b_coarse" [min]="0"
+                            [max]="4" [autoCorrect]="true" [step]="0.5"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="c_fine" i18n i18n-text text="C fine"></kendo-label>
+                        <kendo-numerictextbox #c_fine name="c_fine" [disabled]="isAllDisabled" [(ngModel)]="metallography.c_fine" [min]="0"
+                            [max]="4" [autoCorrect]="true" [step]="0.5"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="c_coarse" i18n i18n-text text="C coarse"></kendo-label>
+                        <kendo-numerictextbox #c_coarse name="c_coarse" [disabled]="isAllDisabled" [(ngModel)]="metallography.c_coarse" [min]="0"
+                            [max]="4" [autoCorrect]="true" [step]="0.5"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="d_fine" i18n i18n-text text="D fine"></kendo-label>
+                        <kendo-numerictextbox #d_fine name="d_fine" [disabled]="isAllDisabled" [(ngModel)]="metallography.d_fine" [min]="0"
+                            [max]="4" [autoCorrect]="true" [step]="0.5"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="d_coarse" i18n i18n-text text="D coarse"></kendo-label>
+                        <kendo-numerictextbox #d_coarse name="d_coarse" [disabled]="isAllDisabled" [(ngModel)]="metallography.d_coarse" [min]="0"
+                            [max]="4" [autoCorrect]="true" [step]="0.5"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="ds" i18n i18n-text text="DS"></kendo-label>
+                        <kendo-numerictextbox #ds name="ds" [disabled]="isAllDisabled" [(ngModel)]="metallography.ds" [min]="0" [max]="4"
+                            [autoCorrect]="true" [step]="0.5"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9"></kendo-stacklayout>
+                </kendo-stacklayout>
+
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="cleanliness_determination" i18n i18n-text
+                        text="Cleanliness determination"></kendo-label>
+                    <kendo-combobox #cleanliness_determination name="cleanliness_determination"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.cleanliness_determination"
+                        [data]="cleanlinessDeterminationDataSource" [valuePrimitive]="true" textField="text"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="cleanliness_50602_astma45_sep1570" i18n i18n-text
+                        text="Cleanliness 50602 ASTMA45 SEP1570"></kendo-label>
+                    <kendo-combobox #cleanliness_50602_astma45_sep1570 name="cleanliness_50602_astma45_sep1570"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.cleanliness_50602_astma45_sep1570"
+                        [data]="cleanliness50602DataSource" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="cleanliness_max_value" i18n i18n-text text="Cleanliness max value"></kendo-label>
+                        <kendo-numerictextbox #cleanliness_max_value name="cleanliness_max_value" [disabled]="isAllDisabled" [(ngModel)]="metallography.cleanliness_max_value" [min]="0"
+                             [autoCorrect]="true" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="cleanliness_textfield" i18n i18n-text
+                        text="Cleanliness textfield"></kendo-label>
+                    <kendo-textarea #cleanliness_textfield name="cleanliness_textfield"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.cleanliness_textfield"></kendo-textarea>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+        <kendo-card [style.flex]="6">
+            <kendo-card-header>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="metallography-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="needs_microsection_structure" i18n i18n-text
+                            text="Needs microsection structure"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="needs_microsection_structure"
+                            [disabled]="isAllDisabled" [(ngModel)]="metallography.needs_microsection_structure" #needs_microsection_structure />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="needs_microsection_grain_size" i18n i18n-text
+                            text="Needs microsection grain size"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="needs_microsection_grain_size"
+                            [disabled]="isAllDisabled" [(ngModel)]="metallography.needs_microsection_grain_size" #needs_microsection_grain_size />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="needs_microsection_carburized" i18n i18n-text
+                            text="Needs microsection carburized"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="needs_microsection_carburized"
+                            [disabled]="isAllDisabled" [(ngModel)]="metallography.needs_microsection_carburized" #needs_microsection_carburized />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="needs_microsection_cleanliness" i18n i18n-text
+                            text="Needs microsection cleanliness"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="needs_microsection_cleanliness"
+                            [disabled]="isAllDisabled" [(ngModel)]="metallography.needs_microsection_cleanliness"
+                            #needs_microsection_cleanliness />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="needs_ic_simulation_annealing" i18n i18n-text
+                            text="Needs ic simulation annealing"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="needs_ic_simulation_annealing"
+                            [disabled]="isAllDisabled" [(ngModel)]="metallography.needs_ic_simulation_annealing" #needs_ic_simulation_annealing />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="needs_ic_external_testing" i18n i18n-text
+                            text="Needs ic external testing"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="needs_ic_external_testing"
+                            [disabled]="isAllDisabled" [(ngModel)]="metallography.needs_ic_external_testing" #needs_ic_external_testing />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9" *ngIf="metallography.needs_ic_simulation_annealing">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="wb_parameter" i18n i18n-text
+                            text="Wb parameter"></kendo-label>
+                        <kendo-numerictextbox #wb_parameter name="wb_parameter" [disabled]="isAllDisabled" [(ngModel)]="metallography.wb_parameter" [min]="0"
+                                              [autoCorrect]="true" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="image" i18n i18n-text text="+ Image"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="image" [disabled]="isAllDisabled" [(ngModel)]="metallography.image" #image />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9"></kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="needs_ic_according_to" i18n i18n-text
+                        text="Needs ic according to"></kendo-label>
+                    <kendo-combobox #needs_ic_according_to name="needs_ic_according_to"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.needs_ic_according_to" [data]="needsAccordingToIcDataSource"
+                        [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="needs_ic_textfield" i18n i18n-text text="Needs ic textfield"></kendo-label>
+                    <kendo-textarea #needs_ic_textfield name="needs_ic_textfield"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.needs_ic_textfield"></kendo-textarea>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="microstructure_assessment" i18n i18n-text
+                        text="Microstructure assessment"></kendo-label>
+                    <kendo-combobox #microstructure_assessment name="microstructure_assessment"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.microstructure_assessment"
+                        [data]="microstructureAssessmentDataSource" [valuePrimitive]="true" textField="text"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="microstructure_quota" i18n i18n-text text="Microstructure quota"></kendo-label>
+                    <kendo-combobox #microstructure_quota name="microstructure_quota"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.microstructure_quota" [data]="microstructureQuotaDataSource"
+                        [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9" *ngIf="metallography.microstructure_quota">
+                    <kendo-label [for]="microstructure_max_quota" i18n i18n-text
+                        text="Microstructure max quota"></kendo-label>
+                    <kendo-numerictextbox #microstructure_max_quota name="microstructure_max_quota"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.microstructure_max_quota" [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="microstructure_textfield" i18n i18n-text
+                        text="Microstructure textfield"></kendo-label>
+                    <kendo-textarea #microstructure_textfield name="microstructure_textfield"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.microstructure_textfield"></kendo-textarea>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="grain_size_determination_according_to" i18n i18n-text
+                        text="Grain size determination according to"></kendo-label>
+                    <kendo-combobox #grain_size_determination_according_to
+                        name="grain_size_determination_according_to"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.grain_size_determination_according_to"
+                        [data]="grainSizeAccordingToDeterminationDataSource" [valuePrimitive]="true" textField="text"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="grain_size" i18n i18n-text text="Grain size"></kendo-label>
+                    <kendo-textarea #grain_size name="grain_size" [disabled]="isAllDisabled" [(ngModel)]="metallography.grain_size"></kendo-textarea>
+                </kendo-stacklayout>
+                 <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="grain_size_value" i18n i18n-text text="Grain Size (>= and fine)"></kendo-label>
+                        <kendo-numerictextbox #grain_size_value name="grain_size_value" [disabled]="isAllDisabled" [(ngModel)]="metallography.grain_size_value" [min]="0"
+                             [autoCorrect]="true" [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="grain_size_after_carburizing" i18n i18n-text
+                        text="Grain size after carburizing"></kendo-label>
+                    <kendo-combobox #grain_size_after_carburizing name="grain_size_after_carburizing"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.grain_size_after_carburizing"
+                        [data]="grainSizeAfterCarburizingDataSource" [valuePrimitive]="true" textField="text"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="grain_size_textfield" i18n i18n-text text="Grain size textfield"></kendo-label>
+                    <kendo-textarea #grain_size_textfield name="grain_size_textfield"
+                        [disabled]="isAllDisabled" [(ngModel)]="metallography.grain_size_textfield"></kendo-textarea>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="offer_note" i18n i18n-text text="Offer note">
+					</kendo-label>
+					<kendo-textarea #offer_note [disabled]="isAllDisabled" [(ngModel)]="metallography.offer_note" name="offer_note">
+
+					</kendo-textarea>
+				</kendo-stacklayout>
+                
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

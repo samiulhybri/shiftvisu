@@ -1,0 +1,55 @@
+<div style="padding: 10px;height: calc(100% - 20px);">
+    <bryntum-scheduler-pro-project-model
+    #project
+    [autoLoad]="projectProps.autoLoad!"
+    [loadUrl]="projectProps.loadUrl!"
+    [resourceStore]="projectProps.resourceStore!"
+    [eventStore]="projectProps.eventStore!"
+    [validateResponse]="projectProps.validateResponse!">
+</bryntum-scheduler-pro-project-model>
+
+<div id="content" class="b-side-by-side">
+    <bryntum-scheduler-pro
+        #schedulerPro
+        [project]="project"
+        [startDate]="schedulerProProps.startDate!"
+        [endDate]="schedulerProProps.endDate!"
+        [barMargin]="schedulerProProps.barMargin!"
+        [rowHeight]="schedulerProProps.rowHeight!"
+        [viewPreset]="schedulerProProps.viewPreset!"
+        [columns]="schedulerProProps.columns!"
+        [resourceImagePath]="schedulerProProps.resourceImagePath!"
+        [allowOverlap]="schedulerProProps.allowOverlap!"
+        [tbar]="schedulerProProps.tbar!"
+        [eventStyle]="schedulerProProps.eventStyle!"
+        [eventColor]="schedulerProProps.eventColor!"
+        [useInitialAnimation]="schedulerProProps.useInitialAnimation!"
+        [stripeFeature]="schedulerProProps.stripeFeature!"
+        [columnLinesFeature]="schedulerProProps.columnLinesFeature!"
+        [filterBarFeature]="schedulerProProps.filterBarFeature!"
+        [calendarHighlightFeature]="schedulerProProps.calendarHighlightFeature!"
+        [eventMenuFeature]="schedulerProProps.eventMenuFeature!"
+        [eventDragFeature]="schedulerProProps.eventDragFeature!"
+        [taskEditFeature]="schedulerProProps.taskEditFeature!"
+        [eventRenderer]="schedulerProProps.eventRenderer!"
+        (onSelectionChange)=" onSchedulerSelectionChange()!">
+    </bryntum-scheduler-pro>
+
+    <bryntum-splitter></bryntum-splitter>
+
+    <bryntum-grid
+        #grid
+        cls="b-unplannedgrid"
+        [selectionMode]="gridProps.selectionMode!"
+        [rowHeight]="gridProps.rowHeight!"
+        [columns]="gridProps.columns!"
+        [tbar]="gridProps.tbar!"
+        [sortFeature]="gridProps.sortFeature!"
+        [groupFeature]="gridProps.groupFeature!"
+        [stripeFeature]="gridProps.stripeFeature!"
+        [disableGridRowModelWarning]="gridProps.disableGridRowModelWarning!"
+        (onSelectionChange)="onGridSelectionChange()!">
+    </bryntum-grid>
+</div>
+
+</div>

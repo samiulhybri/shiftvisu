@@ -1,0 +1,179 @@
+<form class="k-form"  *ngIf="materialAnalysis">
+	<kendo-stacklayout orientation="horizontal" [gap]="12" class="window-scroll-content">
+		<kendo-card [style.flex]="6">
+			<kendo-card-header i18n>
+			  Material Data
+			</kendo-card-header>
+			<kendo-card-body class="chem-details-body">
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="custom_id" i18n i18n-text text="DIN Norm"> <span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+						<kendo-textbox #custom_id 
+							name="custom_id"
+							[(ngModel)]="materialAnalysis.custom_id"
+							[readonly]="isAllDisabled || disabledCustomId"
+							[disabled]="isAllDisabled"
+						>
+						</kendo-textbox>
+						<div *ngIf="!materialAnalysis.custom_id && submitted" class="k-text-error k-fs-sm" i18n>
+							DIN Norm  is required.
+						</div>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal"  class="calculation-tab" [gap]="9">
+					<label [for]="material"  i18n>Material Id<span class="k-text-error k-pl-1">*</span> </label>
+					
+					<div>
+						<kendo-multiselect
+							#material 
+							[(ngModel)]="materialAnalysis.materials"
+							name="material"
+							[data]="materials"
+							textField="custom_id" 
+							valueField="id"
+							[style.width]="'100%'"
+							[filterable]="true"
+							(filterChange)="handleFilter($event, 'materials')"
+							[readonly]="isAllDisabled"
+							[disabled]="isAllDisabled"
+						>
+				   		</kendo-multiselect>
+
+				   <div *ngIf="materialAnalysis?.materials?.length == 0 && submitted" class="k-text-error k-fs-sm" i18n>
+					Material  is required.
+				</div>
+					
+					</div>
+				</kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="regulation" i18n i18n-text text="Regulation"> <span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+                        <kendo-textbox #regulation name="regulation"
+                            [(ngModel)]="materialAnalysis.regulation"
+							[readonly]="isAllDisabled"
+							[disabled]="isAllDisabled"
+                        >
+                        </kendo-textbox>
+                        <div *ngIf="!materialAnalysis.regulation && submitted" class="k-text-error k-fs-sm" i18n>
+                            Regulation is required.
+                        </div>
+                    </div>
+				</kendo-stacklayout>   
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="issue_revision" i18n i18n-text text="Issue/revision"> <span class="k-text-error k-pl-1">*</span></kendo-label>
+					<div>
+                        <kendo-textbox #issue_revision name="issue_revision"
+                            [(ngModel)]="materialAnalysis.issue_revision"
+							[readonly]="isAllDisabled"
+							[disabled]="isAllDisabled"
+                        >
+                        </kendo-textbox>
+                        <div *ngIf="!materialAnalysis.issue_revision && submitted" class="k-text-error k-fs-sm" i18n>
+                            Issue Revision is required.
+                        </div>
+                    </div>
+				</kendo-stacklayout>
+
+                 
+              
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="note" i18n i18n-text text="Note"></kendo-label>
+					<kendo-textarea #note 
+						name="note"  
+						[style.width]="'50%'"
+						[(ngModel)]="materialAnalysis.note"
+						[readonly]="isAllDisabled"
+					>
+					</kendo-textarea>
+				</kendo-stacklayout>
+			</kendo-card-body>	
+		</kendo-card>
+		<kendo-card [style.flex]="6" class="" >
+			<kendo-card-header>
+				 <span i18n>Property</span>
+				<kendo-grid-spacer></kendo-grid-spacer>
+				<button kendoButton class="m-r-5" themeColor="primary" [disabled]="materialAnalysis.chemAnalyses.length || isAllDisabled" (click)="setDefaultValue()" i18n>
+					<span class="k-icon icon-save"></span> Default
+				</button>
+                <button  kendoButton themeColor="primary" 
+				[disabled]="isAllDisabled" (click)="addchemAnalysis()" i18n>
+					<span class="k-icon icon-add"></span> New
+				</button>
+			</kendo-card-header>
+			<kendo-card-body class="chem-analyses window-scroll-content" >
+				<table  [width]="'100%'">
+					<thead *ngIf="materialAnalysis?.chemAnalyses.length">
+						<tr>
+							<th ><span i18n> Element</span><span class="k-text-error k-pl-1">*</span> </th>
+							<th ><span i18n> Unit</span><span class="k-text-error k-pl-1">*</span></th>
+							<th ><span i18n> Min</span><span class="k-text-error k-pl-1">*</span></th>
+							<th ><span i18n> Max</span><span class="k-text-error k-pl-1">*</span></th>
+							<th ><span i18n> </span></th>
+						</tr>
+					</thead>
+					<tbody >
+						<tr class="input-field" *ngFor="let data of materialAnalysis.chemAnalyses;let i = index">
+							<td>
+								<kendo-textbox
+                                        [ngModelOptions]="{standalone: true}"
+									[(ngModel)]="data.name"
+									[disabled]="isAllDisabled"
+									[readonly]="isAllDisabled"
+								>
+							</kendo-textbox>
+							</td>
+							<td>
+								<kendo-combobox 
+									#unit
+                                    [ngModelOptions]="{standalone: true}"
+									[(ngModel)]="data.unit"
+									[data]="chemicalAnalysisUnitDataSource"
+									textField="text" 
+									valueField="value"
+									[valuePrimitive]="true"
+									[filterable]="false"
+									[readonly]="isAllDisabled"
+									[disabled]="isAllDisabled">
+							    </kendo-combobox>
+							</td>
+							<td>
+								<kendo-numerictextbox
+                                    [ngModelOptions]="{standalone: true}"
+									[(ngModel)]="data.min"
+									format="n4"
+									[readonly]="isAllDisabled"
+									[disabled]="isAllDisabled"
+								>
+							    </kendo-numerictextbox>
+							</td>
+							<td>
+								<kendo-numerictextbox
+                                  [ngModelOptions]="{standalone: true}"
+								   [(ngModel)]="data.max"
+								   format="n4"
+								   [readonly]="isAllDisabled"
+								   [disabled]="isAllDisabled"
+								>
+							    </kendo-numerictextbox>
+							</td>
+							<td>
+								<button kendoButton
+									themeColor="primary"
+									(click)="removeChemAnalyses(data,i)"
+									[disabled]="isAllDisabled"
+									>
+									<span class="k-icon icon-trash"></span>
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div *ngIf="submitted && emptyChemAnalysis" class="k-text-error k-fs-sm" i18n>
+					Element, Unit, Min and Max is required.
+				</div>
+			</kendo-card-body>
+		</kendo-card>
+    </kendo-stacklayout>
+</form>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

@@ -1,0 +1,155 @@
+<kendo-card width="100" *ngIf="meltAnalysis">
+	<div class="panelbar-wrapper">
+		<kendo-panelbar>
+			<kendo-panelbar-item i18n-title title="Purity Determination" [expanded]="false">
+				<ng-template kendoPanelBarContent>
+					<div class="table-div">
+						<div class="content">
+							<table class="table">
+								<thead>
+									<tr>
+										<td i18n>Name</td>
+										<td i18n class="k-center">Steel Company</td>
+										<td i18n class="k-center">Hwe</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td i18n> Purity grade K3 max</td>
+										<td>
+											<kendo-numerictextbox [(ngModel)]="meltAnalysis.k3"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox [(ngModel)]="meltAnalysis.k4"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td i18n> Purity grade K4 max</td>
+										<td>
+
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.k3_hwe"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.k4_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="content">
+							<table class="table">
+								<thead>
+									<tr>
+										<td i18n>Name</td>
+										<td i18n class="k-center">A</td>
+										<td i18n class="k-center">B</td>
+										<td i18n class="k-center">C</td>
+										<td i18n class="k-center">D</td>
+										<td i18n class="k-center">DS</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td> Fain SW</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.fine_a"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.fine_b"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.fine_c"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.fine_d"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox [(ngModel)]="meltAnalysis.ds"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td> Glob SW</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_a"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_b"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_c"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_d"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_ds"></kendo-numerictextbox>
+										</td>
+									</tr>
+
+									<tr>
+										<td> Fain HWE</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.fine_a_hwe"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.fine_b_hwe"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.fine_c_hwe"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.fine_d_hwe"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.ds_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+									<tr>
+										<td> Glob HWE</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_a_hwe"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_b_hwe"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_c_hwe"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_d_hwe"></kendo-numerictextbox>
+										</td>
+										<td>
+											<kendo-numerictextbox
+												[(ngModel)]="meltAnalysis.thick_ds_hwe"></kendo-numerictextbox>
+										</td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</ng-template>
+			</kendo-panelbar-item>
+		</kendo-panelbar>
+	</div>
+</kendo-card>

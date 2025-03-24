@@ -1,0 +1,63 @@
+<div class="toolsDiv">
+	<app-grid-table headerTitle="Tool Repair" i18n-headerTitle url="/Items" [columns]="columns" [showAction]="false"
+		[showDownload]="false" [showNewButton]="false" [showSearch]="true" selectionMode="None"
+		additionalFilterQuery="is_tool eq true and is_active eq true"
+		filterQuery="is_tool eq true and is_active eq true"
+		[expandQuery]="expandQuery"
+		[showTableSettingBtn]="false"
+		[isBaseVisu]="true"
+		[isComboBoxOneActive]="true"
+		[isComboBoxTwoActive]="true"
+		comboBoxOneLabelText="Status"
+		i18n-comboBoxOneLabelText
+		comboBoxTwoLabelText="Active Repair"
+		i18n-comboBoxTwoLabelText
+		[comboBoxOneData]="toolStatusfilterItems"
+		[comboBoxTwoData]="toolActiveReapairsfilterItems"
+		(comboBoxOneSelectionChanged)="onFilterToolGrid($event, 'status')"
+		(comboBoxTwoSelectionChanged)="onFilterToolGrid($event, 'active_repair')"
+		(processData)="changeWithUpdatedData($event)" [enableServerSideFiltering]="true" #childComponentRef>
+	</app-grid-table>
+
+	<div *ngIf="isCreateDialogOpen">
+		<app-repair-details [modalHeight]="'92%'" [modalType]="createDialogModalType" [selectedItem]="selectedRepair"
+			[selectedProdOrderPos]="selectedActiveRepair" [allUserList]="userList" [allSupplierList]="supplierList"
+			[allRepairTypeList]="operationPlanList" [isDialogOpen]="isCreateDialogOpen" (isSaveClicked)="isSavedModal()"
+			(isCloseClicked)="closeCreateDialog()"
+			(isShowMessage)="isShowMessage($event)">
+		</app-repair-details>
+	</div>
+
+	<app-dialog id="addGroupDialog" [isDialogOpen]="isPreviewDialogOpen" [title]="previewDialogTitle" (onBeforeClose)="closeAttachmentDialog()">
+		<div class="w-[70vw] ml-[-16px] mr-[-16px]">
+			<app-file-preview [modelId]="showAttachmentId" [model]="'item'" [filesCount]="fileCount"
+				[filePreviewHeight]="filePreviewHeight"></app-file-preview>
+		</div>
+
+		<div
+			slot="footer"
+			class="dialog-footer">
+			<ui5-button
+				class="ml-8"
+				(click)="closeAttachmentDialog()"
+				>
+				{{ localization.close }}</ui5-button>
+		</div>
+	</app-dialog>
+
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L"
+		class="busy-indicator"></ui5-busy-indicator>
+</div>
+
+<app-active-repair
+	#activeRepairTable
+	[activeRepairs]="activeRepairs"
+	[isActiveRepairsDialogOpen]="isActiveRepairsDialogOpen"
+	(closeActiveRepairsDialog)="closeActiveRepairsDialog()"
+	[allUserList]="userList"
+	[allSupplierList]="supplierList"
+	(afterSaveDetails)="afterSaveDetails()"
+	[allRepairTypeList]="operationPlanList">
+</app-active-repair>

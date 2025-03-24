@@ -1,0 +1,106 @@
+<form novalidate class="k-form" *ngIf="specification">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="1">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="specification-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"><span
+                                class="k-text-error k-pl-1">*</span></kendo-label>
+                        <kendo-textbox #custom_id name="custom_id"
+                            [(ngModel)]="specification.custom_id" [disabled]="isAllDisabled"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+                        <kendo-textbox #name name="name" [(ngModel)]="specification.name" [disabled]="isAllDisabled"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="documentation_id" i18n>Documentation Id: </label>
+                    <kendo-combobox #documentation_id name="documentation_id" [(ngModel)]="specification.documentation"
+                        [data]="documentations" textField="custom_id" valueField="id" [filterable]="true"
+                        (filterChange)="handleFilter($event, 'documentation')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="metallography_id" i18n>Metallography Id: </label>
+                    <kendo-combobox #metallography_id name="metallography_id" [(ngModel)]="specification.metallography"
+                        [data]="metallographies" textField="custom_id" valueField="id" [filterable]="true"
+                        (filterChange)="handleFilter($event,'metallography')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="testing_scope_id" i18n>Testing Scope Id: </label>
+                    <kendo-combobox #testing_scope_id name="testing_scope_id" [(ngModel)]="specification.testingScope"
+                        [data]="testingScopes" textField="custom_id" valueField="id" [filterable]="true"
+                        (filterChange)="handleFilter($event, 'testing_scope')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="non_destructive_testing_id" i18n>Non Destructive Testing Id: </label>
+                    <kendo-combobox #non_destructive_testing_id name="non_destructive_testing_id"
+                        [(ngModel)]="specification.nonDestructiveTesting" [data]="nonDestructiveTestings"
+                        textField="custom_id" valueField="id" [filterable]="true"
+                        (filterChange)="handleFilter($event, 'non_destructive_testing')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="material_id" i18n>Material Id: </label>
+                    <kendo-combobox #material_id name="material_id" [(ngModel)]="specification.material" [data]="materials"
+                        textField="custom_id" valueField="id" [filterable]="true" (valueChange)="onMaterialChange($event)"
+                        (filterChange)="handleFilter($event, 'material')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="hardenability_range_id" i18n>Hardenability Range Id: </label>
+                    <kendo-combobox #hardenability_range_id name="hardenability_range_id" [(ngModel)]="specification.hardenabilityRange" [data]="hardenabilityRanges"
+                        textField="custom_id" valueField="id" [filterable]="true"
+                        (filterChange)="handleFilter($event, 'hardenability_range')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="material_analysis_id" i18n>Material Chemical Analysis Id: </label>
+                    <kendo-combobox #material_analysis_id name="material_analysis_id" [(ngModel)]="specification.materialAnalysis" [data]="materialAnalyses"
+                        textField="custom_id" valueField="id" [filterable]="true"
+                        (filterChange)="handleFilter($event, 'material_analysis')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="deformation_id" i18n>Deformation Id: </label>
+                    <kendo-combobox #deformation_id name="deformation_id" [(ngModel)]="specification.deformation" [data]="deformations"
+                        textField="custom_id" valueField="id" [filterable]="true"
+                        (filterChange)="handleFilter($event, 'deformation')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="residual_material_id" i18n>Residual Material Id: </label>
+                    <kendo-combobox #residual_material_id name="residual_material_id"
+                        [(ngModel)]="specification.residualMaterial" [data]="residualMaterials" textField="custom_id"
+                        valueField="id" [filterable]="true" (filterChange)="handleFilter($event, 'residual_material')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="hwe_work_plan_id" i18n>Hwe Work Plan id: </label>
+                    <kendo-combobox #hwe_work_plan_id name="hwe_work_plan_id"
+                        [(ngModel)]="specification.hweWorkPlan" [data]="hweWorkPlan" textField="custom_id"
+                        valueField="id" [filterable]="true" (filterChange)="handleFilter($event, 'hwe_work_plan')" [disabled]="isAllDisabled">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

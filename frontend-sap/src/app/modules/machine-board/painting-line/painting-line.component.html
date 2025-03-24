@@ -1,0 +1,232 @@
+<ui5-dialog
+    [open]="true"
+    class="w-[95vw]"
+	#paintingLineDialog
+	header-text="Load/Unload"
+	i18n-header-text>
+
+    <div class="main-div flex-grow h-full">
+        <ui5-busy-indicator
+            class="w-full"
+            size="L">
+            <ui5-card>
+                <div slot="header">
+                    <div class="flex justify-start">
+                        <ui5-tabcontainer
+                            (tab-select)="tabNavChanged($event)"
+                            fixed
+                            collapsed>
+                            <ui5-tab
+                                [disabled]="isLoading"
+                                #uploadTab
+                                i18n-text
+                                text="Load"
+                                [selected]="selectedTab === 'uploadTab'"
+                                id="uploadTab"></ui5-tab>
+                            <ui5-tab
+                                [disabled]="isLoading"
+                                #downloadTab
+                                i18n-text
+                                text="Unload"
+                                [selected]="selectedTab === 'downloadTab'"
+                                id="downloadTab"></ui5-tab>
+                        </ui5-tabcontainer>
+                    </div>
+                </div>
+                <div class="info-container painting-line-h-6vh">
+                    <ui5-busy-indicator
+                        class="h-full"
+                        style="width: 60%;"
+                        [active]="isLoading"
+                        size="L">
+                    
+                        <ui5-card class="h-full">
+                            <ui5-bar style="height: 50px;" slot="header" design="Header">
+                                <ui5-segmented-button *ngIf="selectedTab === 'downloadTab'" slot="endContent" (ui5SelectionChange)="toggleModeButton($event)">
+                                    <ui5-segmented-button-item id="automatic-mode" [selected]="isAutomaticMode" i18n>Automatic</ui5-segmented-button-item>
+                                    <ui5-segmented-button-item id="manual-mode" [selected]="!isAutomaticMode" i18n>Manual</ui5-segmented-button-item>
+                                </ui5-segmented-button>
+                            </ui5-bar> 
+                            <!-- <div class="divider"></div> -->
+                            <div class="flex flex-col justify-between" *ngIf="selectedTab !== 'downloadTab' || (selectedTab === 'downloadTab' && unloadedQuantities) || !isAutomaticMode">
+                                <div class="flex flex-col m-4 gap-5">
+                                    <div class="flex flex-col">
+                                        <ui5-label for="quantity" show-colon 
+                                        i18n>Order</ui5-label>
+                                        <ui5-input
+                                            *ngIf="selectedTab === 'downloadTab' && isAutomaticMode"
+                                            [readonly]='true'
+                                            class="w-full"
+                                            [value]="unloadedOperation"
+                                        >
+                                        ></ui5-input>
+                                        <ui5-select *ngIf="selectedTab === 'uploadTab' || !isAutomaticMode" class="w-full"
+                                            (ui5Change)="changeOrder($event)"
+                                        >
+                                            <ui5-option 
+                                                *ngFor="let operation of filteredOrderDetails"
+                                                [value]="operation.id.toString()"
+                                                [selected]="selectedOperations?.id === operation.id"
+                                            >{{ operation?.prodOrderCustomId }} - {{ operation?.prodOrderPosOperationPosition }} - {{ operation?.itemId }}</ui5-option>
+                                        </ui5-select>
+                                    </div>
+                                    <div class="flex flex-row gap-4">
+                                        <div class="order-card" [class.card-warning]="selectedTab === 'uploadTab' && isNegative && this.remainingQuantity < 0">
+                                            <ui5-title level="H5" wrapping-type="Normal">{{ this.remainingQuantity }} {{selectedOperations?.unitOfMeasureCustomId}}</ui5-title>
+                                            <span [hidden]="selectedTab !== 'uploadTab'" class="label-style" i18n>Remaining quantity to load</span>
+                                            <span [hidden]="selectedTab !== 'downloadTab'" class="label-style" i18n>Remaining quantity to unload</span>
+                                        </div>
+                                        <div *ngIf="selectedTab === 'downloadTab'" class="order-card">
+                                            <ui5-title level="H5" wrapping-type="Normal">{{uploadedQuantity}} {{selectedOperations?.unitOfMeasureCustomId}}</ui5-title>
+                                            <span class="label-style" i18n>Total Quantity loaded</span>
+                                        </div>
+                                        <div class="order-card">
+                                            <ui5-title level="H5" wrapping-type="Normal">{{ selectedOperations ? selectedOperations.orderQuantity : 0 }} {{selectedOperations?.unitOfMeasureCustomId}}</ui5-title>
+                                            <span class="label-style" i18n>Order Quantity</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <ui5-label [hidden]="selectedTab !== 'uploadTab'" for="quantity" show-colon 
+                                        i18n>Quantity loaded</ui5-label>
+                                        <ui5-label [hidden]="selectedTab !== 'downloadTab'" for="quantity" show-colon 
+                                        i18n>Quantity unloaded</ui5-label>
+                                        <div class="flex flex-row items-center gap-2">
+                                            <ui5-input
+                                                #quantityInputRef
+                                                [readonly]="(selectedTab === 'downloadTab' && isAutomaticMode) || filteredOrderDetails.length < 1"
+                                                id="quantity"
+                                                name="quantity"
+                                                class="w-full"
+                                                [(ngModel)]="quantityAdded"
+                                                (ui5Input)="onInputChange()"
+                                                (keydown)="onKeyDown($event)"
+                                                [valueState]="isError ? 'Negative' : (isNegative ? 'Critical' : 'None')">
+                                            >
+                                                <div slot="valueStateMessage">{{ isError ? errorStatus : warningMessage }}</div>
+                                            </ui5-input>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="isAutomaticMode" class="flex flex-row-reverse m-4 gap-5">
+                                    <ui5-button
+                                        *ngIf="selectedTab === 'downloadTab'"
+                                        design="Emphasized"
+                                        [disabled]="disableButtonDuringRequest"
+                                        (ui5Click)="unloadWithoutUnloading()" i18n>Unload without storing quantity
+                                    </ui5-button>
+                                </div>
+                            </div>
+                            <div *ngIf="!unloadedQuantities && selectedTab === 'downloadTab' && isAutomaticMode"  class="flex flex-col m-4 gap-5" style="justify-content: center; align-items: center;">
+                                <p i18n>Nothing remaining to unload</p>
+                            </div>
+                        </ui5-card>
+                    </ui5-busy-indicator>
+                    <ui5-card class="h-full" style="min-width: 40%; margin-right: 25px;">
+                        <div class="overflow-x-auto flex-grow painting-line-h-6vh">
+                            <app-grid-table
+                                i18n-headerTitle
+                                [headerTitle]="headerTitle"
+                                [url]="'/'+gridTableUrl"
+                                expandQuery="$expand=user,machine,prodOrderPosOperation($expand=prodOrderPos($expand=prodOrder))"
+                                [filterQuery]="'machine_id eq ' + currentMachine?.id"
+                                [columns]="columns"
+                                [sortBy]="'date'"
+                                [customSortType]="'desc'"
+                                [showSearch]="false"
+                                [model]="selectedTab === 'downloadTab' ? prodOrderPosOperationUnloadedQuantity : prodOrderPosOperationLoadedQuantity"
+                                [showDeleteButton]="true"
+                                [showDownload]="false"
+                                [editPermission]="true"
+                                [showEditButton]="false"
+                                [selectionMode]="'Single'"
+                                [showAction]="true"
+                                [showActiveButton]="false"
+                                [showNewButton]="false"
+                                [customData]="false"
+                                [useOdataStyles]="true"
+                                (deleteClick)="deleteClick($event)"
+                                #gridTableComponentRef>
+                            </app-grid-table>
+                        </div>
+                    </ui5-card>
+                </div>
+            </ui5-card>
+        </ui5-busy-indicator>
+    </div>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+            #saveButtonRef
+            *ngIf="selectedTab !== 'downloadTab'"
+			design="Emphasized"
+            [disabled]="filteredOrderDetails.length < 1 || !quantityAdded || isError || isLoading"
+            (ui5Click)="onSave()">{{ localization.save }}
+        </ui5-button>
+        <ui5-button
+            #saveButtonRef
+            *ngIf="selectedTab === 'downloadTab'"
+			design="Emphasized"
+            [disabled]="!quantityAdded || isError || isLoading || !unloadedQuantities"
+            (ui5Click)="onUnloading()">{{ localization.save }}
+        </ui5-button>
+		<ui5-button
+			class="ml-8"
+            (ui5Click)="closeDialog()">{{ localization.close }}
+        </ui5-button>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+        #paintingLineWarningDialog
+        [state]="'Critical'"
+        header-text="Warning"
+        i18n-header-text>
+		<div>
+			<ui5-text class="fs-14" i18n>Are you sure?</ui5-text>
+		</div>
+		<div
+			slot="footer"
+			class="left-component-footer">
+			<ui5-button
+				(click)="confirmSave()"
+				design="Emphasized">{{ localization.save }}
+			</ui5-button>
+			<ui5-button
+				class="ml-8"
+				id="clockInCloseButton"
+				(click)="closeWarning()"
+				>{{ localization.close }}
+			</ui5-button>
+		</div>
+</ui5-dialog>
+
+<ui5-dialog
+    id="deleteDialog"
+    header-text="Warning"
+    state="Critical">
+    <p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+    <div class="flex flex-col-item">
+        <ui5-busy-indicator
+            [active]="isLoading"
+            size="M">
+        </ui5-busy-indicator>
+    </div>
+    <div
+        slot="footer"
+        class="footer-style gap-8">
+        <ui5-button
+            class="dialogSubmit"
+            design="Emphasized"
+            (click)="deleteSubmit()"
+            [disabled]="isLoading"
+            >{{ localization.ok }}</ui5-button
+        >
+        <ui5-button
+            design="Transparent"
+            (click)="closeDialogDelete()"
+            >{{ localization.close }}</ui5-button
+        >
+    </div>
+</ui5-dialog>

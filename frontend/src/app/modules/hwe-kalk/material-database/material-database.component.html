@@ -1,0 +1,24 @@
+<kendo-grid-component 
+    [gridItems]="gridItems"
+    [columns]="columns"
+    [state]="state"
+    [isLoadedEnabled]="isLoadedEnabled"
+    [isSortable]="isSortable"
+    [isFilterable]="isFilterable"
+    [isGroupable]="isGroupable"
+    [isPageable]="isPageable"
+    [toolbarConfig]="toolbarConfig"
+    (emitState)="changeState($event)"
+    (emitData)="changeState($event)"
+    (gridRefersh)="sendRequest()"
+    (deleteDataItem)="deleteDataItem($event)"
+    [editView]="editView"
+    [addWindowEvent]="addWindowEvent"
+    (filterState)="changeGridFilter($event)"
+>
+<ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+    <ng-container *ngIf="column.name == 'heat_treatment'">
+        <div>{{ getEnumTranslateGrid('heat_treatment', dataItem.heat_treatment) }}</div>
+    </ng-container>
+</ng-template>
+</kendo-grid-component>

@@ -1,0 +1,48 @@
+<div class="heat-treatment" *ngIf="additionalHeatTreatments" >
+    <div class="buttons k-w-full k-d-flex">
+        <button kendoButton themeColor="error" [disabled]="!additionalHeatTreatments.length || isDeletedAll"
+                (click)="deleteAll()" i18n>
+            <span class="k-icon icon-trash"></span> Delete all
+        </button>
+        <kendo-grid-spacer></kendo-grid-spacer>
+        <button class="right" kendoButton themeColor="primary" (click)="add()" i18n>
+            <span class="k-icon icon-add"></span> New
+        </button>
+    </div>
+    <div *ngIf="additionalHeatTreatments.length" class="k-w-full">
+        <table class="heat-treatment-pos k-w-full">
+            <thead>
+            <tr *ngIf="!isDeletedAll">
+                <th i18n>Pos <span class="k-text-error k-pl-1">*</span></th>
+                <th i18n>Additional measure <span class="k-text-error k-pl-1">*</span></th>
+                <th i18n>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let data of additionalHeatTreatments|orderByKey:'pos';let i = index">
+                <ng-container *ngIf="!data.isDeleted">
+                    <td>
+                        <kendo-numerictextbox #pos name="pos" [(ngModel)]="data.pos" [step]="1"
+                                              format="##"></kendo-numerictextbox>
+                    </td>
+                    <td >
+                        <kendo-combobox #type name="type" [(ngModel)]="data.type"
+                                        [data]="additionalHeatTreatmentTypeDataSource" textField="text" valueField="value"
+                                        [filterable]="true" [valuePrimitive]="true"
+                                        (filterChange)="handleFilter($event, 'type')">
+                        </kendo-combobox>
+                    </td>
+                    <td class="k-text-center">
+                        <button kendoButton themeColor="primary" (click)="deleteOne(i)">
+                            <span class="k-icon icon-trash"></span>
+                        </button>
+                    </td>
+                </ng-container>
+            </tr>
+            </tbody>
+        </table>
+        <div *ngIf="hasValidationErrorAdditionalHeatTreatment" class="k-text-error k-fs-sm" i18n>
+            Error! Pos and Type are required.
+        </div>
+    </div>
+</div>

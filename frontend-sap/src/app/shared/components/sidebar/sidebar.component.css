@@ -1,0 +1,35 @@
+ui5-side-navigation {
+	border-radius: 0.5rem;
+	box-shadow: var(--_ui5-v1-20-1_side_navigation_box_shadow);
+	height: 100%;
+	margin-left: 12px !important;
+}
+
+.sidebar-container {
+	height: 100%;
+	width: 100%;
+	position: relative;
+	transition: width 0.3s ease-in-out;
+}
+  
+.sidebar-container.collapsed {
+	width: 50px;
+}
+  
+.collapse-button {
+	position: absolute;
+	top: 4%;
+	right: -20px;
+	transform: translateY(-50%);
+	background: var(--sapButton_Background);
+	border-radius: 50%;
+	cursor: pointer;
+	box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+	z-index: 99999;
+}
+
+@media (min-width: 2550px) {
+	.collapse-button {
+		top: 3%;
+	}
+}

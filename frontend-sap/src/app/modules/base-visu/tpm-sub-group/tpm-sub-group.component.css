@@ -1,0 +1,18 @@
+.tpm-sub-dialog-body{
+    width: 418px;
+	min-height: 216px;
+} 
+
+.flex-row-item {
+	display: flex;
+	flex-direction: row;
+	gap: 5px;
+}
+
+.pd-header {
+	padding: 11px 0px 11px 0px;
+}
+
+.sapTextColor {
+	color: var(--sapTextColor);
+}

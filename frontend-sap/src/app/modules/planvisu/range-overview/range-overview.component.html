@@ -1,0 +1,116 @@
+<div class="content">
+	<app-grid-table
+		headerTitle="Range Overview"
+		[customUrl]="customUrl"
+		i18n-headerTitle
+		[columns]="columns"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[isBusy]="isLoading"
+		button1Text="All"
+		button2Text="Not Critical"
+		button3Text="Critical"
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="false"
+		[isBaseVisu]="false"
+		[showSearch]="true"
+		[useOdataStyles]="false"
+		[enableServerSideFiltering]="true"
+		[showAction]="false"
+		[isGlobalSearchVisible]="true"
+		[isComboBoxOneActive]="false"
+		[isMultiSelectOneActive]="true"
+		[isMultiSelectOneSelectAllFlag]="false"
+		[showExtraButton]="true"
+		[extraButtonText]="extraButtonTitle"
+		comboBoxOneLabelText="Change Week"
+		keyForCacheCustomDataTableColumns="planVisuRangeOverview"
+		[multiSelectOnePlaceholder]="selectHallTitle"
+		[comboBoxOneData]="weekViewData"
+		[multiSelectOneData]="hallMultiComboBoxData"
+		(comboBoxOneSelectionChanged)="comboBoxSelectionChanged($event)"
+		(multiSelectOneSelectionChanged)="multiSelectOneSelectionChange($event)"
+		(extraButtonClick)="handleExtraButtonClick()"
+		i18n-comboBoxOneLabelText
+		[isCustomApiCall]="true"
+		[isBusy]="isLoading"
+		selectionMode="Single"
+		[onDoubleClick]="onDoubleClick"
+		(onLoadMoreForCustomAPI)="onLoadMoreForCustomAPI()"
+		(onSearchForCustomAPI)="onSearchForCustomAPI($event)"
+		(segmentedButtonClick)="segmentedButtonClick($event)"
+		#gridTable>
+	</app-grid-table>
+</div>
+
+<ui5-dialog
+	[open]="isDialogOpen"
+	[headerText]="dialogTitile">
+	<div class="flex flex-col justify-between h-[500px] w-[1300px]">
+		<div class="">
+			<app-bar-chart
+				[chartData]="rangeList"
+				[showBarValueUnit]="false"
+				[isRangeOverview]="true"></app-bar-chart>
+		</div>
+
+		<div class="w-full h-[180px]">
+			<app-grid-table
+				url=""
+				i18n-headerTitle
+				[limit]="0"
+				[columns]="dialogColumns"
+				[showAction]="false"
+				[showDownload]="false"
+				[showActiveButton]="false"
+				[showNewButton]="false"
+				[isBaseVisu]="false"
+				[data]="dialogData"
+				[customData]="true"
+				[showSearch]="false"
+				[enableServerSideFiltering]="false"
+				selectionMode="None"
+				#transportOrderTable>
+			</app-grid-table>
+		</div>
+	</div>
+
+	<div
+		slot="footer"
+		class="flex flex-row justify-end items-center w-full"
+		><ui5-button
+			i18n
+			(click)="closeDialog()"
+			>Close</ui5-button
+		></div
+	>
+</ui5-dialog>
+
+<ui5-popover
+	[open]="showPopOver"
+	[opener]="opener"
+	(after-close)="close()">
+	<div class="p-3 min-w-[300px] h-[150px]">
+		<div class="h-[150px] w-full">
+			<app-grid-table
+				url=""
+				i18n-headerTitle
+				[limit]="0"
+				[columns]="popoverColumns"
+				[showAction]="false"
+				[showDownload]="false"
+				[showActiveButton]="false"
+				[showNewButton]="false"
+				[isBaseVisu]="false"
+				[data]="popoverData"
+				[customData]="true"
+				[showSearch]="false"
+				[enableServerSideFiltering]="false"
+				selectionMode="None"
+				#transportOrderTable>
+			</app-grid-table>
+		</div>
+	</div>
+</ui5-popover>

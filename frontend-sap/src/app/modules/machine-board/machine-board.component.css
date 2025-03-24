@@ -1,0 +1,21 @@
+#schertech_logo {
+	margin: 0 0 0 36px;
+	height: 24.23px;
+}
+
+.outer-container {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.top-section {
+	width: 256px;
+	min-height: 194px;
+	flex: 0 0 auto;
+	color: var(--sapButton_Reject_Background);
+}
+
+.sidebar {
+	flex: 1;
+}

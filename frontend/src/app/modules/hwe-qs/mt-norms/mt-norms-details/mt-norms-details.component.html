@@ -1,0 +1,149 @@
+<form novalidate class="k-form" *ngIf="mtNorm">
+    <kendo-stacklayout orientation="horizontal" [gap]="9">
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Information
+            </kendo-card-header>
+            <kendo-card-body class="mt-norm-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="custom_id" i18n i18n-text text="custom Id">
+                        <span class="k-text-error k-pl-1">*</span>
+                    </kendo-label>
+                    <kendo-textbox #custom_id name="custom_id" [disabled]="isAllDisabled"
+                        [(ngModel)]="mtNorm.custom_id">
+                    </kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="specification" i18n i18n-text text="Specification"></kendo-label>
+                    <kendo-textbox #specification name="specification" [disabled]="isAllDisabled"
+                        [(ngModel)]="mtNorm.specification">
+                    </kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label name="revision" [for]="issue" i18n i18n-text text="revision">
+                    </kendo-label>
+                    <kendo-textbox name="revision" #revision [disabled]="isAllDisabled" [(ngModel)]="mtNorm.revision">
+                    </kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="test_class" i18n i18n-text text="Test Class"></kendo-label>
+                    <kendo-textbox #test_class [disabled]="isAllDisabled" [(ngModel)]="mtNorm.test_class"
+                        name="test_class">
+                    </kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="registration_limit" i18n i18n-text text="Registration Limit"></kendo-label>
+                    <kendo-combobox #registration_limit [disabled]="isAllDisabled"
+                        [(ngModel)]="mtNorm.registration_limit" [data]="mtNormRegistrationLimitData" textField="text"
+                        [valuePrimitive]="true" name="registration_limit" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="test_range" i18n i18n-text text="Test Range"></kendo-label>
+                    <kendo-combobox #test_range [disabled]="isAllDisabled" [(ngModel)]="mtNorm.test_range"
+                        [data]="mtNormTestRangeData" textField="text" [valuePrimitive]="true" name="test_range"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="testing_facility" i18n i18n-text text="Testing Facility"></kendo-label>
+                    <kendo-combobox #testing_facility [disabled]="isAllDisabled"
+                        [(ngModel)]="mtNorm.testing_facility" [data]="mtNormTestingFacilityData" textField="text"
+                        [valuePrimitive]="true" name="testing_facility" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="test_equipment" i18n i18n-text text="Test Equipment"></kendo-label>
+                    <kendo-combobox #test_equipment [disabled]="isAllDisabled" [(ngModel)]="mtNorm.test_equipment"
+                        [data]="mtNormTestEquipmentData" textField="text" [valuePrimitive]="true" name="test_equipment"
+                        valueField="value">
+                    </kendo-combobox>
+
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="uv_lamp" i18n i18n-text text="Uv Lamp"></kendo-label>
+                    <kendo-combobox #uv_lamp [disabled]="isAllDisabled" [(ngModel)]="mtNorm.uv_lamp"
+                        [data]="mtNormUvLampData" textField="text" [valuePrimitive]="true" name="uv_lamp"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="lux_meter" i18n i18n-text text="Lux Meter"></kendo-label>
+                    <kendo-combobox #lux_meter [disabled]="isAllDisabled" [(ngModel)]="mtNorm.lux_meter"
+                        [data]="luxMeterData" textField="text" [valuePrimitive]="true" name="lux_meter"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Information
+            </kendo-card-header>
+            <kendo-card-body class="mt-norm-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="field_strength_meter" i18n i18n-text text="Field Strength Meter"></kendo-label>
+                    <kendo-combobox #field_strength_meter [disabled]="isAllDisabled"
+                        [(ngModel)]="mtNorm.field_strength_meter" [data]="mtNormFieldStrengthMeterData" textField="text"
+                        [valuePrimitive]="true" name="field_strength_meter" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="uv_meter" i18n i18n-text text="UV Meter"></kendo-label>
+                    <kendo-combobox #uv_meter [disabled]="isAllDisabled" [(ngModel)]="mtNorm.uv_meter"
+                        [data]="mtNormUvMeterData" textField="text" [valuePrimitive]="true" name="uv_meter"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="magnetization" i18n i18n-text text="Magnetization"></kendo-label>
+                    <kendo-combobox #magnetization [disabled]="isAllDisabled" [(ngModel)]="mtNorm.magnetization"
+                        [data]="mtNormMagnetizationData" textField="text" [valuePrimitive]="true" name="magnetization"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="current_type" i18n i18n-text text="Current Type"></kendo-label>
+                    <kendo-combobox #current_type [disabled]="isAllDisabled" [(ngModel)]="mtNorm.current_type"
+                        [data]="mtNormCurrentTypeData" textField="text" [valuePrimitive]="true" name="current_type"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="illuminance" i18n i18n-text text="illuminance"></kendo-label>
+                    <kendo-combobox #illuminance [disabled]="isAllDisabled"
+                        [(ngModel)]="mtNorm.illuminance" [data]="mtNormIlluminanceData" textField="text"
+                        [valuePrimitive]="true" name="illuminance" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="irradiance" i18n i18n-text text="Irradiance"></kendo-label>
+                    <kendo-combobox #irradiance [disabled]="isAllDisabled"
+                        [(ngModel)]="mtNorm.irradiance" [data]="mtNormIrradianceData" textField="text"
+                        [valuePrimitive]="true" name="irradiance" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="residual_magnetism" i18n i18n-text text="Residual Magnetism"></kendo-label>
+                    <kendo-combobox #residual_magnetism [disabled]="isAllDisabled"
+                        [(ngModel)]="mtNorm.residual_magnetism" [data]="mtNormResidualMagnetismData" textField="text"
+                        [valuePrimitive]="true" name="residual_magnetism" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="control_unit" i18n i18n-text text="Control Unit"></kendo-label>
+                    <kendo-combobox #control_unit [disabled]="isAllDisabled" [(ngModel)]="mtNorm.control_unit"
+                        [data]="mtNormControlUnitData" textField="text" [valuePrimitive]="true" name="control_unit"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="comments" i18n i18n-text text="Comments"></kendo-label>
+                    <kendo-textarea #comments [disabled]="isAllDisabled" name="comments"
+                        [(ngModel)]="mtNorm.comments"></kendo-textarea>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

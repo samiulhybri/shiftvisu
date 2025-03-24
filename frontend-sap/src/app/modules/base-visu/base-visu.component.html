@@ -1,0 +1,569 @@
+<div class="p-0 pb-2 box-border grid gap-2 grid-rows-[auto_1fr] grid-cols-[auto_1fr] h-full">
+	<app-header-nav
+		class="col-span-2 row-start-1 row-end-2"
+		[isHomePage]="false"
+		title='BaseVisu'
+		[showPlantSelector]="true"
+		(logOutDialogEvent)="logoutDialogOpen()"
+		(isSidebarCollapse)="sideNavItemCollapse()">
+	</app-header-nav>
+	
+	<ui5-side-navigation 
+	    [collapsed]="isSideNavCollapsed"
+		(selection-change)="sideNavigationSelectionChange($event)">
+		<ui5-side-navigation-item
+			id="machine"
+			text="Machines"
+			i18n-text
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.BASEVISU_MACHINES_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_MACHINE_GROUPS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_MACHINE_STATES_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_MACHINE_STATE_GROUPS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_TPM_GROUPS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_TPM_SUB_GROUPS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_STANDARD_VALUE_KEY_VIEW)
+			"
+			icon="machine">
+			<ui5-side-navigation-sub-item
+				id="machineSubItem"
+				[selected]="router.url === '/base-visu/machine'"
+				text="Machines"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_MACHINES_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="machineGroupSubItem"
+				[selected]="router.url === '/base-visu/machine-group'"
+				text="Machine Groups"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_MACHINE_GROUPS_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="tpmGroupsSubItem"
+				[selected]="router.url === '/base-visu/tpm-groups'"
+				text="TPM Groups"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_TPM_GROUPS_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="tpmSubGroupsSubItem"
+				[selected]="router.url === '/base-visu/tpm-sub-groups'"
+				text="TPM SubGroups"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_TPM_SUB_GROUPS_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="machineStateSubItem"
+				[selected]="router.url === '/base-visu/machine-state'"
+				text="Machine States"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_MACHINE_STATES_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="machineStateGroupsSubItem"
+				[selected]="router.url === '/base-visu/machine-state-groups'"
+				text="Machine State Groups"
+				*ngIf="
+					authService.isPermissionValid(
+						permissionEnums.BASEVISU_MACHINE_STATE_GROUPS_VIEW
+					)
+				"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="standardValueKeySubItem"
+				[selected]="router.url === '/base-visu/standard-value-key'"
+				text="Standard Value Keys"
+				*ngIf="
+					authService.isPermissionValid(permissionEnums.BASEVISU_STANDARD_VALUE_KEY_VIEW)
+				"
+				i18n-text></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="parts"
+			text="Items"
+			i18n-text
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.BASEVISU_ITEMS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_ITEM_GROUPS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_ITEM_STATES_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_ITEM_STATE_GROUP_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_OPERATION_CONTROL_PROFILE_VIEW)
+			"
+			icon="connected">
+			<ui5-side-navigation-sub-item
+				id="itemSubItem"
+				[selected]="router.url === '/base-visu/item'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_ITEMS_VIEW)"
+				text="Items"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="itemGroupSubItem"
+				[selected]="router.url === '/base-visu/item-group'"
+				text="Item Groups"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_ITEM_GROUPS_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="itemTypeSubItem"
+				[selected]="router.url === '/base-visu/item-type'"
+				text="Item Types"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_ITEM_TYPES_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="itemStatesSubItem"
+				[selected]="router.url === '/base-visu/item-states'"
+				text="Item States"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_ITEM_STATES_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="itemStateGroupSubItem"
+				[selected]="router.url === '/base-visu/item-state-group'"
+				text="Item State Groups"
+				*ngIf="
+					authService.isPermissionValid(permissionEnums.BASEVISU_ITEM_STATE_GROUP_VIEW)
+				"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="serialNumberProfileSubItem"
+				[selected]="router.url === '/base-visu/serial-number-profile'"
+				text="Serial Number Profiles"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_SERIAL_NUMBER_PROFILE_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="operationControlProfilesSubItem"
+				[selected]="router.url === '/base-visu/operation-control-profiles'"
+				text="Operation Control Profiles"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_OPERATION_CONTROL_PROFILE_VIEW)"
+				i18n-text>
+			</ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="tools"
+			text="Tools"
+			i18n-text
+			*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_TOOLS_VIEW)"
+			icon="technical-object">
+			<ui5-side-navigation-sub-item
+				id="toolsSubItem"
+				[selected]="router.url === '/base-visu/tools'"
+				text="Tools"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_TOOLS_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="user"
+			text="Users"
+			i18n-text="Users"
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.BASEVISU_USERS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_USER_GROUPS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_QUALIFICATIONS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_USER_CAPACITIES_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_NOTIFICATION_GROUPS_VIEW)
+			"
+			icon="person-placeholder">
+			<ui5-side-navigation-sub-item
+				id="userSubItem"
+				[selected]="router.url === '/base-visu/user'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_USERS_VIEW)"
+				text="Users"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="userGroupSubItem"
+				[selected]="router.url === '/base-visu/user-group'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_USER_GROUPS_VIEW)"
+				text="User Groups"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="userCapacitiesSubItem"
+				[selected]="router.url === '/base-visu/user-capacities'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_USER_CAPACITIES_VIEW)"
+				text="User Capacities"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="qualifications"
+				text="Qualifications"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_QUALIFICATIONS_VIEW)"
+				i18n-text
+				[selected]="
+					router.url === '/base-visu/qualifications'
+				"></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="notificationGroupSubItem"
+				text="Notification Groups"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_NOTIFICATION_GROUPS_VIEW)"
+				i18n-text
+				[selected]="
+					router.url === '/base-visu/notification-group'
+				"></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="logistics"
+			text="Logistics"
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.BASEVISU_PLANTS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_STORAGE_LOCATION_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_WAREHOUSE_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_STORAGE_TYPE_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_STORAGE_SECTION_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_STORAGE_BIN_VIEW) ||
+				authService.isPermissionValid(
+					permissionEnums.BASEVISU_PRODUCTION_SUPPLY_AREA_VIEW
+				) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_HALLS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_TRANSPORT_ORDER_TYPE_VIEW)
+			"
+			i18n-text
+			icon="factory">
+			<ui5-side-navigation-sub-item
+				id="plantSubItem"
+				[selected]="router.url === '/base-visu/plant'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_PLANTS_VIEW)"
+				text="Plants"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="storageLocationSubItem"
+				[selected]="router.url === '/base-visu/storage-location'"
+				*ngIf="
+					authService.isPermissionValid(permissionEnums.BASEVISU_STORAGE_LOCATION_VIEW)
+				"
+				text="Storage Locations"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="warehouseSubItem"
+				[selected]="router.url === '/base-visu/warehouse'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_WAREHOUSE_VIEW)"
+				text="Warehouses"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="storageTypeSubItem"
+				[selected]="router.url === '/base-visu/storage-type'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_STORAGE_TYPE_VIEW)"
+				text="Storage Types"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="storageSectionSubItem"
+				[selected]="router.url === '/base-visu/storage-section'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_STORAGE_SECTION_VIEW)"
+				text="Storage Sections"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="storageBinSubItem"
+				[selected]="router.url === '/base-visu/storage-bin'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_STORAGE_BIN_VIEW)"
+				text="Storage Bins"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="productionSupplyAreaSubItem"
+				[selected]="router.url === '/base-visu/production-supply-area'"
+				*ngIf="
+					authService.isPermissionValid(
+						permissionEnums.BASEVISU_PRODUCTION_SUPPLY_AREA_VIEW
+					)
+				"
+				text="Production Supply Areas"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="hallSubItem"
+				[selected]="router.url === '/base-visu/hall'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_HALLS_VIEW)"
+				text="Halls"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="transportOrderTypesSubItem"
+				[selected]="router.url === '/base-visu/transport-order-types'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_TRANSPORT_ORDER_TYPE_VIEW)"
+				text="Transport Order Types"
+				i18n-text></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="customer"
+			text="Customers"
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.BASEVISU_CUSTOMERS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_CUSTOMER_GROUPS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_SALES_STATUS_VIEW) ||
+				authService.isPermissionValid(
+					permissionEnums.BASEVISU_REVENUE_CLASSIFICATIONS_VIEW
+				) ||
+				authService.isPermissionValid(
+					permissionEnums.BASEVISU_EMPLOYEE_CLASSIFICATIONS_VIEW
+				) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_MARKET_SEGMENTS_VIEW) ||
+				authService.isPermissionValid(
+					permissionEnums.BASEVISU_POTENTIAL_CLASSIFICATIONS_VIEW
+				) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_MACHINE_CLASSIFICATIONS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_CRM_ACTION_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_CUSTOMER_CATEGORY_VIEW)"
+			i18n-text
+			icon="customer">
+			<ui5-side-navigation-sub-item
+				id="customerSubItem"
+				[selected]="router.url === '/base-visu/customer'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_CUSTOMERS_VIEW)"
+				text="Customers"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="customerGroupSubItem"
+				[selected]="router.url === '/base-visu/customer-group'"
+				text="Customer Groups"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_CUSTOMER_GROUPS_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="revenueClassificationsSubItem"
+				[selected]="router.url === '/base-visu/revenue-classifications'"
+				text="Revenue Classifications"
+				*ngIf="
+					authService.isPermissionValid(
+						permissionEnums.BASEVISU_REVENUE_CLASSIFICATIONS_VIEW
+					)
+				"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="employeeClassificationsSubItem"
+				[selected]="router.url === '/base-visu/employee-classifications'"
+				text="Employee Classifications"
+				*ngIf="
+					authService.isPermissionValid(
+						permissionEnums.BASEVISU_EMPLOYEE_CLASSIFICATIONS_VIEW
+					)
+				"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="machineClassificationsSubItem"
+				[selected]="router.url === '/base-visu/machine-classifications'"
+				text="Machine Classifications"
+				*ngIf="
+					authService.isPermissionValid(
+						permissionEnums.BASEVISU_MACHINE_CLASSIFICATIONS_VIEW
+					)
+				"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="potentialClassificationsSubItem"
+				[selected]="router.url === '/base-visu/potential-classifications'"
+				text="Potential Classifications"
+				*ngIf="
+					authService.isPermissionValid(
+						permissionEnums.BASEVISU_POTENTIAL_CLASSIFICATIONS_VIEW
+					)
+				"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				[selected]="router.url === '/base-visu/sales-status'"
+				text="Sales Status"
+				id="salesStatusSubItem"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_SALES_STATUS_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				[selected]="router.url === '/base-visu/market-segments'"
+				text="Market Segments"
+				id="marketSegmentsSubItem"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_MARKET_SEGMENTS_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item [selected]="router.url === '/base-visu/crm-actions'" text="CRM Actions"
+				id="crmActionsSubItem" *ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_CRM_ACTION_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item [selected]="router.url === '/base-visu/areas'" text="Areas"
+				id="areasSubItem" *ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_AREA_VIEW)"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item [selected]="router.url === '/base-visu/customer-categories'" text="Customer Categories" id="customerCategoriesSubItem"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_CUSTOMER_CATEGORY_VIEW)" i18n-text></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="suppliers"
+			text="Suppliers"
+			*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_SUPPLIERS_VIEW)"
+			i18n-text
+			icon="supplier">
+			<ui5-side-navigation-sub-item
+				id="suppliersSubItem"
+				[selected]="router.url === '/base-visu/suppliers'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_SUPPLIERS_VIEW)"
+				text="Suppliers"
+				i18n-text></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="energy"
+			text="Energy"
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.BASEVISU_ENERGY_CONSUMERS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_ENERGY_CONSUMER_GROUPS_VIEW)
+			"
+			i18n-text
+			icon="general-leave-request">
+			<ui5-side-navigation-sub-item
+				id="energyConsumerSubItem"
+				[selected]="router.url === '/base-visu/energy-consumer'"
+				*ngIf="
+					authService.isPermissionValid(permissionEnums.BASEVISU_ENERGY_CONSUMERS_VIEW)
+				"
+				text="Energy Consumers"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="energyConsumerGroupsSubItem"
+				[selected]="router.url === '/base-visu/energy-consumer-groups'"
+				*ngIf="
+					authService.isPermissionValid(
+						permissionEnums.BASEVISU_ENERGY_CONSUMER_GROUPS_VIEW
+					)
+				"
+				text="Energy Consumer Groups"
+				i18n-text></ui5-side-navigation-sub-item>
+				<ui5-side-navigation-sub-item
+				id="energyMeterSubItem"
+				[selected]="router.url === '/base-visu/energy-meter'"
+				*ngIf="
+					authService.isPermissionValid(
+						permissionEnums.BASEVISU_ENERGY_METER_VIEW
+					)
+				"
+				text="Energy Meter"
+				i18n-text></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="crucible"
+			text="Melting"
+			i18n-text
+			*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_CRUCIBLES_VIEW)"
+			icon="temperature">
+			<ui5-side-navigation-sub-item
+				id="crucibleSubItem"
+				[selected]="router.url === '/base-visu/crucible'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_CRUCIBLES_VIEW)"
+				text="Crucibles"
+				i18n-text></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="printer"
+			text="Printing"
+			i18n-text
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.BASEVISU_PRINTERS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_TERMINALS_VIEW)
+			"
+			icon="print">
+			<ui5-side-navigation-sub-item
+				id="printerSubItem"
+				[selected]="router.url === '/base-visu/printer'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_PRINTERS_VIEW)"
+				text="Printers"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="terminalSubItem"
+				[selected]="router.url === '/base-visu/terminal'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_TERMINALS_VIEW)"
+				text="Terminals"
+				i18n-text></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="settings"
+			text="Settings"
+			i18n-text
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.BASEVISU_SETTINGS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_ROLES_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_PERMISSIONS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_LANGUAGES_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_COUNTRIES_VIEW)
+			"
+			icon="settings">
+			<ui5-side-navigation-sub-item
+				id="settingsSubItem"
+				[selected]="router.url === '/base-visu/settings'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_SETTINGS_VIEW)"
+				text="Settings"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="role"
+				text="Roles"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_ROLES_VIEW)"
+				i18n-text
+				[selected]="router.url === '/base-visu/role'"></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="permission"
+				text="Permissions"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_PERMISSIONS_VIEW)"
+				i18n-text
+				[selected]="router.url === '/base-visu/permission'"></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="countriesSubItem"
+				text="Countries"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_COUNTRIES_VIEW)"
+				i18n-text
+				[selected]="router.url === '/base-visu/countries'"></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="languagesSubItem"
+				text="Languages"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_LANGUAGES_VIEW)"
+				i18n-text
+				[selected]="router.url === '/base-visu/languages'"></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			id="capacity"
+			text="Capacity"
+			i18n-text
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.BASEVISU_SHIFT_MODELS_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_CAPACITIES_VIEW) ||
+				authService.isPermissionValid(permissionEnums.BASEVISU_SHIFT_VIEW) || 
+				authService.isPermissionValid(permissionEnums.BASEVISU_HALL_CAPACITY_SETTINGS_VIEW)
+			"
+			icon="calendar">
+			<ui5-side-navigation-sub-item
+				id="capacitiesSubItem"
+				[selected]="router.url === '/base-visu/capacities'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_CAPACITIES_VIEW)"
+				text="Capacities"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="hallCapacitySettingSubItem"
+				[selected]="router.url === '/base-visu/hall-capacity-setting'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_HALL_CAPACITY_SETTINGS_VIEW)"
+				text="Hall Capacity Settings"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="shiftSubItem"
+				[selected]="router.url === '/base-visu/shift'"
+				*ngIf="authService.isPermissionValid(baseVisuShiftView)"
+				text="Shifts"
+				i18n-text></ui5-side-navigation-sub-item>
+			<ui5-side-navigation-sub-item
+				id="shiftModelSubItem"
+				[selected]="router.url === '/base-visu/shift-model'"
+				*ngIf="authService.isPermissionValid(permissionEnums.BASEVISU_SHIFT_MODELS_VIEW)"
+				text="Shift Models"
+				i18n-text></ui5-side-navigation-sub-item>
+		</ui5-side-navigation-item>
+	</ui5-side-navigation>
+	<div [ngClass]="{ content: !isCapacityPlan, contentForCapacity: isCapacityPlan }">
+		<router-outlet></router-outlet>
+	</div>
+</div>
+
+<ui5-dialog
+	header-text="Confirm"
+	[open]="isLogOutDialogOpen"
+	state="Critical"
+	(beforeClose)="closeDialog()">
+	<div class="logout-content">
+		<ui5-text i18n> Do you want to logout? </ui5-text>
+		<ui5-busy-indicator
+			size="M"
+			[active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		class="logout-footer"
+		slot="footer">
+		<ui5-button
+			design="Emphasized"
+			class="mr5"
+			i18n
+			id="logoutConfirmButton"
+			(click)="logOut()"
+			>Confirm</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			id="logoutCancelButton"
+			i18n
+			>Cancel</ui5-button
+		>
+	</div>
+</ui5-dialog>

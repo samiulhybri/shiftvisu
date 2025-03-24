@@ -1,0 +1,44 @@
+<kendo-grid-component
+	[gridItems]="gridItems"
+	[columns]="columns"
+	[state]="state"
+	[isLoadedEnabled]="isLoadedEnabled"
+	[isSortable]="isSortable"
+	[isFilterable]="isFilterable"
+	[isGroupable]="isGroupable"
+	[isPageable]="isPageable"
+	[toolbarConfig]="toolbarConfig"
+	(emitState)="changeState($event)"
+	(emitData)="changeState($event)"
+	(gridRefersh)="sendRequest()"
+	(deleteDataItem)="deleteDataItem($event)"
+	[editView]="editView"
+	[addWindowEvent]="addWindowEvent"
+	(filterState)="changeGridFilter($event)"
+>
+
+	<ng-template #actionColumnContent let-dataItem>
+		<button kendoButton [primary]="false">
+			<span class="k-icon icon-printer" (click)="generatePdfOrText(dataItem, 0)"></span>
+		</button>
+        <button kendoButton [primary]="false">
+			<span class="k-icon icon-document-text" (click)="generatePdfOrText(dataItem, 1)"></span>
+		</button>
+	</ng-template>
+</kendo-grid-component>
+
+
+<kendo-dialog
+	title="Certificate Pdf"
+	*ngIf="showPdfDialog"
+	(close)="showPdfDialog=false"
+	[minWidth]="'90vw'"
+	[height]="'90%'"
+>
+	<app-loader *ngIf="isLoaderEnabled"></app-loader>
+
+	<app-attachment-preview *ngIf="attachmentFiles.length" [filePreviewHeight]="'100vh'"  [attachmentFiles]="attachmentFiles" [isLoading]="isLoaderEnabled">
+
+	</app-attachment-preview>
+
+</kendo-dialog>

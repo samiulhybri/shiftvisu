@@ -1,0 +1,96 @@
+<ui5-dialog
+	class="max-w-[98%]"
+	id="docVisuProcessDetailsPage"
+	[open]="isDialogOpen"
+	[headerText]="docVisuPage"
+	i18n-headerText
+	(onBeforeClose)="closeDialogDocVisuProcessDetailsPage()">
+	<div slot="header" class="flex items-center justify-between p-2 ">
+		<ui5-button class="mr-2 ml-[-28px]"
+		icon="menu2"
+		design="Transparent"          
+		style="color: black;"
+		(click)="onClickSidebarChange()"
+	>
+	</ui5-button>
+	<span>{{ docVisuPage }}</span>
+	</div>
+
+	<div class="h-[calc(77vh-8px)] flex gap-[10px] overflow-visible"
+	[ngClass]="{
+		'lg:w-[calc(96vw-10px)]': !isSideNavCollapsed,
+		'2xl:w-[calc(85vw-10px)]': !isSideNavCollapsed, 
+		'lg:w-[calc(80vw-10px)]': isSideNavCollapsed,
+		'2xl:w-[calc(75vw-10px)]': isSideNavCollapsed, 
+	  }">
+		<ui5-busy-indicator
+			class="h-full"
+			[active]="isNavBarLoading">
+			<ui5-side-navigation [collapsed]="isSideNavCollapsed" class="rounded-lg">
+				<ui5-side-navigation-item
+					icon="machine"
+					#machineNavItem
+					text="Machine"
+					i18n-text
+					aria-expanded="true">
+					<ui5-side-navigation-sub-item
+						[text]="machineName"
+						(click)="selectMachine(machineId)"
+						[selected]="true">
+					</ui5-side-navigation-sub-item>
+				</ui5-side-navigation-item>
+
+				<ui5-side-navigation-item
+					icon="product"
+					id="nav-item"
+					text="Items"
+					i18n-text>
+					@for (item of items; track $index) {
+						<ui5-side-navigation-sub-item
+							[text]="item.name"
+							(click)="selectItem(item.id)">
+						</ui5-side-navigation-sub-item>
+					}
+				</ui5-side-navigation-item>
+
+				<ui5-side-navigation-item
+					icon="wrench"
+					id="nav-item-tool"
+					text="Tools"
+					i18n-text>
+					@for (tool of tools; track $index) {
+						<ui5-side-navigation-sub-item
+							[text]="tool.name"
+							(click)="selectTool(tool.id)">
+						</ui5-side-navigation-sub-item>
+					}
+				</ui5-side-navigation-item>
+			</ui5-side-navigation>
+		</ui5-busy-indicator>
+
+		
+		<ui5-busy-indicator
+		[active]="isLoading">
+			<div>
+			@if (!isProcessLoading && processId !== 0) {
+				<app-doc-visu-process-details			
+					[machineId]="machineId"
+					[processId]="processId"
+					[isMachineBoardActive]="isMachineBoardActive"
+				></app-doc-visu-process-details>
+			}
+		</div>
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="left-component-footer">
+		<ui5-button
+			design="Transparent"
+			id="close-edit-dialog"
+			(click)="closeDialogDocVisuProcessDetailsPage()"
+			i18n
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>

@@ -1,0 +1,57 @@
+<ui5-card>
+	<div class="h-[calc(100vh-304px)]">
+		<app-grid-table
+			headerTitle="Details"
+			i18n-headerTitle
+			url="/ShiftVisuComponents"
+			[filterQuery]="filterQuery"
+			[columns]="columns"
+			[showAction]="false"
+			[showSearch]="false"
+			[selectedRowsId]="selectedRowsId"
+			[showActiveButton]="false"
+			[showTableSettingBtn]="false"
+			addButtonText="New"
+			i18n-addButtonText
+			[showNewButton]="false"
+			[showDownload]="false"
+			[editPermission]="authService.isPermissionValid(shiftVisuAdminPermission)"
+			[isBaseVisu]="false"
+			[enableServerSideFiltering]="false"
+			keyForCacheCustomDataTableColumns="modelComponent"
+			(rowClick)="rowClick($event)"
+			#modelComponentRef></app-grid-table>
+	</div>
+</ui5-card>
+
+<ui5-dialog
+	id="dialog"
+	state="Critical"
+	[open]="isOpenDataUnsaved"
+	header-text="Warning"
+	i18n-header-text>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L">
+		<p i18n>You have unsaved changes. Do you want to save?</p>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-end">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				class="mr-1 mb-1"
+				(click)="closeDataUnSavedDialog()"
+				i18n
+				>No</ui5-button
+			>
+			<ui5-button
+				class="mr-1 mb-1"
+				design="Emphasized"
+				(click)="saveUnSavedData()"
+				i18n
+				>Yes</ui5-button
+			>
+		</div>
+	</div>
+</ui5-dialog>

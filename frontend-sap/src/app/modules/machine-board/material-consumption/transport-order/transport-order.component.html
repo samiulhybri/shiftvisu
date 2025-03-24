@@ -1,0 +1,53 @@
+<div class="staging-area-wraper w-full h-[60vh] max-h-[850px] grid gap-3 grid-cols-6">
+	<ui5-card class="h-[60vh] max-h-[850px] col-span-4 md:col-span-1">
+		<ui5-card-header
+			slot="header"
+			title-text="Transport Orders"
+			i18n-title-text></ui5-card-header>
+		<div class="divider list-border-bottom"></div>
+		<div class="h-[calc(60vh-50px)] max-h-[800px]">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				class="w-full h-full">
+				<ui5-list
+					growing="Scroll"
+					class="h-full list-border-bottom"
+					selectionMode="Single"
+					(itemClick)="onListClick($event)">
+					<ui5-li
+						*ngFor="let transportOrder of transportOrders; index as i"
+						[id]="transportOrder.id"
+						[selected]="i === 0">
+						{{ transportOrder.custom_id }}
+					</ui5-li>
+				</ui5-list>
+			</ui5-busy-indicator>
+		</div>
+	</ui5-card>
+	<ui5-card class="h-[60vh] max-h-[850px] col-span-4 md:col-span-5">
+		<ui5-card-header
+			slot="header"
+			title-text="Positions"
+			i18n-title-text></ui5-card-header>
+		<div class="h-[calc(60vh-50px)] max-h-[800px] pr-2">
+			<app-grid-table
+				url=""
+				i18n-headerTitle
+				[limit]="0"
+				[columns]="columns"
+				[showAction]="false"
+				[showDownload]="false"
+				[showActiveButton]="false"
+				[showNewButton]="false"
+				[isBaseVisu]="false"
+				[data]="transportOrderPosData"
+				[customData]="true"
+				[showSearch]="false"
+				[enableServerSideFiltering]="false"
+				expandQuery="$expand=transportOrderPosDeliveries($expand=user),prodOrderPosBomPos($expand=unitOfMeasure($select=name,custom_id),prodOrderPos($select=quantity)),transportOrder,item($select=custom_id,name,$expand=unitOfMeasure),responsibleUser($select=custom_id,name),machine($select=custom_id,name)"
+				selectionMode="None"
+				#transportOrderTable>
+			</app-grid-table>
+		</div>
+	</ui5-card>
+</div>

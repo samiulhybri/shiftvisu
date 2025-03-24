@@ -1,0 +1,176 @@
+<div
+	class="content"
+	cdkDropListGroup>
+	<div class="flex flex-row justify-between h-11 rounded-tr-2xl items-center pl-4 border-y">
+		<div>
+			<ui5-title
+				level="H5"
+				class="noselect"
+				i18n
+				>Setup Plan</ui5-title
+			>
+		</div>
+		<div class="flex flex-row items-center justify-end space-x-2 mr-2">
+			<ui5-multi-combobox #hallRef id="hallMultiComboBox" (selectionChange)="selectHall($event)" placeholder="Select Hall"
+				i18n-placeholder class="multi-combobox">
+				<ui5-mcb-item *ngFor="let hall of halls" selected="{{ hall.isSelected }}"
+					text="{{ hall.custom_id }} - {{ hall.name }}" [id]="hall.id">
+				</ui5-mcb-item>
+			</ui5-multi-combobox>
+			<ui5-input
+				id="searchInput"
+				class="noselect mr-4"
+				slot="searchField"
+				placeholder="Search"
+				i18n-placeholder
+				[(ngModel)]="searchedValue"
+				(input)="onSearchInput($event)">
+				<ui5-icon
+					name="search"
+					slot="icon"
+					ui5-icon=""></ui5-icon>
+			</ui5-input>
+			<ui5-label class="noselect mr-1" i18n show-colon>Date From</ui5-label>
+			<ui5-date-picker
+				id="startDatePicker"
+				class="mr-2 w-[220px]"
+				format-pattern="dd.MM.yyyy"
+				[value]="formatedCurrentDate"
+				(change)="changeStartDate($event)"
+				[minDate]="firstDayOfMonth"
+				[maxDate]="lastDayOfMonth">
+			</ui5-date-picker>
+			<ui5-label
+				class="noselect mr-1"
+				i18n
+				show-colon
+				>Date Until</ui5-label
+			>
+			<ui5-date-picker
+				id="endDatePicker"
+				class="mr-2 w-[220px]"
+				format-pattern="dd.MM.yyyy"
+				class="noselect"
+				[value]="formatedEndDate"
+				(change)="changeEndDate($event)"
+				[minDate]="firstDayOfMonth"
+				[maxDate]="lastDayOfMonth">
+			</ui5-date-picker>
+			<ui5-button
+				design="Emphasized"
+				i18n
+				(click)="dateFilter()">
+				Refresh
+			</ui5-button>
+		</div>
+	</div>
+	<div class="h-[93.5%] overflow-auto">
+		<ui5-table
+			[loading]="isLoading"
+			mode="None"
+			overflow-mode="Scroll"
+			class="h-[99%] rounded-bl-2xl">
+			<ui5-table-header-row
+				slot="headerRow"
+				sticky>
+				<ui5-table-header-cell
+					class="overflow-hidden border-solid border-x-0 border-b-0 border-color sticky-cell"
+					min-width="210px">
+					<ui5-title
+						level="H5"
+						i18n
+						class="noselect"
+						>Machine</ui5-title
+					>
+				</ui5-table-header-cell>
+				<ui5-table-header-cell
+					*ngFor="let date of dates"
+					class="noselect border-l border-solid border-color border-b-0 border-r-0"
+					min-width="300px">
+					<ui5-title level="H5">{{ date | date: "dd.MM.yyyy" }}</ui5-title>
+				</ui5-table-header-cell>
+			</ui5-table-header-row>
+			<ui5-table-row *ngFor="let machine of filteredMachines">
+				<ui5-table-cell class="sticky-cell">
+					<div class="w-full flex flex-col justify-center">
+						<ui5-title
+							level="H5"
+							class="noselect ml-4"
+							>
+							{{ machine.name || "" | truncate: 45 }}</ui5-title
+						>
+					</div>
+				</ui5-table-cell>
+				<ui5-table-cell
+					*ngFor="let date of dates"
+					class="border-solid border-color border-y-0 border-r-0 p-0">
+					<div class="w-full flex flex-col justify-between">
+						<div class="ml-4 mr-4 mt-[10px] overflow-auto mb-2">
+							<ui5-list
+								class="h-full"
+								id="orderList"
+								cdkScrollable>
+								@for (
+									operation of machine.prodOrderPosOperations;
+									track $index
+								) {
+									@if (
+										(date | date: "dd.MM.yyyy") ==
+										(processDateFormat(operation.start || "")
+											| date: "dd.MM.yyyy")
+									) {
+										<div
+											id="{{ operation.id }}"
+											class="h-[94px] overflow-auto mr-[8px] mb-1.5 shadow-md rounded-xl">
+											<app-generic-tag
+												(dblclick)="orderDetails(operation, false)"
+												[type]="operation.type ?? type.None">
+												<div
+													class="ml-[11px] mr-[11px] flex direction-row items-center w-full">
+													<div
+														class="ml-[11px] mr-[11px] flex flex-col">
+														<ui5-title
+															level="H6"
+															class="noselect"
+															>{{ getTitleWithValue(operation, "Order") }}
+														</ui5-title>
+														<ui5-title
+															level="H6"
+															class="noselect">
+															{{ getTitleWithValue(operation, "Tool") }}
+														</ui5-title>
+														<ui5-title
+															level="H6"
+															class="noselect">
+															{{ getTitleWithValue(operation, "Status") }}
+														</ui5-title>
+														<ui5-title level="H6" class="noselect">
+															{{ getTitleWithValue(operation, "Date") }}
+														</ui5-title>
+													</div>
+												</div>
+											</app-generic-tag>
+										</div>
+									}
+								}
+							</ui5-list>
+						</div>
+					</div>
+				</ui5-table-cell>
+			</ui5-table-row>
+		</ui5-table>
+	</div>
+</div>
+
+// Order Details dialog
+<app-order-details-dialog
+	#orderDetailsDialog
+	[open]="isDialogOpen"
+	[dialogTitle]="dialogTitle || ''"
+	[selectedOperation]="selectedOperation"
+	[selecteItem]="selecteItem"
+	[operationEnd]="operationEnd ?? ''"
+	[operationStart]="operationStart ?? ''"
+	[isDialogEditable]="true"
+	(changeIsDialogOpen)="closeDialog()"
+	></app-order-details-dialog>

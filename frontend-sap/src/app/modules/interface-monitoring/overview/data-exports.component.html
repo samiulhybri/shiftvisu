@@ -1,0 +1,246 @@
+<div class="grid grid-flow-col grid-cols-2 gap-x-2 h-full border-none default-bg">
+	<div class="h-full border border-solid border-gray-300 shadow-lg rounded-xl overflow-hidden">
+		<app-grid-table
+			headerTitle="Overview"
+			i18n-headerTitle
+			url="/DataExports"
+			[columns]="columns"
+			[showRowDataCount]="true"
+			[showAction]="false"
+			[showDownload]="false"
+			[showNewButton]="false"
+			[showEditButton]="false"
+			[showDeleteButton]="false"
+			[showSearch]="true"
+			selectionMode="Single"
+			sortBy="last_exported_at"
+			customSortType="desc"
+			(rowClick)="handleRowClick($event)"
+			[enableServerSideFiltering]="true"
+			keyForCacheCustomDataTableColumns="dataExportsColumns"
+			(processData)="processDataExportData($event)"
+			(searchClick)="handleSearchClick($event)"
+			#childComponentRef>
+		</app-grid-table>
+	</div>
+	<div
+		class="flex flex-col border border-solid border-gray-300 shadow-lg rounded-xl overflow-hidden mr-3"
+		style="background: var(--sapList_HeaderBackground)">
+		<ui5-bar design="Header">
+			<ui5-title
+				level="H5"
+				i18n
+				slot="startContent"
+				>Details</ui5-title
+			>
+		</ui5-bar>
+		<ui5-busy-indicator
+			[active]="isLoading"
+			class="overflow-auto flex-1">
+			<div class="w-full" *ngIf="showDetailsBody; else noDataFound">
+				<div class="grid grid-flow-row p-3 mb-1">
+					<ui5-label
+						show-colon
+						required
+						readonly
+						>{{localization.name}}</ui5-label
+					>
+					<ui5-input
+						id="nameInput"
+						name="name"
+						[(ngModel)]="selectedRowValue.name"
+						class="w-100"
+						readonly
+						[required]="true"></ui5-input>
+				</div>
+				<div class="ml-4 flex flex-row mb-1">
+					<div class="flex flex-col w-1/2">
+						<ui5-label
+							show-colon
+							i18n
+							>Exporting</ui5-label
+						>
+						<ui5-switch
+							id="exportingSwitch"
+							name="exporting"
+							disabled
+							[(ngModel)]="selectedRowValue.is_exporting">
+						</ui5-switch
+					></div>
+					<div class="flex flex-col w-1/2">
+						<ui5-label
+							show-colon
+							i18n
+							>Exported</ui5-label
+						>
+						<ui5-switch
+							id="exportedSwitch"
+							name="exported"
+							disabled
+							[(ngModel)]="selectedRowValue.is_exported">
+						</ui5-switch
+					></div>
+				</div>
+				<div class="flex flex-row gap-2 p-3">
+					<div class="flex-column w-1/2">
+						<ui5-label
+							i18n
+							show-colon
+							>Created</ui5-label
+						>
+						<ui5-input
+							name="created_at"
+							class="w-100"
+							readonly
+							[(ngModel)]="selectedRowValue.created_at">
+						</ui5-input
+					></div>
+					<div class="flex-column w-1/2">
+						<ui5-label
+							i18n
+							show-colon
+							>Last Exported</ui5-label
+						>
+						<ui5-input
+							name="last_exported_at"
+							class="w-100"
+							readonly
+							[(ngModel)]="selectedRowValue.last_exported_at">
+						</ui5-input
+					></div>
+				</div>
+				<div class="flex flex-row gap-2 p-3">
+					<div class="flex-column flex-1">
+						<ui5-label
+							i18n
+							show-colon
+							>Http Method</ui5-label
+						>
+						<ui5-input
+							name="http_method"
+							class="w-100"
+							readonly
+							[(ngModel)]="selectedRowValue.http_method">
+						</ui5-input
+					></div>
+					<div class="flex-column flex-1">
+						<ui5-label
+							i18n
+							show-colon
+							>Url</ui5-label
+						>
+						<ui5-input
+							name="http_url"
+							class="w-100"
+							[readonly]="!canEdit"
+							[(ngModel)]="selectedRowValue.http_url">
+						</ui5-input
+					></div>
+				</div>
+
+				<ui5-panel
+					class="border-solid shadow-md overflow-auto border border-gray-300 m-3"
+					[collapsed]="true">
+					<div
+						class="flex flex-row items-center justify-between w-full"
+						slot="header">
+						<div
+							class="ui5-panel-header-title"
+							i18n
+							>Payload</div
+						>
+						@if (canEdit) {
+							@if (isEditingPayload) {
+								<ui5-button
+									icon="accept"
+									(ui5Click)="setPayloadEditable(false)"></ui5-button>
+							} @else {
+								<ui5-button
+									icon="edit"
+									(ui5Click)="setPayloadEditable(true)"></ui5-button>
+							}
+						}
+					</div>
+					@if (isEditingPayload) {
+						<ui5-textarea
+							name="http_payload"
+							class="w-full"
+							[growing]="true"
+							[(ngModel)]="selectedRowValue.http_payload">
+						</ui5-textarea>
+					}
+					<div id="httpPayload"></div>
+				</ui5-panel>
+				<ui5-panel
+					headerText="Result Message"
+					class="border-solid shadow-md overflow-auto border border-gray-300 m-3"
+					[collapsed]="true"
+					i18n-headerText>
+					<div id="resultMessage"></div>
+				</ui5-panel>
+				<ui5-panel
+					headerText="Data"
+					class="border-solid shadow-md overflow-auto border border-gray-300 m-3"
+					[collapsed]="true"
+					i18n-headerText>
+					<div id="data"></div>
+				</ui5-panel>
+			</div>
+			<ng-template #noDataFound>
+				<div class="h-[60vh] flex justify-center items-center">
+					<p i18n>No data</p>
+				</div>
+			</ng-template>
+		</ui5-busy-indicator>
+		@if (canEdit) {
+			<ui5-bar design="Footer" *ngIf="showDetailsBody && selectedRowValue.isSelected">
+				<ui5-button
+					slot="endContent"
+					icon="sap-icon://complete"
+					(ui5Click)="onMarkAsExportedOpen()"
+					>Mark as Exported</ui5-button
+				>
+				<ui5-button
+					slot="endContent"
+					(ui5Click)="save()"
+					>{{ localization.save }}</ui5-button
+				>
+				<ui5-button
+					slot="endContent"
+					design="Emphasized"
+					(ui5Click)="retry()"
+					i18n
+					>Save and rerun</ui5-button
+				>
+			</ui5-bar>
+		}
+	</div>
+</div>
+
+<ui5-dialog
+	id="warningForMarkASExported"
+	[open]="warningForMarkASExported"
+	header-text="Warning"
+	i18n-header-text
+	state="Negative">
+	<p i18n>Are you sure?</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			(click)="onMarkAsExportedUpdate()"
+			[disabled]="isLoading"
+			i18n
+			>Ok</ui5-button
+		>
+		<ui5-button (click)="closeWarningForMarkASExportedDialog()">{{
+			localization.close
+		}}</ui5-button>
+	</div>
+</ui5-dialog>

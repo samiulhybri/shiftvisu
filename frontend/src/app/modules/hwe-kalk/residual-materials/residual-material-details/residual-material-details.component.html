@@ -1,0 +1,85 @@
+<form novalidate class="k-form" *ngIf="residualMaterial">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="residual-material-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                        <kendo-textbox #custom_id name="custom_id" [disabled]="isAllDisabled || disabledCustomId" [(ngModel)]="residualMaterial.custom_id"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+                        <kendo-textbox #name name="name" [disabled]="isAllDisabled" [(ngModel)]="residualMaterial.name"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="specification" i18n i18n-text text="Specification"></kendo-label>
+                        <kendo-textbox #specification name="specification" [disabled]="isAllDisabled" [(ngModel)]="residualMaterial.specification"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="revision" i18n i18n-text text="Revision"></kendo-label>
+                        <kendo-textbox #revision name="revision" [disabled]="isAllDisabled" [(ngModel)]="residualMaterial.revision"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="frequency" i18n i18n-text text="Frequency"></kendo-label>
+                    <kendo-combobox #frequency name="frequency" [disabled]="isAllDisabled" [(ngModel)]="residualMaterial.frequency"
+                        [data]="frequencyDataSource" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="quantity_sample_geometries" i18n i18n-text text="Quantity Sample Geometries"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                        <kendo-numerictextbox #quantity_sample_geometries name="quantity_sample_geometries" [disabled]="isAllDisabled" [(ngModel)]="residualMaterial.quantity_sample_geometries"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="free_text" i18n i18n-text text="Sample Dimension"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                        <kendo-textarea rows="4" #free_text name="free_text" [disabled]="isAllDisabled" [(ngModel)]="residualMaterial.free_text"></kendo-textarea>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="marking" i18n i18n-text text="Marking"></kendo-label>
+                        <kendo-combobox #marking [disabled]="isAllDisabled"
+                            [(ngModel)]="residualMaterial.marking" [data]="markingData" textField="text"
+                            [valuePrimitive]="true" name="marking" valueField="value">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="cross_section_type" i18n i18n-text text="Cross Section Type"></kendo-label>
+                        <kendo-combobox #cross_section_type [disabled]="isAllDisabled"
+                            [(ngModel)]="residualMaterial.cross_section_type" [data]="crossSectionTypeData" textField="text"
+                            [valuePrimitive]="true" name="cross_section_type" valueField="value">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="offer_note" i18n i18n-text text="Offer note">
+					</kendo-label>
+					<kendo-textarea [disabled]="isAllDisabled" [(ngModel)]="residualMaterial.offer_note" name="offer_note"> 
+					</kendo-textarea>
+				</kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

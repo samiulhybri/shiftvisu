@@ -1,0 +1,220 @@
+<div
+	class="heat-treatment"
+	*ngIf="offerPos">
+	<div class="buttons k-w-full k-d-flex">
+		<button
+			kendoButton
+			themeColor="error"
+			*ngIf="isPermissionValidate(permissionEnum.HWEKALK_SALES_COSTS_DELETE)"
+			[disabled]="!offerPos.offerPosCosts.length"
+			(click)="deleteAll()"
+			i18n>
+			<span class="k-icon icon-trash"></span> Delete all
+		</button>
+		<div
+			style="padding-left: 12px; align-self: center"
+			i18n
+			>Base material: {{ offerPos?.item?.custom_id }}/{{
+				offerPos?.item?.hweClassificationLieferant?.value_string ?? ""
+			}}/{{ offerPos?.item?.hweClassificationBlockTyp?.value_string ?? "" }}</div
+		>
+		<div
+			*ngIf="offerPos.calculation.is_material_in_stock === true"
+			style="padding-left: 4px; align-self: center"
+			i18n
+			>(calculated as in stock)</div
+		>
+		<div
+			*ngIf="offerPos.calculation.is_material_in_stock === false"
+			style="padding-left: 4px; align-self: center"
+			i18n
+			>(calculated as not in stock)</div
+		>
+
+		<kendo-grid-spacer></kendo-grid-spacer>
+		<button
+			kendoButton
+			class="k-mr-2"
+			themeColor="primary"
+			*ngIf="isPermissionValidate(permissionEnum.HWEKALK_SALES_COSTS_GENERATE)"
+			[disabled]="offerPos.offerPosCosts.length > 0"
+			(click)="generateOfferPosCosts()"
+			i18n>
+			<span class="k-icon icon-globe"></span> Generate
+		</button>
+		<button
+			class="right"
+			kendoButton
+			themeColor="primary"
+			*ngIf="isPermissionValidate(permissionEnum.HWEKALK_SALES_COSTS_NEW)"
+			(click)="add()"
+			i18n>
+			<span class="k-icon icon-add"></span> New
+		</button>
+	</div>
+
+	<div
+		*ngIf="offerPos.offerPosCosts.length"
+		class="cost-table k-w-full k-mt-4">
+		<table class="heat-treatment-pos k-w-full">
+			<thead>
+			<tr>
+				<th i18n>Name</th>
+				<th i18n>Quantity</th>
+				<th i18n>Unit</th>
+				<th i18n>Factor</th>
+				<th i18n>Cost status</th>
+				<th i18n>Type</th>
+				<th i18n>Cost</th>
+				<th i18n>DLZ Days</th>
+				<th
+					i18n
+					*ngIf="isPermissionValidate(permissionEnum.HWEKALK_SALES_COSTS_DELETE)">
+					Action
+				</th>
+			</tr>
+			</thead>
+			<tbody>
+			<ng-container *ngFor="let group of getGroupedCosts(); trackBy: trackCostGroup">
+				<tr *ngFor="let data of group.items">
+					<td class="material-cost">
+						<kendo-textbox
+							#type
+							name="type"
+							[(ngModel)]="data.name">
+						</kendo-textbox>
+					</td>
+					<td>
+						<kendo-numerictextbox
+							#quantity
+							name="quantity"
+							[(ngModel)]="data.quantity"
+							[spinners]="false"
+							[changeValueOnScroll]="false"
+							format="n2"
+							disabled></kendo-numerictextbox>
+					</td>
+					<td>
+						<kendo-combobox 
+							#unit
+							disabled
+							[ngModelOptions]="{standalone: true}" 
+							[(ngModel)]="data.unit"
+							[data]="workPlanUnits" 
+							[valuePrimitive]="true" 
+							textField="text"
+							valueField="value">
+						</kendo-combobox>
+					</td>
+					<td>
+						<kendo-numerictextbox
+							#factor
+							name="factor"
+							[(ngModel)]="data.factor"
+							[spinners]="false"
+							[changeValueOnScroll]="false"
+							format="n2"
+							disabled></kendo-numerictextbox>
+					</td>
+					<td>
+						<kendo-numerictextbox
+							#price
+							name="price"
+							[(ngModel)]="data.price"
+							[spinners]="false"
+							[changeValueOnScroll]="false"
+                            format="#.##\ €"
+                            decimals="2"
+							disabled></kendo-numerictextbox>
+					</td>
+					<td>
+						<kendo-dropdownlist
+							#type
+							name="type"
+							[data]="costCalcTypesWithNames()"
+							valueField="value"
+							textField="text"
+							[(ngModel)]="data.hwe_cost_calc_type"
+							[valuePrimitive]="true"
+							disabled>
+						</kendo-dropdownlist>
+					</td>
+					<td>
+						<kendo-numerictextbox
+							#cost
+							name="cost"
+							[(ngModel)]="data.cost"
+							[spinners]="false"
+                            format="#.##\ €"
+                            decimals="2"
+							[changeValueOnScroll]="false"
+                            [ngStyle]="{'color': data.cost > 0 ? 'black' : 'red'}"
+						>
+
+                        </kendo-numerictextbox>
+					</td>
+					<td>
+						<kendo-numerictextbox
+							#lead_time_days
+							name="lead_time_days"
+							[(ngModel)]="data.lead_time_days"
+							[spinners]="false"
+							[changeValueOnScroll]="false"
+							format="0"
+							[decimals]="0"></kendo-numerictextbox>
+					</td>
+					<td
+						class="k-text-center"
+						*ngIf="isPermissionValidate(permissionEnum.HWEKALK_SALES_COSTS_DELETE)">
+						<button
+							kendoButton
+							themeColor="primary"
+							(click)="deleteOne(data)">
+							<span class="k-icon icon-trash"></span>
+						</button>
+					</td>
+				</tr>
+
+				<tr>
+					<th
+						class="cost-footer-column"
+						[colSpan]="6">
+						{{ group.name }}
+					</th>
+					<th class="cost-footer-column">{{ group.costSum | number: "1.2-2" }} <span i18n>€</span></th>
+					<th class="cost-footer-column">{{ group.leadSum }} <span i18n>Days</span></th>
+				</tr>
+			</ng-container>
+			</tbody>
+		</table>
+	</div>
+
+	<kendo-card
+		[style.width]="'100%'"
+		class="k-w-full k-mt-4">
+		<kendo-card-header i18n> Text</kendo-card-header>
+		<kendo-card-body>
+			<kendo-textarea
+				[rows]="10"
+				resizable="none"
+				[(ngModel)]="offerPos.calculation.text">
+			</kendo-textarea>
+			<kendo-textarea
+				[rows]="10"
+				resizable="none"
+				[(ngModel)]="offerPos.calculation.text2">
+			</kendo-textarea>
+			<kendo-textarea
+				[rows]="10"
+				resizable="none"
+				[(ngModel)]="offerPos.calculation.text3">
+			</kendo-textarea>
+			<kendo-textarea
+				[rows]="10"
+				resizable="none"
+				[(ngModel)]="offerPos.calculation.text4">
+			</kendo-textarea>
+		</kendo-card-body>
+	</kendo-card>
+</div>
+<app-loader *ngIf="isWindowLoaderEnabled"></app-loader>

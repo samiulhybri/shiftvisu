@@ -1,0 +1,849 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Users"
+		url="/Users"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		expandQuery="$expand=userGroup,machines,shiftModel,userRoles,supervisorOne,supervisorTwo,hall"
+		addButtonText="New"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[model]="user"
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		(newButtonClick)="newButtonClick()"
+		(editClick)="editClick($event)"
+		(deleteClick)="deleteClick($event)"
+		[enableServerSideFiltering]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_USERS_EDIT')"
+		[showSearch]="true"
+		[showActiveButton]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+
+	<ui5-dialog
+		id="deleteDialog"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col gap-[5px]">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M"></ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div></ui5-dialog
+	>
+</div>
+
+<app-dialog
+	id="machineDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="ml-[-24px]">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ dialogTitle }}</ui5-title
+			>
+		</div>
+		<ui5-tabcontainer
+			class="ml-[-46px]"
+			(tab-select)="tabNavChanged($event)"
+			fixed
+			collapsed>
+			 <ui5-tab
+				#coreDataTab
+				i18n-text
+				text="Core Data"
+				[selected]="selectedTab === 'core_data'"
+				id="core_data"></ui5-tab>
+			<ui5-tab
+				#assignedRolesTab
+				i18n-text
+				text="Assigned Roles"
+				[selected]="selectedTab === 'assigned_roles'"
+				id="assigned_roles"></ui5-tab>
+			<ui5-tab
+				#accessibleMachinesTab
+				i18n-text
+				text="Accessible Machines"
+				[selected]="selectedTab === 'accessible_machines'"
+				id="accessible_machines"></ui5-tab>
+			<ui5-tab
+				#userGroupTab
+				i18n-text
+				text="User Groups"
+				[selected]="selectedTab === 'user_groups'"
+				id="user_groups"></ui5-tab>
+			 <ui5-tab
+				#qialificationTab
+				i18n-text
+				text="Qualifications"
+				[selected]="selectedTab === 'qualifications'"
+				id="qualifications"></ui5-tab
+		></ui5-tabcontainer>
+	</div>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L"
+		class="ml-[-16px] mr-[-16px]">
+		<div class="w-[80vw] h-[65vh] form">
+			<div>
+				<form
+					(ngSubmit)="onSubmit(create0rUpdateForm)"
+					#create0rUpdateForm="ngForm">
+					<div
+						[hidden]="selectedTab !== 'core_data'"
+						class="h-[62vh] overflow-y-auto">
+						<div class="flex flex-row gap-[10rem]">
+							<div class="flex flex-col">
+								<ui5-label show-colon>{{ localization.active }}</ui5-label>
+								<ui5-switch
+									id="isActiveSwitch"
+									[(ngModel)]="selectedUser.is_active"
+									[disabled]="shouldBeDisabled('is_active')"
+									name="is_active"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label
+									show-colon
+									class="ml-8"
+									i18n
+									>Melter</ui5-label
+								>
+								<ui5-switch
+									id="isMelfterSwitch"
+									[(ngModel)]="selectedUser.is_melter"
+									[disabled]="shouldBeDisabled('is_melter')"
+									name="is_melter"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label
+									show-colon
+									class="ml-8"
+									i18n
+									>Supervisor</ui5-label
+								>
+								<ui5-switch
+									id="isSupervisorSwitch"
+									[(ngModel)]="selectedUser.is_supervisor"
+									[disabled]="shouldBeDisabled('is_supervisor')"
+									name="is_supervisor"></ui5-switch>
+							</div>
+						</div>
+						<div class="flex mb-10 gap-2.5 mt-3">
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									required
+									>{{ localization.id }}</ui5-label
+								>
+								<ui5-busy-indicator
+									[active]="isLoadingCustomId"
+									size="S">
+									<ui5-input
+										[(ngModel)]="selectedUser.custom_id"
+										[valueState]="
+											customId.valid == false &&
+											(customId.touched || create0rUpdateForm.submitted)
+												? 'Negative'
+												: customIdState
+										"
+										name="custom_id"
+										[required]="true"
+										#customId="ngModel"
+										(input)="onChangeCustomId()"
+										[disabled]="shouldBeDisabled('customIdInput')"
+										class="w-full"
+										id="customIdInput">
+										<div slot="valueStateMessage">
+											{{ customIdValueStateText }}
+										</div></ui5-input
+									></ui5-busy-indicator
+								>
+							</div>
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									i18n
+									>Chip Number</ui5-label
+								>
+								<ui5-input
+									[(ngModel)]="selectedUser.chip_number"
+									name="chip_number"
+									class="w-full"
+									[disabled]="shouldBeDisabled('chip_number')"
+									id="chip_number"></ui5-input>
+							</div>
+						</div>
+						<div class="flex mb-10 gap-2.5">
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									required
+									>{{ localization.name }}</ui5-label
+								>
+								<ui5-input
+									[(ngModel)]="selectedUser.name"
+									[disabled]="shouldBeDisabled('name')"
+									name="name"
+									[required]="true"
+									[valueState]="
+										name.valid == false &&
+										(name.touched || create0rUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									#name="ngModel"
+									class="w-full"
+									id="name"></ui5-input>
+							</div>
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									i18n
+									>IP Address</ui5-label
+								>
+								<div class="flex w-full items-center">
+									<ui5-input
+										[(ngModel)]="selectedUser.ip_address"
+										id="ip_address"
+										name="ip_address"
+										[disabled]="shouldBeDisabled('ip_address')"
+										[valueState]="
+											ipAddress.valid == false &&
+											(ipAddress.touched || create0rUpdateForm.submitted)
+												? 'Negative'
+												: 'None'
+										"
+										#ipAddress="ngModel"
+										class="w-full"
+										pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"></ui5-input>
+									<ui5-button
+										class="ml-8"
+										(click)="fillYourIP()"
+										tooltip="Auto insert your IP"
+										i18n-tooltip
+										i18n>
+										IP
+									</ui5-button>
+								</div>
+							</div>
+						</div>
+						<div class="flex mb-10 gap-2.5">
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									i18n
+									required
+									>Username</ui5-label
+								>
+								<ui5-input
+									[(ngModel)]="selectedUser.username"
+									[disabled]="shouldBeDisabled('username')"
+									[required]="true"
+									[valueState]="
+										username.valid == false &&
+										(username.touched || create0rUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									name="username"
+									id="username"
+									class="w-full"
+									#username="ngModel"></ui5-input>
+							</div>
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									i18n
+									>Supervisor 1</ui5-label
+								>
+
+								<ui5-combobox
+									id="supervisor1ComboBox"
+									(selectionChange)="changeSuperVisor1($event)"
+									[disabled]="shouldBeDisabled('supervisor1_user')"
+									[value]="selectedSuperVisor1.name || ''"
+									class="w-full"
+									(input)="onSuperVisor1InputChange($event)"
+									#supervisor1ComboBox>
+									@for (supervisor of superVisors; track $index) {
+										<ui5-cb-item
+											[id]="supervisor.id"
+											[additionalText]="
+												supervisor.custom_id?.toString() || ''
+											"
+											*ngIf="
+												supervisor.id != selectedUser.supervisor2_user_id &&
+												supervisor.is_supervisor
+											"
+											text="{{ supervisor.name }}"></ui5-cb-item>
+									}
+								</ui5-combobox>
+							</div>
+						</div>
+						<div class="flex mb-10 gap-2.5">
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									i18n
+									>Email</ui5-label
+								>
+								<ui5-input
+									[(ngModel)]="selectedUser.email"
+									type="Email"
+									name="email"
+									[disabled]="shouldBeDisabled('email')"
+									[valueState]="emailState"
+									#email="ngModel"
+									id="email"
+									class="w-full">
+									<div slot="valueStateMessage">
+										{{ emailValueStateText }}
+									</div></ui5-input
+								>
+							</div>
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									i18n
+									>Supervisor 2</ui5-label
+								>
+
+								<ui5-combobox
+									id="supervisor2ComboBox"
+									(selectionChange)="changeSuperVisor2($event)"
+									[disabled]="shouldBeDisabled('supervisor2_user')"
+									[value]="selectedSuperVisor2.name || ''"
+									class="w-full"
+									(input)="onSuperVisor2InputChange($event)"
+									#supervisor2ComboBox>
+									@for (supervisor of superVisors; track $index) {
+										<ui5-cb-item
+											[id]="supervisor.id"
+											[additionalText]="
+												supervisor.custom_id?.toString() || ''
+											"
+											*ngIf="
+												supervisor.id != selectedUser.supervisor1_user_id &&
+												supervisor.is_supervisor
+											"
+											text="{{ supervisor.name }}"></ui5-cb-item>
+									}
+								</ui5-combobox>
+							</div>
+						</div>
+						<div class="flex mb-10 gap-2.5 pb-2">
+							<!-- Hide that field -->
+							<div
+								class="flex flex-col gap-[5px] w-6/12"
+								*ngIf="false">
+								<ui5-label
+									show-colon
+									i18n
+									>User Type</ui5-label
+								>
+								<ui5-input
+									[(ngModel)]="selectedUser.user_type"
+									[disabled]="shouldBeDisabled('user_type')"
+									name="user_type"
+									id="user_type"
+									class="w-full"
+									[valueState]="
+										userType.valid == false &&
+										(userType.touched || create0rUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									#userType="ngModel"></ui5-input>
+							</div>
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									i18n
+									show-colon
+									>Default Shift Model</ui5-label
+								>
+								<ui5-combobox
+									#shiftModelComboBox
+									class="w-100"
+									[value]="selectedUser.shiftModel?.custom_id || ''"
+									[disabled]="shouldBeDisabled('shiftModel')"
+									(selection-change)="onChangeShiftModel($event)">
+									<ng-container *ngFor="let shiftModel of shiftModels">
+										<ui5-cb-item [text]="shiftModel.custom_id">
+										</ui5-cb-item> </ng-container
+								></ui5-combobox>
+							</div>
+
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									i18n
+									show-colon
+									>Hall</ui5-label
+								>
+								<ui5-combobox
+									#hallComboBox
+									id="hallComboBox"
+									class="w-100"
+									[value]="selectedUser.hall?.name || ''"
+									[disabled]="shouldBeDisabled('hall')"
+									(change)="
+										inputInvalidEntryRestrict(
+											$event,
+											selectedUser.hall?.name
+										)
+									"
+									(selection-change)="onChangeHall($event)"
+									(input)="onHallInputChange($event)">
+									<ng-container *ngFor="let hall of halls">
+										<ui5-cb-item
+											*ngIf="hall.is_active"
+											id="{{ hall.id }}"
+											[additionalText]="hall.custom_id"
+											text="{{ hall.name }}">
+										</ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+						</div>
+
+						<div class="custom-hr"> </div>
+
+						<div class="flex mb-10 gap-2.5 pt-2">
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									i18n
+									>New Password</ui5-label
+								>
+								<ui5-input
+									[(ngModel)]="passwords.newPassword"
+									name="newPassword"
+									id="newPassword"
+									class="w-full"
+									[valueState]="
+										newPassword.valid == false &&
+										(newPassword.touched || create0rUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									[disabled]="shouldBeDisabled('password')"
+									(input)="passwordMatch()"
+									[valueState]="newPasswordValueState"
+									#newPassword="ngModel"></ui5-input>
+							</div>
+
+							<div class="flex flex-col gap-[5px] w-6/12">
+								<ui5-label
+									show-colon
+									i18n
+									>Confirm Password</ui5-label
+								>
+								<ui5-input
+									[(ngModel)]="passwords.confirmPassword"
+									name="confirmPassword"
+									id="confirmPassword"
+									class="w-full"
+									[valueState]="
+										(confirmPassword.valid == false &&
+											(confirmPassword.touched ||
+												create0rUpdateForm.submitted)) ||
+										!isPasswordNotMatched
+											? 'Negative'
+											: 'None'
+									"
+									[disabled]="shouldBeDisabled('password')"
+									(input)="passwordMatch()"
+									[valueState]="confirmPasswordValueState"
+									#confirmPassword="ngModel"></ui5-input>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div [hidden]="selectedTab !== 'assigned_roles'">
+					<ui5-card>
+						<div class="h-[62vh] w-full">
+							<app-grid-table
+								#childComponentRoles
+								headerTitle="Assigned Roles"
+								i18n-headerTitle
+								[showRowDataCount]="true"
+								[showAction]="false"
+								[showDownload]="false"
+								[showActiveButton]="false"
+								[columns]="roleColumns"
+								[addButtonText]="addButtonText"
+								[data]="selectedUser.roles"
+								(newButtonClick)="associateButtonClick('assigned_roles')"
+								(onSearchOnKeyUp)="onSearchOnChangeInput($event, 'roles')"
+								selectionMode="None"
+								[customData]="true"
+								[showSearch]="true">
+							</app-grid-table>
+						</div>
+					</ui5-card>
+				</div>
+				<div [hidden]="selectedTab !== 'accessible_machines'">
+					<ui5-card>
+						<div class="h-[62vh] w-full">
+							<app-grid-table
+								#childComponentMachines
+								[headerTitle]="associateDialogTitle"
+								i18n-headerTitle
+								[showRowDataCount]="true"
+								[showAction]="false"
+								[showDownload]="false"
+								[showActiveButton]="false"
+								[columns]="machineColumns"
+								[addButtonText]="addButtonText"
+								expandQuery="$expand=machines&select=machines"
+								[data]="copyMachinesData"
+								(newButtonClick)="associateButtonClick('accessible_machines')"
+								(onSearchOnKeyUp)="onSearchOnChangeInput($event, 'machines')"
+								selectionMode="None"
+								[customData]="true"
+								[showSearch]="true">
+							</app-grid-table> </div
+					></ui5-card>
+				</div>
+				<div [hidden]="selectedTab !== 'user_groups'">
+					<ui5-card>
+						<div class="h-[62vh] w-full">
+							<app-grid-table
+								#childComponentUserGroup
+								[headerTitle]="associateDialogTitle"
+								i18n-headerTitle
+								[showRowDataCount]="true"
+								[showAction]="false"
+								[showDownload]="false"
+								[showActiveButton]="false"
+								[columns]="userGroupColumns"
+								[addButtonText]="addButtonText"
+								[data]="selectedUser.user_group"
+								expandQuery="$expand=userGroup&select=userGroup"
+								(newButtonClick)="associateButtonClick('user_groups')"
+								(onSearchOnKeyUp)="onSearchOnChangeInput($event, 'user_groups')"
+								selectionMode="None"
+								[customData]="true"
+								[showSearch]="true">
+							</app-grid-table> </div
+					></ui5-card>
+				</div>
+				<div [hidden]="selectedTab !== 'qualifications'">
+					<ui5-card>
+						<div class="h-[62vh] w-full">
+							<app-grid-table
+								#childComponentQualification
+								headerTitle="Qualifications"
+								i18n-headerTitle
+								[showAction]="false"
+								[showRowDataCount]="true"
+								[showDownload]="false"
+								[showActiveButton]="false"
+								[showNewButton]="false"
+								[columns]="qualificationColumns"
+								[data]="associateData"
+								(editClick)="associateEditClick($event)"
+								(onSearchOnKeyUp)="onSearchOnChangeInput($event, 'qualification')"
+								[showDeleteButton]="false"
+								selectionMode="Single"
+								[showAction]="true"
+								[customData]="true"
+								[showSearch]="true">
+							</app-grid-table> </div
+					></ui5-card>
+				</div>
+			</div> </div
+	></ui5-busy-indicator>
+	<div
+		slot="footer"
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<app-dialog [isDialogOpen]="isAssociateDialogOpen">
+	<div
+		slot="header"
+		class="w-full">
+		<div class="flex flex-row justify-between">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ associateDialogTitle }}</ui5-title
+			>
+			<app-associate-selector
+				(selectionEvent)="selectAllAssociate($event)"
+				[enableSelection]="isDeselectEnable"></app-associate-selector>
+		</div>
+		<ui5-input
+			id="searchInput"
+			class="w-full"
+			slot="searchField"
+			[(ngModel)]="searchedValue"
+			(input)="onSearchInput($event)">
+			<ui5-icon
+				name="search"
+				slot="icon"
+				ui5-icon=""></ui5-icon
+		></ui5-input>
+	</div>
+	<div class="h-[60vh] w-[518px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="S"
+			class="w-full"
+			*ngIf="selectedUser">
+			<ui5-list
+				*ngIf="selectedTab === 'assigned_roles'"
+				selectionMode="Multiple"
+				(selectionChange)="changeRoles($event)">
+				<ui5-li
+					*ngFor="let role of filteredRoles"
+					[selected]="role.isSelected"
+					[id]="role.id">
+					{{ role.name }}</ui5-li
+				></ui5-list
+			>
+			<ui5-list
+				*ngIf="selectedTab === 'accessible_machines'"
+				selectionMode="Multiple"
+				(selectionChange)="machineChange($event)">
+				 <ui5-li
+					*ngFor="let machine of filteredMachines"
+					[selected]="machine.isSelected"
+					[id]="machine.id">
+					{{ machine.custom_id }} |{{ machine.name }}</ui5-li
+				></ui5-list
+			>
+			<ui5-list
+				*ngIf="selectedTab === 'user_groups'"
+				selectionMode="Multiple"
+				(selectionChange)="changeUserGroups($event)">
+				<ui5-li
+					*ngFor="let userGroup of filteredUserGroups"
+					[selected]="userGroup.isSelected"
+					[id]="userGroup.id">
+					{{ userGroup.custom_id }} |{{ userGroup.name }}</ui5-li
+				></ui5-list
+			></ui5-busy-indicator
+		>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		    <ui5-button
+			design="Emphasized"
+			id="saveButton"
+			(click)="onAssociateSave()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="cancelButton"
+			(click)="cancelDialog()"
+			>{{ localization.close }} </ui5-button
+		>  
+	</div>
+</app-dialog>
+<app-dialog [isDialogOpen]="isAssociateUpdateDialogOpen">
+	<div
+		slot="header"
+		class="w-full">
+		<ui5-title
+			class="pd-10"
+			level="H5"
+			>{{ associateDialogTitle }}</ui5-title
+		>
+	</div>
+	<div>
+		<div class="flex flex-col gap-[5px] w-full">
+			<ui5-label
+				show-colon
+				i18n
+				>Item Id</ui5-label
+			>
+			<ui5-input
+				class="w-full"
+				[value]="associateUser?.item?.custom_id"
+				[disabled]="shouldBeDisabled('custom_id')"
+				id="itemCustomIdInput"
+				[readonly]="true"></ui5-input>
+		</div>
+		<div class="flex flex-space-between">
+			<div class="flex flex-col">
+				<ui5-label
+					show-colon
+					i18n
+					>Machine Id</ui5-label
+				>
+				<ui5-input
+					[value]="associateUser?.machine?.custom_id"
+					[disabled]="shouldBeDisabled('custom_id')"
+					id="customIdInput"
+					[readonly]="true"></ui5-input>
+				<ui5-label
+					show-colon
+					i18n
+					>Qualification Hours</ui5-label
+				>
+				<ui5-input
+					[value]="associateUser.min_qualification_hours"
+					[disabled]="shouldBeDisabled('min_qualification_hours')"
+					id="qualificationHoursInput"
+					[readonly]="true"></ui5-input>
+
+				<ui5-label
+					show-colon
+					i18n
+					>Prequalified</ui5-label
+				>
+				<ui5-switch
+					id="isActiveSwitchMachineState"
+					ngDefaultControl
+					name="is_prequalified"
+					[disabled]="shouldBeDisabled('is_prequalified')"></ui5-switch>
+			</div>
+			<div class="flex flex-col ml-8">
+				<ui5-label
+					show-colon
+					i18n>
+					Operation</ui5-label
+				>
+				<ui5-input
+					[value]="associateUser.operation_code"
+					[disabled]="shouldBeDisabled('operation_code')"
+					name="operation_code"
+					id="operationCodeInput"
+					[readonly]="true"></ui5-input>
+				<ui5-label
+					show-colon
+					i18n
+					>Qualification Operation</ui5-label
+				>
+				<ui5-input
+					[value]="associateUser.min_qualification_operations"
+					[disabled]="shouldBeDisabled('min_qualification_operations')"
+					id="qualificationOperationsInput"
+					[readonly]="true"></ui5-input>
+				<ui5-label
+					show-colon
+					i18n
+					>Suspended</ui5-label
+				>
+				<ui5-switch
+					id="isActiveSwitchMachineState"
+					ngDefaultControl
+					name="is_suspended"
+					[disabled]="shouldBeDisabled('is_suspended')"></ui5-switch>
+			</div>
+		</div>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			id="saveButtonMachineState"
+			[disabled]="disableButtonDuringRequest"
+			(click)="onSaveUserSwitch()"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="cancelButtonMachineState"
+			(click)="cancelDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<app-associate-preview-dialog
+	[isPreviewDialogOpen]="isPreviewDialogOpen"
+	[title]="associateDialogTitle"
+	[columns]="associateColumns"
+	[data]="associateData"
+	(closeAssociate)="closeAssociateDialog()">
+</app-associate-preview-dialog>
+<ui5-dialog
+	#errorDialogUsers
+	id="errorDialogUsers"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col gap-[5px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M"></ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+<ui5-dialog
+	#deleteErrorDialogUsers
+	id="deleteErrorDialogUsers"
+	state="Negative"
+	header-text="Error">
+	<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+	<div
+		slot="footer"
+		class="deleteErrorDialogFooter">
+		<ui5-button
+			class="dialogCloser"
+			design="Transparent"
+			(click)="closeDeleteErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

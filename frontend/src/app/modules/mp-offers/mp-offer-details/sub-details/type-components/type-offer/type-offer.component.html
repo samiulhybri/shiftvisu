@@ -1,0 +1,33 @@
+<div [formGroup]="form" *ngIf="data != undefined">
+    <kendo-gridlayout [gap]="{ cols: 10 }" [cols]="[{width: 200 },{width: 'auto' },{width: 250 },{width: 200 },{width: 150 }]">
+        <kendo-gridlayout-item class="label-format" [col]="1">
+            <label [textContent]="data.name"></label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item  [col]="2">
+            <kendo-label class="k-text-center header-lbl-format" i18n-text text="Supplier" i18n>
+                <kendo-combobox #supplier formControlName="supplier" [(ngModel)]="data.supplier" [data]="suppliers"
+                textField="name" valueField="id" [disabled]="isFieldDisabled"
+                [filterable]="true" (filterChange)="handleFilter($event)"></kendo-combobox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item  [col]="3">
+            <kendo-label style="justify-content: space-between;text-align: start;" class="k-text-center header-lbl-format" i18n-text text="Offer Date" i18n>
+                <kendo-datepicker [(ngModel)]="data.supplier_offer_date" formControlName="supplier_offer_date" 
+                    [style.width.px]="120" [disabled]="isFieldDisabled">
+                </kendo-datepicker>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item  [col]="4">
+            <label class="k-text-inverse">
+                <span class="label-span-oc" style="float: left;" i18n>Offer</span>
+                <kendo-textbox [(ngModel)]="data.supplier_offer_id" #supplier_offer_id formControlName="supplier_offer_id"
+                [style.width.px]="102" style="float: right;" i18n [disabled]="isFieldDisabled">
+                </kendo-textbox>
+            </label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item  [col]="5" style="text-align: right;">
+            <kendo-numerictextbox #total [(ngModel)]="data.total" class="number-right-align" formControlName="total"
+                format="c2" [style.width.px]="150" [spinners]="false" [disabled]="isFieldDisabled"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>

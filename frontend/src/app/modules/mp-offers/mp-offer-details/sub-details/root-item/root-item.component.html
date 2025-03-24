@@ -1,0 +1,493 @@
+<div [formGroup]="form">
+    <kendo-listview [data]="listFakeData">
+        <ng-template kendoListViewHeaderTemplate>
+            <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="header k-text-inverse k-font-weight-bold" i18n>Description</div>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+        <ng-template kendoListViewItemTemplate let-dataItem="dataItem">
+            <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="k-text-inverse">
+                        <span i18n>Customer</span><span class="k-text-error k-pl-1">*</span>
+                    </div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="2" [colSpan]="2">
+                    <kendo-combobox #customer_id formControlName="customer_id" [(ngModel)]="data.customer"
+                        [data]="customers" textField="name" valueField="id" [filterable]="true"
+                        (filterChange)="handleFilter($event,'customer')" [disabled]="data.is_closed" required
+                        [class.formError]="form.get('customer_id').invalid">
+                    </kendo-combobox>
+                    <!-- <kendo-formerror *ngIf="form.controls.customer_id.errors?.required" style="margin-left: 5px;">Required</kendo-formerror> -->
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="4">
+                    <div class="k-text-inverse" i18n>Final customer</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="5" [colSpan]="2">
+                    <kendo-combobox #final_customer_id formControlName="final_customer_id"
+                        [(ngModel)]="data.finalCustomer" [data]="customers" textField="name" valueField="id"
+                        [filterable]="true" (filterChange)="handleFilter($event,'final_cust')"
+                        [disabled]="data.is_closed">
+                    </kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="1">
+                    <div class="k-text-inverse">
+                        <span i18n>Tool type</span><span class="k-text-error k-pl-1">*</span>
+                    </div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="2" [colSpan]="2">
+                    <kendo-combobox #tool_type formControlName="tool_type" [(ngModel)]="data.tool_type"
+                        [data]="toolTypeDataSource" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'tool_typ')" [disabled]="data.is_closed"
+                        required [class.formError]="form.get('tool_type').invalid">
+                    </kendo-combobox>
+                    <!-- <kendo-formerror *ngIf="form.controls.tool_type.errors?.required" style="margin-left: 5px;">Required</kendo-formerror> -->
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="4">
+                    <div class="k-text-inverse">
+                        <span i18n>Construction of</span><span class="k-text-error k-pl-1">*</span>
+                    </div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="5" [colSpan]="2">
+                    <kendo-combobox #construction_type formControlName="construction_type"
+                        [(ngModel)]="data.construction_type" [data]="constructionTypeDataSource" [valuePrimitive]="true"
+                        textField="text" valueField="value" [filterable]="true"
+                        (filterChange)="handleFilter($event,'const_typ')" [disabled]="data.is_closed" required
+                        [class.formError]="form.get('construction_type').invalid">
+                    </kendo-combobox>
+                    <!-- <kendo-formerror *ngIf="form.controls.construction_type.errors?.required" style="margin-left: 5px;">Required</kendo-formerror> -->
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="1">
+                    <div class="k-text-inverse" i18n>Press(ton)</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="2" [colSpan]="2">
+                    <kendo-numerictextbox #press_weight formControlName="press_weight" class="number-right-align"
+                        [(ngModel)]="data.press_weight" format="n" [step]="1" [spinners]="false"
+                        [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="4">
+                    <div class="k-text-inverse" i18n>Quantity imprint</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="5" [colSpan]="2">
+                    <kendo-textbox #quantity_imprint formControlName="quantity_imprint"
+                        [(ngModel)]="data.quantity_imprint" [disabled]="data.is_closed"></kendo-textbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="4" [col]="1">
+                    <div class="k-text-inverse" i18n>Max dimension(mm)</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="4" [col]="2">
+                    <kendo-numerictextbox #max_length formControlName="max_length" [(ngModel)]="data.max_length"
+                        [step]="1" format="n" class="number-right-align" [spinners]="false"
+                        [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="4" [col]="3">
+                    <kendo-numerictextbox #max_height formControlName="max_height" [(ngModel)]="data.max_height"
+                        [step]="1" format="n" class="number-right-align" [spinners]="false"
+                        [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="4" [col]="4">
+                    <kendo-numerictextbox #max_width formControlName="max_width" [(ngModel)]="data.max_width" [step]="1"
+                        format="n" class="number-right-align" [spinners]="false"
+                        [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="4" [col]="5">
+                    <div class="k-text-inverse" i18n>Est weight(kg)</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="4" [col]="6">
+                    <kendo-numerictextbox #weight formControlName="weight" [(ngModel)]="data.weight" format="n"
+                        [step]="1" class="number-right-align" [spinners]="false"
+                        [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+    </kendo-listview>
+
+    <kendo-listview [data]="listFakeData">
+        <ng-template kendoListViewHeaderTemplate>
+            <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="header k-text-inverse k-font-weight-bold" i18n>Piece</div>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+        <ng-template kendoListViewItemTemplate let-dataItem="dataItem">
+            <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="k-text-inverse" i18n>Dimension</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="2">
+                    <kendo-label>
+                        <span class="k-label" i18n>L</span>
+                        <kendo-numerictextbox #length formControlName="length" [(ngModel)]="data.length" [step]="1"
+                            format="n" class="number-right-align" [spinners]="false"
+                            [disabled]="data.is_closed"></kendo-numerictextbox>
+                    </kendo-label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="3">
+                    <kendo-label>
+                        <span class="k-label" i18n>W</span>
+                        <kendo-numerictextbox #width formControlName="width" [(ngModel)]="data.width" [step]="1"
+                            format="n" class="number-right-align" [spinners]="false"
+                            [disabled]="data.is_closed"></kendo-numerictextbox>
+                    </kendo-label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="4">
+                    <kendo-label>
+                        <span class="k-label" i18n>H</span>
+                        <kendo-numerictextbox #height formControlName="height" [(ngModel)]="data.height" [step]="1"
+                            format="n" class="number-right-align" [spinners]="false"
+                            [disabled]="data.is_closed"></kendo-numerictextbox>
+                    </kendo-label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="5">
+                    <kendo-label>
+                        <span class="k-label" i18n>Spess.</span>
+                        <kendo-numerictextbox #size formControlName="size" [(ngModel)]="data.size" [step]="0.01"
+                            format="n" class="number-right-align" [spinners]="false"
+                            [disabled]="data.is_closed"></kendo-numerictextbox>
+                    </kendo-label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="6">
+                    <kendo-numerictextbox [spinners]="false" class="input-spacer-blank"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="1">
+                    <div class="k-text-inverse" i18n>Projected area(cm<sup>2</sup>)</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="2">
+                    <kendo-numerictextbox #projected_area formControlName="projected_area"
+                        [(ngModel)]="data.projected_area" [step]="1" format="n" [spinners]="false"
+                        class="number-right-align" [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="3">
+                    <div class="k-text-inverse" i18n>Total volumn imprint(cm<sup>3</sup>)</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="4">
+                    <kendo-numerictextbox #imprint_volume formControlName="imprint_volume"
+                        [(ngModel)]="data.imprint_volume" [step]="1" format="n" class="number-right-align"
+                        [spinners]="false" [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="5" [colSpan]="2">
+                    <kendo-label class="k-form" i18n i18n-text text="Materiale">
+                        <kendo-textbox #material formControlName="material" [(ngModel)]="data.material"
+                            [disabled]="data.is_closed"></kendo-textbox>
+                    </kendo-label>
+                </kendo-gridlayout-item>
+                <!-- <kendo-gridlayout-item [row]="2" [col]="6">
+                        <kendo-textbox #material formControlName="material" [(ngModel)]="data.material" [disabled]="data.is_closed"></kendo-textbox>
+                </kendo-gridlayout-item> -->
+                <kendo-gridlayout-item [row]="3" [col]="1">
+                    <div class="k-text-inverse" i18n>Guaranteed status</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="2">
+                    <kendo-numerictextbox #shots_guaranteed formControlName="shots_guaranteed"
+                        [(ngModel)]="data.shots_guaranteed" [step]="1" format="n" class="number-right-align"
+                        [spinners]="false" [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="3">
+                    <div class="k-text-inverse" i18n>Finishing(visible)</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="4">
+                    <kendo-textbox #finishing_visible formControlName="finishing_visible"
+                        [(ngModel)]="data.finishing_visible" [disabled]="data.is_closed"></kendo-textbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="5">
+                    <div class="k-text-inverse" i18n>Finishing(not visible)</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="6">
+                    <kendo-textbox #finishing_not_visible formControlName="finishing_not_visible"
+                        [(ngModel)]="data.finishing_not_visible" [disabled]="data.is_closed"></kendo-textbox>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+    </kendo-listview>
+
+    <kendo-listview [data]="listFakeData">
+        <ng-template kendoListViewHeaderTemplate>
+            <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="header k-text-inverse k-font-weight-bold" i18n>Injection</div>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+        <ng-template kendoListViewItemTemplate let-dataItem="dataItem">
+            <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }"
+                [cols]="[{width:100},{width:'auto'},{width:100},{width:100},{width:60},{width:'auto'}]">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="k-text-inverse" i18n>Injection 1</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="2">
+                    <kendo-combobox #injection_type formControlName="injection_type" [(ngModel)]="data.injection_type"
+                        [data]="injectionTypeDataSource" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'inj_typ')"
+                        [disabled]="data.is_closed"></kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="3">
+                    <div class="k-text-inverse" i18n>Nozzle Qty</div>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="1" [col]="4">
+                    <kendo-numerictextbox #nozzle_quantity formControlName="nozzle_quantity"
+                        [(ngModel)]="data.nozzle_quantity" [step]="1" [spinners]="false" format="n"
+                        class="number-right-align" [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="1" [col]="5">
+                    <div class="k-text-inverse" i18n>Type</div>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="1" [col]="6">
+                    <kendo-combobox #nozzle_type formControlName="nozzle_type" [(ngModel)]="data.nozzle_type"
+                        [data]="nozzleTypeDataSource" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'nozzle_typ')"
+                        [disabled]="data.is_closed"></kendo-combobox>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="2" [col]="1">
+                    <div class="k-text-inverse" i18n>Injection 2</div>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="2" [col]="2">
+                    <kendo-combobox #injection_type_2 formControlName="injection_type_2"
+                        [(ngModel)]="data.injection_type_2" [data]="injectionTypeDataSource" [valuePrimitive]="true"
+                        textField="text" valueField="value" [filterable]="true"
+                        (filterChange)="handleFilter($event,'inj_typ')" [disabled]="data.is_closed"></kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="3">
+                    <div class="k-text-inverse" i18n>Nozzle Qty</div>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="2" [col]="4">
+                    <kendo-numerictextbox #nozzle_quantity_2 formControlName="nozzle_quantity_2"
+                        [(ngModel)]="data.nozzle_quantity_2" [step]="1" [spinners]="false" format="n"
+                        class="number-right-align" [disabled]="data.is_closed"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="2" [col]="5">
+                    <div class="k-text-inverse" i18n>Type</div>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="2" [col]="6">
+                    <kendo-combobox #nozzle_type_2 formControlName="nozzle_type_2" [(ngModel)]="data.nozzle_type_2"
+                        [data]="nozzleTypeDataSource" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'nozzle_typ')"
+                        [disabled]="data.is_closed"></kendo-combobox>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="3" [col]="1">
+                    <div class="k-text-inverse" i18n>Injection Note</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [col]="2" [colSpan]="5">
+                    <kendo-textarea #injection_note formControlName="injection_note" [(ngModel)]="data.injection_note"
+                        [cols]="150" [rows]="3" style="width: auto;" [disabled]="data.is_closed">
+                    </kendo-textarea>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+    </kendo-listview>
+
+    <kendo-listview [data]="listFakeData">
+        <ng-template kendoListViewHeaderTemplate>
+            <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="header k-text-inverse k-font-weight-bold" i18n>Movements</div>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+        <ng-template kendoListViewItemTemplate let-dataItem="dataItem">
+            <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }"
+                [cols]="[{width:100},{width:'auto'},{width:100},{width:'auto'},{width:100},{width:'auto'},{width:100},{width:'auto'}]">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <label class="k-text-inverse k-text-center">
+                        <span class="label-span" i18n>Movements</span>
+                    </label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="2">
+                    <kendo-combobox formControlName="has_movements" [(ngModel)]="data.has_movements"
+                        [data]="movYesNoTypeDS" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'yes_no_mv')"
+                        [disabled]="data.is_closed">
+                    </kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="3" [colSpan]="6"></kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="2" [col]="1">
+                    <div class="k-text-inverse" i18n>Mechanic</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="2" [col]="2">
+                    <kendo-textbox #movements_mechanic formControlName="movements_mechanic"
+                        [(ngModel)]="data.movements_mechanic" [disabled]="data.is_closed"></kendo-textbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="2" [col]="3">
+                    <div class="k-text-inverse" i18n>Hydroaulic</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="2" [col]="4">
+                    <kendo-textbox #movements_hydraulic formControlName="movements_hydraulic"
+                        [(ngModel)]="data.movements_hydraulic" [disabled]="data.is_closed"></kendo-textbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="2" [col]="5">
+                    <div class="k-text-inverse" i18n>Inclined_rods</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="2" [col]="6">
+                    <kendo-textbox #rods formControlName="rods" [(ngModel)]="data.rods"
+                        [disabled]="data.is_closed"></kendo-textbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="2" [col]="7">
+                    <div class="k-text-inverse" i18n>Unscrewing</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="2" [col]="8">
+                    <kendo-textbox #unscrewing formControlName="unscrewing" [(ngModel)]="data.unscrewing"
+                        [disabled]="data.is_closed"></kendo-textbox>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="3" [col]="1">
+                    <div class="k-text-inverse" i18n>Jowls</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="3" [col]="2">
+                    <kendo-textbox #jowls formControlName="jowls" [(ngModel)]="data.jowls"
+                        [disabled]="data.is_closed"></kendo-textbox>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="3" [col]="3">
+                    <label class="k-text-inverse k-text-center" i18n>
+                        <span class="label-span">Third plate</span>
+                    </label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="3" [col]="4">
+                    <kendo-combobox formControlName="has_third_plate" [(ngModel)]="data.has_third_plate"
+                        [data]="thirdYesNoTypeDS" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'yes_no_trp')"
+                        [disabled]="data.is_closed">
+                    </kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="3" [col]="5">
+                    <label class="k-text-inverse" i18n>
+                        <span class="label-span">Double extraction</span>
+                    </label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="3" [col]="6">
+                    <kendo-combobox formControlName="has_double_extraction" [(ngModel)]="data.has_double_extraction"
+                        [data]="dexYesNoTypeDS" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'yes_no_dex')"
+                        [disabled]="data.is_closed">
+                    </kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [hidden]="!data.has_movements" [row]="3" [col]="7"
+                    [colSpan]="2"></kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+    </kendo-listview>
+
+    <kendo-listview [data]="listFakeData">
+        <ng-template kendoListViewHeaderTemplate>
+            <kendo-gridlayout [gap]="{ rows: 10, cols: 10 }">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="header k-text-inverse k-font-weight-bold" i18n>Extraction</div>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+        <ng-template kendoListViewItemTemplate let-dataItem="dataItem">
+            <kendo-gridlayout [gap]="{ rows: 5, cols: 10 }"
+                [cols]="[{width:200},{width:'auto'},{width:200},{width:'auto'},{width:200},{width:'auto'}]">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    <div class="k-text-inverse " i18n>Type</div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="2">
+                    <kendo-combobox #extraction_type formControlName="extraction_type"
+                        [(ngModel)]="data.extraction_type" [data]="extractionTypeDataSource" [valuePrimitive]="true"
+                        textField="text" valueField="value" [filterable]="true"
+                        (filterChange)="handleFilter($event,'ext_typ')" [disabled]="data.is_closed">
+                    </kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="3" [colSpan]="3"></kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="2" [col]="1">
+                    <label class="k-text-inverse" style="display: inline-flex;">
+                        <span class="label-span" i18n>Rounded extractor</span>
+                    </label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="2">
+                    <kendo-combobox formControlName="is_rounded_extractor" [(ngModel)]="data.is_rounded_extractor"
+                        [data]="rexYesNoTypeDS" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'yes_no_rex')"
+                        [disabled]="data.is_closed">
+                    </kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="3">
+                    <label class="k-text-inverse" style="display: inline-flex;">
+                        <span class="label-span" i18n>Tubular extractor</span>
+                    </label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="4">
+                    <kendo-combobox formControlName="is_tubular_extractor" [(ngModel)]="data.is_tubular_extractor"
+                        [data]="texYesNoTypeDS" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'yes_no_tex')"
+                        [disabled]="data.is_closed"></kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="5">
+                    <label class="k-text-inverse" style="display: inline-flex;">
+                        <span class="label-span" i18n>Tear extractor</span>
+                    </label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="2" [col]="6">
+                    <kendo-combobox formControlName="is_tear_extractor" [(ngModel)]="data.is_tear_extractor"
+                        [data]="tearexYesNoTypeDS" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'yes_no_tearex')"
+                        [disabled]="data.is_closed"></kendo-combobox>
+                </kendo-gridlayout-item>
+
+                <kendo-gridlayout-item [row]="3" [col]="1">
+                    <label class="k-text-inverse" style="display: inline-flex;">
+                        <span class="label-span" i18n>Square extractor</span>
+                    </label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="2">
+                    <kendo-combobox formControlName="is_square_extractor" [(ngModel)]="data.is_square_extractor"
+                        [data]="sqxYesNoTypeDS" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'yes_no_sqx')"
+                        [disabled]="data.is_closed">
+                    </kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="3">
+                    <label class="k-text-inverse" style="display: inline-flex;">
+                        <span class="label-span" i18n>Laths/rings</span>
+                    </label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="4">
+                    <kendo-combobox formControlName="has_laths_rings" [(ngModel)]="data.has_laths_rings"
+                        [data]="lathYesNoTypeDS" [valuePrimitive]="true" textField="text" valueField="value"
+                        [filterable]="true" (filterChange)="handleFilter($event,'yes_no_lath')"
+                        [disabled]="data.is_closed">
+                    </kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="5">
+                    <div class="k-text-inverse" style="display: inline-flex;">
+                        <span class="label-span" i18n>Extraction help fixed</span>
+                    </div>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="3" [col]="6">
+                    <kendo-combobox formControlName="is_extraction_help_fixed"
+                        [(ngModel)]="data.is_extraction_help_fixed" [data]="exhYesNoTypeDS" [valuePrimitive]="true"
+                        textField="text" valueField="value" [filterable]="true"
+                        (filterChange)="handleFilter($event,'yes_no_exh')"
+                        [disabled]="data.is_closed"></kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="4" [col]="1">
+                    <label class="k-text-inverse" style="display: inline-flex;">
+                        <span class="label-span" i18n>Hydroaulic extraction fixed</span>
+                    </label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="4" [col]="2">
+                    <kendo-combobox formControlName="is_hydraulic_extraction_fixed"
+                        [(ngModel)]="data.is_hydraulic_extraction_fixed" [data]="hyexYesNoTypeDS"
+                        [valuePrimitive]="true" textField="text" valueField="value"
+                        [disabled]="data.is_closed" [filterable]="true"
+                        (filterChange)="handleFilter($event,'yes_no_hyex')">
+                    </kendo-combobox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="4" [col]="3" [colSpan]="3"></kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template>
+    </kendo-listview>
+</div>

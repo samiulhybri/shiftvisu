@@ -1,0 +1,319 @@
+<app-dialog id="addGroupDialog" [isDialogOpen]="isCreateDialogOpen" [title]="dialogTitle" #modal
+    (onBeforeClose)="closeCreateDialog()">
+    <ui5-busy-indicator [active]="isLoading" size="M" class="busy-indicator">
+        <form (ngSubmit)="onFormSubmit(repairForm)" #repairForm="ngForm" *ngIf="prodOrderData">
+            <div class="repair-body grid grid-cols-3">
+                <div class="col-span-1 left-details-section">
+                    <div class="repair-details-card">
+                        <div class="card-header">
+                            <span class="font-bold font-size" i18n>Order Details</span>
+                        </div>
+                        <div class="mt-5 mb-5 w-full items-center grid grid-flow-col grid-cols-2">
+                            <div class="grid grid-col-span-2">
+                                <ui5-label show-colon i18n>Order Id</ui5-label>
+                                <ui5-input class="w-100" #orderCustomId="ngModel" readonly
+                                    [(ngModel)]="prodOrderData.custom_id" name="order_custom_id" id="order_custom_id">
+                                </ui5-input>
+                            </div>
+                            <div class="ml-5 grid grid-col-span-2">
+                                <ui5-label show-colon i18n>Tool Id</ui5-label>
+                                <ui5-input id="toolCustomId" class="w-100" #nameInput="ngModel" readonly
+                                    [(ngModel)]="selectedItem.custom_id" name="toolCustomId"></ui5-input>
+                            </div>
+                        </div>
+                        <div class="mb-5 w-full items-center grid grid-flow-col grid-cols-1">
+                            <div class="grid grid-col-span-1">
+                                <ui5-label show-colon i18n>Tool Name</ui5-label>
+                                <ui5-input id="nameInput" class="w-100" #nameInput="ngModel" readonly
+                                    [(ngModel)]="selectedItem.name" name="nameInput"></ui5-input>
+                            </div>
+                        </div>
+                        <div class="mb-5 w-full items-center grid grid-flow-col grid-cols-4">
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-label show-colon i18n>Length</ui5-label>
+                                <ui5-input #length="ngModel" type="Text" name="length" id="length" class="w-100"
+                                    [(ngModel)]="selectedItem.length" i18n-placeholder placeholder="HH:MM" i18n
+                                    [readonly]="true">
+                                </ui5-input>
+                            </div>
+
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-label show-colon i18n>Width</ui5-label>
+                                <ui5-input #width="ngModel" type="Text" name="width" id="width" class="w-100"
+                                    [(ngModel)]="selectedItem.width" i18n-placeholder placeholder="" i18n
+                                    [readonly]="true">
+                                </ui5-input>
+                            </div>
+                        </div>
+                        <div class="mb-5 w-full items-center grid grid-flow-col grid-cols-4">
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-label show-colon i18n>Height</ui5-label>
+                                <ui5-input #height="ngModel" type="Text" name="height" id="height" class="w-100"
+                                    [(ngModel)]="selectedItem.height" i18n-placeholder placeholder="HH:MM" i18n
+                                    [readonly]="true">
+                                </ui5-input>
+                            </div>
+
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-label show-colon i18n>Weight</ui5-label>
+                                <ui5-input #weight="ngModel" type="Text" name="weight" id="weight" class="w-100"
+                                    [(ngModel)]="selectedItem.total_weight" i18n-placeholder placeholder="" i18n
+                                    [readonly]="true">
+                                </ui5-input>
+                            </div>
+                        </div>
+                        <div class="mb-5 w-full items-center grid grid-flow-col grid-cols-4">
+                            <div class="grid col-span-2">
+                                <ui5-label show-colon i18n>Date</ui5-label>
+                                <ui5-date-picker id="creation_date" name="created_at" class="w-100"
+                                    format-pattern="dd.MM.yyyy"
+                                    [value]="prodOrderPosData.created_at | dateFormat:'dd.MM.yyyy'"
+                                    (change)="onUpdateValue($event, 'created_at')" readonly>
+                                </ui5-date-picker>
+                            </div>
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-label show-colon i18n>Estimated Time (H)</ui5-label>
+                                <ui5-input #estimated_hours="ngModel" type="Number" name="estimated_hours"
+                                    id="estimated_hours" class="w-100" [(ngModel)]="prodOrderPosData.estimated_hours"
+                                    i18n-placeholder placeholder="Enter Estimated Time" i18n
+                                    [readonly]="modalType == 'view'">
+                                </ui5-input>
+                            </div>
+                        </div>
+                        <div class="mb-5 w-full items-center grid grid-flow-col grid-cols-4">
+                            <div class="grid col-span-2">
+                                <ui5-label required show-colon i18n>Rep. Noted</ui5-label>
+                                <ui5-combobox id="creatorUserCombobox"
+                                    [valueState]="userCreatorName == '' ? 'Negative' : 'None'" class="w-100"
+                                    name="user_creator" show-clear-icon i18n-placeholder placeholder="Select User Noted"
+                                    [value]="userCreatorName" (input)="onUpdateValue($event, 'user_creator')"
+                                    (change)="onSelectionChange($event, 'user_creator')"
+                                    [readonly]="modalType == 'view'">
+                                    <ui5-cb-item *ngFor="let user of allUserList" id="{{ user.id }}"
+                                        text="{{ user.name }}"></ui5-cb-item>
+                                </ui5-combobox>
+                            </div>
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-label required show-colon i18n>Responsible</ui5-label>
+                                <ui5-combobox id="responsibleUserCombobox"
+                                    [valueState]="userResponsibleName == '' ? 'Negative' : 'None'" class="w-100"
+                                    name="user_responsible" show-clear-icon i18n-placeholder
+                                    placeholder="Select User Responsible" [value]="userResponsibleName"
+                                    (input)="onUpdateValue($event, 'user_responsible')"
+                                    (change)="onSelectionChange($event, 'user_responsible')"
+                                    [readonly]="modalType == 'view'">
+                                    <ui5-cb-item *ngFor="let user of allUserList" id="{{ user.id }}"
+                                        text="{{ user.name }}"></ui5-cb-item>
+                                </ui5-combobox>
+                            </div>
+                        </div>
+                        <div class="date-picker-section mb-5 w-full items-center grid grid-flow-col grid-cols-4">
+                            <div class="grid col-span-2">
+                                <ui5-label required show-colon i18n>Start Date Repair</ui5-label>
+                                <ui5-date-picker id="start_date" name="start" class="w-100 date-picker"
+                                    format-pattern="dd.MM.yyyy"
+                                    [value]="prodOrderPosData.start ? (prodOrderPosData.start | dateFormat:'dd.MM.yyyy') : ''"
+                                    [valueState]="!prodOrderPosData.start ? 'Negative' : 'None'"
+                                    (change)="onUpdateValue($event, 'start_date')"
+                                    [readonly]="modalType == 'view'"></ui5-date-picker>
+                            </div>
+                            <div class="prod-date ml-5 grid col-span-2">
+                                <ui5-label required show-colon i18n>Start Date Production ({{ productiondateSubText }})</ui5-label>
+                                <ui5-date-picker name="release_date" class="w-100 date-picker"
+                                    format-pattern="dd.MM.yyyy"
+                                    [value]="prodOrderPosData.release_date ? (prodOrderPosData.release_date | dateFormat:'dd.MM.yyyy') : ''"
+                                    [valueState]="!prodOrderPosData.release_date ? 'Negative' : 'None'"
+                                    (change)="onUpdateValue($event, 'release_date')"
+                                    [readonly]="modalType == 'view' || !isToolRepairProductionDateManual"></ui5-date-picker>
+                            </div>
+                        </div>
+                        <div class="mb-5 w-full items-center grid grid-flow-col grid-cols-4" *ngIf="!isAddToolRepair">
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-label show-colon i18n>Actual Time</ui5-label>
+                                <ui5-input #actual_time="ngModel" type="Text" name="actual_time" id="actual_time"
+                                    class="w-100" [(ngModel)]="prodOrderPosData.actual_time" i18n-placeholder
+                                    placeholder="HH:MM" i18n [readonly]="modalType == 'view' || modalType == 'add'">
+                                </ui5-input>
+                            </div>
+
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-label show-colon i18n>Cost</ui5-label>
+                                <ui5-input #cost="ngModel" type="Number" name="cost" id="cost" class="w-100"
+                                    [(ngModel)]="prodOrderPosData.cost" i18n-placeholder placeholder="" i18n
+                                    [readonly]="modalType == 'view' || modalType == 'add'">
+                                </ui5-input>
+                            </div>
+                        </div>
+                        <div class="w-full items-center grid grid-flow-col grid-cols-4">
+                            <div class="grid col-span-2">
+                                <ui5-label required show-colon i18n>Production</ui5-label>
+                            </div>
+                        </div>
+                        <div class="mb-5 w-full items-center grid grid-flow-col grid-cols-4">
+                            <div class="grid col-span-2">
+                                <ui5-radio-button name="is_production_possible"
+                                    [checked]="prodOrderPosData.is_production_possible == true ? true : false"
+                                    (change)="onUpdateValue($event, 'is_production_possible', true)" i18n-text
+                                    text="Possible" [readonly]="modalType == 'view'">
+                                </ui5-radio-button>
+                            </div>
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-radio-button name="is_production_possible"
+                                    [checked]="prodOrderPosData.is_production_possible == false ? true : false"
+                                    (change)="onUpdateValue($event, 'is_production_possible', false)" i18n-text
+                                    text="Not possible" [readonly]="modalType == 'view'">
+                                </ui5-radio-button>
+                            </div>
+                        </div>
+                        <div class="w-full items-center grid grid-flow-col grid-cols-4">
+                            <div class="grid col-span-2">
+                                <ui5-label required show-colon i18n>Repair Internal/External</ui5-label>
+                            </div>
+                        </div>
+                        <div class="mb-5 w-full items-center grid grid-flow-col grid-cols-4">
+                            <div class="grid col-span-2">
+                                <ui5-radio-button name="label"
+                                    [checked]="prodOrderPosData.label === label.INTERNAL ? true : false"
+                                    (change)="onUpdateValue($event, 'label')" i18n-text text="Internal"
+                                    [readonly]="modalType == 'view'">
+                                </ui5-radio-button>
+                            </div>
+                            <div class="ml-5 grid col-span-2">
+                                <ui5-radio-button name="label"
+                                    [checked]="prodOrderPosData.label === label.EXTERNAL ? true : false"
+                                    (change)="onUpdateValue($event, 'label')" i18n-text text="External"
+                                    [readonly]="modalType == 'view'">
+                                </ui5-radio-button>
+                            </div>
+                        </div>
+                        <div *ngIf="prodOrderPosData.label === label.EXTERNAL"
+                            class="mb-5 w-full items-center grid grid-flow-col grid-cols-1">
+                            <div class="grid grid-col-span-1">
+                                <ui5-label show-colon i18n>Supplier (Toolmaker)</ui5-label>
+                                <ui5-combobox id="toolSupplierCombobox" class="w-100" name="tool_supplier"
+                                    show-clear-icon i18n-placeholder placeholder="Select Supplier"
+                                    [value]="toolSupplierName" (input)="onUpdateValue($event, 'tool_supplier')"
+                                    (change)="onSelectionChange($event, 'tool_supplier')"
+                                    [readonly]="modalType == 'view'">
+                                    <ui5-cb-item *ngFor="let supplier of allSupplierList" id="{{ supplier.id }}"
+                                        text="{{ supplier.name }}"></ui5-cb-item>
+                                </ui5-combobox>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between w-[100%]">
+                            <ui5-label show-colon i18n class="w-[60%]" style="font-size: medium;font-weight: bold;">Sampling Required</ui5-label>
+                            <ui5-switch id="sampling_required" class="w-[40%]" name="sampling_required" [(ngModel)]="prodOrderPosData.is_sampling_required"
+                            [disabled]="!hasAuth"
+                            (change)="onSamplingRequiredChange()"
+                                >
+                            </ui5-switch>
+                        </div>
+                        <div class="flex items-center justify-between w-[100%]" *ngIf="prodOrderPosData.is_sampling_required">
+                            <ui5-label show-colon i18n style="font-size: medium;font-weight: bold;" class="w-[60%]">Sampling Done</ui5-label>
+                            <ui5-switch id="sampling_done" class="w-[40%]" name="sampling_done" [(ngModel)]="prodOrderPosData.is_sampling_done"
+                            [disabled]="!hasAuth"
+                                >
+                            </ui5-switch>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-2 right-details-section">
+                    <div class="h-full rounded-md bg-white repair-details-card" style="padding: 0;">
+                        <div class="pl-4 pr-2 pb-0 pt-2  flex justify-between"
+                            *ngIf="isPlannedOrder || modalType == 'view'">
+                            <span class="font-bold font-siz">Order Repair</span>
+                            <div class="flex items-center">
+                                <ui5-label show-colon i18n style="font-size: medium;font-weight: bold;">Complete Repair
+                                    Order</ui5-label>
+                                <ui5-switch id="activeSwitch" name="is_active" [(ngModel)]="isAllRepairDone"
+                                    [disabled]="isAllOrderRepairDoneButtonDisabled">
+                                </ui5-switch>
+                            </div>
+                        </div>
+                        <ui5-tabcontainer class="mt-[10px]" id="tabContainer" (tab-select)="tabNavChanged($event)" fixed
+                            collapsed tab-layout="Inline">
+                            <ui5-tab #typeRepairTab required i18n-text text="Repair Type" id="type_of_repair_tab"
+                                additionalText="{{ typeOfRepairTabCount }}"
+                                [selected]="selectedTab === 'type_of_repair_tab'"></ui5-tab>
+                            <ui5-tab #otherRepairTab required i18n-text text="Other Repair" id="other_repair_tab" 
+                                additionalText="{{ otherRepairTabCount }}" 
+                                [selected]="selectedTab === 'other_repair_tab'"></ui5-tab>
+                            <ui5-tab #notesTab i18n-text text="Remarks" id="notes_tab"
+                                additionalText="{{ prodOrderPosData.notes != '' ? 1 : 0 }}"
+                                [selected]="selectedTab === 'notes_tab'"></ui5-tab>
+                            <ui5-tab #attachmentTab i18n-text text="Attachment" id="attachment_tab" 
+                                additionalText="{{ attachmentCount }}" 
+                                [selected]="selectedTab === 'attachment_tab'"></ui5-tab>
+                        </ui5-tabcontainer>
+
+                        <div class="tab-details-section" *ngIf="selectedTab === 'type_of_repair_tab'"
+                            [ngStyle]="{ height: modalHeight}">
+                            <div class="treeView">
+                                <app-repair-tree [data]="treeTableData" [selectionMode]="treeTableSelectionMode"
+                                    *ngIf="!isPlannedOrder" [selectedRowIds]="selectedTreeRowIds"
+                                    [columns]="treeTableColumns" [tableTitle]="tableTitle"
+                                    [subRowsKey]="'operationPlanPos'"
+                                    (finalSelectedRepairs)="setTypeRepairOperaitons($event)"
+                                    (searchWord)="onSearchTreeTable($event)" #typeOfRepairTree>
+                                </app-repair-tree>
+
+                                <div class="tableStandard_repair" *ngIf="isPlannedOrder">
+                                    <app-grid-table headerTitle="Repair Type" i18n-headerTitle [data]="newTypeOfRepair"
+                                        [customData]="true" [columns]="newTypeOfRepairColumns" [showSearch]="true"
+                                        [showDownload]="false" [editPermission]="true" addButtonText="Add"
+                                        i18n-addButtonText [showNewButton]="false" selectionMode="None"
+                                        [showAction]="false" [showActiveButton]="false" #newTypeOfRepairTable>
+                                    </app-grid-table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-details-section" *ngIf="selectedTab === 'other_repair_tab'"
+                            [ngStyle]="{ height: modalHeight}">
+                            <div class="tableStandard_repair">
+                                <app-grid-table headerTitle="Other Repair" i18n-headerTitle
+                                    [data]="selectedNewOtherRepairOp" [customData]="true" [columns]="otherRepairColumns"
+                                    [showSearch]="false" [showDownload]="false" [editPermission]="true"
+                                    addButtonText="Add" i18n-addButtonText [showNewButton]="isAddButtonShow"
+                                    selectionMode="None" [showAction]="false"
+                                    (newButtonClick)="openNewOtherRepairDialog()" [showActiveButton]="false"
+                                    #otherRepair>
+                                </app-grid-table>
+                            </div>
+                        </div>
+                        <div class="tab-details-section" *ngIf="selectedTab === 'notes_tab'"
+                            [ngStyle]="{ height: modalHeight}">
+                            <app-text-editor [notes]="prodOrderPosData.notes"
+                                [isReadOnly]="modalType == 'view' ? true : false" (sendNotes)="onChangeNotes($event)"
+                                style="width: 100%; height: 100%;">
+                            </app-text-editor>
+                        </div>
+                        <div class="tab-details-section" *ngIf="selectedTab === 'attachment_tab'"
+                            [ngStyle]="{ height: modalHeight}">
+                            <app-attachment-upload [model]="'ProdOrderPos'"
+                                [modelId]="prodOrderPosData ? prodOrderPosData.id : null" [modalType]="modalType"
+                                [mediaData]="prodOrderPosData.media" [uploadedFiles]="tempFiles"
+                                [deletedFiles]="deletedSavedFiles" [checkNewFiles]="checkForNewAttachments"
+                                [fileCount]="attachmentCount" [updatedStandardFile]="selectedStandardFile"
+                                [isShowStandard]="false" (tempFilesChanged)="onAttachmentChanges($event, 'onUpload')"
+                                (deletedFilesChanged)="onAttachmentChanges($event, 'onDelete')"
+                                (standardFileSelected)="onAttachmentChanges($event, 'onStandardSelect')"
+                                (newFilesCount)="onAttachmentChanges($event, 'fileCount')"
+                                style="width: 100%; height: 100%;">
+                            </app-attachment-upload>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ui5-busy-indicator>
+
+    <div slot="footer" class="dialog-footer">
+        <ui5-button *ngIf="modalType != 'view' || hasAuth" class="ml-8" (click)="saveNewToolRepair()" design="Emphasized"
+            [disabled]="disableButtonDuringRequest">
+            {{isSaveOrUpdate}}
+        </ui5-button>
+        <ui5-button class="ml-8" design="Transparent" (click)="closeCreateDialog()" i18n>
+            {{ localization.close }}</ui5-button>
+    </div>
+    <ui5-toast #detailModalToast id="detailModalToast" placement="BottomCenter">{{ toastMessage }}</ui5-toast>
+</app-dialog>

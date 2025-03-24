@@ -1,0 +1,30 @@
+<kendo-grid-component 
+    [gridItems]="gridItems"
+    [columns]="columns"
+    [state]="state"
+    [isLoadedEnabled]="isLoadedEnabled"
+    [isSortable]="isSortable"
+    [isFilterable]="isFilterable"
+    [isGroupable]="isGroupable"
+    [isPageable]="isPageable"
+    [toolbarConfig]="toolbarConfig"
+    (emitState)="changeState($event)"
+    (emitData)="changeState($event)"
+    (gridRefersh)="sendRequest()"
+    (deleteDataItem)="deleteDataItem($event)"
+    [editView]="editView"
+    [addWindowEvent]="addWindowEvent"
+    (filterState)="changeGridFilter($event)"
+>
+	<ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+		<ng-container *ngIf="column.name == 'ingot_casting'">
+			<div>{{ getEnumTranslateGrid('ingot_casting', dataItem.ingot_casting) }}</div>
+		</ng-container>
+		<ng-container *ngIf="column.name == 'stretch_forging_degree'">
+			<div>{{ getEnumTranslateGrid('stretch_forging_degree', dataItem.stretch_forging_degree) }}</div>
+		</ng-container>
+		<ng-container *ngIf="column.name == 'continuous_casting'">
+			<div>{{ getEnumTranslateGrid('continuous_casting', dataItem.continuous_casting) }}</div>
+		</ng-container>
+	</ng-template>
+</kendo-grid-component>

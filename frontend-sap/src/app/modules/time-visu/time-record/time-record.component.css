@@ -1,0 +1,7 @@
+.calc-height{
+    height: calc(100% - 50px);
+}
+
+.title-color {
+	color: var(--progressbar-machine-card-bar-color);
+}

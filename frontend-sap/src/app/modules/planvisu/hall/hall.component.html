@@ -1,0 +1,1179 @@
+<div
+	class="tool-layout"
+	cdkDropListGroup>
+	<div class="shellbar">
+		<ui5-list
+			id="backlogList"
+			style="height: 95%; margin-top: 2px; width: 100%"
+			growing="Scroll"
+			cdkDropList
+			[cdkDropListData]="hall.getBacklogList()"
+			[cdkDropListConnectedTo]="['machineList']"
+			(cdkDropListDropped)="dropBacklog($event)"
+			cdkScrollable>
+			<ui5-li class="w-full">
+				<div
+					style="
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
+						width: 100%;
+					">
+					<ui5-title
+						level="H5"
+						style="margin-right: 30px"
+						class="noselect"
+						i18n
+						>Backlog</ui5-title
+					>
+					<div style="width: 200px"></div>
+					<ui5-button
+						id="overflow"
+						design="Transparent"
+						(click)="openPopOver()"
+						icon="overflow"></ui5-button>
+				</div>
+			</ui5-li>
+			<div style="margin-top: 2px"></div>
+			@for (prodOrderPosOperation of hall.getBacklogList(); track $index) {
+				<ui5-card
+					id="{{ prodOrderPosOperation.id }}"
+					class="backlog-card"
+					[style.height]="
+						(prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.item_name ||
+							prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+								?.outer_diameter_final ||
+							prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+								?.offerPosRawDimensions?.length) &&
+						(prodOrderPosOperation.prodOrderPos?.calculation?.note_linked_operations ||
+							prodOrderPosOperation.prodOrderPos?.item?.getDeliveryPriority()
+								?.value_string)
+							? '85px'
+							: prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.item_name ||
+								  prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.outer_diameter_final ||
+								  prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.offerPosRawDimensions?.length ||
+								  prodOrderPosOperation.prodOrderPos?.calculation
+										?.note_linked_operations ||
+								  prodOrderPosOperation.prodOrderPos?.item?.getDeliveryPriority()
+										?.value_string
+								? '70px'
+								: '50px'
+					"
+					cdkDrag
+					(dblclick)="clickOnOperation(prodOrderPosOperation)">
+					<div style="display: flex; flex-direction: row; border-radius: 5rem">
+						<div
+							style="
+								width: 6px;
+								height: 100px;
+								border-radius: 4px 0px 0px 4px;
+								background-color: var(--production-color);
+							"></div>
+						<div
+							style="
+								margin-left: var(--card-margin);
+								margin-right: var(--card-margin);
+								margin-top: 5px;
+								margin-bottom: 5px;
+								padding-bottom: 5px;
+								overflow: hidden;
+								display: flex;
+								flex-direction: column;
+							">
+							<ui5-title
+								level="H5"
+								class="noselect"
+								style="margin-bottom: 5px; overflow: hidden">
+								{{ prodOrderPosOperation.name | slice: 0 : 17
+								}}{{ prodOrderPosOperation.name!.length > 17 ? "..." : "" }} |
+								{{ prodOrderPosOperation.prodOrderPos?.quantity }}pcs
+							</ui5-title>
+							<ui5-label class="noselect">
+								{{
+									prodOrderPosOperation.prodOrderPos?.calculation?.sales_order
+								}}|{{ prodOrderPosOperation.prodOrderPos?.prodOrder?.custom_id }} |
+								{{ prodOrderPosOperation.getMinute() }}min |
+								{{ prodOrderPosOperation.start | date: "dd MMM" }} |
+								{{ prodOrderPosOperation.end | date: "dd MMM" }}
+							</ui5-label>
+							<ui5-label
+								class="noselect"
+								*ngIf="
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.item_name! ||
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.outer_diameter_final ||
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.offerPosRawDimensions?.length
+								">
+								{{
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.item_name! | productType: isInForgePage
+								}}
+								{{
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.item_name
+										? "|"
+										: ""
+								}}
+								{{
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.outer_diameter_final
+								}}
+								{{
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.outer_diameter_final
+										? "mm"
+										: ""
+								}}
+								{{
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.offerPosRawDimensions?.length
+										? (prodOrderPosOperation.prodOrderPos?.calculation
+												?.offerPos)!.offerPosRawDimensions[0]!
+												.rolling_pin_value
+										: ""
+								}}
+								{{
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.offerPosRawDimensions?.length
+										? (prodOrderPosOperation.prodOrderPos?.calculation
+												?.offerPos)!.offerPosRawDimensions[0]!
+												.rolling_pin_value
+										: null
+											? "|"
+											: ""
+								}}
+								{{
+									prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+										?.offerPosRawDimensions?.length
+										? (prodOrderPosOperation.prodOrderPos?.calculation
+												?.offerPos)!.offerPosRawDimensions[0]!
+												.rolling_pin_value
+										: ""
+								}}
+							</ui5-label>
+							<ui5-label
+								class="noselect"
+								*ngIf="
+									prodOrderPosOperation.prodOrderPos?.calculation
+										?.note_linked_operations ||
+									prodOrderPosOperation.prodOrderPos?.item?.getDeliveryPriority()
+										?.value_string
+								">
+								{{
+									prodOrderPosOperation.prodOrderPos?.calculation
+										?.note_linked_operations
+								}}
+								|
+								{{
+									prodOrderPosOperation.prodOrderPos?.item?.getDeliveryPriority()
+										?.value_string
+								}}
+							</ui5-label>
+						</div>
+					</div>
+				</ui5-card>
+			}
+		</ui5-list>
+		<div
+			style="
+				height: 36px;
+				width: 100%;
+				background-color: var(--color-white);
+				border-radius: 0rem 0rem 0.5rem 0.5rem;
+				border-top: 1px solid var(--div-border-color);
+				display: flex;
+				flex-direction: row;
+				justify-content: end;
+				align-items: center;
+				align-content: center;
+			">
+			<div
+				style="
+					height: 20px;
+					background-color: var(--statnstill-color);
+					border-radius: 8px;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					margin-right: 8px;
+				">
+				<ui5-title
+					style="color: var(--color-white); padding: 5px 8px"
+					level="H6"
+					class="noselect"
+					i18n
+					>Error</ui5-title
+				>
+			</div>
+			<div
+				style="
+					height: 20px;
+					background-color: var(--production-color);
+					border-radius: 8px;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					margin-right: 8px;
+				">
+				<ui5-title
+					style="color: var(--color-white); padding: 5px 8px"
+					level="H6"
+					i18n
+					>Not Scheduled</ui5-title
+				>
+			</div>
+			<div
+				style="
+					height: 20px;
+					background-color: var(--goodPartColor);
+					border-radius: 8px;
+					align-content: center;
+					margin-right: 16px;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					margin-right: 16px;
+				">
+				<ui5-title
+					style="color: var(--color-white); padding: 5px 8px"
+					level="H6"
+					i18n
+					>Scheduled</ui5-title
+				>
+			</div>
+		</div>
+	</div>
+	<div class="content">
+		<div
+			style="
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				height: 44px;
+				background-color: var(--color-white);
+				border-radius: 1rem 1rem 0rem 0rem;
+				align-items: center;
+				padding-left: 16px;
+				border-bottom: 1px solid #a8b3bd;
+			">
+			<div> </div>
+			<div
+				style="
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: end;
+				">
+				<ui5-label
+					style="margin-right: 16px"
+					class="noselect"
+					i18n
+					show-colon
+					>Machine</ui5-label
+				>
+				<ui5-multi-combobox
+					(selection-change)="changeMachines($event)"
+					placeholder="Select Machines"
+					i18n-placeholder="Select Machines"
+					class="noselect"
+					style="margin-right: 8px">
+					@for (machineGroup of hall.machineGroup; track $index) {
+						@if (machineGroup.isSelected) {
+							@for (machine of machineGroup.machines; track $index) {
+								<ui5-mcb-item
+									id="{{ machine.id }}"
+									text="{{ machine.custom_id }} - {{ machine.name }}"
+									[selected]="machine.isSelected"></ui5-mcb-item>
+							}
+						}
+					}
+				</ui5-multi-combobox>
+
+				<ui5-label
+					style="margin-right: 16px"
+					class="noselect"
+					i18n
+					show-colon
+					>Machine Group</ui5-label
+				>
+				<ui5-multi-combobox
+					style="margin-right: 8px"
+					(selection-change)="changeGroups($event)"
+					class="noselect"
+					i18n-placeholder
+					placeholder="Select Machine Groups">
+					<ui5-mcb-item
+						*ngFor="let machineGroup of hall.machineGroup; index as i"
+						id="{{ machineGroup.id }}"
+						text="{{ machineGroup.custom_id }} - {{ machineGroup.name }}"
+						[selected]="machineGroup.isSelected"></ui5-mcb-item>
+				</ui5-multi-combobox>
+				<ui5-label
+					style="margin-right: 16px"
+					class="noselect"
+					show-colon
+					i18n
+					>Prod. Date Until</ui5-label
+				>
+				<ui5-date-picker
+					style="margin-right: 8px; width: 220px"
+					[value]="hall.tableDate ?? ''"
+					(change)="changeDate($event)"
+					format-pattern="MMM dd, yyyy"
+					class="noselect"
+					[minDate]="minDate"
+					[maxDate]="maxDate">
+				</ui5-date-picker>
+				<ui5-button
+					id="kanbanOverflow"
+					class="mr-2"
+					design="Emphasized"
+					(click)="checkRestrictions()"
+					i18n>
+					Check Restriction
+				</ui5-button>
+				<ui5-button
+					id="kanbanOverflow"
+					class="mr-2"
+					design="Transparent"
+					(click)="openKanbanPopOver()"
+					icon="overflow"></ui5-button>
+				<ui5-segmented-button
+					(selection-change)="weekDayChange()"
+					style="margin-right: 8px">
+					<ui5-segmented-button-item [selected]="isWeek"
+						>Weekly</ui5-segmented-button-item
+					>
+					<ui5-segmented-button-item [selected]="!isWeek"
+						>Daily</ui5-segmented-button-item
+					>
+				</ui5-segmented-button>
+			</div>
+		</div>
+		<div style="height: 94.5%; overflow: auto">
+			<ui5-table
+				mode="None"
+				overflow-mode="Scroll"
+				style="height: 99%; border-radius: 0 0 1rem 1rem">
+				<ui5-table-header-row slot="headerRow">
+					<ui5-table-header-cell
+						style="overflow: hidden"
+						min-width="210px">
+						<ui5-title
+							level="H5"
+							i18n
+							class="noselect"
+							>Machine</ui5-title
+						>
+					</ui5-table-header-cell>
+					@for (machineGroup of hall.machineGroup; track $index) {
+						@if (machineGroup.isSelected) {
+							@for (machine of machineGroup.machines; track $index) {
+								@if (machine.isSelected) {
+									<ui5-table-header-cell
+										class="noselect"
+										style="overflow: hidden"
+										min-width="300px">
+										<ui5-title level="H5">{{ machine.name }}</ui5-title>
+									</ui5-table-header-cell>
+								}
+							}
+						}
+					}
+				</ui5-table-header-row>
+				<ui5-table-row *ngIf="isWeek">
+					<ui5-table-cell>
+						<div style="width: 100%">
+							<ui5-title
+								level="H5"
+								style="margin-left: 16px"
+								class="noselect"
+								i18n
+								>Past</ui5-title
+							>
+						</div>
+					</ui5-table-cell>
+					@for (machineGroup of hall.machineGroup; track $index) {
+						@if (machineGroup.isSelected && machineGroup.is_active) {
+							@for (machine of machineGroup.machines; track $index) {
+								@if (machine.isSelected) {
+									<ui5-table-cell min-width="300px">
+										<div
+											style="
+												display: flex;
+												flex-direction: column;
+												height: 185px;
+												overflow: hidden;
+												width: 100%;
+											">
+											<div
+												style="
+													display: flex;
+													flex-direction: row;
+													width: 100%;
+													height: 32px;
+													border-top: 1px var(--div-border-color) solid;
+													border-bottom: 1px var(--div-border-color) solid;
+												">
+												<div
+													style="
+														width: 50%;
+														border-right: 1px solid
+															var(--div-border-color);
+														display: flex;
+														align-items: center;
+														margin-left: 16px;
+													">
+													<ui5-text
+														i18n
+														class="noselect"
+														>0h Capacity</ui5-text
+													>
+												</div>
+												<div
+													style="
+														width: 50%;
+														display: flex;
+														align-items: center;
+														margin-left: 16px;
+													">
+													<ui5-text
+														i18n
+														class="noselect"
+														>{{
+															machineGroup.totalUsedMinutesByMachineId(
+																machine.id!,
+																hall.dates[0],
+																true
+															)
+														}}min Used</ui5-text
+													>
+												</div>
+											</div>
+											<div
+												style="
+													margin-top: 9px;
+													margin-left: 16px;
+													margin-right: 16px;
+												">
+												<ui5-list
+													id="pastList"
+													growing="Scroll"
+													style="height: 130px"
+													cdkDropList
+													[cdkDropListConnectedTo]="[
+														'backlogList',
+														'machineList',
+													]"
+													[cdkDropListData]="
+														machineGroup.prodOrderPosOperations
+													"
+													cdkScrollable>
+													@for (
+														prodOrderPosOperation of sortOperations(
+															machineGroup.prodOrderPosOperations,
+															machine.id!,
+															hall.dates[0],
+															true
+														);
+														track $index
+													) {
+														@if (
+															prodOrderPosOperation.prodOrderPos
+																?.prodOrder?.isSelected
+														) {
+															<div
+																id="{{ prodOrderPosOperation.id }}"
+																style="margin-bottom: 4px"
+																cdkDrag
+																(dblclick)="
+																	clickOnOperation(
+																		prodOrderPosOperation
+																	)
+																">
+																<app-generic-tag
+																	[type]="
+																		hall.getStatus(
+																			prodOrderPosOperation
+																		) == 'Error' ||
+																		isRestricted(
+																			prodOrderPosOperation
+																		)
+																			? type.Error
+																			: type.Info
+																	">
+																	<div
+																		style="
+																			margin-left: var(--card-margin);
+																			margin-right: var(--card-margin);
+																			padding-bottom: 5px;
+																			overflow: hidden;
+																			display: flex;
+																			flex-direction: column;
+																		">
+																		<ui5-title
+																			level="H5"
+																			class="noselect"
+																			style="
+																				margin-bottom: 5px;
+																				overflow: hidden;
+																			">
+																			{{
+																				prodOrderPosOperation.name
+																					| slice: 0 : 17
+																			}}{{
+																				prodOrderPosOperation
+																					.name!.length >
+																				17
+																					? "..."
+																					: ""
+																			}}
+																			|
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.quantity
+																			}}pcs
+																			<ui5-icon
+																				name="locked"
+																				*ngIf="
+																					isOperationLocked(
+																						prodOrderPosOperation
+																					)
+																				"></ui5-icon>
+																		</ui5-title>
+																		<ui5-label class="noselect">
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.sales_order
+																			}}|
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.prodOrder
+																					?.custom_id
+																			}}
+																			|
+																			{{
+																				prodOrderPosOperation.getMinute()
+																			}}min |
+																			{{
+																				prodOrderPosOperation.start
+																					| date: "dd MMM"
+																			}}
+																			|
+																			{{
+																				prodOrderPosOperation.end
+																					| date: "dd MMM"
+																			}}
+																		</ui5-label>
+																		<ui5-label
+																			class="noselect"
+																			*ngIf="
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.item_name ||
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.outer_diameter_final ||
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.offerPosRawDimensions
+																					?.length
+																			">
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.item_name!
+																					| productType
+																						: isInForgePage
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.item_name
+																					? "|"
+																					: ""
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.outer_diameter_final
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.outer_diameter_final
+																					? "mm"
+																					: ""
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.offerPosRawDimensions
+																					?.length
+																					? (prodOrderPosOperation
+																							.prodOrderPos
+																							?.calculation
+																							?.offerPos)!
+																							.offerPosRawDimensions[0]!
+																							.rolling_pin_value
+																					: ""
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.offerPosRawDimensions
+																					?.length
+																					? (prodOrderPosOperation
+																							.prodOrderPos
+																							?.calculation
+																							?.offerPos)!
+																							.offerPosRawDimensions[0]!
+																							.rolling_pin_value
+																					: null
+																						? "|"
+																						: ""
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.offerPosRawDimensions
+																					?.length
+																					? (prodOrderPosOperation
+																							.prodOrderPos
+																							?.calculation
+																							?.offerPos)!
+																							.offerPosRawDimensions[0]!
+																							.rolling_pin_value
+																					: ""
+																			}}
+																		</ui5-label>
+																		<ui5-label
+																			class="noselect"
+																			*ngIf="
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.note_linked_operations ||
+																				prodOrderPosOperation.prodOrderPos?.item?.getDeliveryPriority()
+																					?.value_string
+																			">
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.note_linked_operations
+																			}}
+																			|
+																			{{
+																				prodOrderPosOperation.prodOrderPos?.item?.getDeliveryPriority()
+																					?.value_string
+																			}}
+																		</ui5-label>
+																	</div>
+																</app-generic-tag>
+															</div>
+														}
+													}
+												</ui5-list>
+											</div>
+										</div>
+									</ui5-table-cell>
+								}
+							}
+						}
+					}
+				</ui5-table-row>
+				<ui5-table-row
+					*ngFor="let date of hall.dates"
+					style="height: max-content">
+					<ui5-table-cell min-width="210px">
+						<div style="width: 100%">
+							<ui5-title
+								level="H5"
+								style="margin-left: 16px"
+								class="noselect"
+								>{{ momentInstance(date).format("dddd MMM DD, yyyy") }}</ui5-title
+							>
+						</div>
+					</ui5-table-cell>
+					@for (machineGroup of hall.machineGroup; track $index) {
+						@if (machineGroup.isSelected && machineGroup.is_active) {
+							@for (machine of machineGroup.machines; track $index) {
+								@if (machine.isSelected) {
+									<ui5-table-cell min-width="300px">
+										<div
+											[ngStyle]="{
+												'display': 'flex',
+												'flex-direction': 'column',
+												'height': isWeek ? '260px' : '780px',
+											}"
+											style="width: 100%">
+											<div
+												style="
+													display: flex;
+													flex-direction: row;
+													width: 100%;
+													height: 32px;
+													border-top: 1px var(--div-border-color) solid;
+													border-bottom: 1px var(--div-border-color) solid;
+												">
+												<div
+													style="
+														width: 50%;
+														border-right: 1px solid
+															var(--div-border-color);
+														display: flex;
+														align-items: center;
+														margin-left: 16px;
+													">
+													<ui5-text class="noselect"
+														>{{
+															isInForgePage
+																? machine.getMinutesInForgeMode(
+																		date,
+																		hall
+																	)
+																: machine.getMinutes(date)
+														}}min Capacity</ui5-text
+													>
+												</div>
+												<div
+													style="
+														width: 50%;
+														display: flex;
+														align-items: center;
+														margin-left: 16px;
+													">
+													<ui5-text
+														i18n
+														class="noselect"
+														>{{
+															machineGroup.totalUsedMinutesByMachineId(
+																machine.id!,
+																date
+															)
+														}}min Used</ui5-text
+													>
+												</div>
+											</div>
+											<div
+												style="
+													margin-top: 9px;
+													margin-left: 16px;
+													margin-right: 16px;
+												">
+												<ui5-list
+													growing="Scroll"
+													[ngStyle]="{
+														height: isWeek ? '220px' : '750px',
+													}"
+													cdkDropList
+													id="machineList"
+													[cdkDropListConnectedTo]="[
+														'backlogList',
+														'pastList',
+													]"
+													(cdkDropListDropped)="
+														dropMachine(
+															$event,
+															machine.id!,
+															machineGroup.id!,
+															date
+														)
+													"
+													[cdkDropListData]="
+														machineGroup.prodOrderPosOperations
+													"
+													cdkScrollable>
+													@for (
+														prodOrderPosOperation of sortOperations(
+															machineGroup.prodOrderPosOperations,
+															machine.id!,
+															date,
+															false
+														);
+														track $index
+													) {
+														@if (
+															prodOrderPosOperation.prodOrderPos
+																?.prodOrder?.isSelected
+														) {
+															<div
+																id="{{ prodOrderPosOperation.id }}"
+																style="margin-bottom: 4px"
+																cdkDrag
+																(dblclick)="
+																	clickOnOperation(
+																		prodOrderPosOperation
+																	)
+																">
+																<app-generic-tag
+																	[type]="
+																		hall.getStatus(
+																			prodOrderPosOperation
+																		) == 'Error' ||
+																		isRestricted(
+																			prodOrderPosOperation
+																		)
+																			? type.Error
+																			: type.Info
+																	">
+																	<div
+																		style="
+																			margin-left: var(--card-margin);
+																			margin-right: var(--card-margin);
+																			padding-bottom: 5px;
+																			overflow: hidden;
+																			display: flex;
+																			flex-direction: column;
+																		">
+																		<ui5-title
+																			level="H5"
+																			class="noselect"
+																			style="
+																				margin-bottom: 5px;
+																				overflow: hidden;
+																			">
+																			{{
+																				prodOrderPosOperation.name
+																					| slice: 0 : 17
+																			}}{{
+																				prodOrderPosOperation
+																					.name!.length >
+																				17
+																					? "..."
+																					: ""
+																			}}
+																			|
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.quantity
+																			}}pcs
+																			<ui5-icon
+																				name="locked"
+																				*ngIf="
+																					isOperationLocked(
+																						prodOrderPosOperation
+																					)
+																				"></ui5-icon>
+																		</ui5-title>
+
+																		<ui5-label class="noselect">
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.sales_order
+																			}}|
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.prodOrder
+																					?.custom_id
+																			}}
+																			|
+																			{{
+																				prodOrderPosOperation.getMinute()
+																			}}min |
+																			{{
+																				prodOrderPosOperation.start
+																					| date: "dd MMM"
+																			}}
+																			|
+																			{{
+																				prodOrderPosOperation.end
+																					| date: "dd MMM"
+																			}}
+																		</ui5-label>
+																		<ui5-label
+																			class="noselect"
+																			*ngIf="
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.item_name ||
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.outer_diameter_final ||
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.offerPosRawDimensions
+																					?.length
+																			">
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.item_name!
+																					| productType
+																						: isInForgePage
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.item_name
+																					? "|"
+																					: ""
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.outer_diameter_final
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.outer_diameter_final
+																					? "mm"
+																					: ""
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.offerPosRawDimensions
+																					?.length
+																					? (prodOrderPosOperation
+																							.prodOrderPos
+																							?.calculation
+																							?.offerPos)!
+																							.offerPosRawDimensions[0]!
+																							.rolling_pin_value
+																					: ""
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.offerPosRawDimensions
+																					?.length
+																					? (prodOrderPosOperation
+																							.prodOrderPos
+																							?.calculation
+																							?.offerPos)!
+																							.offerPosRawDimensions[0]!
+																							.rolling_pin_value
+																					: null
+																						? "|"
+																						: ""
+																			}}
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.offerPos
+																					?.offerPosRawDimensions
+																					?.length
+																					? (prodOrderPosOperation
+																							.prodOrderPos
+																							?.calculation
+																							?.offerPos)!
+																							.offerPosRawDimensions[0]!
+																							.rolling_pin_value
+																					: ""
+																			}}
+																		</ui5-label>
+																		<ui5-label
+																			class="noselect"
+																			*ngIf="
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.note_linked_operations ||
+																				prodOrderPosOperation.prodOrderPos?.item?.getDeliveryPriority()
+																					?.value_string
+																			">
+																			{{
+																				prodOrderPosOperation
+																					.prodOrderPos
+																					?.calculation
+																					?.note_linked_operations
+																			}}
+																			|
+																			{{
+																				prodOrderPosOperation.prodOrderPos?.item?.getDeliveryPriority()
+																					?.value_string
+																			}}
+																		</ui5-label>
+																	</div>
+																</app-generic-tag>
+															</div>
+														}
+													}
+												</ui5-list>
+											</div>
+										</div>
+									</ui5-table-cell>
+								}
+							}
+						}
+					}
+				</ui5-table-row>
+			</ui5-table>
+		</div>
+	</div>
+</div>
+<app-dialog
+	[isDialogOpen]="isHallDeactivatedDialogOpen"
+	title="Error"
+	state="Negative">
+	<ui5-text i18n>The requested Hall is deactivated</ui5-text>
+</app-dialog>
+<app-dialog
+	[isDialogOpen]="isDataNotSaveErrorDialog"
+	title="Error"
+	state="Negative">
+	<ui5-text i18n>Unable to save data</ui5-text>
+</app-dialog>
+
+<ui5-busy-indicator
+	size="M"
+	[active]="isBusy"
+	class="center">
+</ui5-busy-indicator>
+
+<ui5-popover
+	opener="overflow"
+	[open]="isPopOverOpen"
+	(before-close)="popOverClose()"
+	placement="End"
+	header-text="Filter Backlog"
+	i18n-header-text>
+	<div class="div-col">
+		<ui5-label
+			show-colon
+			i18n
+			>Start Date</ui5-label
+		>
+		<ui5-date-picker
+			[value]="hall.startDateFilterValue ?? ''"
+			(change)="changeStartDateFilter($event)"
+			format-pattern="MMM dd, yyyy">
+		</ui5-date-picker>
+		<ui5-label
+			show-colon
+			i18n
+			>Order</ui5-label
+		>
+		<ui5-input
+			[value]="hall.backlogOrderFilter"
+			(input)="changeBacklogOrderFilter($event)"></ui5-input>
+		<ui5-label
+			show-colon
+			i18n
+			>Quantity</ui5-label
+		>
+		<ui5-input
+			[value]="hall.quantityFilter"
+			(input)="changeBacklogQuantity($event)"></ui5-input>
+		<ui5-label
+			show-colon
+			i18n
+			>Operation Name</ui5-label
+		>
+		<ui5-input
+			[value]="hall.operationNameFilter"
+			(input)="changeBacklogOperation($event)"></ui5-input>
+		<ui5-label
+			show-colon
+			i18n
+			>Product Type</ui5-label
+		>
+		<ui5-input
+			[value]="hall.productTypeFilter"
+			(input)="changeBacklogProductType($event)"></ui5-input>
+		<ui5-label
+			show-colon
+			i18n
+			>Linked Operations</ui5-label
+		>
+		<ui5-input
+			[value]="hall.linkedOperation"
+			(input)="changeBacklogLinkedOperations($event)"></ui5-input>
+	</div>
+</ui5-popover>
+<ui5-popover
+	opener="kanbanOverflow"
+	[open]="isKanbanPopOverOpen"
+	(before-close)="kanbanPopOverClose()"
+	placement="End"
+	header-text="Filter Kanban"
+	i18n-header-text>
+	<div class="div-col">
+		<ui5-label
+			class="noselect"
+			i18n
+			show-colon
+			>Order</ui5-label
+		>
+		<ui5-input
+			(input)="changeOrders($event)"
+			placeholder="Search Orders"
+			class="noselect"
+			i18n-placeholder></ui5-input>
+		<ui5-label
+			show-colon
+			i18n
+			class="mt-1"
+			>Hall</ui5-label
+		>
+		<ui5-multi-combobox
+			style="margin-right: 8px"
+			(selection-change)="changeHall($event)"
+			class="noselect"
+			i18n-placeholder
+			placeholder="Select Halls">
+			<ui5-mcb-item
+				*ngFor="let h of halls; index as i"
+				id="{{ h.id }}"
+				text="{{ h.custom_id }} - {{ h.name }}"
+				[selected]="h.isSelected"></ui5-mcb-item>
+		</ui5-multi-combobox>
+	</div>
+</ui5-popover>
+
+<router-outlet></router-outlet>

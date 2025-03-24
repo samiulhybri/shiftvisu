@@ -1,0 +1,10 @@
+@import '/schertech-theme/dist/scss/custom';
+
+.popup {
+    padding: $standard-item-gap;
+    background: $kendo-grid-alt-bg;
+    border: 1px solid $kendo-card-header-border;
+    box-shadow: $kendo-appbar-box-shadow;
+    border-radius: $kendo-window-border-radius;
+}
+

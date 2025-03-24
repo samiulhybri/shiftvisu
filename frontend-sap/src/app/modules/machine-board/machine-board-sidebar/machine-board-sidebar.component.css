@@ -1,0 +1,77 @@
+.sapHoverColor {
+    background-color: var(--sapHoverColor);
+}
+
+.nav-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    margin: 6px 12px 6px 12px;
+    border: none;
+}
+
+.nav-button:hover {
+    cursor: pointer;
+    color: var(--sapBaseColor);
+    background-color: var(--sapHighlightColor);
+    border: none;
+    outline: none !important;
+}
+
+.left-component-footer {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    height: 32px;
+}
+
+.left-side {
+    display: flex;
+    align-items: center;
+}
+
+.terminal-pad {
+    padding: 6px 12px 6px 12px;
+}
+
+.h-1 {
+    height: 1px;
+}
+
+.c-grey {
+    background-color: grey;
+}
+
+.p-12 {
+    padding: 12px;
+}
+
+.top-sidebar {
+}
+
+.bottom-sidebar {
+}
+
+.selected {
+    background-color: var(--sapBrandColor);
+    color: var(--sapBaseColor);
+}
+
+.scrollable-content {
+    padding-top: 6px;
+    display: flex;
+    overflow-y: auto;
+    flex-direction: column;
+    height: 100%;
+}
+
+.border-none {
+    border: none;
+}
+
+:host {
+    display: flex;
+}

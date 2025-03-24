@@ -1,0 +1,52 @@
+<kendo-dialog 
+    title="{{settings.title}}"
+    (close)="close()" 
+    class="item-dialog-scroll-content"
+    [width]="settings?.width ?? '65%'" 
+    [height]="settings?.height ?? '80vh'"
+>
+  
+    <kendo-card width="100">
+        <kendo-card-header class="header">
+            <span i18n>Items</span>
+            <kendo-grid-spacer></kendo-grid-spacer>
+            <kendo-textbox
+                [style.width.px]="191"
+                i18n i18n-placeholder placeholder="Search All Column"
+                [(ngModel)]="searchValue"
+                [clearButton]="true">
+                
+                <ng-template kendoTextBoxSuffixTemplate>
+                    <kendo-textbox-separator></kendo-textbox-separator>
+                    <button kendoButton fillMode="flat" icon="search"></button>
+                </ng-template>
+		</kendo-textbox>
+        <button kendoButton class="k-ml-xs" *ngIf="settings.showButton" type="button" [primary]="true" (click)="buttonEventClick()"> {{buttonText}}  </button>
+        </kendo-card-header>
+        <kendo-card-body  class="table-container">
+            <table>
+                <tr class="thead">
+                    <th></th>
+                    <th *ngFor="let column of columns">{{column.name}}</th>
+                </tr>
+                <tr *ngFor="let item of items | comboboxFilter: searchValue" (click)="selectItem(item)"
+                    [ngClass]="(currentItem?.id==item.id) ? 'selected-row' :'' ">
+                    <td>
+                        <input type="checkbox" [checked]="currentItem?.id==item.id" />
+                    </td>
+                    <td *ngFor="let column of columns">
+                        {{item[column.field]}}
+                    </td>
+    
+                </tr>
+            </table>
+        </kendo-card-body>
+    </kendo-card>
+
+    <kendo-dialog-actions>
+        <button kendoButton i18n (click)="close()"> <span class="k-icon k-i-close"></span> Cancel</button>
+        <button kendoButton themeColor="primary" i18n (click)="confirmCheck()"> <span class="k-icon k-i-check"></span>
+            Confirm</button>
+    </kendo-dialog-actions>
+    <app-loader *ngIf="isWindowLoaderEnabled"></app-loader>
+</kendo-dialog>

@@ -1,0 +1,57 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  min-width: 0;
+
+  background: #ffffff;
+
+  box-shadow: 0px 0px 6px rgba(18, 29, 44, 0.12);
+  border-radius: 8px;
+}
+
+.chat-list {
+  flex: 1 1 1px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.chat-list-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 1px solid rgba(18, 29, 44, 0.08);
+  padding: 12px 16px;
+  gap: 8px;
+  height: 30px;
+}
+
+.chat-list-title {
+  flex: 1;
+}
+
+.chat-list-action {
+  width: 30px;
+  height: 30px;
+
+  ::ng-deep .k-button-icon .k-image {
+    max-width: 16px;
+    height: 16px;
+  }
+}
+
+::ng-deep .k-popup {
+  border-radius: 4px;
+
+  .k-button {
+    justify-content: start;
+  }
+}
+
+.search-box {
+  margin: 8px;
+  margin-bottom: 5px;
+  height: 42px;
+  background: #f9fafb;
+}

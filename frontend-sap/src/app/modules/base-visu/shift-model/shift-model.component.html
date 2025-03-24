@@ -1,0 +1,355 @@
+<div class="grid grid-flow-col grid-cols-2 gap-x-2 h-full border-none default-bg">
+	<div class="h-full border border-solid border-gray-300 shadow-lg rounded-xl overflow-hidden">
+		<app-grid-table
+			headerTitle="Shift Models"
+			url="/ShiftModels"
+			i18n-headerTitle
+			[showRowDataCount]="true"
+			[columns]="shiftModelColumns"
+			[showAction]="true"
+			[showSearch]="true"
+			[showDownload]="false"
+			[showActiveButton]="false"
+			selectionMode="Single"
+			[editPermission]="authService.isPermissionValid('BASEVISU_SHIFT_MODELS_EDIT')"
+			addButtonText="New"
+			i18n-addButtonText
+			i18n-deleteButtonText
+			[showDeleteButton]="true"
+			deleteButtonText="Delete"
+			[showNewButton]="true"
+			(newButtonClick)="newButtonClick()"
+			(deleteClick)="deleteClick($event)"
+			(editClick)="editClick($event)"
+			(rowClick)="handleRowClick($event)"
+			(processData)="processShiftModelData()"
+			keyForCacheCustomDataTableColumns="/ShiftModels"
+			[enableServerSideFiltering]="true"
+			(searchClick)="handleSearchClick($event)"
+			sortBy="id"
+			#childComponentRef>
+		</app-grid-table>
+
+		<app-dialog [isDialogOpen]="isDialogOpen">
+			<div
+				slot="header"
+				class="w-100">
+				<div class="pl-0">
+					<ui5-title
+						class="h-10 flex items-center"
+						level="H5"
+						>{{ dialogTitle }}</ui5-title>
+				</div>
+			</div>
+
+			<ui5-busy-indicator
+				[active]="isLoading"
+				class="w-100"
+				size="L">
+				<form>
+					<div class="w-[550px]">
+						<form
+							(ngSubmit)="onSubmit(createOrUpdateForm)"
+							#createOrUpdateForm="ngForm">
+							<div class="grid grid-flow-row">
+								<ui5-label
+									show-colon
+									required
+									>{{ localization.id }}</ui5-label
+								>
+								<ui5-busy-indicator
+									[active]="isLoadingCustomId"
+									size="S">
+									<ui5-input
+										#customId="ngModel"
+										[valueState]="
+											customId.valid == false &&
+											(customId.touched || createOrUpdateForm.submitted)
+												? 'Negative'
+												: customIdState
+										"
+										[(ngModel)]="selectedShiftModel.custom_id"
+										(input)="onChangeCustomId()"
+										id="customIdInput"
+										name="custom_id"
+										class="w-100"
+										[required]="true">
+										<div
+											slot="valueStateMessage"
+											>
+											{{ customIdValueStateText }}
+										</div>
+									</ui5-input>
+								</ui5-busy-indicator>
+							</div>
+							<div class="grid grid-flow-row">
+								<ui5-label
+									show-colon
+									required
+									>{{ localization.name }}</ui5-label
+								>
+								<ui5-input
+									id="name"
+									#nameInput="ngModel"
+									[required]="true"
+									class="w-100"
+									[(ngModel)]="selectedShiftModel.name"
+									[valueState]="
+										nameInput.valid == false &&
+										(nameInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									name="name"></ui5-input>
+							</div>
+						</form>
+					</div>
+				</form>
+			</ui5-busy-indicator>
+
+			<div
+				slot="footer"
+				class="dialog-footer">
+				<ui5-button
+					id="saveButton"
+					design="Emphasized"
+					[disabled]="disableButtonDuringRequest"
+					(click)="onSubmitShiftModel()">
+					{{ localization.save }}</ui5-button
+				>
+				<ui5-button
+					id="cancelButton"
+					class="ml-8 border-none"
+					(click)="closeDialog()">
+					{{ localization.close }}</ui5-button
+				>
+			</div>
+		</app-dialog>
+	</div>
+	<div class="h-full border border-solid border-gray-300 shadow-lg rounded-xl overflow-hidden">
+		<app-grid-table
+			headerTitle="Shifts {{
+				selectedShiftModelId && selectedShiftModel.custom_id ? '(' + selectedShiftModel.custom_id + ')' : ''
+			}}"
+			i18n-headerTitle
+			[data]="shiftForTreeTable"
+			[columns]="shiftColumns"
+			[showAction]="false"
+			[showSearch]="false"
+			[showDownload]="false"
+			selectionMode="Multiple"
+			[showActiveButton]="false"
+			addButtonText="Add Shift"
+			i18n-addButtonText
+			i18n-deleteButtonText
+			[editPermission]="authService.isPermissionValid('BASEVISU_SHIFT_MODELS_EDIT')"
+			deleteButtonText="Delete"
+			[showDeleteButton]="true"
+			[addButtonDisable]="addButtonDisable"
+			[customData]="true"
+			[showDeleteButtonInHeader]="selectedShiftModelId ? true : false"
+			[isTreeTable]="true"
+			[showNewButton]="selectedShiftModelId ? true : false"
+			(newButtonClick)="associateButtonClick()"
+			(rowClick)="rowSelectionChangeForShift($event)"
+			(deleteButtonClick)="deleteMultipleShift()"
+			#childComponentForShiftRef>
+		</app-grid-table>
+
+		<app-dialog [isDialogOpen]="isAssociateDialogOpen">
+			<div
+				slot="header"
+				class="w-100">
+				<div class="pl-0">
+					<ui5-title
+						class="h-10 flex items-center"
+						level="H5"
+						i18n
+						>Add Shift ( {{ selectedShiftModel.custom_id }} )</ui5-title>
+				</div>
+			</div>
+			<form>
+				<ui5-busy-indicator
+					[active]="isLoading"
+					class="w-100"
+					size="L">
+					<div class="w-[478px]">
+						<div class="grid grid-flow-row mb-[10px]">
+							<ui5-label
+								show-colon
+								i18n
+								required
+								>Selected Working Days</ui5-label>
+							<ui5-multi-combobox
+								(selectionChange)="onWeekDaysChange($event)"
+								[valueState]="weekDaysState"
+								class="w-full">
+								<ui5-mcb-item
+									*ngFor="let weekDay of weekDays"
+									id="{{ weekDay.value }}"
+									[selected]="weekDay.isSelected"
+									text="{{ weekDay.text }}"></ui5-mcb-item>
+							</ui5-multi-combobox>
+						</div>
+						<div class="grid grid-flow-row">
+							<ui5-label
+								show-colon
+								i18n
+								required
+								>Select Shift(s)</ui5-label>
+							<ui5-combobox
+								id="shiftComboBox"
+								class="w-100"
+								#shiftComboBoxComboBox
+								[valueState]="shiftState"
+								[value]="selectedShifts[selectedShifts.length - 1]?.name || ''"
+								(selection-change)="onChangeShifts($event)">
+								<ng-container *ngFor="let shift of allShifts">
+									<ui5-cb-item
+										id="{{ shift.id }}"
+										[additionalText]="shift.custom_id"
+										text="{{ shift.name }} ({{ shift.start_time }} - {{
+											shift.end_time
+										}})"></ui5-cb-item>
+								</ng-container>
+							</ui5-combobox>
+
+							<div class="col-span-1 w-full mb-2 h-[245px] overflow-scroll">
+								<ui5-list
+									selection-mode="Delete"
+									(itemDelete)="onDateDelete($event)">
+									<ui5-li
+										(itemDelete)="onDateDelete($event)"
+										*ngFor="let shift of selectedShifts"
+										id="{{ shift.id }}"
+										>{{ shift.name }}</ui5-li
+									>
+								</ui5-list>
+							</div>
+						</div>
+					</div>
+				</ui5-busy-indicator>
+			</form>
+
+			<div
+				slot="footer"
+				class="dialog-footer">
+				<ui5-button
+					id="saveButton"
+					design="Emphasized"
+					[disabled]="disableButtonDuringRequest"
+					(click)="onSaveShiftToShiftModel($event)">
+					{{ localization.save }}</ui5-button
+				>
+				<ui5-button
+					id="cancelButton"
+					class="ml-8 border-none"
+					(click)="cancelDialog()">
+					{{ localization.close }}</ui5-button
+				>
+			</div>
+		</app-dialog>
+	</div>
+</div>
+
+<ui5-dialog
+	id="deleteDialog"
+	header-text="Warning"
+	state="Critical">
+	<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteSubmit()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="overlappedDialog"
+	#overlappedDialog
+	header-text="Warning"
+	state="Negative">
+	<p>{{ localization.shiftsTimeOverlapped }}</p>
+
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogOverlapped()"
+			id="closeOverlapButton"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="deleteShiftsDialog"
+	#deleteShiftsDialog
+	header-text="Warning"
+	state="Critical">
+	<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			id="deleteForShiftButton"
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteShiftsSubmit()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			id="closeButon"
+			(click)="closeDialogOverlapped()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+<ui5-dialog
+	#errorDialogShiftModels
+	id="errorDialogShiftModels"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

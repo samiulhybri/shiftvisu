@@ -1,0 +1,184 @@
+<ui5-busy-indicator
+	[active]="saveMode == null"
+	class="w-full">
+	<div class="!h-[calc(100vh-370px)] w-full flex flex-col gap-[30px]">
+		<div class="flex items-center py-[10px]">
+			<ui5-label
+				show-colon
+				i18n
+				>Accepted</ui5-label
+			>
+			<ui5-switch
+				id="acceptedSwitch"
+				[(ngModel)]="eightDReport.author_accepted">
+			</ui5-switch>
+		</div>
+
+		<div class="w-full flex flex-row justify-between gap-[10px]">
+			<div class="w-[50%] flex flex-col">
+				<ui5-label
+					show-colon
+					i18n
+					>Author 8D Report</ui5-label
+				>
+				<ui5-input
+					class="w-full"
+					[readonly]="true"
+					[value]="
+						saveMode == 'patch' ? (eightDReport.author?.name ?? '') : (user.name ?? '')
+					"></ui5-input>
+			</div>
+
+			<div class="w-[50%] flex flex-col">
+				<ui5-label
+					show-colon
+					i18n
+					>Closing Date</ui5-label
+				>
+				<ui5-date-picker
+					class="w-full"
+					formatPattern="dd.MM.yyyy"
+					[(ngModel)]="eightDReport.author_closing_date"></ui5-date-picker>
+			</div>
+		</div>
+
+		<div class="!h-min flex flex-col justify-center gap-[5px] relative">
+			<ui5-label
+				show-colon
+				i18n
+				>Signature</ui5-label
+			>
+			@if (imageSource) {
+				<img
+					class="image-center top-[26px] z-[1]"
+					height="150"
+					width="400"
+					priority
+					[ngSrc]="imageSource" />
+			} @else {
+				<div
+					class="image-center top-[26px] z-[1] !h-[150px] flex flex-col justify-center"
+					i18n
+					>Image Not Found</div
+				>
+			}
+			<ui5-textarea
+				class="h-[154px]"
+				disabled>
+			</ui5-textarea>
+		</div>
+
+		<div class="flex items-center py-[5px]">
+			<ui5-label class="font-bold w-[200px]" i18n>Decision Client</ui5-label>
+
+			<div class="flex items-center">
+				<ui5-label
+					show-colon
+					i18n
+					>8D Report Accepted</ui5-label
+				>
+				<ui5-switch
+					id="reportAcceptedSwitch"
+					[(ngModel)]="eightDReport.client_accepted">
+				</ui5-switch>
+			</div>
+		</div>
+
+		<div class="w-full flex flex-row justify-between gap-[10px]">
+			<div class="w-[50%] flex flex-col">
+				<ui5-label
+					show-colon
+					i18n
+					>Closure Client</ui5-label
+				>
+				<ui5-input
+					placeholder="Write name"
+					i18n-placeholder
+					class="w-full"
+					[(ngModel)]="eightDReport.client_name"></ui5-input>
+			</div>
+
+			<div class="w-[50%] flex flex-col">
+				<ui5-label
+					show-colon
+					i18n
+					>Closing Date</ui5-label
+				>
+				<ui5-date-picker
+					class="w-full"
+					formatPattern="dd.MM.yyyy"
+					[(ngModel)]="eightDReport.client_closing_date"></ui5-date-picker>
+			</div>
+		</div>
+		<div class="!h-min flex flex-col gap-[5px]">
+			<ui5-label
+				show-colon
+				i18n
+				class="font-bold text-sm"
+				>Signature</ui5-label
+			>
+			<ui5-file-uploader
+				hideInput
+				(change)="onFileChange($event)">
+				<ui5-button icon="upload" i18n>Upload</ui5-button>
+			</ui5-file-uploader>
+		</div>
+		<div class="flex flex-wrap gap-[10px]">
+			@if (isFetchingSignatures) {
+				<ui5-busy-indicator
+					[active]="isFetchingSignatures"
+					size="L"
+					class="w-full">
+					<div class="w-full h-[200px]"></div>
+				</ui5-busy-indicator>
+			} @else {
+				<ui5-upload-collection
+					class="w-full"
+					(ui5ItemDelete)="deleteFile($event)">
+					<div>
+						@for (file of uploadedFiles; track $index) {
+							<div class="w-[500px] p-[5px] inline-block">
+								<ui5-upload-collection-item
+									[id]="$index"
+									[fileName]="file.file_name ?? file.name"
+									[fileNameClickable]="file.original_url"
+									[uploadState]="file.file_name ? 'Complete' : 'Uploading'"
+									[progress]="50"
+									[hideTerminateButton]="true"
+									(ui5FileNameClick)="fileShow(file)">
+									{{fileSizeText}}: {{ (file.size / 1024).toFixed(2) }} KB
+
+									@if (checkFileType(file.mime_type, "image")) {
+										<img
+											[src]="file.original_url ?? ''"
+											slot="thumbnail" />
+									} @else if (checkFileType(file.type, "image")) {
+										<ui5-icon
+											name="picture"
+											slot="thumbnail"></ui5-icon>
+									} @else if (checkFileType(file.type ?? file.mime_type, "pdf")) {
+										<ui5-icon
+											name="pdf-attachment"
+											slot="thumbnail"></ui5-icon>
+									} @else if (
+										checkFileType(file.type ?? file.mime_type, "excel")
+									) {
+										<ui5-icon
+											name="excel-attachment"
+											slot="thumbnail"></ui5-icon>
+									} @else if (
+										checkFileType(file.type ?? file.mime_type, "powerpoint")
+									) {
+										<ui5-icon
+											name="ppt-attachment"
+											slot="thumbnail"></ui5-icon>
+									}
+								</ui5-upload-collection-item>
+							</div>
+						}
+					</div>
+				</ui5-upload-collection>
+			}
+		</div>
+	</div>
+</ui5-busy-indicator>

@@ -1,0 +1,23 @@
+.machine-dialog-body {
+    width: 35rem !important;
+    height: 37rem !important;
+    padding: 0;
+    overflow: hidden auto;
+}
+
+.machine-dialog-body::-webkit-scrollbar {
+    width: 6px;
+    border-radius: var(--list-border-radius);
+    background: transparent;
+    box-shadow: inset 0 0 4px transparent;
+}
+
+.machine-dialog-body::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-color);
+    border-radius: var(--list-border-radius)
+}
+
+.item-details-section,
+.item-attachment-section {
+    width: 100%;
+}

@@ -1,0 +1,35 @@
+<div [formGroup]="form" *ngIf="data != undefined">
+    <kendo-gridlayout [gap]="{ cols: 10 }"
+        [cols]="[{width: 200 },{width: 'auto' },{width: 140 },{width: 182 },{width: 150 }]">
+        <kendo-gridlayout-item class="label-format" [row]="index" [col]="1">
+            <label [textContent]="data.name"></label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="2">
+            <kendo-label class="" i18n-text text="Supplier" i18n>
+                <kendo-combobox #supplier formControlName="supplier" [(ngModel)]="data.supplier" [data]="suppliers"
+                    textField="name" valueField="id" [filterable]="true"
+                    (filterChange)="handleFilter($event)" [disabled]="isFieldDisabled"></kendo-combobox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="3">
+            <kendo-label style="justify-content: flex-end;" class="k-form" text="KG">
+                <kendo-numerictextbox #quantity [(ngModel)]="data.quantity" class="number-right-align"
+                    formControlName="quantity" style="width:70px;" format="n" [spinners]="false" [disabled]="isFieldDisabled">
+                </kendo-numerictextbox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="4">
+            <kendo-label style="justify-content: space-between;" class="k-form" i18n i18n-text text="Costo al KG">
+                <kendo-numerictextbox #price [(ngModel)]="data.price" class="number-right-align" formControlName="price"
+                    format="c2" style="width:90px;" [spinners]="false" [disabled]="isFieldDisabled">
+                </kendo-numerictextbox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+
+        <kendo-gridlayout-item [row]="index" [col]="5" style="text-align: right;">
+            <kendo-numerictextbox #total formControlName="total" class="number-right-align" tabindex="-1"
+                [spinners]="false" style="width:150px;" placeholder="{{intl.formatNumber(data.getTotal(), 'c', 'it')}}"
+                [readonly]="true"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>

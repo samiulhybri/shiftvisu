@@ -1,0 +1,24 @@
+<app-grid-table
+	[headerTitle]="gridTitle"
+	[data]="gridData"
+	[customData]="true"
+	[columns]="columns"
+	[showDownload]="false"
+	[showActiveButton]="false"
+	button1Text="All"
+	button2Text="Inactive"
+	button3Text="Active"
+	i18n-addButtonText
+	i18n-button1Text
+	i18n-button2Text
+	i18n-button3Text
+	[showNewButton]="false"
+	[isBaseVisu]="false"
+	[showSearch]="true"
+	[enableServerSideFiltering]="false"
+	[showAction]="false"
+	selectionMode="Multiple"
+	[showSearch]="false"
+	(rowClick)="onActionGridRowSelect($event)"
+	#gridTable>
+</app-grid-table>

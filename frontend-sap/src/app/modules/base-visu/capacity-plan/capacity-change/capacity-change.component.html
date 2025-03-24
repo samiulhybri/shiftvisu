@@ -1,0 +1,263 @@
+<app-dialog
+	[isDialogOpen]="isCapacityChangeDialogOpen"
+	id="shiftChange"
+	(onBeforeClose)="handleChangeShiftClose()">
+	<ui5-bar
+		slot="header"
+		class="w-full">
+		<ui5-title
+			class="h-10 flex items-center ml-[-26px] text-base"
+			slot="startContent">
+			{{ selectedDate }}
+		</ui5-title>
+		<ui5-title
+			class="h-10 flex items-center mr-[-20px] text-blue-600 text-sm"
+			slot="endContent">
+			{{ hoursLeftTitle }} {{ getTotalHours() }}
+		</ui5-title>
+	</ui5-bar>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		class="w-100"
+		size="L">
+		<ui5-card class="w-[80vw] 2xl:h-[616px] xl:h-[616px] lg:h-[350px] md:h-[320px] ml-[-16px] mr-[-16px]">
+			<div class="2xl:h-[616px] xl:h-[616px] lg:h-[350px]">
+				<app-grid-table
+					headerTitle="Shifts"
+					[data]="selectedCapacities"
+					i18n-headerTitle
+					[columns]="columns"
+					[showAction]="model === 'user'"
+					[showSearch]="true"
+					[showDeleteButtonInHeader]="true"
+					[editPermission]="editPermission"
+					[showDownload]="false"
+					[showActiveButton]="false"
+					addButtonText="Add Shift"
+					i18n-addButtonText
+					i18n-deleteButtonText
+					[showDeleteButton]="true"
+					[customData]="true"
+					deleteButtonText="Delete"
+					[showDeleteButton]="true"
+					[showNewButton]="true"
+					[model]="shift"
+					(rowClick)="onRowSectionChange($event)"
+					(deleteButtonClick)="deleteMultipleShift()"
+					(newButtonClick)="newButtonClick()"
+					(deleteClick)="deleteClick($event)"
+					(editClick)="editClick($event)"
+					#childComponentRef>
+				</app-grid-table>
+			</div>
+		</ui5-card>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-32px]">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			[disabled]="totalHours > 24 || isLoading"
+			(click)="saveShiftsToCapacity()">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="handleChangeShiftClose()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<app-dialog
+	[isDialogOpen]="isAddShiftDialogOpen"
+	id="shiftChange"
+	(onBeforeClose)="handleAddShiftClose()">
+	<ui5-bar
+		slot="header"
+		class="w-full">
+		<ui5-title
+			class="h-10 flex items-center ml-[-26px] text-base"
+			i18n
+			slot="startContent">Add Shift</ui5-title
+		>
+	</ui5-bar>
+	<ui5-card class="w-[80vw] 2xl:h-[616px] xl:h-[616px] lg:h-[350px] ml-[-16px] mr-[-16px]" *ngIf="isAddShiftDialogOpen">
+		<div class="2xl:h-[616px] xl:h-[616px] lg:h-[350px] md:h-[320px]">
+			<app-grid-table
+				headerTitle="Shift Lists"
+				i18n-headerTitle
+				[columns]="shiftsColumns"
+				[showAction]="false"
+				[showSearch]="true"
+				[showDownload]="false"
+				[showActiveButton]="false"
+				i18n-addButtonText
+				[editPermission]="authService.isPermissionValid('BASEVISU_CAPACITIES_EDIT')"
+				i18n-deleteButtonText
+				[showDeleteButton]="true"
+				deleteButtonText="Delete"
+				additionalFilterQuery="&$filter=is_active eq true"
+				[data]="allShifts"
+				[customData]="true"
+				[showNewButton]="false"
+				(rowClick)="onRowSectionChangeForAddShift($event)"
+				#childComponentForAllShiftsRef>
+			</app-grid-table>
+		</div>
+	</ui5-card>
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-32px]">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			(click)="onSaveShifts()">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="handleAddShiftClose()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	id="overlappedDialog"
+	#overlappedDialog
+	header-text="Warning"
+	state="Negative">
+	<p>{{ localization.shiftsTimeOverlapped }}</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			(click)="closeDialogOverlapped()"
+			id="closeOverlapButton"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<app-dialog [isDialogOpen]="isShiftChangeDialogOpen">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="pl-0">
+			<ui5-title
+				class="h-10 flex items-center"
+				level="H5"
+				>{{ localization.edit }}</ui5-title
+			>
+		</div>
+	</div>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		class="w-100"
+		size="L">
+		<div class="w-[550px]" *ngIf="isShiftChangeDialogOpen">
+			<form
+				(ngSubmit)="onSubmit(createOrUpdateForm)"
+				#createOrUpdateForm="ngForm">
+				<div class="grid grid-flow-col grid-cols-2 gap-x-[10px] mt-[10px]">
+					<div class="grid grid-flow-row">
+						<ui5-label
+							show-colon
+							i18n
+							required
+							>Start Time</ui5-label
+						>
+						<ui5-time-picker
+							id="start_time"
+							#startTimeInput="ngModel"
+							name="start_time"
+							[valueState]="startTimeTimePickerState"
+							format-pattern="HH:mm"
+							(change)="startTimeChange()"
+							[(ngModel)]="selectedShift.start_time">
+							<div
+								slot="valueStateMessage"
+								i18n
+								>Start Time can't be empty!</div
+							>
+						</ui5-time-picker>
+					</div>
+					<div class="grid grid-flow-row">
+						<ui5-label
+							show-colon
+							i18n
+							required
+							>End Time</ui5-label
+						>
+						<ui5-time-picker
+							format-pattern="HH:mm"
+							id="end_time"
+							#endTimeInput="ngModel"
+							[valueState]="endTimeTimePickerState"
+							name="end_time"
+							(change)="endTimeChange()"
+							[valueState]="selectedShift.valueStateForHours"
+							[(ngModel)]="selectedShift.end_time">
+							<div
+								slot="valueStateMessage"
+								i18n
+								>End Time can't be empty!</div
+							>
+						</ui5-time-picker>
+					</div>
+				</div>
+				<div class="grid grid-flow-col grid-cols-2 gap-x-[10px] mt-[10px]">
+					<div class="grid grid-flow-row col-span-1">
+						<ui5-label
+							show-colon
+							i18n
+							>Total Hours</ui5-label
+						>
+						<ui5-input
+							[readonly]="true"
+							[value]="selectedShift.calculateHours()"
+							class="w-full"></ui5-input>
+					</div>
+					<div class="grid grid-flow-row col-span-1">
+						<ui5-label
+							show-colon
+							i18n
+							>Break Minutes</ui5-label
+						>
+						<ui5-step-input
+							name="break_minutes"
+							id="break_minutes"
+							ngDefaultControl
+							(change)="changeBreakMinutes($event)"
+							[(ngModel)]="selectedShift.break_minutes"
+							[min]="0">
+						</ui5-step-input>
+					</div>
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			(click)="onSubmitShift()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="closeSubmitDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>

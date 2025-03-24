@@ -1,0 +1,192 @@
+<div
+	id="machine-card"
+	class="card xl:w-[406px] lg:w-[395px] md:w-[385px] sm:w-[365px]"
+	[ngStyle]="selectedCardView == cardView.Standard ? {} : { height: '57px' }">
+	<div
+		[ngClass]="
+			cardType == card.PRODUCTION && selectedCardView == cardView.Standard
+				? 'green card-header half-radius'
+				: cardType == card.PRODUCTION && selectedCardView == cardView.Compact
+				? 'green-compact card-header full-radius'
+				: cardType == card.STANDSTILL && selectedCardView == cardView.Standard
+				? 'red card-header half-radius'
+				: cardType == card.STANDSTILL && selectedCardView == cardView.Compact
+				? 'red-compact card-header full-radius'
+				: cardType == card.SETUP && selectedCardView == cardView.Standard
+				? 'yellow card-header half-radius'
+				: cardType == card.SETUP && selectedCardView == cardView.Compact
+				? 'yellow-compact card-header full-radius'
+				: cardType == card.OFF && selectedCardView == cardView.Standard
+				? 'off card-header half-radius'
+				: cardType == card.OFF && selectedCardView == cardView.Compact
+				? 'off-compact card-header full-radius'
+
+				: cardType == prodOrderPosOperationStatus.IN_PRODUCTION && selectedCardView == cardView.Standard
+				? 'green card-header half-radius'
+				: cardType == prodOrderPosOperationStatus.IN_PRODUCTION && selectedCardView == cardView.Compact
+				? 'green-compact card-header full-radius'
+
+				: cardType == prodOrderPosOperationStatus.IN_SETUP && selectedCardView == cardView.Standard
+				? 'yellow card-header half-radius'
+				: cardType == prodOrderPosOperationStatus.IN_SETUP && selectedCardView == cardView.Compact
+				? 'yellow-compact card-header full-radius'
+
+				: selectedCardView == cardView.Standard
+				? 'red card-header half-radius'
+				: 'red-compact card-header full-radius'
+		">
+		<div class="div-row icon-layout">
+			<div class="div-row">
+				<ui5-icon
+					[name]="
+						cardType == card.PRODUCTION || cardType == prodOrderPosOperationStatus.IN_PRODUCTION
+							? 'media-play'
+							: cardType == card.STANDSTILL
+							? 'media-pause'
+							: cardType == card.SETUP || cardType == prodOrderPosOperationStatus.IN_SETUP
+							? 'wrench'
+							: cardType == card.OFF
+							? 'decline'
+							: cardType == card.READY
+							? 'accept'
+							: 'media-pause'
+					"
+					class="card-icon"
+					[ngClass]="{
+						'card-icon-media-play': cardType == card.PRODUCTION || cardType == prodOrderPosOperationStatus.IN_PRODUCTION,
+						'card-icon-media-pause': cardType == card.STANDSTILL,
+						'card-icon-ready-pause ': cardType == card.READY,
+						'card-icon-wrench': cardType == card.SETUP || cardType == prodOrderPosOperationStatus.IN_SETUP,
+						'card-icon-off': cardType != card.PRODUCTION && cardType != card.STANDSTILL && cardType != card.SETUP && cardType != card.READY && cardType != prodOrderPosOperationStatus.IN_PRODUCTION && cardType != prodOrderPosOperationStatus.IN_SETUP
+					}"
+					[ngStyle]="
+						cardType
+							? cardType == card.OFF 
+								? { color: 'var(--sapTextColor)' }
+								: { color: 'var(--sapBaseColor)' }
+							: { color: 'var(--sapTextColor)' }
+					"></ui5-icon>
+				<div class="flex-column card-header-label-layout">
+					<ui5-text
+						class="title-text"
+						[ngStyle]="
+							cardType 
+								? cardType == card.OFF
+									? { color: 'var(--sapTextColor)' }
+									: { color: 'var(--sapBaseColor)' }
+								: { color: 'var(--sapTextColor)' }
+						"
+						>{{ machine?.name|slice:0:17 }}{{machine?.name!.length>17?'...':''}}</ui5-text
+					>
+					<ui5-text
+						class="subtitle"
+						[ngStyle]="
+							cardType
+								? cardType == card.OFF
+									? { color: 'var(--sapTextColor)' }
+									: { color: 'var(--sapBaseColor)' }
+								: { color: 'var(--sapTextColor)' }
+						"
+						>{{ machine?.custom_id }}</ui5-text
+					>
+				</div>
+			</div>
+			<div
+				class="percentage-layout"
+				[ngStyle]="
+					cardType
+						? cardType == card.OFF
+							? { border: '2px solid var(--sapTextColor)' }
+							: { border: '2px solid var(--sapBaseColor)' }
+						: { border: '2px solid var(--sapTextColor)' }
+				">
+				<ui5-text
+					class="percentage-text"
+					[ngStyle]="
+						cardType
+							? cardType == card.OFF
+								? { color: 'var(--sapTextColor)' }
+								: { color: 'var(--sapBaseColor)' }
+							: { color: 'var(--sapTextColor)' }
+					"
+					>{{(machine?.oee || 0) * 100 |number:"1.0-0"}}%</ui5-text
+				>
+			</div>
+		</div>
+	</div>
+
+	<div
+		class="card-footer xl:justify-center xl:h-[144px] lg:h-[100px]"
+		*ngIf="selectedCardView == cardView.Standard"
+		[ngStyle]="
+			cardType == card.PRODUCTION || cardType == prodOrderPosOperationStatus.IN_PRODUCTION
+				? { border: '1px solid var(--production-color)' }
+				: cardType == card.STANDSTILL
+				? { border: '1px solid var(--statnstill-color)' }
+				: cardType == card.SETUP || cardType == prodOrderPosOperationStatus.IN_SETUP
+				? { border: '1px solid #E76500' }
+				: { border: '1px solid var(--sapTextColor)' }
+		"
+		[ngClass]="{
+			'footer-green-hover': cardType == card.PRODUCTION || cardType == prodOrderPosOperationStatus.IN_PRODUCTION,
+			'footer-red-hover': cardType == card.STANDSTILL,
+			'footer-reddish-hover': cardType == card.READY,
+			'footer-yellow-hover': cardType == card.SETUP || cardType == prodOrderPosOperationStatus.IN_SETUP,
+			'footer-off-hover':
+				cardType != card.PRODUCTION && cardType != card.STANDSTILL && cardType != card.SETUP && cardType != prodOrderPosOperationStatus.IN_PRODUCTION && cardType != prodOrderPosOperationStatus.IN_SETUP && cardType != card.READY
+		}">
+		<div class="div-row justify-content-align-items">
+			<div class="div-row justify-align-center">
+				<div class="item-layout">
+					<ui5-label
+						i18n
+						show-colon
+						class="mr-4"
+						>Cycle Time</ui5-label
+					>
+				</div>
+				<ui5-text class="bold-text" i18n>No Data</ui5-text>
+			</div>
+			<div
+				class="div-row justify-align-center gap-0.5"
+				style="height: 100%">
+				<ui5-icon name="fob-watch"></ui5-icon>
+				<ui5-text class="bold-text" i18n>No Data</ui5-text>
+			</div>
+		</div>
+		<div class="card-divider-layout"></div>
+		<div class="div-row justify-content-align-items">
+			<div class="div-row justify-align-center">
+				<div class="item-layout">
+					<ui5-label
+						i18n
+						show-colon
+						class="mr-4"
+						>Standard Time</ui5-label
+					>
+				</div>
+				<ui5-text class="bold-text"
+					>{{ machine?.current_operation?.getFormattedTe() }}
+				</ui5-text>
+			</div>
+		</div>
+		<div class="card-divider-layout"></div>
+		<div class="div-row justify-content-align-items overflow-hidden">
+			<div class="div-row justify-align-center">
+				<div class="item-layout">
+					<ui5-label
+						i18n
+						show-colon
+						class="mr-4"
+						>Item</ui5-label
+					>
+				</div>
+				<ui5-text class="bold-text truncate"
+				    title="{{ machine?.current_operation?.prodOrderPos?.item?.name || '' }}"
+					>{{ getItemDisplayText() | truncate: 20 }}
+					</ui5-text
+				>
+			</div>
+		</div>
+	</div>
+</div>

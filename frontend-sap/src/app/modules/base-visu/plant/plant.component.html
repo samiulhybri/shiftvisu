@@ -1,0 +1,514 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Plants"
+		url="/Plants"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_PLANTS_EDIT')"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		[showSearch]="true"
+		expandQuery="$expand=itemPackagingRework,itemPackagingScrap,storageLocationRework,storageLocationScrap,prodOrderPosOperationIndirect($expand=prodOrderPos($expand=prodOrder))"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+
+	<ui5-dialog
+		id="deleteDialogPlant"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+
+	<ui5-dialog
+		#deleteErrorDialogPlant
+		id="deleteErrorDialogPlant"
+		state="Negative"
+		header-text="Error">
+		<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+		<div
+			slot="footer"
+			class="deleteErrorDialogFooter">
+			<ui5-button
+				class="dialogCloser"
+				design="Transparent"
+				(click)="closeDeleteErrorDialog()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+<app-dialog
+	id="plantDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div>
+			<ui5-title
+				class="pd-10 ml-[-10px]"
+				level="H5"
+				>{{ dialogTitle }}
+			</ui5-title>
+		</div>
+	</div>
+	<form
+		(ngSubmit)="onSubmit(create0rUpdateForm)"
+		#create0rUpdateForm="ngForm"
+		class="w-[620px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			class="w-full"
+			size="L">
+			<div class="w-full">
+				<div class="flex flex-row gap-[5rem] w-full">
+					<div class="flex flex-col">
+						<ui5-label show-colon>{{ localization.active }}</ui5-label>
+						<ui5-switch
+							id="activeSwitch"
+							name="is_active"
+							[checked]="selectedPlant.is_active"
+							[(ngModel)]="selectedPlant.is_active">
+						</ui5-switch>
+					</div>
+					<div class="flex flex-col">
+						<ui5-label
+							show-colon
+							i18n
+							>Shift for ClockIn Required</ui5-label
+						>
+						<ui5-switch
+							id="activeSwitch"
+							name="is_shift_for_clockin_required"
+							[checked]="selectedPlant.is_shift_for_clockin_required"
+							[(ngModel)]="selectedPlant.is_shift_for_clockin_required">
+						</ui5-switch>
+					</div>
+					<div class="flex flex-col">
+						<ui5-label
+							show-colon
+							i18n
+							>Auto Post Goods Receipt Scrap</ui5-label
+						>
+						<ui5-switch
+							id="activeSwitch"
+							name="auto_post_goods_receipt_scrap"
+							[checked]="selectedPlant.auto_post_goods_receipt_scrap"
+							[(ngModel)]="selectedPlant.auto_post_goods_receipt_scrap">
+						</ui5-switch>
+					</div>
+				</div>
+				<div class="grid grid-cols-2 w-full gap-2 mt-3">
+					<div class="grid h-full w-full">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								#customId="ngModel"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || create0rUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								[(ngModel)]="selectedPlant.custom_id"
+								(input)="onChangeCustomId()"
+								class="w-full"
+								id="customIdInput"
+								name="custom_id"
+								[required]="true">
+								<div slot="valueStateMessage">
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+
+					<div class="grid h-full">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.name }}</ui5-label
+						>
+						<ui5-input
+							id="plantNameInput"
+							class="w-full"
+							#nameInput="ngModel"
+							[required]="true"
+							[(ngModel)]="selectedPlant.name"
+							(change)="onChangeName($event)"
+							[valueState]="
+								nameInput.valid == false &&
+								(nameInput.touched || create0rUpdateForm.submitted)
+									? 'Negative'
+									: 'None'
+							"
+							name="name"></ui5-input>
+					</div>
+					<div class="grid h-full">
+						<ui5-label
+							show-colon
+							i18n
+							>Item Packaging Rework</ui5-label
+						>
+						<ui5-combobox
+							#itemCombobox
+							id="itemCombobox"
+							[value]="selectedPlant.itemPackagingRework?.name || ''"
+							filter="None"
+							(change)="
+								inputInvalidEntryRestrict(
+									$event,
+									selectedPlant.itemPackagingRework?.name
+								)
+							"
+							(selection-change)="onChangeItem($event)"
+							(focus)="onItemInputChange($event)"
+							name="itemCombobox"
+							[loading]="itemComboboxLoading"
+							(input)="onItemInputChange($event)"
+							class="w-full">
+							>
+							<ng-container *ngFor="let item of items">
+								<ui5-cb-item
+									*ngIf="item.is_active"
+									id="{{ item.id }}"
+									[additionalText]="item.custom_id"
+									text="{{ item.name }}">
+								</ui5-cb-item
+							></ng-container>
+						</ui5-combobox>
+					</div>
+					<div class="grid h-full">
+						<ui5-label
+							show-colon
+							i18n
+							>Item Packaging Scrap</ui5-label
+						>
+						<ui5-combobox
+							#itemCombobox
+							id="itemCombobox"
+							[value]="selectedPlant.itemPackagingScrap?.name || ''"
+							filter="None"
+							(change)="
+								inputInvalidEntryRestrict(
+									$event,
+									selectedPlant.itemPackagingScrap?.name
+								)
+							"
+							(selection-change)="onChangeItem($event, true)"
+							(focus)="onItemInputChange($event, true)"
+							name="itemCombobox"
+							[loading]="itemComboboxLoading"
+							(input)="onItemInputChange($event, true)"
+							class="w-full">
+							>
+							<ng-container *ngFor="let item of items">
+								<ui5-cb-item
+									*ngIf="item.is_active"
+									id="{{ item.id }}"
+									[additionalText]="item.custom_id"
+									text="{{ item.name }}">
+								</ui5-cb-item
+							></ng-container>
+						</ui5-combobox>
+					</div>
+					<div class="grid h-full">
+						<ui5-label
+							show-colon
+							i18n
+							>Storage Location Rework</ui5-label
+						>
+						<ui5-combobox
+							#hallComboBox
+							id="hallComboBox"
+							class="w-100"
+							[value]="selectedPlant.storageLocationRework.name || ''"
+							(change)="
+								inputInvalidEntryRestrict(
+									$event,
+									selectedPlant.storageLocationRework.name
+								)
+							"
+							(selection-change)="onChangeStorageLocationRework($event)"
+							(input)="onStorageLocationReworkInputChange($event)">
+							<ng-container *ngFor="let storageLocation of storageLocations">
+								<ui5-cb-item
+									*ngIf="storageLocation.is_active"
+									id="{{ storageLocation.id }}"
+									[additionalText]="storageLocation.custom_id"
+									text="{{ storageLocation.name }}">
+								</ui5-cb-item>
+							</ng-container>
+						</ui5-combobox>
+					</div>
+					<div class="grid h-full">
+						<ui5-label
+							show-colon
+							i18n
+							>Storage Location Scrap</ui5-label
+						>
+						<ui5-combobox
+							#hallComboBox
+							id="hallComboBox"
+							class="w-100"
+							[value]="selectedPlant.storageLocationScrap.name || ''"
+							(change)="
+								inputInvalidEntryRestrict(
+									$event,
+									selectedPlant.storageLocationScrap.name
+								)
+							"
+							(selection-change)="onChangeStorageLocationScrap($event)"
+							(input)="onStorageLocationScrapInputChange($event)">
+							<ng-container *ngFor="let storageLocation of storageLocations">
+								<ui5-cb-item
+									*ngIf="storageLocation.is_active"
+									id="{{ storageLocation.id }}"
+									[additionalText]="storageLocation.custom_id"
+									text="{{ storageLocation.name }}">
+								</ui5-cb-item>
+							</ng-container>
+						</ui5-combobox>
+					</div>
+
+					<div class="grid h-full">
+						<ui5-label
+							show-colon
+							required
+							i18n
+							>Block QualiVisu for Inspection Point after</ui5-label
+						>
+						<ui5-input
+							id="qualivisuBlockThresholdInput"
+							class="w-full"
+							#qualivisuBlockThresholdInput="ngModel"
+							[required]="true"
+							pattern="^[0-9]*$"
+							[(ngModel)]="selectedPlant.qualivisu_block_threshold"
+							[valueState]="
+								qualivisuBlockThresholdInput.valid == false &&
+								(qualivisuBlockThresholdInput.touched ||
+									create0rUpdateForm.submitted)
+									? 'Negative'
+									: 'None'
+							"
+							name="qualivisu_block_threshold"></ui5-input>
+					</div>
+
+					<div class="grid h-full">
+						<ui5-label
+							show-colon
+							required
+							i18n
+							>QualiVisu Shift Check offset</ui5-label
+						>
+						<ui5-input
+							id="qualivisuShiftCheckOffsetInput"
+							class="w-full"
+							#qualivisuShiftCheckOffsetInput="ngModel"
+							[required]="true"
+							pattern="^[0-9]*$"
+							[(ngModel)]="selectedPlant.qualivisu_shift_check_offset"
+							[valueState]="
+								qualivisuShiftCheckOffsetInput.valid == false &&
+								(qualivisuShiftCheckOffsetInput.touched ||
+									create0rUpdateForm.submitted)
+									? 'Negative'
+									: 'None'
+							"
+							name="qualivisu_shift_check_offset"></ui5-input>
+					</div>
+
+					<div class="grid h-full">
+						<ui5-label
+							showColon
+							i18n
+							>Operation For Indirect Times</ui5-label
+						>
+						<ui5-input
+							slot="endContent"
+							class="w-full cursor-pointer"
+							[value]="selectedPlant.prodOrderPosOperationIndirect.name || ''"
+							placeholder="Select Order"
+							i18n-placeholder>
+							<ui5-icon
+								id="valueHelpIcon"
+								slot="icon"
+								name="value-help"
+								(click)="openDropdown()"></ui5-icon>
+						</ui5-input>
+						<ui5-popover
+							id="OrderListPopover"
+							opener="valueHelpIcon"
+							class="w-[500px]"
+							placement="Bottom"
+							[open]="isValueHelpDialog"
+							(before-close)="closeDropdown()">
+							<div class="flex flex-column w-full gap-2">
+								<div class="flex-column">
+									<ui5-label
+										show-colon
+										i18n
+										class="pr-2"
+										>Production Order</ui5-label
+									>
+									<ui5-busy-indicator size="S">
+										<ui5-combobox
+											#prodOrderCombobox
+											id="itemCombobox"
+											[value]="selectedProdOrder.custom_id || ''"
+											filter="None"
+											(selection-change)="onChangeProdOrder($event)"
+											(change)="onAfterChangeProdOrder($event)"
+											(focus)="onProdOrderInputChange($event)"
+											name="itemCombobox"
+											[loading]="prodOrderComboboxLoading"
+											(input)="onProdOrderInputChange($event)"
+											class="w-full">
+											>
+											<ng-container *ngFor="let item of prodOrders">
+												<ui5-cb-item
+													id="{{ item.id }}"
+													text="{{ item.custom_id }}">
+												</ui5-cb-item
+											></ng-container>
+										</ui5-combobox>
+									</ui5-busy-indicator>
+								</div>
+
+								<div class="flex-column">
+									<ui5-busy-indicator
+										[active]="isLoadingOperation"
+										size="S">
+										<ui5-label
+											showColon
+											i18n
+											>Operations</ui5-label
+										>
+										<ui5-combobox
+											#hallComboBox
+											id="hallComboBox"
+											class="w-full"
+											[value]="selectedOperation.name || ''"
+											[disabled]="!operations.length"
+											(selection-change)="onChangeOperation($event)"
+											(input)="onOperationInputChange($event)">
+											<ng-container *ngFor="let operation of operations">
+												<ui5-cb-item
+													id="{{ operation.id }}"
+													[additionalText]="operation.pos"
+													text="{{ operation.name }}">
+												</ui5-cb-item>
+											</ng-container>
+										</ui5-combobox>
+									</ui5-busy-indicator>
+								</div>
+							</div>
+
+							<div
+								slot="footer"
+								class="dialog-footer my-2">
+								<ui5-button
+									design="Emphasized"
+									(click)="onSaveOperation()"
+									[disabled]="disableButtonDuringRequest"
+									>{{ localization.save }}</ui5-button
+								>
+								<ui5-button
+									class="ml-8"
+									design="Transparent"
+									(click)="isValueHelpDialog = false"
+									>{{ localization.close }}</ui5-button
+								>
+							</div>
+						</ui5-popover>
+					</div>
+				</div>
+			</div>
+		</ui5-busy-indicator>
+	</form>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogPlants
+	id="errorDialogPlants"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

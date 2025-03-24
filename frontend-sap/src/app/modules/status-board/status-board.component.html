@@ -1,0 +1,89 @@
+<div
+	class="flex-column">
+	<app-header-nav
+		title='Statusboard'
+		[isHomePage]="true"
+		[showDateTime]="true"
+		[date]="date"
+		[showPlantSelector]="true"
+		(logOutDialogEvent)="logoutDialogOpen()">
+	</app-header-nav>
+
+	<div
+		class="div-row h-[calc(100vh-70px)]"
+		style="width: auto; margin: 12px">
+		<app-legend
+			[settings]="settings"
+			[totalInProduction]="totalInProduction"
+			[totalInStandStill]="totalInStandStill"
+			[totalInSetup]="totalInSetup"
+			[totalInOFF]="totalInOFF"
+			[totalInReady]="totalInReady"></app-legend>
+		<div
+			class="flex-column"
+			style="width: 100%; margin-left: 12px; height: 100%">
+			<app-machine-status
+				[machines]="machines"
+				[machineGroups]="machineGroups"
+				[halls]="halls"
+				[selectedCardView]="selectedCardView"
+				(selectedCardChange)="selectedCardChange($event)">
+			</app-machine-status>
+			<div
+				*ngIf="authService.isPermissionValid(machineBoardViewPermission)"
+				class="grid-list">
+				@for (machine of filteredMachines; track machine.id; let i = $index) {
+					<a
+						[routerLink]="'/machine-board/' + machine.id"
+						style="text-decoration: none">
+						<app-machine-card
+							[id]="machine.custom_id"
+							[cardType]="machine.status!"
+							[selectedCardView]="selectedCardView"
+							[machine]="machine"
+							[index]="i">
+							<ui5-busy-indicator [active]="!isBusy"></ui5-busy-indicator>
+						</app-machine-card>
+					</a>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+<ui5-busy-indicator
+	size="L"
+	[active]="isBusy"
+	style="z-index: 2; position: absolute; top: 50%; left: 50%"></ui5-busy-indicator>
+
+<ui5-dialog
+	id="logoutDialog"
+	header-text="Confirm"
+	[open]="isLogOutDialogOpen"
+	state="Critical"
+	(beforeClose)="closeDialog()">
+	<div class="logout-content">
+		<ui5-text i18n> Do you want to logout?</ui5-text>
+		<ui5-busy-indicator
+			size="M"
+			[active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		class="logout-footer"
+		slot="footer">
+		<ui5-button
+			id="confirmButton"
+			design="Emphasized"
+			class="mr5"
+			i18n
+			(click)="logOut()"
+			>Confirm
+		</ui5-button>
+		<ui5-button
+			id="cancelButton"
+			(click)="closeDialog()"
+			i18n
+			>Cancel
+		</ui5-button>
+	</div>
+</ui5-dialog>

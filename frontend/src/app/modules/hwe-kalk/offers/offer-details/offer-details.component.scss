@@ -1,0 +1,112 @@
+.card-style {
+	width: 100% !important;
+	border: none;
+	box-shadow: none;
+	position: relative;
+}
+
+.k-tabstrip-items {
+	height: 48px;
+}
+
+.min-width-col{
+	min-width: 150px;
+}
+
+.offer-pos {
+	tr {
+		height: 36px;
+		border: 0px, 0px, 0px, 1px;
+		padding: 3px, 12px, 3px, 12px;
+
+	}
+
+	th,
+	td {
+		padding: 6px 6px 6px 6px;
+		border-right: rbg(18, 29, 44, 0.08)
+	}
+
+	tr td:last-child {
+		width: 122px;
+		text-align: center;
+
+		button {
+			margin: 1px;
+		}
+
+		border: none;
+	}
+
+	&+.k-text-error {
+		padding: 0 12px;
+	}
+
+	thead,
+	tr:nth-child(even) {
+		background: #f5f5f5;
+	}
+
+	&.sticky-last-column {
+
+		th:last-child,
+		td:last-child {
+			position: sticky;
+			right: 0;
+			z-index: 1;
+		}
+
+		th:last-child,
+		tr:nth-child(even) td:last-child {
+			background: #f5f5f5 !important;
+		}
+
+		tr:nth-child(odd) td:last-child {
+			background: #fff !important;
+		}
+
+		thead th:last-child {
+			z-index: 2;
+		}
+	}
+}
+
+.right-tab {
+	min-height: calc(100vh - 361px);
+	overflow: hidden;
+
+	.card-body {
+		height: calc(100vh - 463px);
+		overflow: auto;
+	}
+
+	.text-area {
+		bottom: 3px;
+		width: 100%;
+
+		.label {
+			font-weight: 600;
+		}
+	}
+}
+
+
+.offer-details-body {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.copy-page {
+	height: 82vh;
+	overflow: auto;
+}
+
+.crm-button{
+	margin-left: auto;
+	width: 30px;
+}
+
+.final-dimension-col{
+	min-width: 200px;
+}

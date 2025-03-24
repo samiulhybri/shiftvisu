@@ -1,0 +1,235 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Countries"
+		url="/Countries"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showSearch]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		[editPermission]="authService.isPermissionValid('BASEVISU_COUNTRIES_EDIT')"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+
+	<ui5-dialog
+		id="deleteDialog"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+
+<app-dialog
+	id="countriesDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="handleClose()"
+	[title]="dialogTitle">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L"
+		*ngIf="selectedRowValue">
+		<div class="w-[27rem] form p-[10px]">
+			<form
+				(ngSubmit)="onSubmit(create0rUpdateForm)"
+				#create0rUpdateForm="ngForm">
+				<div class="flex flex-space-between mb-10">
+					<div class="flex-col-item">
+						<ui5-label show-colon>{{ localization.active }}</ui5-label>
+						<ui5-switch
+							id="activeSwitch"
+							name="is_active"
+							[checked]="selectedRowValue.is_active"
+							[(ngModel)]="selectedRowValue.is_active">
+						</ui5-switch>
+					</div>
+				</div>
+				<div class="flex flex-space-between mb-10">
+					<div class="flex-col-item">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								#customId="ngModel"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || create0rUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								[(ngModel)]="selectedRowValue.custom_id"
+								(input)="onChangeCustomId()"
+								id="customIdInput"
+								name="custom_id"
+								[required]="true">
+								<div
+									slot="valueStateMessage"
+									>
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+					<div class="flex-col-item">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.name }}</ui5-label
+						>
+						<ui5-input
+							id="name"
+							#nameInput="ngModel"
+							[required]="true"
+							[(ngModel)]="selectedRowValue.name"
+							(change)="onChangeName($event)"
+							[valueState]="
+								nameInput.valid == false &&
+								(nameInput.touched || create0rUpdateForm.submitted)
+									? 'Negative'
+									: 'None'
+							"
+							name="name"></ui5-input>
+					</div>
+				</div>
+
+				<div class="flex flex-space-between mb-10">
+					<div class="flex-col-item">
+						<ui5-label
+							i18n
+							show-colon
+							required
+							>HWE Freight Surplus</ui5-label>
+						<ui5-input
+							id="hweFreightSurplusInput"
+							#hwe_freight_surplus="ngModel"
+							[required]="true"
+							pattern="^\d+(\.\d+)?$"
+							[valueState]="
+								hwe_freight_surplus.valid == false && hwe_freight_surplus.touched
+									? 'Negative'
+									: 'None'
+							"
+							[(ngModel)]="selectedRowValue.hwe_freight_surplus"
+							name="hwe_freight_surplus"></ui5-input>
+					</div>
+
+					<div class="flex-col-item">
+						<ui5-label
+							i18n
+							show-colon
+							required
+							>HWE Overhead Surplus</ui5-label>
+						<ui5-input
+							id="hweOverHeadSurplusInput"
+							#hwe_overhead_surplus="ngModel"
+							[required]="true"
+							pattern="^\d+(\.\d+)?$"
+							[valueState]="
+								hwe_overhead_surplus.valid == false && hwe_overhead_surplus.touched
+									? 'Negative'
+									: 'None'
+							"
+							[(ngModel)]="selectedRowValue.hwe_overhead_surplus"
+							name="hwe_overhead_surplus"></ui5-input>
+					</div>
+				</div>
+
+				<div class="flex flex-space-between mb-10">
+					<div class="flex-col-item">
+						<ui5-label
+							i18n
+							show-colon
+							>CRM Id</ui5-label>
+						<ui5-input
+							id="crmIdInput"
+							#crm_id="ngModel"
+							[(ngModel)]="selectedRowValue.crm_id"
+							name="crm_id"></ui5-input>
+					</div>
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			(click)="handleClose()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogCountries
+	id="errorDialogCountries"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+

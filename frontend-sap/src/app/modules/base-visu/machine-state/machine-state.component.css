@@ -1,0 +1,19 @@
+.machine-state-dialog-body {
+	width: 868px;
+	margin: -16px;
+}
+
+ui5-responsive-popover {
+	margin-left: 90px !important;
+	width: 230px;
+	margin-top: -10px !important;
+}
+
+.responsive-dialog-footer {
+	justify-content: end;
+}
+
+#popover::part(header) {
+	display: flex;
+	justify-content: center;
+}

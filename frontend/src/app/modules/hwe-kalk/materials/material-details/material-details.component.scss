@@ -1,0 +1,25 @@
+::ng-deep .chem-analyses tr td:not(:first-child) .k-input-inner {
+	text-align: center;
+}
+
+.chem-analyses table tr th {
+	text-align: center;
+	padding: 8px 12px;
+}
+
+.chem-details-body {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.chem-analyses table tr td:last-child {
+	text-align: center;
+}
+
+.m-r-5 {
+	margin-right: 5px;
+}
+::ng-deep .input-field .k-numerictextbox .k-input-spinner {
+	display: none;
+}

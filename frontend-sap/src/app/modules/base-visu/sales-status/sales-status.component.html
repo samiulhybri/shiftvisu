@@ -1,0 +1,239 @@
+<app-grid-table
+	headerTitle="Sales Status"
+	url="/SalesStatuses"
+	i18n-headerTitle
+	[showRowDataCount]="true"
+	[columns]="column"
+	[showAction]="true"
+	[showSearch]="true"
+	[showDownload]="false"
+	[showActiveButton]="false"
+	button1Text
+	button2Text
+	button3Text
+	addButtonText="New"
+	i18n-addButtonText
+	i18n-button1Text
+	i18n-button2Text
+	i18n-button3Text
+	[editPermission]="authService.isPermissionValid('BASEVISU_SALES_STATUS_EDIT')"
+	[isBaseVisu]="true"
+	(newButtonClick)="newButtonClick()"
+	(deleteClick)="deleteClick($event)"
+	(editClick)="editClick($event)"
+	[showNewButton]="true"
+	selectionMode="Single"
+	#childComponentRef>
+</app-grid-table>
+
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()"
+	[title]="dialogTitle">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L">
+		<div
+			class="form w-[418px] h-full"
+			*ngIf="selectedSalesStatus">
+			<form
+				(ngSubmit)="onSubmit(create0rUpdateForm)"
+				#create0rUpdateForm="ngForm">
+				<div class="flex justify-between">
+					<div class="flex flex-col">
+						<ui5-label
+							show-colon
+							i18n
+							>Show In Kanban</ui5-label
+						>
+						<ui5-switch
+							[(ngModel)]="selectedSalesStatus.show_in_kanban"
+							name="show_in_kanban"
+							id="show_in_kanban"></ui5-switch>
+					</div>
+					<div class="flex flex-col">
+						<ui5-label
+							show-colon
+							i18n
+							>Show In Sales Funnel</ui5-label
+						>
+						<ui5-switch
+							[(ngModel)]="selectedSalesStatus.show_in_sales_funnel"
+							name="show_in_sales_funnel"
+							id="show_in_sales_funnel"></ui5-switch>
+					</div>
+				</div>
+				<div class="w-full">
+					<div class="flex-col gap-[5px] mt-2">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								#customId="ngModel"
+								[(ngModel)]="selectedSalesStatus.custom_id"
+								class="w-full"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || create0rUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								(input)="onChangeCustomId()"
+								id="customIdInput"
+								[required]="true"
+								name="custom_id">
+								<div
+									slot="valueStateMessage"
+									>
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+					<div class="flex-col gap-[5px] mt-2">
+						<ui5-label
+							show-colon
+							i18n
+							>Sort Order</ui5-label
+						>
+						<ui5-input
+							id="sort_order"
+							class="w-full"
+							pattern="^[0-9]*$"
+							type="Number"
+							[(ngModel)]="selectedSalesStatus.sort_order"
+							name="sort_order"></ui5-input>
+					</div>
+					<div class="flex flex-col gap-[10px] mt-2 mb-2">
+						<ui5-label
+							show-colon
+							class="mr-[5px]"
+							i18n
+							>Color</ui5-label
+						>
+					</div>
+					<div class="flex flex-row items-center w-full">
+						<div
+							[style.background-color]="'#' + selectedSalesStatus.color"
+							class="flex flex-row h-[26px] w-[26px] rounded cursor-pointer mr-2"
+							id="colorPalette"
+							(click)="openColorPicker()"></div>
+						<div class="flex flex-row w-full">
+							<ui5-input
+								id="valueHelpInput"
+								#colorInput="ngModel"
+								class="w-full"
+								[readonly]="true"
+								[(ngModel)]="selectedSalesStatus.color"
+								name="color"></ui5-input>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="flex items-center justify-end flex-row w-full">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	id="deleteDialog"
+	header-text="Warning"
+	state="Critical">
+	<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteSubmit()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-responsive-popover
+	opener="colorPalette"
+	id="popover"
+	header-text="Default Color"
+	placement-type="Top"
+	hide-arrow="true"
+	#popover
+	i18n-header-text
+	class="ml-[90px] w-[230px] mt-[-10px]">
+	<div>
+		<ng-container *ngFor="let color of colorPaletteKeys">
+			<ui5-color-palette-item
+				[value]="'#' + color"
+				#colorItem
+				(click)="itemclicked(color)"></ui5-color-palette-item>
+		</ng-container>
+	</div>
+	<div
+		slot="footer"
+		class="flex justify-end">
+		<ui5-button
+			id="closeButton"
+			class="ml-8"
+			design="Transparent"
+			(click)="closeResponsiveDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-responsive-popover>
+<ui5-dialog
+	#errorDialogSalesStatus
+	id="errorDialogSalesStatus"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

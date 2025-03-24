@@ -1,0 +1,295 @@
+<div class="w-full flex justify-end">
+	<ui5-bar class="mt-[10px] mx-[10px] rounded-lg">
+		<ui5-title
+			slot="startContent"
+			level="H4"
+			>{{ machineWorkloadHeaderTitle }}</ui5-title
+		>
+		<ui5-multi-combobox
+			#hallRef
+			slot="endContent"
+			id="hallMultiComboBox"
+			(selectionChange)="selectHall($event)"
+			placeholder="Select Hall"
+			i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item
+				*ngFor="let hall of halls"
+				[selected]="hall.isSelected"
+				[text]="hall.custom_id + ' - ' + hall.name"
+				[id]="hall.id">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+
+		<ui5-multi-combobox
+			#machineGroupRef
+			slot="endContent"
+			id="machineGroupMultiComboBox"
+			(selectionChange)="selectMachineGroup($event)"
+			placeholder="Select Machine Group"
+			i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item
+				*ngFor="let machineGroup of machineGroups"
+				[text]="machineGroup.custom_id + ' - ' + machineGroup.name"
+				[id]="machineGroup.id">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+
+		<ui5-multi-combobox
+			#machineRef
+			slot="endContent"
+			id="machineMultiComboBox"
+			(selectionChange)="selectMachine($event)"
+			placeholder="Select Machine"
+			i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item
+				*ngFor="let machine of machineList"
+				[text]="machine.custom_id + ' - ' + machine.name"
+				[id]="machine.id">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+
+		<ui5-button
+			slot="endContent"
+			design="Emphasized"
+			(click)="onGo()"
+			i18n
+			[disabled]="isBusy"
+			>Go</ui5-button
+		>
+		<ui5-button
+			slot="endContent"
+			design="Emphasized"
+			(click)="onReset()"
+			i18n
+			[disabled]="isBusy"
+			>Reset</ui5-button
+		>
+		<ui5-busy-indicator
+			[active]="isWorkloadCalculationBusy"
+			slot="endContent">
+			<ui5-button
+				design="Emphasized"
+				i18n
+				[disabled]="isBusy"
+				(click)="recalculateWorkload()">
+				Calculate Workload
+			</ui5-button>
+		</ui5-busy-indicator>
+	</ui5-bar>
+</div>
+
+<div class="content">
+	<div
+		class="workload-container"
+		style="height: calc(100% - 20px)">
+		<div class="h-[30%] flex gap-2 ml-4">
+			<div
+				class="bg-white p-4 w-[267px]"
+				[ngClass]="{
+					'shadow-lg rounded-2xl': selectedMachineWorkloadDetails.name,
+				}">
+				<div
+					*ngIf="selectedMachineWorkloadDetails"
+					class="flex flex-col gap-3">
+					<ui5-label
+						*ngIf="selectedMachineWorkloadDetails.name"
+						class="text-sm font-bold text-gray-900"
+						show-colon
+						i18n
+						>Machine</ui5-label
+					>
+
+					<!-- Show Machine Name only if it's defined -->
+					<ui5-label
+						*ngIf="selectedMachineWorkloadDetails.name"
+						class="text-sm font-bold text-gray-900">
+						{{ selectedMachineWorkloadDetails.name }}
+					</ui5-label>
+
+					<!-- Demand Before Calculation -->
+					<div
+						*ngIf="
+							selectedMachineWorkloadDetails.demand_without_calculation !== undefined
+						"
+						class="flex justify-between">
+						<ui5-label
+							class="text-sm text-gray-500"
+							show-colon
+							i18n
+							>Demand (Before Calculation)</ui5-label
+						>
+						<ui5-label class="text-sm text-gray-600"
+							>{{
+								selectedMachineWorkloadDetails.demand_without_calculation
+							}}
+							hr</ui5-label
+						>
+					</div>
+
+					<!-- Demand After Calculation -->
+					<div
+						*ngIf="
+							selectedMachineWorkloadDetails.demand_after_calculation !== undefined
+						"
+						class="flex justify-between">
+						<ui5-label
+							show-colon
+							class="text-sm text-gray-500"
+							show-colon
+							i18n
+							>Demand (After Calculation)</ui5-label
+						>
+						<ui5-label class="text-sm text-gray-600"
+							>{{
+								selectedMachineWorkloadDetails.demand_after_calculation
+							}}
+							hr</ui5-label
+						>
+					</div>
+
+					<!-- Capacity Before Calculation -->
+					<div
+						*ngIf="
+							selectedMachineWorkloadDetails.capacity_without_calculation !==
+							undefined
+						"
+						class="flex justify-between">
+						<ui5-label
+							class="text-sm text-gray-500"
+							show-colon
+							i18n
+							>Capacity (Before Calculation)</ui5-label
+						>
+						<ui5-label class="text-sm text-gray-600"
+							>{{
+								selectedMachineWorkloadDetails.capacity_without_calculation
+							}}
+							hr</ui5-label
+						>
+					</div>
+
+					<!-- Capacity After Calculation -->
+					<div
+						*ngIf="
+							selectedMachineWorkloadDetails.capacity_after_calculation !== undefined
+						"
+						class="flex justify-between">
+						<ui5-label
+							class="text-sm text-gray-500"
+							show-colon
+							>Capacity (After Calculation)</ui5-label
+						>
+						<ui5-label class="text-sm text-gray-600"
+							>{{
+								selectedMachineWorkloadDetails.capacity_after_calculation
+							}}
+							hr</ui5-label
+						>
+					</div>
+
+					<!-- Machine Usage -->
+					<div
+						*ngIf="selectedMachineWorkloadDetails.machine_usage !== undefined"
+						class="flex justify-between">
+						<ui5-label
+							class="text-sm text-gray-500"
+							show-colon
+							>Machine Usage</ui5-label
+						>
+						<ui5-label class="text-sm text-gray-600"
+							>{{ selectedMachineWorkloadDetails.machine_usage }}%</ui5-label
+						>
+					</div>
+
+					<!-- Employee Usage -->
+					<div
+						*ngIf="selectedMachineWorkloadDetails.employee_usage !== undefined"
+						class="flex justify-between">
+						<ui5-label
+							class="text-sm text-gray-500"
+							show-colon
+							>Employee Usage</ui5-label
+						>
+						<ui5-label class="text-sm text-gray-600"
+							>{{ selectedMachineWorkloadDetails.employee_usage }}%</ui5-label
+						>
+					</div>
+
+					<!-- Overtime Factor -->
+					<div
+						*ngIf="selectedMachineWorkloadDetails.overtime_factor !== undefined"
+						class="flex justify-between">
+						<ui5-label
+							class="text-sm text-gray-500"
+							show-colon
+							>Overtime Factor</ui5-label
+						>
+						<ui5-label class="text-sm text-gray-600">{{
+							selectedMachineWorkloadDetails.overtime_factor
+						}}</ui5-label>
+					</div>
+
+					<!-- Distribution Factor -->
+					<div
+						*ngIf="selectedMachineWorkloadDetails.distribution_factor !== undefined"
+						class="flex justify-between">
+						<ui5-label
+							class="text-sm text-gray-500"
+							show-colon
+							>Distribution Factor</ui5-label
+						>
+						<ui5-label class="text-sm text-gray-600">{{
+							selectedMachineWorkloadDetails.distribution_factor
+						}}</ui5-label>
+					</div>
+
+					<!-- Additional Hours -->
+					<div
+						*ngIf="selectedMachineWorkloadDetails.additional_hours !== undefined"
+						class="flex justify-between">
+						<ui5-label
+							class="text-sm text-gray-500"
+							show-colon
+							>Additional Hours</ui5-label
+						>
+						<ui5-label class="text-sm text-gray-600"
+							>{{ selectedMachineWorkloadDetails.additional_hours }} hr</ui5-label
+						>
+					</div>
+				</div>
+			</div>
+
+			<div style="width: calc(100% - 267px)">
+				<app-bar-chart
+					[chartData]="rangeList"
+					[thresholdValue]="thresholdValue"
+					[reportType]="ReportType.MACHINE_WORKLOAD"
+					[barValueUnit]="barValueUnit">
+				</app-bar-chart>
+			</div>
+		</div>
+
+		<div
+			class="h-[70%] mt-3"
+			style="margin-bottom: 10px">
+			<app-grid-workload
+				[demandsData]="demandsData"
+				[capacityData]="capacityData"
+				[capacitySettings]="capacitySettings"
+				[reportType]="ReportType.MACHINE_WORKLOAD"
+				[gridTitle]="'Machine'"
+				[dataField]="'machine'"
+				[accessorKey]="accessorKey"
+				[startDate]="startDate"
+				[endDate]="endDate"
+				[utilizationPercentage]="utilizationPercentage"
+				(totalMachineEvent)="updateMachineWorkloadTitle($event)"
+				[valueFormatType]="ReportValueEnum.PERCENT_VALUE">
+			</app-grid-workload>
+		</div>
+	</div>
+</div>
+<ui5-toast #toast>{{ toastMessage }}</ui5-toast>

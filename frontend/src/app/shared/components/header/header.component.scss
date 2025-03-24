@@ -1,0 +1,55 @@
+@import '../../../../../schertech-theme/dist/scss/custom';
+@import '../../../../../schertech-theme/dist/scss/tokens';
+
+::ng-deep {
+    .k-appbar {
+        height: $header-height;
+        border-radius: $tb-kendo-border-radius-layout;
+
+        .module-name {
+            cursor: pointer;
+            
+            &>* {
+                font: {
+                    family: "Snasm-Regular";
+                    size: 24px;
+                }
+            }
+
+            >.yellow {
+                color: $kendo-color-warning;
+            }
+        }
+
+        .user-section {
+            .user-name {
+                color: $kendo-color-primary;
+            }
+        }
+
+        &.k-appbar-light {
+            .module-name {
+                >.blue {
+                    color: $kendo-color-primary;
+                }
+            }
+        }
+
+        &.k-appbar-dark {
+            .module-name {
+                >.blue {
+                    color: $kendo-body-bg;
+                }
+            }
+
+            .user-section {
+                .user-name {
+                    color: $kendo-body-bg;
+                }
+            }
+        }
+    }
+    .logo{
+        cursor: pointer;
+    }
+}

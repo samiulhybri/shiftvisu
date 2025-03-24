@@ -1,0 +1,22 @@
+<div class="master-detail">
+  <app-chat-list> </app-chat-list>
+
+  <app-chat-detail
+    *ngIf="
+      (selectedChat | async) !== null || (selectedUser | async) !== null;
+      else placeholder
+    "
+    class="detail"
+  >
+  </app-chat-detail>
+
+  <ng-template #placeholder>
+    <div
+      class="detail placeholder"
+      i18n="Placeholder text when no chat is selected"
+    >
+      No Chat Selected
+    </div>
+  </ng-template>
+</div>
+<div kendoDialogContainer></div>

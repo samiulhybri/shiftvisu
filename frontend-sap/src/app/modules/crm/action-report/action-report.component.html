@@ -1,0 +1,180 @@
+<div class="w-full flex justify-end">
+	<ui5-bar class="w-full rounded-t-lg flex justify-end">
+		<ui5-multi-combobox
+			slot="endContent"
+			#countryRef
+			(selectionChange)="selectCountry($event)"
+			placeholder="Select Country"
+			i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item
+				*ngFor="let country of countries"
+				text="{{ country.custom_id }} - {{ country.name }}"
+				[id]="country.id">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+
+		<ui5-multi-combobox
+			slot="endContent"
+			#userRef
+			(selectionChange)="selectUser($event)"
+			placeholder="Select Responsible"
+			i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item
+				*ngFor="let responsible of responsibles"
+				text="{{ responsible.name }}"
+				[id]="responsible.id">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+
+		<ui5-multi-combobox
+			slot="endContent"
+			#segmentRef
+			(selectionChange)="selectSegment($event)"
+			placeholder="Select Segment"
+			i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item
+				*ngFor="let segment of segments"
+				text="{{ segment.name }}"
+				[id]="segment.id">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+
+		<ui5-multi-combobox
+			#actionRef
+			slot="endContent"
+			(selectionChange)="selectAction($event)"
+			placeholder="Select Action"
+			i18n-placeholder
+			class="multi-combobox">
+			<ui5-mcb-item
+				*ngFor="let action of crmActions"
+				text="{{ action.name }}"
+				[id]="action.id">
+			</ui5-mcb-item>
+		</ui5-multi-combobox>
+
+		<ui5-button
+			slot="endContent"
+			class=""
+			design="Emphasized"
+			(click)="onGo()"
+			i18n
+			[disabled]="isBusy"
+			>Go
+		</ui5-button>
+		<ui5-button
+			slot="endContent"
+			class=""
+			design="Emphasized"
+			(click)="onReset(ChartInterval.DAY)"
+			i18n
+			[disabled]="isBusy"
+			>Reset
+		</ui5-button>
+
+		<ui5-segmented-button
+			slot="endContent"
+			(selection-change)="onSegmentChange($event)">
+			<ui5-segmented-button-item
+				id="day"
+				i18n
+				[disabled]="isBusy"
+				>Day</ui5-segmented-button-item
+			>
+
+			<ui5-segmented-button-item
+				id="week"
+				i18n
+				[disabled]="isBusy"
+				>Week</ui5-segmented-button-item
+			>
+
+			<ui5-segmented-button-item
+				id="month"
+				i18n
+				[disabled]="isBusy"
+				>Month</ui5-segmented-button-item
+			>
+		</ui5-segmented-button>
+	</ui5-bar>
+</div>
+
+<ui5-busy-indicator
+	[active]="isBusy"
+	class="w-full h-full">
+	<div
+		class="flex w-full bg-white gap-3 py-2"
+		style="height: calc(100% - 50px)">
+		<div class="w-[30%] md:w-[52%] lg:w-[30%] flex items-center justify-center">
+			<div class="h-full w-full flex shadow overflow-y-auto">
+				<app-vertical-bar-chart
+					[chartData]="marketSegments"
+					[thresholdValue]="thresholdValue"
+					[barValueUnit]="''"
+					class="h-full w-full">
+				</app-vertical-bar-chart>
+			</div>
+		</div>
+
+		<!-- Right Side (70%) -->
+		<div class="w-[30%] md:w-[48%] lg:w-[70%] flex flex-col gap-3">
+			<!-- Hello 2 (25% Height) -->
+			<div class="h-[28%] flex items-center justify-center">
+				<div class="h-full w-full shadow">
+					<app-bar-chart
+						[chartData]="rangeList"
+						[thresholdValue]="thresholdValue"
+						[crmReport]="crmReport"
+						[rotation]="rotation"
+						[barValueUnit]="''">
+					</app-bar-chart>
+				</div>
+			</div>
+
+			<!-- Bottom Section (75%) -->
+			<div class="h-[72%] flex gap-4 px-3">
+				<!-- Hello 3 (60% Width, Full Height) -->
+				<div class="w-[50%] h-full shadow">
+					<app-crm-action-grid
+						[gridData]="actionGridData"
+						[gridTitle]="actionGridTitle"
+						(onExportGridRowDetailsEvent)="
+							reciveGridExportedData($event, ActionReportGridName.ACTION)
+						"
+						[columns]="actionGridColumns">
+					</app-crm-action-grid>
+				</div>
+
+				<!-- Right Column (40% Width) -->
+				<div class="w-[50%] flex flex-col gap-3">
+					<!-- Hello 4 (50% Height) -->
+					<div class="h-[50%] shadow">
+						<app-crm-action-grid
+							[gridData]="responsibleGridData"
+							[gridTitle]="responsibleGridTitle"
+							(onExportGridRowDetailsEvent)="
+								reciveGridExportedData($event, ActionReportGridName.RESPONSIBLE)
+							"
+							[columns]="responsibleGridColumns">
+						</app-crm-action-grid
+					></div>
+					<!-- Hello 5 (50% Height) -->
+					<div class="h-[50%] shadow"
+						><app-crm-action-grid
+							[gridData]="countryGridData"
+							[gridTitle]="countryGridTitle"
+							(onExportGridRowDetailsEvent)="
+								reciveGridExportedData($event, ActionReportGridName.COUNTRY)
+							"
+							[columns]="countryGridColumns">
+						</app-crm-action-grid
+					></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</ui5-busy-indicator>
+<ui5-toast #toast>{{ toastMessage }}</ui5-toast>

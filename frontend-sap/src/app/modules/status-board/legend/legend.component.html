@@ -1,0 +1,26 @@
+<div
+	id="legend"
+	class="legend">
+	<div
+		class="flex-column title-layout">
+		<ui5-title
+			level="H5"
+			i18n
+			>Legend</ui5-title
+		>
+		<div
+			class="divider"></div>
+	</div>
+	<div
+		class="flex-column card-layout gap-1 overflow-auto p-1"
+		>
+		<app-legend-card class="max-h-[130px] aspect-[1.35] flex-1 h-[50px]" [cardType]="cardType.PRODUCTION" [totalMachines]="totalInProduction"></app-legend-card>
+		<app-legend-card class="max-h-[130px] aspect-[1.35] flex-1 h-[50px]" [cardType]="cardType.STANDSTILL" [totalMachines]="totalInStandStill"></app-legend-card>
+		<app-legend-card class="max-h-[130px] aspect-[1.35] flex-1 h-[50px]" [cardType]="cardType.SETUP" [totalMachines]="totalInSetup"></app-legend-card>
+		<app-legend-card class="max-h-[130px] aspect-[1.35] flex-1 h-[50px]" [cardType]="cardType.OFF" [totalMachines]="totalInOFF"></app-legend-card>
+		<app-legend-card 
+			*ngIf="statusboardSidebarTypeClass.getStateValue(settings.status_board_sidebar_type) == statusboardSidebarType.STANDARD_2"
+		 	class="max-h-[130px] aspect-[1.35] flex-1 h-[50px]" [cardType]="cardType.READY" [totalMachines]="totalInReady"></app-legend-card
+		>
+	</div>
+</div>

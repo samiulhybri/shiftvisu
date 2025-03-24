@@ -1,0 +1,55 @@
+.order-buttons-wrapper {
+	border-top: var(--card-border-color);
+	height: Hug (52px) px;
+}
+
+.order-card {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+	border-radius: 0.5rem;
+	background-color: var(--card-background-color);
+	height: 44px;
+	gap: 8px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	background-color: var(--card-background-color);
+	height: 44px;
+	gap: 8px;
+}
+
+.order-card ui5-title {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.label-style {
+	font-size: var(--title-text-font-size);
+	color: var(--list-description-text-color);
+}
+
+.min-height-order-details {
+	min-height: 500px;
+	border-top: var(--card-border-color);
+}
+
+#progressIndicator::part(bar) {
+	background-color: var(--progressbar-information-bar-color);
+	z-index: 5;
+}
+
+#progressIndicator::part(remaining-bar) {
+	background-color: var(--progressbar-information-remaining-bar-color);
+}
+
+.border-top {
+	border-top: var(--card-border-color);
+}
+
+.hide-bottom-border {
+	border-bottom-color: transparent;
+}

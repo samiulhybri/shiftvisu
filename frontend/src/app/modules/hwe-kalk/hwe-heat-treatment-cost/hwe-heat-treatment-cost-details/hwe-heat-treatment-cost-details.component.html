@@ -1,0 +1,30 @@
+<div novalidate class="k-form" *ngIf="hweHeatTreatmentCost">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="1">
+            <kendo-card-header i18n> Heat Treatment Cost </kendo-card-header>
+            <kendo-card-body class="cost-details-body" >
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="type" i18n i18n-text text="Treatment cost Type"></kendo-label>
+                    <div>
+                        <kendo-combobox #type [(ngModel)]="hweHeatTreatmentCost.type" [data]="typeData" textField="text"
+                            valueField="value" [valuePrimitive]="true" name="continuous_casting"
+                            [ngModelOptions]="{standalone: true}">
+                        </kendo-combobox>
+                    </div>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <label [for]="min_cost" text="min_cost" i18n>Minimum Cost </label>
+                    <kendo-numerictextbox  #min_cost [(ngModel)]="hweHeatTreatmentCost.min_cost"
+                        [ngModelOptions]="{standalone: true}" format="#.##\ €" [decimals]="2">
+                    </kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <label [for]="cost" text="cost" i18n>Cost: </label>
+                    <kendo-numerictextbox  #cost [(ngModel)]="hweHeatTreatmentCost.cost"
+                        [ngModelOptions]="{standalone: true}" format="#.##\ €" [decimals]="2">
+                    </kendo-numerictextbox>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</div>

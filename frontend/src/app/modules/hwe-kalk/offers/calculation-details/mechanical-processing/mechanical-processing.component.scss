@@ -1,0 +1,126 @@
+.offer-pos {
+    kendo-stacklayout {
+        padding: 6px;
+        align-items: center;
+    }
+    .mt-15{
+        margin-top: 15px;
+    }
+    .dimension-header {
+        display: block;
+        font-size: 1.17em;
+        margin-block-start: 1em;
+        margin-block-end: -.5em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+        font-weight: bold;
+    }
+    .dimension-section-width{
+        width: 33.6%;
+    }
+    .dimension-sub-header {
+        display: flex;
+        flex-direction: row-reverse;
+        margin-right: 17%;
+        font-weight: 600
+    }
+
+    .raw-header {
+        display: flex;
+        justify-content: space-between;
+
+        button {
+            margin-top: 10px;
+            height: 30px;
+        }
+    }
+
+    .raw-body {
+        width: 100%;
+        margin-bottom: 12px;
+        .input-box-width{
+            width: 28.5%;
+        }
+        .semi-product-type{
+            width: 50%;
+        }
+    }
+
+    .total-column {
+        flex: 3;
+        font-weight: bold;
+    }
+
+    .sum-column {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        font-weight: bold;
+        padding-right: 46px;
+    }
+}
+
+.dimensions {
+
+    .finished {
+        margin: 10px;
+
+        p {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .dimension-surface {
+            display: flex;
+            flex-direction: row-reverse;
+            margin-right: 14%;
+            font-weight: 600
+        }
+
+        table {
+            width: 100%;
+
+            tr:nth-child(even) {
+                background: #f5f5f5;
+            }
+
+            tr {
+                width: 100%;
+                padding: 6px;
+
+
+
+                td:last-child {
+                    text-align: center;
+                }
+                td{
+                    width: 25%;
+                }
+            }
+        }
+    }
+
+
+}
+::ng-deep .input-field .k-numerictextbox .k-input-spinner {
+    display: none;
+}
+::ng-deep .customer-request kendo-numerictextbox .k-input-inner {
+    text-align: right !important;
+}
+
+.table-view .k-align-items-stretch:nth-child(even) {
+    background: #f5f5f5;
+}
+.k-input-solid{
+    background-color: transparent;
+}
+
+@media screen and (min-width: 850px) and (max-width: 1400px) {
+    #label_outer_diameter, #label_inner_diameter , #customer_measurement_outer_diameter, #customer_measurement_inner_diameter, #customer_measurement_inner_length, #customer_measurement_inner_radius, #label_diameter, #label_min_allowance_diameter, #label_max_allowance_diameter, #label_outer_tolerance, #label_outer_diameter_surface {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+    }
+}

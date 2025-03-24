@@ -1,0 +1,11 @@
+:host {
+    position: relative;
+}
+
+.mt-norm-details-body {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+    max-height: calc(100vh - 228px);
+    overflow: auto;
+}

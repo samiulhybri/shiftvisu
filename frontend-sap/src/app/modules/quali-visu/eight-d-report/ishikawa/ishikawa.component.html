@@ -1,0 +1,29 @@
+<div class="grid grid-cols-3 gap-[10px] h-[calc(100vh-375px)]">
+	@for (category of ishikawaCategoryArray; track $index) {
+		<ui5-card class="h-[calc(50vh-200px)] col-span-1">
+			<div class="h-[calc(50vh-220px)]">
+				<app-grid-table
+					[headerTitle]="category.text"
+					[url]="baseUrl"
+					[columns]="columns"
+					[isBusy]="saveMode == null || isIshikawaLoading"
+					[customData]="true"
+					[data]="data | ishikawaFilter: category.value"
+					[showAction]="true"
+					[showSearch]="false"
+					[showDownload]="false"
+					[showActiveButton]="false"
+					[customActionButtons]="customButtons"
+                    [addButtonDisable]="!eightDReportId || saveMode == null || isIshikawaLoading"
+					addButtonText="Add"
+					i18n-addButtonText
+					[showNewButton]="true"
+					selectionMode="None"
+					[enableServerSideFiltering]="false"
+					(newButtonClick)="newButtonClick(category.value)"
+					[keyForCacheCustomDataTableColumns]="'ishikawa' + category.value"
+					#ishikawa></app-grid-table>
+			</div>
+		</ui5-card>
+	}
+</div>

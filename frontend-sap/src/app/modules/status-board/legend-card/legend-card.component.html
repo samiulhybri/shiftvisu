@@ -1,0 +1,6 @@
+<div class="legend-card w-full"  [ngClass]="cardType == machineStatus.PRODUCTION?'machine-production ':cardType == machineStatus.STANDSTILL?'machine-standstill':cardType==machineStatus.SETUP?'machine-setup':cardType==machineStatus.READY?'machine-ready':'machine-off'">
+    <div class="div-row legend-card-sub">
+        <ui5-icon [name]="cardType == machineStatus.PRODUCTION?'media-play':cardType == machineStatus.STANDSTILL?'media-pause':cardType==machineStatus.SETUP?'wrench':cardType==machineStatus.READY?'accept':'decline'" style="height: 50%;width: 50%;" [ngStyle]="{color: cardType==machineStatus.OFF?'var(--sapTextColor)':'var(--sapBaseColor)'}"></ui5-icon>
+        <ui5-title class="text-[min(7vw,7vh)]" [ngStyle]="{color: cardType==machineStatus.OFF ?'var(--sapTextColor)':'var(--sapBaseColor)'}">{{totalMachines}}</ui5-title>
+    </div>
+</div>

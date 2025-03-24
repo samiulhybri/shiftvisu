@@ -1,0 +1,931 @@
+<kendo-dialog
+	style="z-index: 99999999"
+	i18n-title
+	title="Calculation"
+	*ngIf="isDialogOpen"
+	(close)="close()"
+	[minWidth]="'80vw'"
+	[minHeight]="'50vh'">
+	<div
+		class="response-table-container"
+		*ngIf="response">
+		<div class="grid-style">
+			<div>
+				<div class="flex-container">
+					<p i18n>Messages:</p>
+					<ng-container>
+						<ul>
+							<li *ngFor="let item of response.messages">{{ item }}</li>
+						</ul>
+					</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Errors:</p>
+					<ng-container>
+						<ul>
+							<li *ngFor="let item of response.errors">{{ item }}</li>
+						</ul>
+					</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p>Is Invalid:</p>
+					<ng-container>{{ response.istUngueltig }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p>Status:</p>
+					<ng-container>{{ response.status }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Outer diameter:</p>
+					<ng-container>{{ response.aussendurchmesser }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Inner diameter:</p>
+					<ng-container>{{ response.innendurchmesser }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Height:</p>
+					<ng-container>{{ response.hoehe }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Radial width:</p>
+					<ng-container>{{ response.radialeBreite }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Outside Diameter Allowance:</p>
+					<ng-container>{{ response.aussendurchmesserAufmass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Inner Diameter Allowance:</p>
+					<ng-container>{{ response.innendurchmesserAufmass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Height Allowance:</p>
+					<ng-container>{{ response.hoeheAufmass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Height Measurement Factor:</p>
+					<ng-container>{{ response.hoeheAufmassFaktor }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Measurement Base:</p>
+					<ng-container>{{ response.aufmassSpannfuss }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Outside Diameter Raw:</p>
+					<ng-container>{{ response.aussendurchmesserRoh }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Inner Diameter Raw:</p>
+					<ng-container>{{ response.innendurchmesserRoh }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Height Raw:</p>
+					<ng-container>{{ response.hoeheRoh }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Radial Width Raw:</p>
+					<ng-container>{{ response.radialeBreiteRoh }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Outer Diameter After Piercing:</p>
+					<ng-container>{{ response.aussendurchmesserNachLochen }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Inner Diameter After Piercing:</p>
+					<ng-container>{{ response.innendurchmesserNachLochen }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Redial Width After Piercing:</p>
+					<ng-container>{{ response.radialeBreiteNachLochen }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Height To Redial Width After Piercing:</p>
+					<ng-container>{{ response.hoeheZuRadialeBreiteNachLochen }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Outside DM Upper Tolerance:</p>
+					<ng-container>{{ response.aussenDMObereToleranz }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Outside DM Lower Tolerance:</p>
+					<ng-container>{{ response.aussenDMUntereToleranz }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Inside DM Upper Tolerance:</p>
+					<ng-container>{{ response.innenDMObereToleranz }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Inside DM Lower Tolerance:</p>
+					<ng-container>{{ response.innenDMUntereToleranz }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Height Upper Tolerance:</p>
+					<ng-container>{{ response.hoeheObereToleranz }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Height Lower Tolerance:</p>
+					<ng-container>{{ response.hoeheUntereToleranz }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Group 1:</p>
+					<ng-container>{{ response.werkstoffgruppe }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Density:</p>
+					<ng-container>{{ response.werkstoffdichte }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Round Min DMA:</p>
+					<ng-container>{{ response.rundMinDMA }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Round Min DMB:</p>
+					<ng-container>{{ response.rundMinDMB }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Round Max DMA:</p>
+					<ng-container>{{ response.rundMaxDMA }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square Min DMA:</p>
+					<ng-container>{{ response.vierkantMinDMA }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square Min DMB:</p>
+					<ng-container>{{ response.vierkantMinDMB }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square Max DMA:</p>
+					<ng-container>{{ response.vierkantMaxDMA }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square Max DMB:</p>
+					<ng-container>{{ response.vierkantMaxDMB }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon Min SWA:</p>
+					<ng-container>{{ response.achtkantMinSWA }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon Min SWB:</p>
+					<ng-container>{{ response.achtkantMinSWB }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon Max SWA:</p>
+					<ng-container>{{ response.achtkantMaxSWA }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon Max SWB:</p>
+					<ng-container>{{ response.achtkantMaxSWB }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Round VG Min:</p>
+					<ng-container>{{ response.rundVGMin }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Round VG Min Rolling:</p>
+					<ng-container>{{ response.rundVGMinWalzen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Round VG Min Piercing:</p>
+					<ng-container>{{ response.rundVGMinLochen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Round VG Max:</p>
+					<ng-container>{{ response.rundVGMax }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Round VG Max Rolling:</p>
+					<ng-container>{{ response.rundVGMaxWalzen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Round VG Max Piercing:</p>
+					<ng-container>{{ response.rundVGMaxLochen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square VG Min:</p>
+					<ng-container>{{ response.vierkantVGMin }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square VG Min Rolling:</p>
+					<ng-container>{{ response.vierkantVGMinWalzen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square VG Min Piercing:</p>
+					<ng-container>{{ response.vierkantVGMinLochen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square VG Max:</p>
+					<ng-container>{{ response.vierkantVGMax }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square VG Max Rolling:</p>
+					<ng-container>{{ response.vierkantVGMaxWalzen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Square VG Max Piercing:</p>
+					<ng-container>{{ response.vierkantVGMaxLochen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon VG Min:</p>
+					<ng-container>{{ response.achtkantVGMin }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon VG Min Rolling:</p>
+					<ng-container>{{ response.achtkantVGMinWalzen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon VG Min Piercing:</p>
+					<ng-container>{{ response.achtkantVGMinLochen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon VG Max:</p>
+					<ng-container>{{ response.achtkantVGMax }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon VG Max Rolling:</p>
+					<ng-container>{{ response.achtkantVGMaxWalzen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Octagon VG Max Piercing:</p>
+					<ng-container>{{ response.achtkantVGMaxLochen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Usage Forging Degree:</p>
+					<ng-container>{{ response.materialEinsatzSaegeLaenge }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Usage Saw Length:</p>
+					<ng-container>{{ response.materialEinsatzVerschmiedungsgrad }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Usage Forging Degree Piercing:</p>
+					<ng-container>{{
+						response.materialEinsatzVerschmiedungsgradLochen
+					}}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Usage Forging Degree Rolling:</p>
+					<ng-container>{{
+						response.materialEinsatzVerschmiedungsgradWalzen
+					}}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Usage Bond Factor:</p>
+					<ng-container>{{ response.materialEinsatzKnickfaktor }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Usage Forging Degree Total:</p>
+					<ng-container>{{
+						response.materialEinsatzVerschmiedungsgradGesamt
+					}}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Usage Slug DM:</p>
+					<ng-container>{{ response.materialEinsatzButzenDM }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Material Usage Upset Ratio:</p>
+					<ng-container>{{ response.materialEinsatzStauchVerhaeltnis }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Single Ring Height:</p>
+					<ng-container>{{ response.hoeheEinzelnerRing }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Allowance Sawing:</p>
+					<ng-container>{{ response.aufmassSaegen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Allowance Additions:</p>
+					<ng-container>{{ response.aufmassZugaben }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Outer Diameter Hot Measurement:</p>
+					<ng-container>{{ response.aussendurchmesserWarmMass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Inner Diameter Hot Measurement:</p>
+					<ng-container>{{ response.innendurchmesserWarmMass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Radial Width After Piercing Hot Measurement:</p>
+					<ng-container>{{ response.radialeBreiteNachLochenWarmMass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Outer Diameter After Piercing Hot Measurement:</p>
+					<ng-container>{{ response.aussendurchmesserNachLochenWarmMass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Inner Diameter After Piercing Hot Measurement:</p>
+					<ng-container>{{ response.innendurchmesserNachLochenWarmMass }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Upset Height Hot Measurement:</p>
+					<ng-container>{{ response.stauchHoeheWarmMass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Radial Width After Rolling Hot Measurement:</p>
+					<ng-container>{{ response.radialeBreiteNachWalzenWarmMass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Rolling Height Hot Measurement:</p>
+					<ng-container>{{ response.walzHoeheWarmMass }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Height Hot Measurement:</p>
+					<ng-container>{{ response.hoeheWarmMass }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Weight:</p>
+					<ng-container>{{ response.gewicht }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Weight Raw:</p>
+					<ng-container>{{ response.gewichtRoh }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Use Weight:</p>
+					<ng-container>{{ response.einsatzGewicht }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Weight Invalid:</p>
+					<ng-container>{{ response.gewichtUngueltig }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Slug DM:</p>
+					<ng-container>{{ response.butzenDM }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Slug Weight:</p>
+					<ng-container>{{ response.butzenGewicht }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Slug Height:</p>
+					<ng-container>{{ response.butzenHoehe }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Machine:</p>
+					<ng-container>{{ response.aggregat }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Machine 1:</p>
+					<ng-container>{{ response.aggregat1 }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Machine 1 Condition Met:</p>
+					<ng-container>{{ response.aggregat1BedingungErfuellt }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Machine 2:</p>
+					<ng-container>{{ response.aggregat2 }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Machine 2 Condition Met:</p>
+					<ng-container>{{ response.aggregat2BedingungErfuellt }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Machine 3:</p>
+					<ng-container>{{ response.aggregat3 }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Machine 3 Condition Met:</p>
+					<ng-container>{{ response.aggregat3BedingungErfuellt }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Slug DM Invalid:</p>
+					<ng-container>{{ response.butzenDMUngueltig }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Valid Slug DM:</p>
+					<ng-container>{{ response.gueltigerButzenDM }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Height After Rolling:</p>
+					<ng-container>{{ response.hoeheNachWalzen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Outside DMA After Rolling:</p>
+					<ng-container>{{ response.aussenDMNachWalzen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Inside DMA After Rolling:</p>
+					<ng-container>{{ response.innenDMNachWalzen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Radial Width After Rolling:</p>
+					<ng-container>{{ response.radialeBreiteNachWalzen }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Outer Diameter After Rolling:</p>
+					<ng-container>{{ response.aussendurchmesserNachRollen }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Inner Diameter After Rolling:</p>
+					<ng-container>{{ response.innendurchmesserNachRollen }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Upset Height After Rolling:</p>
+					<ng-container>{{ response.stauchHoeheNachRollen }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Redial Width After Rolling:</p>
+					<ng-container>{{ response.radialeBreiteNachRollen }}</ng-container>
+				</div>
+			</div>
+
+			<div>
+				<div class="flex-container">
+					<p i18n>Wall Thicknesses Sleeve Rings:</p>
+					<ng-container>{{ response.wandstaerkeMinHuelsenRinge }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Rolling Path:</p>
+					<ng-container>{{ response.walzweg }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Rolling Height:</p>
+					<ng-container>{{ response.walzHoehe }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Rolling Path Min:</p>
+					<ng-container>{{ response.walzwegMin }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Compression Height:</p>
+					<ng-container>{{ response.stauchHoehe }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Axial Difference:</p>
+					<ng-container>{{ response.axialDifferenz }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Radial Width Per 100MM:</p>
+					<ng-container>{{ response.radialeBreitePro100MM }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Height By Radial Width:</p>
+					<ng-container>{{ response.hoeheDurchRadialeBreite }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Rolling Mandrel:</p>
+					<ng-container>{{ response.walzdorn }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Taxiway:</p>
+					<ng-container>{{ response.rollweg }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Abort Calculation:</p>
+					<ng-container>{{ response.berechnungAbbrechen }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Shape:</p>
+					<ng-container>{{ response.form }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Bend Factor:</p>
+					<ng-container>{{ response.knickfaktor }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Ring Will be Rolled:</p>
+					<ng-container>{{ response.ringWirdgerollt }}</ng-container>
+				</div>
+			</div>
+			<div>
+				<div class="flex-container">
+					<p i18n>Height Multiple Rolling:</p>
+					<ng-container>{{ response.hoeheMehrfachwalzung }}</ng-container>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<app-loader *ngIf="isWindowLoaderEnabled"></app-loader>
+	<kendo-dialog-actions
+		class="recipe-modal-action"
+		[layout]="end">
+		<kendo-grid-spacer></kendo-grid-spacer>
+		<button
+			class="recipe-modal-cancel-btn"
+			kendoButton
+			iconClass="k-icon k-i-close"
+			(click)="close()"
+			i18n>
+			Close
+		</button>
+	</kendo-dialog-actions>
+</kendo-dialog>
+
+<kendo-dialog
+	style="z-index: 99999999"
+	i18n-title
+	title="Question"
+	*ngIf="isQuestionDialogOpen"
+	(close)="onQuestionDialogClose()"
+	[minWidth]="'25vw'"
+	[minHeight]="'25vh'">
+	<div class="calculation-details-body">
+		<ng-container *ngIf="response.status">
+			<ng-container [ngSwitch]="response.status">
+				<!-- Status 101: Kombiwalzen -->
+				<div *ngSwitchCase="101">
+					<p i18n>Möchten Sie Kombiwalzen?</p>
+
+					<kendo-stacklayout
+						orientation="vertical"
+						[gap]="5">
+						<kendo-stacklayout
+							orientation="horizontal"
+							[gap]="9">
+							<kendo-label
+								[for]="kombiwalzen"
+								i18n-text
+								text="Kombiwalzen:"></kendo-label>
+							<kendo-combobox
+								#kombiwalzen
+								name="kombiwalzen"
+								[(ngModel)]="selectedKombiwalzen"
+								[data]="kombiwalzens"
+								textField="text"
+								valueField="value"
+								[style.width]="'84%'">
+							</kendo-combobox>
+						</kendo-stacklayout>
+
+						<kendo-stacklayout
+							class="k-align-items-center"
+							orientation="horizontal"
+							[gap]="9">
+							<kendo-label
+								[for]="quantity_raw_piece"
+								class="font-medium"
+								i18n
+								i18n-text
+								text="Pieces for raw part:">
+							</kendo-label>
+							<kendo-numerictextbox
+								format="#.##\ Stück"
+								#quantity_raw_piece
+								name="quantity_raw_piece"
+								[decimals]="0"
+								[(ngModel)]="
+									offerPos.offerPosRawDimensions[rawDimentionIndex]
+										.quantity_raw_piece
+								">
+							</kendo-numerictextbox>
+						</kendo-stacklayout>
+					</kendo-stacklayout>
+				</div>
+
+				<!-- Status 102: Fließpressen -->
+				<div *ngSwitchCase="102">
+					<p i18n>Möchten Sie Fließpressen?</p>
+					<kendo-stacklayout
+						orientation="horizontal"
+						[gap]="9">
+						<kendo-label
+							[for]="fliesspressen"
+							i18n-text
+							text="Fließpressen:"></kendo-label>
+						<div>
+							<input
+								type="checkbox"
+								kendoCheckBox
+								[(ngModel)]="fliesspressen"
+								[ngModelOptions]="{ standalone: true }" />
+						</div>
+					</kendo-stacklayout>
+				</div>
+
+				<!-- Status 103: Kleiner Lochen -->
+				<div *ngSwitchCase="103">
+					<p i18n>Die Wandstärke ist zu niedrig! Möchten Sie kleiner Lochen?</p>
+					<kendo-stacklayout
+						orientation="horizontal"
+						[gap]="9">
+						<kendo-label
+							[for]="kleinerLochen"
+							i18n-text
+							text="KleinerLochen:"></kendo-label>
+						<div>
+							<input
+								type="checkbox"
+								kendoCheckBox
+								[(ngModel)]="kleinerLochen"
+								[ngModelOptions]="{ standalone: true }" />
+						</div>
+					</kendo-stacklayout>
+				</div>
+
+				<!-- Success and Error messages -->
+				<p
+					*ngSwitchCase="501"
+					i18n
+					>Calculation successful</p
+				>
+				<p
+					*ngSwitchCase="502"
+					i18n
+					>Calculation invalid</p
+				>
+				<p
+					*ngSwitchCase="503"
+					i18n
+					>Error during the calculation process (Missing table entry for example)</p
+				>
+			</ng-container>
+		</ng-container>
+	</div>
+
+	<app-loader *ngIf="isWindowLoaderEnabled"></app-loader>
+	<kendo-dialog-actions
+		class="recipe-modal-action"
+		[layout]="'end'">
+		<kendo-grid-spacer></kendo-grid-spacer>
+		<button
+			class="recipe-modal-cancel-btn"
+			kendoButton
+			themeColor="primary"
+			[disabled]="response.status >= 500"
+			(click)="submitQuestion()"
+			i18n>
+			Calculate
+		</button>
+		<button
+			class="recipe-modal-cancel-btn"
+			kendoButton
+			iconClass="k-icon k-i-close"
+			(click)="onQuestionDialogClose()"
+			i18n>
+			Close
+		</button>
+	</kendo-dialog-actions>
+</kendo-dialog>
+
+<kendo-dialog
+	style="z-index: 99999999"
+	i18n-title
+	title="Error"
+	*ngIf="isErrorDialogOpen"
+	(close)="onErrorDialogClose()"
+	[minWidth]="'20vw'"
+	[minHeight]="'20vh'">
+	<div class="calculation-details-body">
+		<p i18n>Please check.</p>
+	</div>
+	<kendo-dialog-actions
+		class="recipe-modal-action"
+		[layout]="'end'">
+		<kendo-grid-spacer></kendo-grid-spacer>
+		<button
+			class="recipe-modal-cancel-btn"
+			kendoButton
+			iconClass="k-icon k-i-close"
+			(click)="onErrorDialogClose()"
+			i18n>
+			Close
+		</button>
+	</kendo-dialog-actions>
+</kendo-dialog>

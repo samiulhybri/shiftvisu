@@ -1,0 +1,50 @@
+:host {
+    position: relative;
+}
+
+.us-norm-details-body {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+    max-height: calc(100vh - 228px);
+    overflow: auto;
+}
+.scroll-content {
+    max-height: calc(100vh - 300px);
+    overflow: hidden auto;
+}
+
+table {
+	tr {
+		height: 36px;
+		border: 0px, 0px, 0px, 1px;
+		padding: 3px, 12px, 3px, 12px;
+
+	}
+
+	th,
+	td {
+		padding: 6px 6px 6px 6px;
+		border-right: rbg(18, 29, 44, 0.08)
+	}
+
+	tr td:last-child {
+		width: 122px;
+		text-align: center;
+
+		button {
+			margin: 1px;
+		}
+
+		border: none;
+	}
+
+	&+.k-text-error {
+		padding: 0 12px;
+	}
+
+	thead,
+	tr:nth-child(even) {
+		background: #f5f5f5;
+	}
+}

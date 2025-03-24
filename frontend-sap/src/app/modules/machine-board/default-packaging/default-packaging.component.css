@@ -1,0 +1,15 @@
+.packaging-instruction-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.packaging-instruction-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 25px;
+}
+
+.description-text-color {
+    color: var(--list-description-text-color);
+}

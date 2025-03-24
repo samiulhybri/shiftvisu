@@ -1,0 +1,171 @@
+<!-- test purpose code -->
+<div class="box-border grid grid-rows-[auto_1fr] grid-cols-[auto_1fr] h-full">
+	<app-header-nav
+		class="col-span-2 row-start-1 row-end-2"
+		[selectedHallValue]="selectedHallValue"
+		[halls]="halls"
+		(hallSelected)="selectHall($event)"
+		[showHallCombobox]="showHallCombobox"
+		title="PlanVisu"
+		(logOutDialogEvent)="logoutDialogOpen()"
+		(isSidebarCollapse)="toggleSideNavCollpaseState()">
+	</app-header-nav>
+
+	<ui5-side-navigation
+		class="ml-3 rounded-lg"
+		[collapsed]="isSideNavCollapsed"
+		(selection-change)="changeNavigaiton($event)">
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_GANTT_CHART_PAGE_VIEW)"
+			id="gantt"
+			text="Gantt Chart"
+			[selected]="router.url.includes('gantt')"
+			icon="horizontal-stacked-chart"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PRODUCTION_PLAN_PAGE_VIEW)"
+			id="productionPlanningPage"
+			text="Production Planning"
+			[selected]="router.url.includes('production-planning')"
+			icon="business-objects-experience"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.PLANVISU_MACHINE_SCHEDULAR_PAGE_VIEW)
+			"
+			id="machineSchedulergPage"
+			text="Machine Scheduler"
+			[selected]="router.url.includes('machine-scheduler')"
+			icon="along-stacked-chart"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_USER_SCHEDULAR_PAGE_VIEW)"
+			id="userSchedulergPage"
+			text="User Scheduler"
+			[selected]="router.url.includes('user-scheduler')"
+			icon="line-chart-time-axis"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_RANGE_OVERVIEW_PAGE_VIEW)"
+			id="rangeOverview"
+			text="Range Overview"
+			[selected]="router.url.includes('range-overview')"
+			icon="business-one"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_ORDER_CREATE_PAGE_VIEW)"
+			id="orderCreate"
+			text="Order Create"
+			[selected]="router.url.includes('create-order')"
+			icon="activities"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_ORDER_VIEW)"
+			id="orderView"
+			text="Order View"
+			[selected]="router.url.includes('order-view')"
+			icon="org-chart"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_ORDER_TREE_VIEW)"
+			id="orderViewTree"
+			text="Order View(Tree)"
+			[selected]="router.url.includes('order-tree-view')"
+			icon="org-chart"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_STAFF_WORKLOAD_PAGE_VIEW)"
+			id="staffWorkload"
+			text="Staff Workload"
+			[selected]="router.url.includes('staff-workload')"
+			icon="screen-split-three"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="
+				authService.isPermissionValid(permissionEnums.PLANVISU_MACHINE_WORKLOAD_PAGE_VIEW)
+			"
+			id="machineWorkload"
+			text="Machine Workload"
+			[selected]="router.url.includes('machine-workload')"
+			icon="business-suite/icon-undesirable-customer"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_SET_UP_PLAN_VIEW)"
+			id="setupPlan"
+			text="Setup Plan"
+			[selected]="router.url.includes('setup-plan')"
+			icon="customize"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_USER_PLAN_VIEW)"
+			id="userPlan"
+			text="User Planning Overview"
+			[selected]="router.url.includes('user-plan')"
+			icon="customize"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+			*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_EXPORT_IMPORT_VIEW)"
+			id="exportImport"
+			text="Export/Import"
+			[selected]="router.url.includes('export-import')"
+			icon="outbox"
+			i18n-text>
+		</ui5-side-navigation-item>
+		<ui5-side-navigation-item
+				i18n-text
+				id="settings"
+				slot="fixedItems"
+				text="Settings"
+				icon="action-settings"
+				*ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_SETTING_VIEW)"
+				[selected]="router.url.includes('settings')">
+			</ui5-side-navigation-item>
+			<ui5-side-navigation-item
+				slot="footer"
+				text="Settings">
+			</ui5-side-navigation-item>
+	</ui5-side-navigation>
+	<div class="overflow-hidden"><router-outlet></router-outlet></div>
+</div>
+
+<ui5-dialog
+	header-text="Confirm"
+	[open]="isLogOutDialogOpen"
+	state="Critical"
+	(beforeClose)="closeDialog()">
+	<div class="logout-content">
+		<ui5-text i18n> Do you want to logout? </ui5-text>
+		<ui5-busy-indicator
+			size="M"
+			[active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		class="logout-footer"
+		slot="footer">
+		<ui5-button
+			design="Emphasized"
+			class="mr5"
+			i18n
+			id="logoutConfirmButton"
+			(click)="logOut()"
+			>Confirm</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			id="logoutCancelButton"
+			>{{ localization.cancel }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

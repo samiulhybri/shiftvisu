@@ -1,0 +1,19 @@
+<div [formGroup]="form" *ngIf="data != undefined">
+    <kendo-gridlayout [gap]="{ cols: 10 }" [cols]="[{width: 200}, {width: 'auto'}, {width: 462}, {width: 150}]">
+        <kendo-gridlayout-item class="label-format" [row]="1" [col]="1">
+            <label [textContent]="data.name"></label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="2">
+            <kendo-label class="k-text-center header-lbl-format" i18n-text text="Supplier" i18n>
+                <kendo-combobox #mouldflow_type formControlName="mouldflow_type" [(ngModel)]="data.supplier" [data]="suppliers"
+                textField="name" valueField="id" [disabled]="isFieldDisabled"
+                [filterable]="true" (filterChange)="handleFilter($event)"></kendo-combobox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="3"></kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="4" style="text-align: right;">
+            <kendo-numerictextbox #total [(ngModel)]="data.total" class="number-right-align"
+                formControlName="total" [style.width.px]="150" format="c2" [spinners]="false" [disabled]="isFieldDisabled"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>

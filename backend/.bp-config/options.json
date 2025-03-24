@@ -1,0 +1,25 @@
+{
+	"PHP_VERSION": "~8.1.10",
+	"COMPOSER_VENDOR_DIR": "vendor",
+	"WEBDIR": "public",
+	"PHP_EXTENSIONS": [
+		"bz2",
+		"zlib",
+		"openssl",
+		"fpm",
+		"tokenizer",
+		"curl",
+		"mcrypt",
+		"mbstring",
+		"pdo",
+		"pdo_pgsql"
+	],
+	"ADDITIONAL_PREPROCESS_CMDS": [
+		"php artisan migrate",
+		"php artisan db:seed --class=ShopfloorSuiteIdGeneratorSeeder",
+		"php artisan db:seed --class=PermissionSeeder",
+		"php artisan db:seed --class=RoleSeeder",
+		"php artisan db:seed --class=ScheduleSeeder",
+		"php artisan optimize:clear"
+	]
+}

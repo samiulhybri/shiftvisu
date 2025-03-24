@@ -1,0 +1,29 @@
+<div [formGroup]="form" *ngIf="data != undefined">
+    <kendo-gridlayout [gap]="{ cols: 10 }" [cols]="[{width: 200 },{width: 'auto' },{width: 250 },{width: 200 },{width: 150 }]">
+        <kendo-gridlayout-item class="label-format"  [col]="1">
+            <label [textContent]="data.name"></label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item  [col]="2">
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item  [col]="3">
+            <kendo-label style="justify-content: flex-end;" class="k-form" text="KG">
+                <kendo-numerictextbox #quantity [(ngModel)]="data.quantity" class="number-right-align"
+                    formControlName="quantity" style="width:120px;" format="n" [spinners]="false" [disabled]="isFieldDisabled">
+                </kendo-numerictextbox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item  [col]="4">
+            <kendo-label class="k-form" i18n i18n-text text="Costo al KG" style="justify-content: space-between;">
+                <kendo-numerictextbox #price [(ngModel)]="data.price" class="number-right-align" formControlName="price"
+                    format="c2" style="width:102px;float: right;" [spinners]="false" [disabled]="isFieldDisabled">
+                </kendo-numerictextbox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+
+        <kendo-gridlayout-item  [col]="5" style="text-align: right;">
+            <kendo-numerictextbox #total formControlName="total" class="number-right-align" tabindex="-1"
+                [spinners]="false" style="width:150px;" placeholder="{{intl.formatNumber(data.getTotal(), 'c', 'it')}}"
+                [readonly]="true"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>

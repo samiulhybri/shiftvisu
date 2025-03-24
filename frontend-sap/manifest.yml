@@ -1,0 +1,5 @@
+applications:
+    - name: ((app_name))
+      memory: 1024M
+      buildpacks: [https://github.com/cloudfoundry/nginx-buildpack.git]
+      random-route: true

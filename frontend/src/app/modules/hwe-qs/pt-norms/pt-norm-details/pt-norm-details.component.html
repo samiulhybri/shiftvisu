@@ -1,0 +1,155 @@
+<form novalidate class="k-form" *ngIf="ptNorm">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="pt-norm-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"><span
+                            class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #custom_id name="custom_id" [disabled]="isAllDisabled"
+                        [(ngModel)]="ptNorm.custom_id"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+                    <kendo-textbox #name name="name" [disabled]="isAllDisabled"
+                        [(ngModel)]="ptNorm.name"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="specification" i18n i18n-text text="Specification"></kendo-label>
+                    <kendo-textbox #specification name="specification" [disabled]="isAllDisabled"
+                        [(ngModel)]="ptNorm.specification"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="issue_revision_status" i18n i18n-text
+                        text="Issue Revision Status"></kendo-label>
+                    <kendo-textbox #issue_revision_status name="issue_revision_status" [disabled]="isAllDisabled"
+                        [(ngModel)]="ptNorm.issue_revision_status"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="quality_class" i18n i18n-text text="Quality Class"></kendo-label>
+                    <kendo-textbox #quality_class name="quality_class" [disabled]="isAllDisabled"
+                        [(ngModel)]="ptNorm.quality_class"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="registration_limit" i18n i18n-text text="Registration Limit"></kendo-label>
+                    <kendo-combobox #registration_limit [disabled]="isAllDisabled" [(ngModel)]="ptNorm.registration_limit"
+                        [data]="registrationLimitData" textField="text" [valuePrimitive]="true" name="registration_limit"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="test_scope" i18n i18n-text text="Test Scope"></kendo-label>
+                    <kendo-combobox #test_scope [disabled]="isAllDisabled" [(ngModel)]="ptNorm.test_scope"
+                        [data]="testScopeDataSource" textField="text" [valuePrimitive]="true" name="test_scope"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="test_equipment" i18n i18n-text text="Test Equipment System"></kendo-label>
+                    <kendo-combobox #test_equipment [disabled]="isAllDisabled" [(ngModel)]="ptNorm.test_equipment"
+                        [data]="testEquipmentSystemDataSource" textField="text" [valuePrimitive]="true"
+                        name="test_equipment" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="test_temperature" i18n i18n-text text="Test Temperature"></kendo-label>
+                    <kendo-combobox #test_temperature [disabled]="isAllDisabled"
+                        [(ngModel)]="ptNorm.test_temperature" [data]="testTemperatureDataSource" textField="text"
+                        [valuePrimitive]="true" name="test_temperature" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="pt-norm-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="developer" i18n i18n-text text="Developer"></kendo-label>
+                    <kendo-combobox #developer [disabled]="isAllDisabled" [(ngModel)]="ptNorm.developer"
+                        [data]="developerDataSource" textField="text" [valuePrimitive]="true" name="developer"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="penetrant" i18n i18n-text text="Penetrant"></kendo-label>
+                    <kendo-combobox #penetrant [disabled]="isAllDisabled" [(ngModel)]="ptNorm.penetrant"
+                        [data]="penetrantDataSource" textField="text" [valuePrimitive]="true" name="penetrant"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="batch_developer" i18n i18n-text text="Batch developer"></kendo-label>
+                    <kendo-textbox #batch_developer name="batch_developer" [disabled]="isAllDisabled"
+                        [(ngModel)]="ptNorm.batch_developer"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="batch_penetrant" i18n i18n-text text="Batch penetrant"></kendo-label>
+                    <kendo-textbox #batch_penetrant name="batch_penetrant" [disabled]="isAllDisabled"
+                        [(ngModel)]="ptNorm.batch_penetrant"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="intermediate_cleaner" i18n i18n-text text="Intermediate Cleaner"></kendo-label>
+                    <kendo-combobox #intermediate_cleaner [disabled]="isAllDisabled"
+                        [(ngModel)]="ptNorm.intermediate_cleaner" [data]="intermediateCleanerDataSource"
+                        textField="text" [valuePrimitive]="true" name="intermediate_cleaner" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="cleaner" i18n i18n-text text="Cleaner"></kendo-label>
+                    <kendo-combobox #cleaner [disabled]="isAllDisabled" [(ngModel)]="ptNorm.cleaner"
+                        [data]="cleanerDataSource" textField="text" [valuePrimitive]="true" name="cleaner"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="illuminance_lux" i18n i18n-text text="Illuminance Lux"></kendo-label>
+                    <kendo-combobox #illuminance_lux [disabled]="isAllDisabled" [(ngModel)]="ptNorm.illuminance_lux"
+                        [data]="illuminanceLuxData" textField="text" [valuePrimitive]="true" name="illuminance_lux"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="lux_meter" i18n i18n-text text="Lux Meter"></kendo-label>
+                    <kendo-combobox #lux_meter [disabled]="isAllDisabled" [(ngModel)]="ptNorm.lux_meter"
+                        [data]="luxMeterDataSource" textField="text" [valuePrimitive]="true" name="lux_meter"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="control_unit" i18n i18n-text text="Control Unit"></kendo-label>
+                    <kendo-combobox #control_unit [disabled]="isAllDisabled" [(ngModel)]="ptNorm.control_unit"
+                        [data]="controlUnitDataSource" textField="text" [valuePrimitive]="true" name="control_unit"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="comments" i18n i18n-text text="Comments"></kendo-label>
+                    <kendo-textarea #comments [disabled]="isAllDisabled" name="comments"
+                        [(ngModel)]="ptNorm.comments"></kendo-textarea>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

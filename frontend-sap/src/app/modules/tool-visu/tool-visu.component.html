@@ -1,0 +1,50 @@
+<div class="p-0 pb-2 box-border grid gap-2 grid-rows-[auto_1fr] grid-cols-[auto_1fr] h-full">
+	<app-header-nav
+		class="col-span-2"
+		[homeRouteLink]="dynamicHomeRouteLink"
+		[isHomePage]="false"
+		title='ToolVisu'
+		(logOutDialogEvent)="logoutDialogOpen()"
+		(isSidebarCollapse)="onChangeSidebar()">
+	</app-header-nav>
+
+	<app-sidebar 
+		[sidebars]="sidebar" 
+		[isSideNavCollapsed]="isSideNavCollapsed"
+		(selectedMenu)="navigateSection($event)">
+	</app-sidebar>
+
+	<div class="content">
+		<router-outlet></router-outlet>
+	</div>
+	
+    <ui5-dialog
+		header-text="Confirm"
+		[open]="isLogOutDialogOpen"
+		state="Critical"
+		(beforeClose)="closeDialog()">
+		<div class="logout-content">
+			<ui5-text i18n> Do you want to logout? </ui5-text>
+			<ui5-busy-indicator
+				size="M"
+				[active]="isBusy">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			class="flex flex-row justify-end items-center w-full"
+			slot="footer">
+			<ui5-button
+				design="Emphasized"
+				class="mr-[5px]"
+				i18n
+				id="logoutConfirmButton"
+				(click)="logOut()"
+				>Confirm</ui5-button>
+			<ui5-button
+				(click)="closeDialog()"
+				id="logoutCancelButton"
+				i18n
+				>Cancel</ui5-button>
+		</div>
+	</ui5-dialog>
+</div>

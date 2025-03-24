@@ -1,0 +1,5 @@
+export enum InspectionOperationTabType {
+	INSERT = "INSERT",
+	INSPECTION_POINT = "INSPECTION_POINT",
+	ATTACHMENT = "ATTACHMENT",
+}

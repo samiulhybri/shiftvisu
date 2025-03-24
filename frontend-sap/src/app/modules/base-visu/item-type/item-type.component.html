@@ -1,0 +1,207 @@
+<div class="toolsDiv">
+	<app-grid-table
+		headerTitle="Item Types"
+		url="/ItemTypes"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_ITEM_TYPES_EDIT')"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		[showSearch]="true"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+
+	<ui5-dialog
+		id="deleteDialog"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col gap-[5px]">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+
+<app-dialog
+	id="ItemTypeDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="handleClose()"
+	[title]="dialogTitle">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L"
+		*ngIf="selectedRowValue">
+		<div class="crucible-dialog-body form w-[418px]">
+			<form
+				(ngSubmit)="onSubmit(create0rUpdateForm)"
+				#create0rUpdateForm="ngForm">
+				<div>
+					<div class="flex flex-row justify-between">
+						<div class="flex flex-col">
+							<ui5-label show-colon>{{ localization.active }}</ui5-label>
+							<ui5-switch
+								id="itemsGroupIsActiveSwitch"
+								name="is_active"
+								[disabled]="shouldBeDisabled('is_active')"
+								[(ngModel)]="selectedRowValue.is_active"></ui5-switch>
+						</div>
+
+						<div class="flex flex-col">
+							<ui5-label
+								show-colon
+								i18n
+								>Stocked in Handling Unit</ui5-label
+							>
+							<ui5-switch
+								id="stockedInHandlingUnitSwitch"
+								name="is_stocked_in_hu"
+								[disabled]="shouldBeDisabled('is_stocked_in_hu')"
+								[(ngModel)]="selectedRowValue.is_stocked_in_hu"></ui5-switch>
+						</div>
+
+						<div class="flex flex-col">
+							<ui5-label
+								show-colon
+								i18n
+								>Packaging</ui5-label
+							>
+							<ui5-switch
+								id="packagingSwitch"
+								name="is_packaging"
+								[disabled]="shouldBeDisabled('is_packaging')"
+								[(ngModel)]="selectedRowValue.is_packaging"></ui5-switch>
+						</div>
+					</div>
+
+					<div class="flex flex-col gap-[5px]">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								class="w-full"
+								#customId="ngModel"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || create0rUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								[(ngModel)]="selectedRowValue.custom_id"
+								(input)="onChangeCustomId()"
+								id="customIdInput"
+								name="custom_id"
+								[disabled]="shouldBeDisabled('custom_id')"
+								[required]="true">
+								<div slot="valueStateMessage">
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+					<div class="flex-col flex gap-[5px] mt-3">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.name }}</ui5-label
+						>
+						<ui5-input
+							class="w-full"
+							id="name"
+							#nameInput="ngModel"
+							[required]="true"
+							[(ngModel)]="selectedRowValue.name"
+							[disabled]="shouldBeDisabled('name')"
+							(change)="onChangeName($event)"
+							[valueState]="
+								nameInput.valid == false &&
+								(nameInput.touched || create0rUpdateForm.submitted)
+									? 'Negative'
+									: 'None'
+							"
+							name="name"></ui5-input>
+					</div>
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="handleClose()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogTPMSubGroups
+	id="errorDialogTPMSubGroups"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

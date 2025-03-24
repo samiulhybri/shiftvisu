@@ -1,0 +1,192 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Operation Control Profiles"
+		[model]="operationControlProfile"
+		[url]="url"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		addButtonText="New"
+		[editPermission]="authService.isPermissionValid('BASEVISU_OPERATION_CONTROL_PROFILE_EDIT')"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		[showSearch]="true"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+
+	<ui5-dialog
+		id="deleteDialogItem"
+		header-text="Warning"
+		state="Critical">
+		<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="footer-style gap-8">
+			<ui5-button
+				class="dialogSubmit"
+				design="Emphasized"
+				(click)="deleteSubmit()"
+				[disabled]="disableButtonDuringRequest"
+				>{{ localization.ok }}</ui5-button
+			>
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialogDelete()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+</div>
+
+<app-dialog
+	id="operationControlprofileDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()"
+	[title]="dialogTitle">
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L"
+		*ngIf="selectedItem">
+		<div class="crucible-dialog-body form w-[418px] h-[230px]">
+			<form
+				(ngSubmit)="onSubmit(createOrUpdateForm)"
+				#createOrUpdateForm="ngForm">
+				<div class="">
+					<div class="flex mb-10">
+						<div class="flex-col-item w-33">
+							<ui5-label show-colon>{{ localization.active }}</ui5-label>
+							<ui5-switch
+								id="itemsActiveSwitch"
+								ngDefaultControl
+								name="is_active"
+								[disabled]="shouldBeDisabled('is_active')"
+								[(ngModel)]="selectedItem.is_active"></ui5-switch>
+						</div>
+						<div class="flex-col-item w-66">
+							<ui5-label show-colon>{{
+								localization.autoPostGoodsReceipt
+							}}</ui5-label>
+							<ui5-switch
+								id="pGdRecpAutInput"
+								ngDefaultControl
+								name="auto_post_goods_receipt"
+								[disabled]="shouldBeDisabled('auto_post_goods_receipt')"
+								[(ngModel)]="selectedItem.auto_post_goods_receipt">
+							</ui5-switch>
+						</div>
+					</div>
+
+					<div class="flex flex-col gap-[5px]">
+						<ui5-label
+							show-colon
+							required
+							>{{ localization.id }}</ui5-label
+						>
+						<ui5-busy-indicator
+							[active]="isLoadingCustomId"
+							size="S">
+							<ui5-input
+								class="w-full"
+								#customId="ngModel"
+								[valueState]="
+									customId.valid == false &&
+									(customId.touched || createOrUpdateForm.submitted)
+										? 'Negative'
+										: customIdState
+								"
+								[(ngModel)]="selectedItem.custom_id"
+								(input)="onChangeCustomId()"
+								id="customIdInput"
+								name="custom_id"
+								[disabled]="shouldBeDisabled('custom_id')"
+								[required]="true">
+								<div slot="valueStateMessage">
+									{{ customIdValueStateText }}
+								</div>
+							</ui5-input>
+						</ui5-busy-indicator>
+					</div>
+					<div class="flex-col flex mt-2 gap-[5px]">
+						<ui5-label i18n show-colon>Confirmation Type</ui5-label>
+						<ui5-combobox id="confirmationTypeCombobox" #confirmation_type class="w-full"
+							[(ngModel)]="selectedItem.confirmation_type" name="confirmation_type"
+							(selection-change)="onConfirmationTypeChange($event)"
+							(change)="inputEntryRestrict($event,selectedItem.confirmation_type)">
+							<ng-container *ngFor="let item of confirmationTypeItems">
+								<ui5-cb-item id="{{ item.value }}" text="{{ item.text }}"></ui5-cb-item>
+							</ng-container>
+						</ui5-combobox>
+					</div>
+					<div class="flex-col flex mt-2 gap-[5px]">
+						<ui5-label i18n show-colon>External Processing Type</ui5-label>
+						<ui5-combobox id="externalProcessingTypeCombobox" #external_processing_type class="w-full"
+							[(ngModel)]="selectedItem.external_processing_type" name="external_processing_type"
+							(selection-change)="onChangeExternalProcessingType($event)"
+							(change)="inputEntryRestrict($event,selectedItem.external_processing_type)">
+							<ng-container *ngFor="let item of externalProcessingTypeItems">
+								<ui5-cb-item id="{{ item.value }}" text="{{ item.text }}"></ui5-cb-item>
+							</ng-container>
+						</ui5-combobox>
+					</div>
+					
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	#deleteErrorDialogItems
+	id="deleteErrorDialogItems"
+	state="Negative"
+	header-text="Error">
+	<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+	<div
+		slot="footer"
+		class="deleteErrorDialogFooter">
+		<ui5-button
+			class="dialogCloser"
+			design="Transparent"
+			(click)="closeDeleteErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

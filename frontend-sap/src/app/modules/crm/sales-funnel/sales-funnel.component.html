@@ -1,0 +1,96 @@
+<ui5-card class="w-full h-full pr-4">
+	<ui5-busy-indicator
+		class="w-full"
+		[active]="isHeaderLoading">
+		<ui5-bar>
+			<ui5-multi-combobox
+				slot="endContent"
+				i18n-placeholder
+				placeholder="Select Country"
+				[showSelectAll]="true"
+				(ui5SelectionChange)="selectCountry($event)">
+				@for (country of allCountries; track $index) {
+					<ui5-mcb-item
+						[id]="country.id"
+						[selected]="country.id ? selectedCountries.includes(country.id.toString()) : false"
+						[text]="country.name"></ui5-mcb-item>
+				}
+			</ui5-multi-combobox>
+
+			<ui5-multi-combobox
+				slot="endContent"
+				i18n-placeholder
+				placeholder="Select Responsible"
+				[showSelectAll]="true"
+				(ui5SelectionChange)="selectResponsible($event)">
+				@for (responsible of allResponsibles; track $index) {
+					<ui5-mcb-item
+						[id]="responsible.id"
+						[selected]="responsible.id
+								? selectedResponsibles.includes(responsible.id.toString())
+								: false"
+						[text]="responsible.name ?? ''">
+					</ui5-mcb-item>
+				}
+			</ui5-multi-combobox>
+
+			<ui5-multi-combobox
+				slot="endContent"
+				i18n-placeholder
+				placeholder="Select Revenue Classification"
+				[showSelectAll]="true"
+				(ui5SelectionChange)="selectRevenueClass($event)">
+				@for (revenueClass of allRevenueClasses; track $index) {
+					<ui5-mcb-item [id]="revenueClass.id" 
+						[selected]="revenueClass.id
+							? selectedRevenueClasses.includes(revenueClass.id.toString())
+							: false" 
+						[text]="revenueClass.name">
+					</ui5-mcb-item>
+				}
+			</ui5-multi-combobox>
+
+			<ui5-multi-combobox
+				slot="endContent"
+				i18n-placeholder
+				placeholder="Select Employee Classification"
+				[showSelectAll]="true"
+				(ui5SelectionChange)="selectEmployeeCLass($event)">
+				@for (employeeClass of allEmployeeClasses; track $index) {
+					<ui5-mcb-item
+						[id]="employeeClass.id"
+						[selected]="employeeClass.id
+								? selectedEmployeeClasses.includes(employeeClass.id.toString())
+								: false"
+						[text]="employeeClass.name">
+					</ui5-mcb-item>
+				}
+			</ui5-multi-combobox>
+
+			<ui5-multi-combobox
+				slot="endContent"
+				i18n-placeholder
+				placeholder="Select Market Segment"
+				[showSelectAll]="true"
+				(ui5SelectionChange)="selectMarketSegment($event)">
+				@for (marketSegment of allMarketSegments; track $index) {
+					<ui5-mcb-item [id]="marketSegment.id" 
+						[selected]="marketSegment.id
+								? selectedMarketSegments.includes(marketSegment.id.toString())
+								: false" 
+						[text]="marketSegment.name">
+					</ui5-mcb-item>
+				}
+			</ui5-multi-combobox>
+		</ui5-bar>
+	</ui5-busy-indicator>
+
+	<ui5-busy-indicator
+		[active]="isLoading"
+		class="w-full pr-4"
+		size="L">
+		<div
+			id="chartdiv"
+			style="width: 95%; height: calc(100vh - 100px)"></div>
+	</ui5-busy-indicator>
+</ui5-card>

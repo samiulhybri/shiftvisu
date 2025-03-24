@@ -1,0 +1,225 @@
+<div class="detail-left-pane">
+  <div
+    class="chat-header"
+    (click)="showChatMembers = selectedChat?.isGroupChat ?? false"
+    [class.clickable]="selectedChat?.isGroupChat"
+  >
+    <app-chat-avatar [chat]="(selectedChat ?? selectedUser)!"></app-chat-avatar>
+    <div class="chat-name-email">
+      <div class="chat-name">
+        {{ getChatDisplayName() }}
+      </div>
+      <div class="chat-email" *ngIf="!selectedChat?.isGroupChat">
+        {{ getChatSubtitle() }}
+      </div>
+    </div>
+  </div>
+
+  <kendo-chat
+    class="expand"
+    id="messages-list"
+    *ngIf="messages | async as messagesList; else messagesPlaceholder"
+    [user]="user"
+    [messages]="messagesList"
+  >
+    <ng-template kendoChatMessageTemplate let-message>
+      <div class="message-body">
+        <!-- Message Author -->
+        <span
+          *ngIf="getIsIncoming(message) && selectedChat?.isGroupChat"
+          class="message-author"
+          >{{ message.author.name }}</span
+        >
+        <!-- Edit/Delete Menu -->
+        <div *ngIf="!getIsIncoming(message) && !message.chatAction">
+          <div *ngIf="!editingMessages.has(message.id); else editingButtons">
+            <button
+              #popupAnchor
+              kendoButton
+              class="message-popup-button"
+              [icon]="'more-horizontal'"
+              [fillMode]="'clear'"
+              [size]="'small'"
+              [themeColor]="'light'"
+              (click)="
+                messageWithPopupOpen === message.id
+                  ? (messageWithPopupOpen = null)
+                  : (messageWithPopupOpen = message.id)
+              "
+            ></button
+            ><kendo-popup
+              [anchor]="popupAnchor.element"
+              [anchorAlign]="{ horizontal: 'right', vertical: 'bottom' }"
+              [popupAlign]="{ horizontal: 'right', vertical: 'top' }"
+              *ngIf="messageWithPopupOpen === message.id"
+            >
+              <div class="content message-popup-content">
+                <button
+                  kendoButton
+                  imageUrl="assets/images/svg/edit.svg"
+                  (click)="beginEditingMessage(message)"
+                  fillMode="clear"
+                  rounded="none"
+                  i18n="Edit message button"
+                >
+                  Edit
+                </button>
+                <button
+                  kendoButton
+                  imageUrl="assets/images/svg/delete.svg"
+                  (click)="deleteMessage(message)"
+                  fillMode="clear"
+                  rounded="none"
+                  i18n="Delete message button"
+                >
+                  Delete
+                </button>
+              </div>
+            </kendo-popup>
+          </div>
+          <ng-template #editingButtons>
+            <button
+              kendoButton
+              *ngIf="editingMessages.has(message.id)"
+              [icon]="'check'"
+              [fillMode]="'clear'"
+              [size]="'small'"
+              [themeColor]="'light'"
+              (click)="finishEditingMessage(message)"
+            ></button>
+            <button
+              kendoButton
+              *ngIf="editingMessages.has(message.id)"
+              [icon]="'x'"
+              [fillMode]="'clear'"
+              [size]="'small'"
+              [themeColor]="'light'"
+              (click)="cancelEditingMessage(message)"
+            ></button>
+          </ng-template>
+        </div>
+        <!-- Message content -->
+        <span
+          *ngIf="!editingMessages.has(message.id); else editingMessage"
+          id="message-{{ message.id }}"
+          >{{ message.text }}</span
+        >
+        <ng-template #editingMessage>
+          <kendo-textarea
+            class="message-editing-input"
+            id="message-{{ message.id }}"
+            [value]="message.text"
+            (keydown)="onMessageEditKeyDown($event, message)"
+            (valueChange)="
+              resizeTextInputToFit(editingMessageInput.input.nativeElement)
+            "
+            resizable="none"
+            [rows]="1"
+            #editingMessageInput
+          ></kendo-textarea>
+        </ng-template>
+        <!-- Message attachments -->
+        <div
+          class="message-attachments"
+          [class.attachments-after-message]="message.text"
+          *ngIf="message.attachments?.length"
+        >
+          <button
+            kendoButton
+            *ngFor="let attachment of message.attachments"
+            fillMode="none"
+            (click)="downloadAttachment(attachment)"
+            class="message-attachment"
+          >
+            {{ attachment.title }}
+            <img
+              class="attachment-download-icon"
+              [src]="
+                getIsIncoming(message)
+                  ? 'assets/images/svg/download_incoming.svg'
+                  : 'assets/images/svg/download_outgoing.svg'
+              "
+            />
+          </button>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template kendoChatAttachmentTemplate>
+      <!-- empty; attachments are rendered inside of the chat bubble -->
+      <!-- TODO: We can avoid this if we "hide" our attachments from kendo -->
+    </ng-template>
+
+    <ng-template kendoChatMessageBoxTemplate>
+      <div class="message-box-container" (drop)="onDrop($event)" (dragover)="onDragOver($event)">
+        <div class="message-attachments">
+          <div
+            *ngFor="let attachment of messageAttachments"
+            class="message-attachment"
+          >
+            <span>{{ attachment.name }}</span>
+            <button
+              kendoButton
+              class="message-attachment-delete"
+              fillMode="clear"
+              icon="x"
+              (click)="removeFile(attachment)"
+            ></button>
+          </div>
+        </div>
+        <div class="message-box-inputs">
+          <input
+            (change)="onFileSelected($event)"
+            #uploadInput
+            type="file"
+            style="display: none"
+            multiple
+          />
+          <button
+            (click)="uploadInput.click()"
+            fillMode="flat"
+            kendoButton
+            imageUrl="assets/images/svg/plus.svg"
+          ></button>
+          <kendo-textarea
+            class="message-box"
+            (inputFocus)="onInputFocus()"
+            (inputBlur)="onInputBlur()"
+            i18n-placeholder="Chat message input placeholder"
+            placeholder="Write your message here ..."
+            (keydown)="onKeyDown($event)"
+            (valueChange)="
+              resizeTextInputToFit(messageBoxInput.input.nativeElement)
+            "
+            (paste)="onPasted($event)"
+            [rows]="1"
+            resizable="none"
+            #messageBoxInput
+          >
+          </kendo-textarea>
+          <button
+            kendoButton
+            class="message-send-button"
+            fillMode="solid"
+            imageUrl="assets/images/svg/send.svg"
+            [themeColor]="'primary'"
+            (click)="sendMessage()"
+          ></button>
+        </div>
+      </div>
+    </ng-template>
+  </kendo-chat>
+
+  <ng-template #messagesPlaceholder>
+    <div class="expand"></div>
+  </ng-template>
+</div>
+
+<div class="detail-right-pane-container" [class.open]="showChatMembers">
+  <app-chat-members
+    *ngIf="selectedChat"
+    class="detail-right-pane"
+    (closePanel)="showChatMembers = false"
+    [chat]="selectedChat"
+  ></app-chat-members>
+</div>

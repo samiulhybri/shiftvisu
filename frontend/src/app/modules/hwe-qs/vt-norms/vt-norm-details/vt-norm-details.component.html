@@ -1,0 +1,108 @@
+<form novalidate class="k-form" *ngIf="vtNorm">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="vt-norm-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"><span
+                            class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #custom_id name="custom_id" [disabled]="isAllDisabled"
+                        [(ngModel)]="vtNorm.custom_id"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+                    <kendo-textbox #name name="name" [disabled]="isAllDisabled"
+                        [(ngModel)]="vtNorm.name"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="specification" i18n i18n-text text="Specification"></kendo-label>
+                    <kendo-textbox #specification name="specification" [disabled]="isAllDisabled"
+                        [(ngModel)]="vtNorm.specification"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="revision" i18n i18n-text text="Revision"></kendo-label>
+                    <kendo-textbox #revision name="revision" [disabled]="isAllDisabled"
+                        [(ngModel)]="vtNorm.revision"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="quality_class" i18n i18n-text text="Quality Class"></kendo-label>
+                    <kendo-textbox #quality_class name="quality_class" [disabled]="isAllDisabled"
+                        [(ngModel)]="vtNorm.quality_class"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="registration_limit" i18n i18n-text text="Registration Limit"></kendo-label>
+                    <kendo-combobox #registration_limit [disabled]="isAllDisabled" [(ngModel)]="vtNorm.registration_limit"
+                        [data]="registrationLimitData" textField="text" [valuePrimitive]="true" name="registration_limit"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="test_scope" i18n i18n-text text="Test Scope"></kendo-label>
+                    <kendo-combobox #test_scope [disabled]="isAllDisabled" [(ngModel)]="vtNorm.test_scope"
+                        [data]="testScopeData" textField="text" [valuePrimitive]="true" name="test_scope"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="vt-norm-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="surface_quality" i18n i18n-text text="Surface Quality"></kendo-label>
+                    <kendo-textbox #surface_quality name="surface_quality" [disabled]="isAllDisabled"
+                        [(ngModel)]="vtNorm.surface_quality"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="Illuminance" i18n i18n-text text="Illuminance"></kendo-label>
+                    <kendo-combobox #Illuminance [disabled]="isAllDisabled" [(ngModel)]="vtNorm.Illuminance"
+                        [data]="illuminanceData" textField="text" [valuePrimitive]="true" name="Illuminance"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="lux_meter" i18n i18n-text text="Lux Meter"></kendo-label>
+                    <kendo-combobox #lux_meter [disabled]="isAllDisabled" [(ngModel)]="vtNorm.lux_meter"
+                        [data]="luxMeterData" textField="text" [valuePrimitive]="true" name="lux_meter"
+                        valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="test_technique" i18n i18n-text text="Test Technique"></kendo-label>
+                    <kendo-multiselect #test_technique [disabled]="isAllDisabled" [(ngModel)]="vtNorm.testTechniques"
+                        [data]="testTechniqueData" [filterable]="true" textField="text" valueField="value"
+                        name="test_technique">
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="auxiliary_mean" i18n i18n-text text="Auxiliary Mean"></kendo-label>
+                    <kendo-multiselect #auxiliary_mean [disabled]="isAllDisabled" [(ngModel)]="vtNorm.auxiliaryMeans"
+                        [data]="auxiliaryMeanData" [filterable]="true" textField="text" valueField="value"
+                        name="auxiliary_mean">
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="comments" i18n i18n-text text="Comments"></kendo-label>
+                    <kendo-textarea #comments [disabled]="isAllDisabled" name="comments"
+                        [(ngModel)]="vtNorm.comments"></kendo-textarea>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

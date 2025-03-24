@@ -1,0 +1,25 @@
+<ui5-card class="h-full rounded-xl">
+	<div class="h-full">
+		<div class="h-[44px] flex items-center pl-4">
+			<ui5-title class="text-[16px]" i18n>Settings</ui5-title>
+		</div>
+		<div class="h-[44px]">
+			<ui5-tabcontainer
+				collapsed
+				fixed
+				(tabSelect)="onTabSelect($event)">
+				<ui5-tab
+					id="documentSectionTab"
+					text="Document Section"
+					[selected]="selectedTab === 'document-section'"
+					i18n-text></ui5-tab>
+				<ui5-tab
+					id="directoryStructureTab"
+					text="Directory Structure"
+					[selected]="selectedTab === 'directory-structure'"
+					i18n-text></ui5-tab>
+			</ui5-tabcontainer>
+		</div>
+		<router-outlet></router-outlet>
+	</div>
+</ui5-card>

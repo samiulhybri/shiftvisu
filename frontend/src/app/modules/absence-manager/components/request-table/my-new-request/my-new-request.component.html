@@ -1,0 +1,196 @@
+<form class="k-form" *ngIf="newRequest">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card class="window-scroll-content w-100" style="min-height: 45vh; height: 100%;">
+            <kendo-card-header i18n>
+                {{getTitle(newRequest.isDetailsModal)}}
+            </kendo-card-header>
+            <kendo-card-body class="offer-details-body" style="display: flex; flex-direction: column; gap: 12px;">
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row"
+                    *ngIf="newRequest.pageName == absenceManagerPageTypes.REQUEST" >
+                    <kendo-label i18n i18n-text text="Employee Name:"> </kendo-label>
+                    <kendo-label #superiors>{{newRequest.user.name}}</kendo-label>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row"
+                    *ngIf="newRequest.pageName == absenceManagerPageTypes.REQUEST" >
+                    <kendo-label i18n i18n-text text="Request Creation Time:"> </kendo-label>
+                    <kendo-label #superiors>{{ intl.formatDate(newRequest?.requestCreatedTime, 'dd.MM.yyyy HH:mm') }}</kendo-label>
+                </kendo-stacklayout>
+
+            
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row" *ngIf="!newRequest.isDetailsModal">
+                    <kendo-label i18n i18n-text text="Full Days:"></kendo-label>
+                    <div class="switch" style="width: 60px;">
+                        <kendo-switch (valueChange)="checkSwitchValue($event)"  onLabel=" "
+                        offLabel=" " #is_full_day name="is_full_day" [(ngModel)]="newRequest.is_full_day"
+                            ></kendo-switch>
+                    </div>        
+                    
+                </kendo-stacklayout> 
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row" *ngIf="!newRequest.is_full_day">
+                    <kendo-label i18n i18n-text text="Date:"><span class="k-text-error k-pl-1"
+                            *ngIf="!newRequest.isDetailsModal">*</span> </kendo-label>
+                    <kendo-datepicker [disabledDates]="disabledDates"  [disabledDatesValidation]="true" #date
+                        name="date"  (keydown)="onKeyDown($event)"
+                        *ngIf="!newRequest.isDetailsModal" [format]="format"
+                        (valueChange)="setTime($event)"
+                        [(ngModel)]="newRequest.date"></kendo-datepicker>
+                    <span *ngIf="newRequest.isDetailsModal">{{ intl.formatDate(newRequest.start, 'dd.MM.yyyy')
+                        }}</span>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row" *ngIf="!newRequest.is_full_day" class="field-row">
+                    <kendo-label i18n i18n-text text="Start Time:"><span class="k-text-error k-pl-1"
+                            *ngIf="!newRequest.isDetailsModal">*</span> </kendo-label>
+                            <kendo-timepicker
+                            (keydown)="onKeyDown($event)"
+                            *ngIf="!newRequest.isDetailsModal"
+                            format="HH:mm"
+                            [disabled]="!newRequest.date"
+                             grid.isWindowLoaderEnabled = false;
+                            [(ngModel)]="newRequest.startTimeN"
+                            [style.width.px]="182"
+                            (valueChange)="newRequest.getTimeDifference($event)"
+                            name="startTimeN"
+                            #startTimeN
+                            ></kendo-timepicker>
+                            <span *ngIf="newRequest.isDetailsModal">{{ intl.formatDate(newRequest.start, 'HH:mm')
+                        }}</span>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row" *ngIf="!newRequest.is_full_day">
+                    <kendo-label i18n i18n-text text="End Time:"><span class="k-text-error k-pl-1"
+                            *ngIf="!newRequest.isDetailsModal">*</span> </kendo-label>
+                            <kendo-timepicker
+                            (keydown)="onKeyDown($event)"
+                            format="HH:mm"
+                            *ngIf="!newRequest.isDetailsModal"
+                            [disabled]="!newRequest.date"
+                            [(ngModel)]="newRequest.endTimeN"
+                            [style.width.px]="182"
+                            (valueChange)="newRequest.getTimeDifference($event)"
+                            name="endTimeN"
+                            #endTimeN
+                            ></kendo-timepicker>
+                    <span *ngIf="newRequest.isDetailsModal">{{ intl.formatDate(newRequest.end, 'HH:mm')
+                        }}</span>
+                </kendo-stacklayout>
+               
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row" *ngIf="newRequest.is_full_day">
+                    <kendo-label i18n i18n-text text="Start Date:"><span class="k-text-error k-pl-1"
+                            *ngIf="!newRequest.isDetailsModal">*</span> </kendo-label>
+                    <kendo-datepicker (keydown)="onKeyDown($event)" [disabledDates]="disabledStartDates" *ngIf="!newRequest.isDetailsModal" #start_date
+                        name="start_date" (valueChange)="newRequest.getTimeDifference($event)"
+                        [(ngModel)]="newRequest.start" [format]="format"></kendo-datepicker>
+                    <span *ngIf="newRequest.isDetailsModal">{{ intl.formatDate(newRequest.start, 'dd.MM.yyyy')
+                        }}</span>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row" *ngIf="newRequest.is_full_day">
+                    <kendo-label i18n i18n-text text="End Date:"><span class="k-text-error k-pl-1"
+                            *ngIf="!newRequest.isDetailsModal">*</span> </kendo-label>
+                    <kendo-datepicker (keydown)="onKeyDown($event)" [focusedDate]="newRequest.start" [disabledDates]="disabledEndDates" *ngIf="!newRequest.isDetailsModal" #end_date
+                        name="end_date" (valueChange)="newRequest.getTimeDifference($event)"
+                        [(ngModel)]="newRequest.end" [format]="format"></kendo-datepicker>
+                    <span *ngIf="newRequest.isDetailsModal">{{ intl.formatDate(newRequest.end, 'dd.MM.yyyy')
+                        }}</span>
+                </kendo-stacklayout>
+             
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row">
+                    <kendo-label i18n i18n-text text="Total Hours:" *ngIf="!newRequest.is_full_day"> </kendo-label>
+                    <kendo-label i18n i18n-text text="Total Days:" *ngIf="newRequest.is_full_day"> </kendo-label>
+                    <kendo-label #total_hour>
+                        {{newRequest?.totalHourChecking(newRequest, true)}}
+                    </kendo-label>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row">
+                    <kendo-label i18n i18n-text text="Type of Absence:"> <span class="k-text-error k-pl-1"
+                            *ngIf="!newRequest.isDetailsModal">*</span> </kendo-label>
+                    <kendo-dropdownlist *ngIf="!newRequest.isDetailsModal" #absence_type name="absence_type"
+                        [(ngModel)]="newRequest.absenceType" [data]="absenceTypes" [valuePrimitive]="false"
+                        textField="custom_id" valueField="id" >
+                    </kendo-dropdownlist>
+                    <span *ngIf="newRequest.isDetailsModal">{{newRequest.absenceType?.custom_id}}</span>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row"
+                    *ngIf="newRequest.pageName === absenceManagerPageTypes.REQUEST">
+                    <kendo-label i18n i18n-text text="Note from Requester:"> </kendo-label>
+                    
+                   <div style="width: 100%; max-height: 62px; overflow-y: auto;" i18n > {{newRequest.applicant_note}}</div>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row" *ngIf="!newRequest.isDetailsModal">
+                    <kendo-label i18n i18n-text text="Superiors:"> </kendo-label>
+                    <kendo-label #superiors> {{userData.supervisor_one ? userData.supervisor_one.name :
+                        ''}}{{(userData.supervisor_one && userData.supervisor_two) ? ',' : ''}}{{userData.supervisor_two ? userData.supervisor_two.name : ''}}
+                    </kendo-label>
+                    
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row"
+                    *ngIf="newRequest.isDetailsModal && !requestService.isRequestActionButtonsVisible">
+                    <kendo-label i18n i18n-text text="Approved by Superior:"> </kendo-label>
+                    <kendo-label #superiors> {{newRequest.approvedBy?.name}}</kendo-label>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row"
+                    *ngIf="newRequest.isDetailsModal && !requestService.isRequestActionButtonsVisible">
+                    <kendo-label i18n i18n-text text="Request Approval Time:"> </kendo-label>
+                    <kendo-label #superiors> {{getApprovalInfo(newRequest)}} {{
+                        intl.formatDate(newRequest?.approval_time, 'dd.MM.yyyy HH:mm') }}</kendo-label>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row"
+                    *ngIf="newRequest.isDetailsModal && newRequest.pageName === absenceManagerPageTypes.MYABSENCE">
+                    <kendo-label i18n i18n-text text="Note from Superior:"> </kendo-label>
+                   
+                         <div style="width: 100%; max-height: 62px; overflow-y: auto;" i18n *ngIf="!requestService.isRequestActionButtonsVisible"> {{newRequest.supervisor_note}}</div>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" style="align-items: flex-start !important; min-height: 30px;"
+                    *ngIf="newRequest.pageName === absenceManagerPageTypes.REQUEST" style="position: relative;">
+                    <kendo-label i18n i18n-text text="Note:"><span class="k-text-error k-pl-1">*</span>
+                    </kendo-label>
+
+                    <div class="note-box" style="display: flex; flex-direction: column; gap: 4px;">
+                        <kendo-textarea  *ngIf="requestService.isRequestActionButtonsVisible"
+                            [ngStyle]="{'border': !hasSuperiorNote && !newRequest.supervisor_note  ? '1px solid red' : ''}"
+                            #note name="note" [(ngModel)]="newRequest.supervisor_note" i18n i18n-placeholder placeholder="Type here.."
+                            resizable="none" style="height: 62px; overflow-y: auto;">
+                        </kendo-textarea>
+                       
+                        <div style="width: 100%; max-height: 62px; overflow-y: auto;" i18n *ngIf="!requestService.isRequestActionButtonsVisible"> {{newRequest.supervisor_note}}</div>
+                        <div *ngIf="!hasSuperiorNote && !newRequest.supervisor_note && requestService.isRequestActionButtonsVisible" class="error-mss"
+                            style="padding: 4px 8px; background: #F3BFC1; color: #6F0D12; border-radius: 2px;">
+                            <p style="padding-bottom: 2px; margin-bottom: 2px;" i18n>Please fill in the follwing field.
+                            </p>
+                            <span>
+                                <ul style="margin: 0; padding-left: 24px;">
+                                    <li i18n>Note</li>
+                                </ul>
+                            </span>
+                        </div>
+                    </div>
+                    <span *ngIf="!newRequest.supervisor_note && requestService.isRequestActionButtonsVisible"  style="position: absolute; top: 5px; right: 4px;"><img
+                            src="assets/icons/text-area-information.png" alt=""></span>
+
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9" class="field-row"  style="align-items: flex-start !important;"
+                    *ngIf="!newRequest.isDetailsModal && newRequest.pageName !== absenceManagerPageTypes.REQUEST">
+                    <kendo-label i18n i18n-text text="Note:">
+                    </kendo-label>
+
+                    <kendo-textarea  #applicantNote name="applicantNote" [(ngModel)]="newRequest.applicant_note" i18n
+                        i18n-placeholder placeholder="Type here.." resizable="none"
+                        style="height: 62px; overflow-y: auto;">
+                    </kendo-textarea>
+                </kendo-stacklayout>
+
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>

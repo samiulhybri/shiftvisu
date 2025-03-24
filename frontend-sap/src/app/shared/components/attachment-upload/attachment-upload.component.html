@@ -1,0 +1,164 @@
+<div style="width: inherit; height: inherit; overflow: hidden;">
+    <div class="attachment-upload-card-container">
+        <ui5-upload-collection #uploadCollection mode="Delete" class="upload-collection-container">
+            <div slot="header" class="attachment-block-header" sticky-header>
+                <div class="header-title-section">
+                    <span i18n>Attachments ({{ fileCount }})</span>
+                </div>
+                <div class="header-button-section">
+                    <ui5-button *ngIf="modalType != 'view' && isCameraVisible" icon="camera" design="Transparent" (click)="onClickCamera()"></ui5-button>
+                    <ui5-file-uploader #fileUploader hide-input multiple [accept]="fileFormat">
+                        <ui5-button i18n *ngIf="modalType != 'view'" [disabled]="isLoading"
+                            design="Transparent">Upload</ui5-button>
+                    </ui5-file-uploader>
+                    <ui5-button *ngIf="isDownloadVisible" #downloadSelected i18n class="download-button" i18n 
+                        [disabled]="fileArr && !fileArr.length" (click)="downloadFiles()"
+                        design="Transparent">Download</ui5-button>
+                    <ui5-input  *ngIf="isSearchVisible" id="searchFiles" slot="searchField" show-clear-icon i18n-placeholder
+                        placeholder="Search by file name" (change)="onSelectSearchFiles($event)"
+                        (input)="onInputSearchFiles($event)">
+                        <ui5-icon name="search" slot="icon"></ui5-icon>
+                    </ui5-input>
+                </div>
+            </div>
+
+            <div class="loader-body" *ngIf="isLoading">
+                <ui5-busy-indicator [active]="isLoading" size="L" class="busy-indicator"></ui5-busy-indicator>
+            </div>
+
+            <div class="attachment-block-body"
+                *ngIf="(fileArr && fileArr.length) || (uploadedFiles && uploadedFiles.length)">
+                <table *ngIf="fileArr && fileArr.length">
+                    <tbody>
+                        <tr *ngFor="let file of fileArr; let i = index">
+                            <div class="table-row">
+                                <td style="width: 10%;" *ngIf="isShowStandard">
+                                    <div class="standard-select-section">
+                                        <span i18n *ngIf="file['type'] == 'image'">Standard</span>
+                                        <ui5-radio-button *ngIf="file['type'] == 'image'"
+                                            name="'fileSelection_' + file.id"
+                                            [checked]="updatedStandardFile && updatedStandardFile.name == file['name'] ? true : (file['is_selected'] == true || file['is_selected'] == 1) ? true : false"
+                                            (change)="onChangeFileSelect(file)">
+                                        </ui5-radio-button>
+                                    </div>
+                                </td>
+                                <td style="width: 15%;" (click)="openPreview(file)">
+                                    <div *ngIf="file['type'] == 'image'" class="file-image-thumbnil">
+                                        <img [src]="file['path']" slot="thumbnail">
+                                    </div>
+                                    <div *ngIf="file['type'] != 'image'" class="file-doc-thumbnil">
+                                        <ui5-icon name="doc-attachment" class="file-icon"
+                                            *ngIf="file['type'] == 'document'"></ui5-icon>
+                                        <ui5-icon name="pdf-attachment" class="file-icon"
+                                            *ngIf="file['type'] == 'pdf'"></ui5-icon>
+                                        <ui5-icon name="excel-attachment" class="file-icon"
+                                            *ngIf="file['type'] == 'excel'"></ui5-icon>
+                                        <ui5-icon name="ppt-attachment" class="file-icon"
+                                            *ngIf="file['type'] == 'powerpoint'"></ui5-icon>
+                                        <ui5-icon name="document-text" class="file-icon"
+                                            *ngIf="file['type'] == 'text'"></ui5-icon>
+                                        <ui5-icon name="document" class="file-icon"
+                                            *ngIf="file['type'] == null"></ui5-icon>
+                                    </div>
+                                </td>
+                                <td style="width: 70%;">
+                                    <div class="file-details-section">
+                                        <span class="file-name text-wrap" (click)="openPreview(file)">{{ file['file_name'] }}</span>
+                                        <div class="file-sub-details-section">
+                                            <div class="flex items-center">
+                                                <ui5-label i18n show-colon>Uploaded On</ui5-label>
+                                                <span>{{ file['updated_at'] | date:'dd.MM.yyyy' }}</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <ui5-label i18n show-colon>File Size</ui5-label>
+                                                <span>{{ file['size'] | fileSize }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="width: 5%;" *ngIf="modalType != 'view'">
+                                    <div class="item-action-section">
+                                        <ui5-button icon="decline" (click)="deleteFile(file, 'saved')"
+                                            [disabled]="isShowStandard && updatedStandardFile && updatedStandardFile.name == file['name'] ? true : isShowStandard && (file['is_selected'] == true || file['is_selected']) == 1 ? true : false"
+                                            design="Transparent">
+                                        </ui5-button>
+                                    </div>
+                                </td>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="not-saved-files-container" *ngIf="uploadedFiles.length">
+                    <table>
+                        <tbody>
+                            <tr *ngFor="let file of uploadedFiles; let i = index">
+                                <div class="table-row">
+                                    <td style="width: 95%;">
+                                        <div class="file-details-section">
+                                            <span class="file-name text-wrap">{{ file['name'] }}</span>
+                                            <div class="file-sub-details-section">
+                                                <div class="flex items-center">
+                                                    <ui5-label i18n show-colon>Uploaded On</ui5-label>
+                                                    <span>{{ file['updated_at'] | date:'dd.MM.yyyy' }}</span>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <ui5-label i18n show-colon>File Size</ui5-label>
+                                                    <span>{{ file['size'] | fileSize }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 5%;">
+                                        <div class="item-action-section">
+                                            <ui5-button icon="decline" (click)="deleteFile(file, 'unsaved')"
+                                                design="Transparent">
+                                            </ui5-button>
+                                        </div>
+                                    </td>
+                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </ui5-upload-collection>
+    </div>
+</div>
+
+<ui5-toast #attachModalToast id="attachModalToast" placement="BottomCenter">{{ toastMessage }}</ui5-toast>
+
+<div *ngIf="isClickToCamera">
+    <app-dialog id="cameraDialog" [isDialogOpen]="isClickToCamera" [title]="cameraModalTitle">
+        <div class="camera-modal-body">
+            <webcam [width]="900" [height]="650" [trigger]="triggerObservable" [switchCamera]="nextWebcam$" [allowCameraSwitch]="true"
+                (imageCapture)="handleImage($event)" (cameraSwitched)="cameraWasSwitched($event)"
+                (initError)="handleCameraError($event)">
+            </webcam>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <ui5-button class="ml-8" (click)="triggerSnapshot()" design="Emphasized" i18n>
+                Take Picture
+            </ui5-button>
+            <ui5-button class="ml-8" *ngIf="multipleCamerasAvailable" icon="synchronize" design="Default" (click)="switchCamera()"></ui5-button>
+            <ui5-button class="ml-8" design="Transparent" (click)="closeCameraModal()" i18n>
+                Close
+            </ui5-button>
+        </div>
+    </app-dialog>
+</div>
+
+<div *ngIf="isOpenFilePreview">
+	<app-dialog id="addGroupDialog" [isDialogOpen]="isOpenFilePreview" [title]="filePreviewTitle" (onBeforeClose)="closeAttachmentDialog()">
+		<div class="w-[70vw] ml-[-16px] mr-[-16px]">
+			<app-file-preview [modelId]="modelId" [model]="model" 
+                [isOpenFromUploader]="true" [selectedFileId]="selectedFileToOpen.id"
+                [filesCount]="fileCount"
+				[filePreviewHeight]="filePreviewHeight"></app-file-preview>
+		</div>
+
+		<div slot="footer" class="dialog-footer">
+			<ui5-button class="ml-8" (click)="closeAttachmentDialog()">
+				{{ localization.cancel }}</ui5-button>
+		</div>
+	</app-dialog>
+</div>

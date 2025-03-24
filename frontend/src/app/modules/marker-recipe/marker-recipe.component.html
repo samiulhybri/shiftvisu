@@ -1,0 +1,308 @@
+<div class="marker-recipe-container">
+    <div class="recipe-section">
+        <kendo-card width="100%">
+            <kendo-card-header>
+                <div class="recipe-header-container">
+                    <span i18n>Recipes</span>
+                    <div class="recipe-action-section">
+                        <div class="search-section">
+                            <kendo-textbox [style.width.px]="191" i18n i18n-placeholder placeholder="Search..."
+                                [(ngModel)]="recipeSearchKey" (keyup)="onRecipeFilter($event)" [clearButton]="true">
+                                <ng-template kendoTextBoxSuffixTemplate>
+                                    <button kendoButton fillMode="flat" icon="search"
+                                        (click)="onRecipeFilter($event, true)"></button>
+                                </ng-template>
+                            </kendo-textbox>
+                        </div>
+                        <div class="preview-section">
+                            <kendo-button imageUrl="assets/icons/eye.png"
+                                (click)="openRecipeInfo()" i18n>Preview Recipe
+                            </kendo-button>
+                        </div>
+                        <div class="new-creation-section">
+                            <button kendoButton [primary]="true" icon="add" (click)="addNewRecipe()" i18n [disabled]="!hasUpdatePermission">
+                                New
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </kendo-card-header>
+            <kendo-card-body>
+                <div class="recipe-grid-layout">
+                    <kendo-grid-component 
+                        [moduleName]="'marker-recipe'" 
+                        [gridItems]="gridItems" 
+                        [columns]="columns"
+                        [state]="state" 
+                        [isLoadedEnabled]="isLoadedEnabled" 
+                        [isSortable]="isSortable"
+                        [isFilterable]="false" 
+                        [isGroupable]="false" 
+                        [isPageable]="isPageable" 
+                        [editView]="editView"
+                        (gridRefersh)="sendRequest()" 
+                        (filterState)="changeGridFilter($event)"
+                        [initialSelection]="rowSelected" 
+                        (gridCellClicked)="onRecipeClicked($event, 'grid')"
+                        (deleteDataItem)="deleteDataItem($event)" 
+                        (emitSelectedItem)="onSelectedRecipe($event)">
+
+                        <ng-template #actionColumnContent let-dataItem>
+                            <button [disabled]="dataItem.machine.custom_id != recipeMachineID || !hasUpdatePermission" kendoButton 
+                                (click)="onSelectedRecipe(dataItem.id)">
+                                <span class="k-icon icon-edit"></span>
+                            </button>
+
+                            <button kendoButton (click)="openCopyConfirmation(dataItem)" [disabled]="!hasUpdatePermission">
+                                <span class="k-icon k-i-copy"></span>
+                            </button>
+
+                            <button [disabled]="dataItem.machine.custom_id != recipeMachineID  || !hasUpdatePermission" kendoButton 
+                                (click)="openDeleteRecipe(dataItem)">
+                                <span class="k-icon icon-trash"></span>
+                            </button>
+                            <kendo-button imageUrl="assets/icons/send-icon.png"
+                                [disabled]="dataItem.machine.custom_id != recipeMachineID || !hasUpdatePermission"
+                                (click)="openDeviceConfirmation(dataItem)" i18n>Send to Device
+                            </kendo-button>
+                        </ng-template>
+                    </kendo-grid-component>
+                </div>
+            </kendo-card-body>
+        </kendo-card>
+    </div>
+    <div class="recipe-child-section">
+        <app-marker-pos [recipe]="selectedRecipe" [isMachineMatched]="isMachineMatched" [isGridVisible]="isViewPosGrid"
+            [isNewBtnDisable]="isNewPosDisabled"></app-marker-pos>
+    </div>
+</div>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>
+
+<kendo-dialog i18n-title [title]="modalTitle" *ngIf="isOpenAddRecipeModal" (close)="closeRecipeModal()" [width]="585"
+    [minWidth]="450" [minHeight]="354" [maxHeight]="420">
+    <kendo-card width="100%">
+        <kendo-card-body class="recipe-form-body">
+            <form novalidate class="k-form" [formGroup]="form">
+                <div class="form-sections action-section">
+                    <kendo-label class="k-text-left header-lbl-format" i18n-text text="Active" i18n>:</kendo-label>
+                    <kendo-switch #is_active formControlName="is_active" [(ngModel)]="recipeData.is_active"
+                        [ngStyle]="{ 'margin-left': '10px' }"></kendo-switch>
+                </div>
+                <div class="form-sections">
+                    <div class="label-input-section custom_id_field">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Customer ID"
+                            i18n>:</kendo-label>
+                        <kendo-textbox #custom_id formControlName="custom_id" [(ngModel)]="recipeData.custom_id"
+                            [readonly]="true"></kendo-textbox>
+                    </div>
+                </div>
+                <div class="form-sections">
+                    <div class="label-input-section">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Machine" i18n>:</kendo-label>
+                        <kendo-combobox #machine formControlName="machine" [(ngModel)]="recipeData.machine"
+                            [data]="castMachineList" textField="customText" valueField="id" [filterable]="false"
+                            (valueChange)="OnChangeMachine($event, '')" i18n-placeholder placeholder="Select a Machine"
+                            required [class.formError]="form.get('machine').invalid">
+                        </kendo-combobox>
+                    </div>
+                    <div class="label-input-section" [ngStyle]="{ 'margin-left': '10px' }">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Name" i18n>:</kendo-label>
+                        <kendo-textbox #name formControlName="name" [(ngModel)]="recipeData.name" i18n-placeholder
+                            placeholder="Insert Name" required
+                            [class.formError]="form.get('name').invalid"></kendo-textbox>
+                    </div>
+                </div>
+                <div class="form-sections">
+                    <div class="label-input-section">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Item ID" i18n>:</kendo-label>
+                        <kendo-combobox #item formControlName="item" [(ngModel)]="recipeData.item" [data]="itemList"
+                            textField="customText" valueField="id" [filterable]="false" (valueChange)="OnChangeItem($event)"
+                            i18n-placeholder placeholder="Select an Item">
+                        </kendo-combobox>
+                    </div>
+                    <div class="label-input-section" [ngStyle]="{ 'margin-left': '10px' }">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Delay" i18n>:</kendo-label>
+                        <kendo-numerictextbox #delay formControlName="delay" [(ngModel)]="recipeData.delay"
+                            i18n-placeholder placeholder="Insert Delay Number" format="##" [spinners]="true" [step]="1"
+                            [min]="0" [max]="99" [decimals]="0"></kendo-numerictextbox>
+                    </div>
+                </div>
+                <div class="form-sections action-section">
+                    <kendo-label class="k-text-left header-lbl-format" i18n-text text="Z-Axis" i18n>:</kendo-label>
+                    <kendo-switch #zaxis formControlName="zaxis" [(ngModel)]="recipeData.zaxis"
+                        [ngStyle]="{ 'margin-left': '10px' }"></kendo-switch>
+                </div>
+            </form>
+        </kendo-card-body>
+    </kendo-card>
+    <kendo-dialog-actions class="recipe-modal-action" [layout]="end">
+        <button class="recipe-modal-cancel-btn" kendoButton iconClass="k-icon k-i-close" (click)="closeRecipeModal()"
+            i18n>Close
+        </button>
+        <button class="recipe-modal-action-btn" kendoButton iconClass="k-icon icon-save" (click)="saveRecipe()"
+            themeColor="primary">
+            <span *ngIf="isNewRecipe" i18n>Save</span>
+            <span *ngIf="!isNewRecipe" i18n>Update</span>
+        </button>
+    </kendo-dialog-actions>
+</kendo-dialog>
+
+<kendo-dialog i18n-title [title]="modalTitle" *ngIf="isClickInfoBtn" (close)="closeInfoModal()" [width]="585"
+    [minHeight]="424" [maxHeight]="464">
+    <kendo-card width="100%">
+        <kendo-card-body class="recipe-info-body">
+            <div class="request_pcc_section">
+                <span i18n>Request data from PCC</span>
+                <kendo-button imageUrl="assets/icons/refresh-white.png"
+                    class="k-button-solid-primary"
+                    (click)="requestDataPCC()" i18n>Request
+                </kendo-button>
+            </div>
+
+            <div class="recipe-info-section" [ngClass]="isEnableSendToPrinter ? 'enable-section' : 'disable-section'">
+                <div class="form-sections">
+                    <div class="label-input-section">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Active Recipe ID" i18n>:</kendo-label>
+                        <kendo-textbox [value]="pccData.recipe_id" [readonly]="true"></kendo-textbox>
+                    </div>
+                    <div class="label-input-section" [ngStyle]="{ 'margin-left': '10px' }">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Machine" i18n>:</kendo-label>
+                        <kendo-textbox [value]="pccData.machine_id" [readonly]="true"></kendo-textbox>
+                    </div>
+                </div>
+
+                <div class="form-sections">
+                    <div class="label-input-section custom_id_field">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Data" i18n>:</kendo-label>
+                        <kendo-textarea [value]="pccData.data" [cols]="150" [rows]="3" resizable="none" [readonly]="true"></kendo-textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="send_data_printer_section" [ngClass]="isEnableSendToPrinter ? 'enable-section' : 'disable-section'">
+                <span i18n>Send data from PCC to printer</span>
+                <kendo-button imageUrl="assets/icons/send-white.png"
+                    class="k-button-solid-primary"
+                    [disabled]="!isEnableSendToPrinter"
+                    (click)="sendPCCDatatoPrinter()" i18n>Send
+                </kendo-button>
+            </div>
+        </kendo-card-body>
+    </kendo-card>
+    <kendo-dialog-actions class="recipe-modal-action" [layout]="end">
+        <button class="recipe-modal-cancel-btn" kendoButton iconClass="k-icon k-i-close" (click)="closeInfoModal()"
+            i18n>Close
+        </button>
+    </kendo-dialog-actions>
+</kendo-dialog>
+
+<kendo-dialog i18n-title [title]="modalTitle" *ngIf="isClickSendDeviceBtn" (close)="closeSendDeviceModal()"
+    [width]="520" [minHeight]="250" [maxHeight]="350">
+    <kendo-card width="100%">
+        <kendo-card-body class="recipe-send-device-form">
+            <div class="send-device-question">
+                <span i18n>The recipe will be send to the device. Do you want to continue?</span>
+            </div>
+
+            <form novalidate class="k-form" [formGroup]="counterForm">
+                <div class="form-sections">
+                    <div class="counter-switch-label">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Set Order Counter" i18n>:</kendo-label>
+                    </div>
+                    <div class="counter-switch-input">
+                        <kendo-switch #is_order_manual_setting formControlName="is_order_manual_setting" [(ngModel)]="sendDeviceCounter.is_order_manual_setting"
+                            (valueChange)="onCounterSwitchChange($event, 'order_manual_setting')">
+                        </kendo-switch>
+                    </div>
+                </div>
+                <div class="form-sections" *ngIf="sendDeviceCounter.is_order_manual_setting">
+                    <div class="counter-input-field">
+                        <kendo-numerictextbox #order_manual_counter formControlName="order_manual_counter" [(ngModel)]="sendDeviceCounter.order_manual_counter" i18n-placeholder
+                            placeholder="No. Input" class="number-right-align" format="##" [spinners]="false"
+                            [min]="0" [max]="9999999" [decimals]="0" required>
+                        </kendo-numerictextbox>
+                    </div>
+                    <div class="counter-switch-input" [ngStyle]="{ 'margin-left': '10px' }">
+                        <button kendoButton class="counter-confirm-button" [primary]="true" iconClass="k-icon k-i-check" (click)="onCounterClickSet('order')" i18n>
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+                <div class="form-sections">
+                    <div class="counter-switch-label">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Set Daily Counter" i18n>:</kendo-label>
+                    </div>
+                    <div class="counter-switch-input">
+                        <kendo-switch #is_day_manual_setting formControlName="is_day_manual_setting" [(ngModel)]="sendDeviceCounter.is_day_manual_setting"
+                            (valueChange)="onCounterSwitchChange($event, 'day_manual_setting')">
+                        </kendo-switch>
+                    </div>
+                </div>
+                <div class="form-sections" *ngIf="sendDeviceCounter.is_day_manual_setting">
+                    <div class="counter-input-field">
+                        <kendo-numerictextbox #day_manual_counter formControlName="day_manual_counter" [(ngModel)]="sendDeviceCounter.day_manual_counter" i18n-placeholder
+                            placeholder="No. Input" class="number-right-align" format="##" [spinners]="false"
+                            [min]="0" [max]="9999999" [decimals]="0" required>
+                        </kendo-numerictextbox>
+                    </div>
+                    <div class="counter-switch-input" [ngStyle]="{ 'margin-left': '10px' }">
+                        <button kendoButton class="counter-confirm-button" [primary]="true" iconClass="k-icon k-i-check" (click)="onCounterClickSet('day')" i18n>
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </kendo-card-body>
+    </kendo-card>
+    <kendo-dialog-actions class="recipe-modal-action" [layout]="end">
+        <button class="recipe-modal-cancel-btn" kendoButton iconClass="k-icon k-i-close"
+            (click)="closeSendDeviceModal()" i18n>Cancel
+        </button>
+        <button class="recipe-modal-action-btn" kendoButton iconClass="k-icon icon-save" (click)="sendRecipetoDevice()"
+            themeColor="primary" i18n>Send Recipe
+        </button>
+    </kendo-dialog-actions>
+</kendo-dialog>
+
+<kendo-dialog i18n-title [title]="modalTitle" *ngIf="isDeleteRecipeBtn" (close)="closeDeleteRecipeModal()" [width]="450"
+    [height]="200">
+    <div class="message-div">
+        <span i18n>Are you sure you want to delete?</span>
+    </div>
+    <kendo-dialog-actions class="recipe-modal-action delete-modal" [layout]="end">
+        <button class="recipe-modal-action-btn" iconClass="k-icon k-i-close" kendoButton (click)="closeDeleteRecipeModal()" i18n>No
+        </button>
+        <button class="recipe-modal-action-btn" iconClass="k-icon k-i-check" kendoButton (click)="deleteRecipe()" themeColor="primary" i18n>Yes
+        </button>
+    </kendo-dialog-actions>
+</kendo-dialog>
+
+<kendo-dialog i18n-title [title]="modalTitle" *ngIf="isCopyRecipeBtn" (close)="closeCopyRecipeModal()" [width]="350"
+    [minHeight]="215" [maxHeight]="250">
+    <kendo-card width="100%">
+        <kendo-card-body class="recipe-copy-form">
+            <form novalidate class="k-form" [formGroup]="copyRecipeForm">
+                <div class="label-input-section">
+                    <kendo-label class="k-text-left header-lbl-format" i18n-text text="Machine" i18n>:</kendo-label>
+                    <kendo-combobox #machine formControlName="machine" [(ngModel)]="copyRecipeFormData.machine_id"
+                        [data]="castMachineList" textField="customText" valueField="id" [filterable]="false"
+                        (valueChange)="OnChangeMachine($event, 'copy')" i18n-placeholder placeholder="Select a Machine"
+                        required [class.formError]="form.get('machine').invalid">
+                    </kendo-combobox>
+                </div>
+            </form>
+            
+            <div class="message-div" style="margin-top: 10px;">
+                <span i18n>Would you like to copy the selected recipe?</span>
+            </div>
+        </kendo-card-body>
+    </kendo-card>
+    <kendo-dialog-actions class="recipe-modal-action copy-modal" [layout]="end">
+        <button class="recipe-modal-action-btn" iconClass="k-icon k-i-close" kendoButton (click)="closeCopyRecipeModal()" i18n>No
+        </button>
+        <button class="recipe-modal-action-btn" iconClass="k-icon k-i-check" kendoButton 
+            (click)="copyOldRecipe()" [disabled]="!copyRecipeFormData.machine_id" themeColor="primary" i18n>Yes
+        </button>
+    </kendo-dialog-actions>
+</kendo-dialog>

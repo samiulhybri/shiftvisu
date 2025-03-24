@@ -1,0 +1,149 @@
+@import '../../../../../schertech-theme/dist/scss/custom';
+@import '../../../../../schertech-theme/dist/scss/tokens';
+
+:host {
+    height: $sidebar-height;
+}
+
+::ng-deep {
+    .k-drawer-container {
+        height: inherit;
+
+        .k-drawer {
+            background-color: $kendo-color-primary;
+            border-radius: $tb-kendo-border-radius-layout;
+            height: inherit !important;
+            flex-basis: $sidebar-width !important;
+
+            .k-drawer-wrapper {
+                width: $sidebar-width !important;
+                overflow: hidden;
+
+                ul.k-drawer-items {
+                    padding: $sidebar-padding;
+
+                    .k-drawer-item {
+                        color: $kendo-selected-text;
+                        background-color: $kendo-color-primary;
+                        border-radius: $kendo-border-radius;
+                        margin-bottom: $sidebar-item-gap;
+
+                        &:hover,
+                        &.k-hover,
+                        &:active,
+                        &:focus,
+                        &.k-focus {
+                            background-color: $tb-kendo-link-hover !important;
+                            color: $kendo-selected-text !important;
+                            box-shadow: none;
+                        }
+
+                        &.k-selected {
+                            background-color: $tb-kendo-link-hover;
+                        }
+
+                        &.bottom-menu {
+                            position: absolute;
+                            bottom: 67px;
+                            width: calc(100% - 24px);
+                            
+                            &.cost.expanded {
+                                bottom: 372px;
+                            }
+                            
+                            &.cost-submenu-1 {
+                                bottom: 328px;
+                            }
+    
+                            &.cost-submenu-2 {
+                                bottom: 282px;
+                            }
+    
+                            &.cost-submenu-3 {
+                                bottom:  238px;
+                            }
+    
+                            &.cost-submenu-4,
+                            &.cost {
+                                bottom: 194px;
+                            }
+                            &.cost-submenu-5,
+                            &.cost {
+                                bottom: 154px;
+                            }
+                            &.cost-submenu-6,
+                            &.cost {
+                                bottom: 110px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .k-drawer-content {
+            padding-left: $sidebar-padding;
+            height: inherit;
+            width: calc(100% - $sidebar-width - $schertech-body-padding);
+        }
+        .release{
+            position: absolute;
+            width: 262px;
+            height: 60px;
+            font-weight: 300;
+            bottom: 17px;
+            color: white;
+            background-color: #004F72;
+            border-radius: 0px 8px;
+            font-size: 14px;
+            >p{
+                margin-left: 28px;
+                margin-bottom: 2px;
+                .copy-right{
+                    font-family: "Snasm-Regular";
+                    font-size: 13px;
+                    letter-spacing: 1px;
+                }
+            }
+          }
+    }
+}
+
+.img {
+    height: 16px;
+    width: 16px;
+    margin: 0px 10px -2px 0px;
+}
+
+.text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.icon {
+    margin-right: 10px;
+}
+
+.flex-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%; /* Ensures the container spans the available width */
+}
+
+.menu-content {
+    display: flex;
+    align-items: center;
+    flex-grow: 1; /* Allows content to take available space */
+    overflow: hidden; /* Hides overflowed content */
+}
+
+.menu-text {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.expand-icon {
+    margin-left: auto; /* Push the expand icon to the end */
+}

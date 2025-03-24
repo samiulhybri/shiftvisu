@@ -1,0 +1,62 @@
+<div class="h-full">
+	<app-grid-table 
+		headerTitle="Repair Type" 
+		url="/OperationPlans" 
+		filterQuery="is_imported eq false"
+		expandQuery="$expand=prodOrderPosOperations($select=id,custom_id)"
+	 	customSortType="desc" i18n-headerTitle
+		[columns]="columns" addButtonText="New Repair Type" [showDownload]="false" [showAction]="hasAuth"
+		[showSearch]="true" i18n-addButtonText [showNewButton]="hasAuth" selectionMode="Single"
+		(newButtonClick)="newButtonClick()" (editClick)="editRepairType($event)"
+		(deleteClick)="openRepairTypeDeleteModal($event)" (rowClick)="selectRepairType($event)"
+		[enableServerSideFiltering]="true"
+		[showTableSettingBtn]="false"
+		[isBaseVisu]="true"
+		(processData)="defaultRowSelection()" [showDeleteButton]="hasAuth" #childComponentRef>
+	</app-grid-table>
+
+	<ui5-dialog id="repairTypeDialog" [open]="isOpen" class="dialog-width" (beforeClose)="closeDialog()">
+		<div slot="header" class="w-100">
+			<div>
+				<ui5-title class="pb-2 pt-2" level="H5" i18n>{{dialogTitle}}</ui5-title>
+			</div>
+		</div>
+		<ui5-busy-indicator [active]="isLoading" size="L" class="w-full">
+			<div class="w-full form">
+
+				<div class="flex-col-item">
+					<ui5-label show-colon required i18n>Repair Type </ui5-label>
+					<ui5-input [(ngModel)]="operationPlan.custom_id" class="w-full" id="repairType" ngDefaultControl
+						name="repairType" placeholder="Write repair type master name" i18n-placeholder
+						[valueState]="errorValue">
+						<div slot="valueStateMessage">
+							{{ customIdValueStateText }}
+						</div>
+					</ui5-input>
+				</div>
+			</div>
+		</ui5-busy-indicator>
+		<div slot="footer" class="dialog-footer">
+			<ui5-button class="mr-1" design="Emphasized" id="dataSaveButton" access
+				ible-name="Button with Accessible Name" (click)="saveRepairTypeMaster()">
+				{{saveOrUpdateButtonTitle}}
+			</ui5-button>
+
+			<ui5-button (click)="closeDialog()" id="dialogCloseButton" design="Default">
+				{{ localization.close }}</ui5-button>
+		</div>
+	</ui5-dialog>
+
+		<ui5-dialog #deleteModal id="deleteDialogShift" header-text="Warning" [open]="isDeleteModalOpen"
+			state="Critical" i18n-header-text (beforeClose)="isDeleteModalOpen = false; selectedRepairTypeIdForDelete = undefined">
+			<ui5-busy-indicator [active]="isDeleteModalLoading" size="L" #deleteDialogLoader> 
+				<p style="width: 100%;">{{deleteModalText}}</p>
+			</ui5-busy-indicator >
+				<div slot="footer" class="footer-style gap-8">
+					<ui5-button class="dialogSubmit" design="Emphasized" (click)="DeleteSelectedRepairType()"
+						id="deleteSubmitButton" [disabled]="isRepairTypeUsed">{{ localization.ok }}</ui5-button>
+					<ui5-button id="deleteCloseButton"
+						(click)="isDeleteModalOpen = false; selectedRepairTypeIdForDelete = undefined">{{ localization.close}}</ui5-button>
+				</div>
+		</ui5-dialog>
+</div>

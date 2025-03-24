@@ -1,0 +1,13 @@
+<ui5-button
+	*ngIf="enableSelection"
+	class="mt-1.5"
+	(click)="deselectAllAssociate()"
+	design="Transparent">
+	{{ deSelectText }}
+</ui5-button>
+<ui5-button
+	class="mt-1.5"
+	(click)="selectAllAssociate()"
+	design="Transparent">
+	{{ selectAllText }}
+</ui5-button>

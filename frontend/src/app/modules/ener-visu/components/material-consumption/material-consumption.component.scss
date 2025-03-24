@@ -1,0 +1,17 @@
+@import '/schertech-theme/dist/scss/custom';
+
+:host {
+	height: inherit;
+}
+
+.container {
+	box-shadow: $kendo-appbar-box-shadow;
+	border-radius: $kendo-window-border-radius;
+	padding: $kendo-chart-container-padding;
+	background: $kendo-card-header-bg;
+}
+
+.k-card-body{
+	padding: $grid-inner-padding;
+	background: $kendo-grid-alt-bg;
+}

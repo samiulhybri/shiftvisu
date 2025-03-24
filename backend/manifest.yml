@@ -1,0 +1,31 @@
+services:
+  - name: pgdb
+    paremeters:
+      path: ./pg-options.json
+      service: postgresql-db
+      service-plan: free
+      skip-service-updates:
+        parameters: true
+      service-tags:
+        - plain
+applications:
+  - name: ((app_name))
+    memory: 1024M
+    buildpacks: [ php_buildpack ]
+    random-route: true
+    env:
+      APP_DEBUG: true
+      APP_ENV: cloud
+      CF_STAGING_TIMEOUT: 15
+      CF_STARTUP_TIMEOUT: 15
+      APP_NAME: ((app_name))
+      DB_CONNECTION: pgsql-cloud
+      LODATA_DISCOVERY_TTL: "null"
+      LODATA_VERSION: "4.1"
+      STANDSTILL_V10: 41
+      PRODUCTION_V10: 42
+      SETUP_V10: 43
+      OFF_V10: 44
+      APP_TIME_ZONE: "Asia/Dhaka"
+      DATA_CHUNK_SIZE: 200
+      MAIL_LOGO_SCT: "schertech-logo.jpg"

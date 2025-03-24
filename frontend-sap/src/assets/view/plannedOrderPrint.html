@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @media print {
+            @page {
+                size: auto;
+                margin: 0mm
+            }
+        }
+
+        body {
+            margin: 40px 56px !important;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+        <div class="container">
+            <div class="header-title"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div class="name-date" style="display: flex; flex-direction: column;">
+                    <span style="font-weight: bold;">valueClientName</span>
+                    <span>valuePresentDate</span>
+                </div>
+            </div>
+            <div class="d-flex items-center justify-between" style="gap:30px">
+                <div class="d-flex flex-col" style="width: 50%;">
+                    <div class="d-flex justify-between" style="margin-bottom: 5px;">
+                        <span class="bold">titleOrderNr</span>
+                        <span>valueOrderNr</span>
+                    </div>
+                    <div class="d-flex justify-between">
+                        <span class="bold">titleRepairStartDate</span>
+                        <span>valueRepairStartDate</span>
+                    </div>
+                   
+                </div>
+                <div style="width: 50%;text-align: center;">
+                   <span>barcodeSvg</span>
+                   <span>ToolName</span>
+                </div>
+            </div>
+            <div class="d-flex justify-between" style="margin-top: 24px; align-items: start;gap:30px">
+                <div class="d-flex flex-col" style="width: 50%; gap: 3px;">
+                    <div class="d-flex justify-between">
+                        <span class="bold">titleToolNr</span>
+                        <span>valueToolNr</span>
+                    </div>
+                    <div class="d-flex justify-between">
+                        <span class="bold">titleToolCalculation</span>
+                        <span>valueLenghtWidthHeight</span>
+                    </div>
+                    <div class="d-flex justify-between">
+                        <span class="bold">titleTotalWeight</span>
+                        <span>valueTotalWeight</span>
+                    </div>
+                </div>
+                <div style="width: 50%;text-align: center;">
+                   
+                 </div>
+            </div>
+            <div>
+                <hr>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; padding: 10px 0px;">
+                <span class="bold">titleRessGrp</span>
+                <span class="bold">titleRessNr</span>
+            </div>
+            <div>
+                <hr>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <span class="bold">titleIsProduction</span>
+                    <span>valueIsProductionPossible</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <span class="bold">titleLabelExternal</span>
+                    <span>valueLabelExternal</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <span class="bold">titleSuppliers</span>
+                    <span></span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <span class="bold">titleContactRef</span>
+                    <span></span>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; padding: 10px 0;">
+                <span class="bold">titleRemarks</span>
+            </div>
+            <span>valueRemarks</span>
+            <div style="width: 100%; padding: 40px 0; display: flex; justify-content: space-between;">
+                <div style="width: 50%; display: flex; align-items: center;  gap: 30px;">
+                    <span class="bold">titleCompletedBy</span>
+                    <span>..................................</span>
+                </div>
+                <div style="width: 50%; display: flex; align-items: center; gap: 30px; justify-content: end;">
+                    <span class="bold">titleTime</span>
+                    <span>..................................</span>
+                </div>
+                <div>
+                </div>
+                <hr>
+            </div>
+        </div>
+    </body>
+
+</html>

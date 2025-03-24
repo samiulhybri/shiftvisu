@@ -1,0 +1,114 @@
+<ui5-dialog
+	#modalRef
+	[class.dim-content]="isIndicator"
+	[open]="true"
+	style="max-width: 500px; min-width: 500px"
+	[headerText]="roleModel.id ? 'Update Role' : 'Add Role'">
+	<div
+		slot="header"
+		class="w-100">
+		<div>
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ dialogTitle }}</ui5-title
+			>
+		</div>
+	</div>
+
+	<ui5-busy-indicator
+		[active]="isIndicator"
+		size="L"
+		*ngIf="roleModel">
+		<div class="form">
+			<form
+				#roleForm="ngForm"
+				(ngSubmit)="submitForm()">
+				<div class="hall-dialog-body form input-group-control flex-col-item">
+					<div class="input-label-group">
+						<ui5-label
+							for="roleNameInput"
+							[required]="true"
+							[showColon]="true"
+							>{{ localization.name }}</ui5-label
+						>
+						<ui5-input
+							style="width: 100%"
+							[valueState]="valueState"
+							id="roleNameInput"
+							name="type"
+							[(ngModel)]="roleModel.name"
+							[required]="true"
+							placeholder="Enter new role name"
+							value="{{ roleModel.name }}"
+							(change)="onRoleNameChange($event)">
+						</ui5-input>
+					</div>
+
+					<div class="input-label-group mt-9">
+						<ui5-label
+							[required]="true"
+							[showColon]="true"
+							for="permission"
+							i18n
+							>Permission List</ui5-label>
+						<ui5-multi-combobox
+							#permissionRef
+							show-select-all
+							(ui5SelectionChange)="onPermissionChange()"
+							style="width: 100%"
+							id="permission"
+							name="permission"
+							placeholder="Type your value">
+							<ui5-mcb-item
+								attr.aria-valuetext="{{ permission.id }}"
+								[selected]="selectedPermissionList.includes(permission.id!)"
+								*ngFor="let permission of permissionList"
+								text="{{ permission.name }}"></ui5-mcb-item>
+						</ui5-multi-combobox>
+					</div>
+					<ui5-busy-indicator
+						size="M"
+						[active]="isIndicator"></ui5-busy-indicator>
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			slot="endContent"
+			[submits]="true"
+			(click)="submitForm()"
+			[disabled]="isIndicator || selectedPermissionList.length < 1">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			slot="endContent"
+			design="Transparent"
+            class="ml-5"
+			(click)="onCloseModal()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+<ui5-dialog
+	#errorDialogMachines
+	id="errorDialogMachines"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item"> </div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

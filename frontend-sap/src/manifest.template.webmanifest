@@ -1,0 +1,15 @@
+{
+	"name": "TITLE",
+	"short_name": "TITLE",
+	"theme_color": "#005981",
+	"background_color": "#fafafa",
+	"display": "standalone",
+	"scope": "./",
+	"start_url": "./",
+	"icons": [
+		{
+			"src": "assets/icons/icon.png",
+			"sizes": "512x512"
+		}		
+	]
+}

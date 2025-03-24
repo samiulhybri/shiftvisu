@@ -1,0 +1,16 @@
+ui5-dialog::part(header),
+ui5-dialog::part(footer) {
+	padding-inline: 1rem;
+}
+
+ui5-dialog::part(content) {
+	padding-inline: 2rem;
+}
+
+:host ::ng-deep .object-status > span {
+	display: block;
+	width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

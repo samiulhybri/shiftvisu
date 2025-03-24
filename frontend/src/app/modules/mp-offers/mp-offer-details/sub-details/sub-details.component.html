@@ -1,0 +1,60 @@
+<div [formGroup]="form" *ngIf="data != undefined">
+    <kendo-listview [data]="materialCostData" style="border-radius: 4px;">
+        <ng-template *ngIf="cost_sub_group != 'root_item' && cost_sub_group != 'notes'" kendoListViewHeaderTemplate>
+            <app-sub-details-header [cost_sub_group]="cost_sub_group"></app-sub-details-header>
+        </ng-template>
+        <ng-template kendoListViewItemTemplate let-dataItem="dataItem">
+            <ng-container formArrayName="data">
+                <div *ngFor="let mCost of data; let i = index" [ngStyle]="{ 'margin-bottom': '8px' }">
+                    <app-type-hours *ngIf="mCost.cost_type == 'HOURS'" [index]="i" [data]="mCost"
+                        (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-hours>
+                    <app-type-weight *ngIf="mCost.cost_type == 'WEIGHT'" [index]="i" [data]="mCost"
+                        [suppliers]="suppliers" (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-weight>
+                    <app-type-piece *ngIf="mCost.cost_type == 'PIECES'" [index]="i" [data]="mCost"
+                        [suppliers]="suppliers" (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-piece>
+                    <app-type-offer *ngIf="mCost.cost_type == 'OFFER'" [index]="i" [data]="mCost"
+                        [suppliers]="suppliers" (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-offer>
+                    <app-type-fixed *ngIf="mCost.cost_type == 'FIXED'" [index]="i" [data]="mCost"
+                        (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-fixed>
+                    <app-type-dimension *ngIf="mCost.cost_type == 'DIMENSION'" [index]="i" [data]="mCost"
+                        [base_data]="base_data" (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-dimension>
+                    <!--New Components Introduced 19.04.2023-->
+                    <app-type-fixed-name *ngIf="mCost.cost_type == 'FIXED_NAME'" [index]="i" [data]="mCost"
+                        (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-fixed-name>
+                    <app-type-hours-fixed *ngIf="mCost.cost_type == 'HOURS_FIXED'" [index]="i" [data]="mCost"
+                        (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-hours-fixed>
+                    <app-type-pf-pm *ngIf="mCost.cost_type == 'PF_PM'" [index]="i" [data]="mCost"
+                        (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-pf-pm>
+                    <app-type-mouldflow *ngIf="mCost.cost_type == 'MOULDFLOW'" [index]="i" [data]="mCost"
+                    [suppliers]="suppliers" (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-mouldflow>
+                    <app-type-fixed-weight *ngIf="mCost.cost_type == 'FIXED_WEIGHT'" [index]="i" [data]="mCost"
+                    (sendUpdatedData)="updatedData($event)" [isFieldDisabled]="offer.is_closed"></app-type-fixed-weight>
+                </div>
+            </ng-container>
+        </ng-template>
+        <!-- <ng-template *ngIf="cost_sub_group != 'root_item' && cost_sub_group != 'notes'" kendoListViewFooterTemplate>
+            <kendo-gridlayout [gap]="{ rows:20, cols: 10 }" style="padding:10px;" [cols]="[{ width: 300 },{width: 'auto' },{width: 90 },{width: 90 },{width: 90 },{width: 90 },{width: 150 }]">
+                <kendo-gridlayout-item [row]="1" [col]="1">
+                    Total <label [textContent]="title"></label>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="3" style="text-align: right;"
+                *ngIf="offer.getTotalPersonHours(cost_sub_group)>0">
+                    <kendo-numerictextbox tabindex="-1" class="number-right-align" [style.width.px]="90"
+                        placeholder="{{offer.getTotalPersonHours(cost_sub_group)}}"
+                        formControlName="total" [readonly]="true" [spinners]="false"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="4" style="text-align: right;" 
+                *ngIf="offer.getTotalMachineHours(cost_sub_group)>0">
+                    <kendo-numerictextbox tabindex="-1" class="number-right-align" [style.width.px]="90"
+                        placeholder="{{offer.getTotalMachineHours(cost_sub_group)}}"
+                        formControlName="total" [readonly]="true" [spinners]="false"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+                <kendo-gridlayout-item [row]="1" [col]="7" style="text-align: right;">
+                    <kendo-numerictextbox tabindex="-1" class="number-right-align" [style.width.px]="150"
+                        placeholder="{{intl.formatNumber(offer.getTotalCostSubGroup(cost_sub_group), 'c', 'it')}}"
+                        formControlName="total" [readonly]="true" [spinners]="false"></kendo-numerictextbox>
+                </kendo-gridlayout-item>
+            </kendo-gridlayout>
+        </ng-template> -->
+    </kendo-listview>
+</div>

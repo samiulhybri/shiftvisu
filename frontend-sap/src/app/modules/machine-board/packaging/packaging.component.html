@@ -1,0 +1,428 @@
+<ui5-dialog
+	#packagingModalRef
+	[open]="true"
+	(beforeClose)="closeDialog()"
+	[headerText]="dialogTitle"
+	class="w-[95vw] bg-gray-100 flex flex-col">
+	<ui5-busy-indicator class="w-full" [active]="isLoading">
+		<div class="main-div flex-grow">
+			<div class="w-full h-full">
+				<ui5-card class="flex flex-col">
+					<div class="overflow-x-auto flex-grow h-full">
+						<app-carton-packaging
+							#cartonPackagingRef
+							(onOpenHandlingUnit)="onOpenHandlingUnit($event)"
+							(packagingPositionLength)="onPackagingPositionLength($event)"
+							(onStockPackaging)="openStockPackagingDialog($event, false)"
+							(onStockDisuniting)="openStockPackagingDialog($event, true)"
+							(onDePackaging)="openDePackagingDialog()"
+							(onUpdateSelectedHU)="updateSelectedHandlingUnit($event)"
+							(onDeleteHandlingUnit)="deletedHandlingUnit()"
+							[handlingUnits]="handlingUnits"
+							[selectedItem]="selectedItem"
+							[selectedOperationId]="selectedOperationId"
+							[selectedHandlingUnit]="selectedHandlingUnit">
+						</app-carton-packaging>
+					</div>
+				</ui5-card>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave($event)"
+			[disabled]="
+				disableButtonDuringRequest ||
+				!selectedHandlingUnit.custom_id ||
+				(!isPackagingPositionLength && selectedHandlingUnit.id)
+			"
+			>
+			{{ localization.save }}</ui5-button>
+		<ui5-button
+			class="ml-8"
+			design="Default"
+			(click)="onSaveAndPrint($event)"
+			[disabled]="
+				disableButtonDuringRequest ||
+				!selectedHandlingUnit.custom_id ||
+				(!isPackagingPositionLength && selectedHandlingUnit.id)
+			"
+			i18n>
+			Save & Print
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()"
+			>
+			{{ localization.close }}</ui5-button>
+	</div>
+	<ui5-toast
+		#statusToastTools
+		id="statusToastTools"
+		placement="BottomCenter"
+		>{{ toasterStatus }}
+	</ui5-toast>
+</ui5-dialog>
+
+<app-dialog
+	id="boxPackagingDialog"
+	[isDialogOpen]="isHandlingUnitDialogOpen"
+	(onBeforeClose)="closeHandlingDialog()"
+	[title]="newHandlingUnitDialogTitle">
+	<ui5-busy-indicator
+		[active]="isInstructionLoading"
+		size="L">
+		<div class="w-[500px] p-8">
+			<div *ngIf="isNewHandlingUnit">
+				<div class="input-selection-grid">
+					<ui5-label
+						class="label-flex-end"
+						for="packagingInstruction"
+						show-colon
+						i18n
+						>Packaging Instruction</ui5-label
+					>
+					<ui5-busy-indicator
+						class="w-full busy-indicator-flex"
+					>
+						<ui5-multi-input
+							id="itemsMultiInput"
+							class="w-full"
+							#instructionInputRef
+							[disabled]="packagingInstructions.length ? false : true"
+							[showValueHelpIcon]="packagingInstructions.length ? true : false"
+							[(ngModel)]="instructionCustomID"
+							(ui5Input)="onSearchInstruction()"
+							(ui5ValueHelpTrigger)="onOpenInstructions()"
+						></ui5-multi-input>
+					</ui5-busy-indicator>
+				</div>
+				<div class="input-selection-grid">
+					<ui5-label
+						class="label-flex-end"
+						for="quantityProduced"
+						[required]="true"
+						[showColon]="true"
+						i18n
+						>Item</ui5-label
+					>
+					<ui5-busy-indicator
+						class="w-full busy-indicator-flex"
+					>
+						<ui5-multi-input
+							id="itemsMultiInput"
+							class="w-full"
+							#itemsMultiInputRef
+							[showValueHelpIcon]="instructionCustomID ? false : true"
+							[disabled]="instructionCustomID ? true : false"
+							[(ngModel)]="selectedItemName"
+							(ui5Input)="onSearchItem()"
+							(ui5ValueHelpTrigger)="onOpenItemList()"
+						></ui5-multi-input>
+					</ui5-busy-indicator>
+				</div>
+			</div>
+			<div class="mt-5" *ngIf="isNewHandlingUnit && selectedItem.id">
+				<app-item-image 
+					[height]="'340px'" 
+					[itemId]="selectedItem.id" 
+					class="w-full" 
+					[isCard]="true"
+					[isSingleImage]="true"
+				></app-item-image>
+			</div>
+			
+			<div *ngIf="!isNewHandlingUnit" class="grid grid-cols-6 gap-4">
+				<div
+					*ngIf="!isNewHandlingUnit"
+					class="col-span-2 flex justify-end items-center">
+					<ui5-label
+						for="quantityProduced"
+						[required]="true"
+						[showColon]="true"
+						i18n
+						>Handling Unit</ui5-label
+					>
+				</div>
+				<div
+					*ngIf="!isNewHandlingUnit"
+					class="col-span-4 mr-[16px]">
+					<ui5-busy-indicator
+						[active]="isLoadingHU"
+						class="w-full"
+					>
+						<ui5-multi-input
+							id="showPos"
+							class="w-full"
+							#showPopRef
+							[disabled]="handlingUnits.length == 0"
+							[showValueHelpIcon]="true"
+							[(ngModel)]="selectedHUCustomId"
+							(ui5Input)="onSearchHandlingUnit()"
+							(ui5ValueHelpTrigger)="onHelpClick()"
+						></ui5-multi-input>
+					</ui5-busy-indicator>
+				</div>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSaveHandlingUnit()"
+			[disabled]="
+				disableButtonDuringRequest || (isNewHandlingUnit && selectedItemName == '') || (!isNewHandlingUnit && selectedHUCustomId == '')
+			"
+			>
+			{{ localization.save }}</ui5-button>
+		<ui5-button
+			class="ml-8"
+			(click)="closeHandlingDialog()"
+			>
+			{{ localization.close }}</ui5-button>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	id="dialog"
+	state="Critical"
+	[open]="isOpenDataUnsavedDialog"
+	header-text="Warning"
+	i18n-header-text>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L">
+		<p i18n>You have unsaved changes. Do you want to save?</p>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-end">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+				class="mr-1 mb-1"
+				(click)="closeDataUnSavedDialog()"
+				i18n
+				>No</ui5-button
+			>
+			<ui5-button
+				class="mr-1 mb-1"
+				design="Emphasized"
+				(click)="saveUnSavedData()"
+				i18n
+				>Yes</ui5-button
+			>
+		</div>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#stockPackagingDialog
+	id="stockPackagingDialog"
+	header-text="Add Quantity"
+	i18n-header-text>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L">
+		<div class="w-[500px] grid grid-cols-4 gap-4 p-8">
+			<div class="col-span-1 flex justify-end items-center">
+				<ui5-label
+					for="inStock"
+					show-colon
+					i18n
+					>In Stock
+				</ui5-label>
+			</div>
+			<div class="col-span-3 mr-[16px]">
+				<ui5-input
+					class="w-full"
+					[readonly]="true"
+					type="Number"
+					value="{{ +stockAmount }}"></ui5-input>
+			</div>
+
+			<div class="col-span-1 flex justify-end items-center">
+				<ui5-label
+					for="quantity"
+					show-colon
+					i18n
+					>Add Quantity</ui5-label>
+			</div>
+			<div class="col-span-3 mr-[16px]">
+				<ui5-input
+					#quantityInputRef
+					id="quantity"
+					name="quantity"
+					class="w-full"
+					[(ngModel)]="quantityAdded"
+					(ui5Input)="onInputChange()"
+					[valueState]="isError ? 'Negative' : 'None'"></ui5-input>
+			</div>
+			<ui5-tag
+				*ngIf="isError"
+				class="col-span-4"
+				design="Set2"
+				color-scheme="2"
+				>{{ errorStatus }}</ui5-tag
+			>
+		</div>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			[disabled]="!quantityAdded || isError"
+			design="Emphasized"
+			(click)="isHandlingUnitUnpack ? onSaveUnpack() : onSavePackage()"
+			i18n>
+			{{ localization.save }}</ui5-button>
+		<ui5-button
+			class="ml-8"
+			(click)="stockPackagingDialog.open = false"
+			i18n>
+			{{ localization.close }}</ui5-button>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#errorDialog
+	state="Negative"
+	header-text="Error"
+>
+	<p>{{ errorStatus }}</p>
+	<div
+		slot="footer"
+		class="flex justify-end w-full items-center">
+		<ui5-button
+			class="dialogCloser"
+			id="close-error-dialog"
+			(click)="onErrorDialogClose()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-popover
+	#handlingUnitListPopover
+	class="w-[500px] h-[500px]"
+	[placement]="'Bottom'"
+	header-text="Handling Unit"
+	i18n-header-text
+>
+	<div>
+		<ui5-list [loading]="loading" [growing]="'Scroll'" (ui5LoadMore)="onLoadMore()" (ui5ItemClick)="onItemClick($event)">
+			<ng-container *ngFor="let handlingUnit of handlingUnits">
+				<ui5-li
+					[style.cursor]="savedHandlingUnitCustomIds.includes(handlingUnit.custom_id!) || !selectableHUCustomIds.includes(handlingUnit.custom_id!) || handlingUnit.is_complete ? 'not-allowed' : ''"
+					*ngIf="handlingUnit.is_active"
+					[id]="handlingUnit.id"
+					[additionalText]="handlingUnit.custom_id"
+					[description]="handlingUnit.item?.name"
+				>{{handlingUnit.custom_id}}</ui5-li>
+			</ng-container>
+		</ui5-list>
+	</div>
+</ui5-popover>
+
+<ui5-popover
+	#itemListPopover
+	class="w-[500px] h-[500px]"
+	[placement]="'Bottom'"
+	header-text="Items"
+	i18n-header-text
+>
+	<div>
+		<ui5-list [loading]="loading" [growing]="'Scroll'" (ui5LoadMore)="onLoadMoreItems()" (ui5ItemClick)="onItemSelect($event)">
+			<ng-container *ngFor="let item of items">
+				<ui5-li
+					*ngIf="item.is_active"
+					[id]="item.id"
+					[additionalText]="item.custom_id"
+					[selected]="selectedItem.custom_id === item.custom_id"
+				>{{item.name}}</ui5-li>
+			</ng-container>
+		</ui5-list>
+	</div>
+</ui5-popover>
+
+<ui5-popover
+	#packagingInstructionPopover
+	class="w-[500px] h-[500px]"
+	[placement]="'Bottom'"
+	header-text="Packaging Instruction"
+	i18n-header-text
+>
+	<div>
+		<ui5-list [loading]="loading" [growing]="'Scroll'" (ui5LoadMore)="onLoadMoreInstruction()" (ui5ItemClick)="onInstructionSelect($event)">
+			<ng-container *ngFor="let instruction of packagingInstructions">
+				<ui5-li
+				style="height: 120px;"
+					*ngIf="instruction.is_active"
+					[id]="instruction.id"
+					[additionalText]="selectedOrderDetails?.itemId"
+					[attr.data-customid]="instruction.custom_id"
+				>
+				<div style="display: flex; align-items: center; justify-content: center;">
+					<p>{{instruction.custom_id}}</p>
+					<app-item-image 
+						class="w-full" 
+						[height]="'110px'" 
+						[itemId]="instruction.packagingInstructionPos[0].packable_id" 
+						[isCard]="false"
+						[isSingleImage]="true"
+					></app-item-image>
+				</div>
+			</ui5-li>
+			</ng-container>
+		</ui5-list>
+	</div>
+</ui5-popover>
+
+<ui5-dialog
+	#stockDePackagingDialog
+	class="w-[50vw]"
+	header-text="De-Packaging"
+	i18n-header-text
+>
+	<ui5-card>
+		<div class="h-[500px]">
+			<app-grid-table
+				headerTitle=""
+				url=""
+				[columns]="dePackagingColumn"
+				i18n-headerTitle=""
+				[showSearch]="false"
+				[showDownload]="false"
+				[showAction]="false"
+				selectionMode="None"
+				[data]="cartonPackagingRef.depackagingData"
+				[showActiveButton]="false"
+				[customData]="true"
+				[isBusy]="true"
+				#childComponentPackagingRef>
+			</app-grid-table>
+		</div>
+	</ui5-card>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			(ui5Click)="onSaveDePackagingData()"
+			design="Emphasized"
+			[disabled]="cartonPackagingRef.depackagingData.length < 1"
+			>
+			{{ localization.save }}</ui5-button>
+		<ui5-button
+			class="ml-8"
+			(click)="stockDePackagingDialog.open = false"
+			>
+			{{ localization.close }}</ui5-button>
+	</div>
+</ui5-dialog>

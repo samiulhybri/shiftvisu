@@ -1,0 +1,345 @@
+<div
+	class="flex h-full"
+	cdkDropListGroup>
+	<div class="shellbar">
+		<div class="overflow-y-auto overflow-x-hidden">
+			<div class="w-full flex flex-row justify-between">
+				<ui5-li>
+					<ui5-title
+						level="H5"
+						class="noselect mr-[30px]"
+						i18n
+						>Backlog</ui5-title
+					>
+				</ui5-li>
+			</div>
+			<ui5-list
+				[loading]="isLoading"
+				class="w-full"
+				growing="Scroll"
+				(ui5LoadMore)="onLoadMore()"
+				cdkDropList
+				id="customerBacklogList"
+				[cdkDropListData]="customerLists"
+				[cdkDropListConnectedTo]="['salesOrderList']">
+				<div
+					*ngFor="let list of customerLists"
+					class="mx-4 mt-2 shadow-md rounded-xl">
+					<app-generic-tag
+						id="{{ list.id }}"
+						cdkDrag
+						(dblclick)="customerDetails(list)">
+						<div class="ml-[11px] mr-[11px] flex direction-row items-center w-[90%]">
+							<div class="ml-[11px] mr-[11px] flex flex-col w-full">
+								<ui5-title
+									id="customerName-{{ list.id }}-{{ list.name }}"
+									level="H6"
+									class="noselect w-full overflow-hidden text-ellipsis whitespace-nowrap"
+									(mouseenter)="
+										onMouseEnter('customerName', list.name || '', list)
+									"
+									(mouseleave)="onMouseLeave()">
+									{{ list.name || ""}}
+								</ui5-title>
+
+								<ui5-title
+									id="salesStatus-{{ list.id }}-{{
+										list?.salesStatus?.custom_id
+									}}"
+									level="H6"
+									class="noselect"
+									(mouseenter)="
+										onMouseEnter(
+											'salesStatus',
+											list?.salesStatus?.custom_id || '',
+											list
+										)
+									"
+									(mouseleave)="onMouseLeave()">
+
+									{{ list?.salesStatus?.custom_id || "" | truncate: 15 }}
+								</ui5-title>
+								<ui5-title
+									id="dateFollowUp"
+									level="H6"
+									class="noselect"
+									i18n>
+									Date:
+									{{
+										list?.date_follow_up
+											? (list?.date_follow_up | date: "dd.MM.yyyy")
+											: ""
+									}}
+								</ui5-title>
+							</div>
+						</div>
+					</app-generic-tag>
+				</div>
+			</ui5-list>
+		</div>
+	</div>
+	<div class="h-full w-full content">
+		<ui5-popover #overflowPopover id="overflowPopover" opener="overflowButton" header-text="Filter" [open]="showheaderPopOver"
+			(before-close)="headerPopOverClose($event)" placement="Start">
+			<div class="flex flex-col gap-2 p-2 border-b" #popoverList>
+				<div class="sm:block md:block lg:block xl:hidden 2xl:hidden">
+					<div class="flex flex-row items-center justify-end">
+						<ui5-label class="mr-1" show-colon i18n>Responsible User</ui5-label>
+						<ui5-multi-combobox slot="endContent" i18n-placeholder show-select-all placeholder="Select Responsible User"
+							(ui5SelectionChange)="selectResponsibleUser($event)">
+							<ui5-mcb-item [id]="user.id" [selected]="user.id && selectedUsersIds.includes(user.id.toString())" [text]="user.name || 'No name found'" *ngFor="let user of users"></ui5-mcb-item>
+						</ui5-multi-combobox>
+					</div>
+				</div>
+				<div>
+					<div class="flex flex-row items-center justify-end">
+						<ui5-label class="mr-1" show-colon i18n>Country</ui5-label>
+						<ui5-multi-combobox slot="endContent" i18n-placeholder show-select-all placeholder="Select Country"
+							(ui5SelectionChange)="selectCountry($event)">
+							<ui5-mcb-item [id]="c.id" [selected]="c.id && selectedCountriesIds.includes(c.id.toString())" [text]="c.name" *ngFor="let c of countries"></ui5-mcb-item>
+						</ui5-multi-combobox>
+					</div>
+				</div>
+				<div>
+					<div class="flex flex-row items-center justify-end">
+						<ui5-label class="mr-1" show-colon i18n>Revenue Classification</ui5-label>
+						<ui5-multi-combobox slot="endContent" i18n-placeholder show-select-all placeholder="Select Revenue Classification"
+							(ui5SelectionChange)="selectRevenueClassification($event)">
+							<ui5-mcb-item [id]="rClassification.id" [selected]="rClassification.id && selectedRClassificationsIds.includes(rClassification.id.toString())" [text]="rClassification.name" *ngFor="let rClassification of revenueClassifications"></ui5-mcb-item>
+						</ui5-multi-combobox>
+					</div>
+				</div>
+				<div>
+					<div class="flex flex-row items-center justify-end">
+						<ui5-label class="mr-1" show-colon i18n>Employee Classification</ui5-label>
+						<ui5-multi-combobox slot="endContent" i18n-placeholder show-select-all placeholder="Select Employee Classification"
+							(ui5SelectionChange)="selectEmployeeClassification($event)">
+							<ui5-mcb-item [id]="eClassification.id" [selected]="eClassification.id && selectedEClassificationsIds.includes(eClassification.id.toString())" [text]="eClassification.name" *ngFor="let eClassification of employeeClassifications"></ui5-mcb-item>
+						</ui5-multi-combobox>
+					</div>
+				</div>
+				<div>
+					<div class="flex flex-row items-center justify-end">
+						<ui5-label class="mr-1" show-colon i18n>Market Segment</ui5-label>
+						<ui5-multi-combobox slot="endContent" i18n-placeholder show-select-all placeholder="Select Market Segment"
+							(ui5SelectionChange)="selectMarketSegment($event)">
+							<ui5-mcb-item [id]="marketSegment.id" [selected]="marketSegment.id && selectedMSegmentsIds.includes(marketSegment.id.toString())" [text]="marketSegment.name" *ngFor="let marketSegment of marketSegments"></ui5-mcb-item>
+						</ui5-multi-combobox>
+					</div>
+				</div>
+				<div>
+					<div class="flex flex-row items-center justify-end">
+						<ui5-label
+							class="noselect mr-1"
+							i18n
+							show-colon
+							>Date Until</ui5-label
+						>
+						<div>
+							<ui5-date-picker
+								id="endDatePicker"
+								class="mr-1"
+								format-pattern="dd.MM.yyyy"
+								class="noselect"
+								[value]="formatedEndDate"
+								(change)="changeEndDate($event)"
+								[minDate]="formatedCurrentDate"
+								[maxDate]="lastDayOfMonth">
+							</ui5-date-picker>
+						</div>
+					</div>
+				</div>
+				<div>
+					<div class="flex flex-row items-center justify-end">
+						<ui5-label class="mr-1" show-colon i18n>Sales Status</ui5-label>
+						<ui5-multi-combobox #salesRef show-select-all (ui5SelectionChange)="onSelectSaleStatus($event)"
+							id="salesCombobox" name="salesStatus" i18n-placeholder placeholder="Select Sales Status">
+							<ui5-mcb-item [selected]="status.id && isIncludes(selectedSalesStatusList,status.id)" *ngFor="let status of salesStatus" attr.aria-valuetext="{{ status.id }}"
+								text="{{ status.custom_id }}"></ui5-mcb-item>
+						</ui5-multi-combobox>
+					</div>
+				</div>
+				<div>
+					<div class="flex flex-row items-center justify-end">
+						<ui5-segmented-button (selection-change)="weekDayChange()">
+							<ui5-segmented-button-item [selected]="isWeek" i18n>Weekly</ui5-segmented-button-item>
+							<ui5-segmented-button-item [selected]="!isWeek" i18n>Daily</ui5-segmented-button-item>
+						</ui5-segmented-button>
+					</div>
+				</div>
+				<div>
+					<div class="flex flex-row items-center justify-end">
+						<ui5-button design="Emphasized" (click)="dateFilter()" i18n>
+							Refresh
+						</ui5-button>
+					</div>
+				</div>
+			</div>
+
+		</ui5-popover>
+
+		<div id="headerContainer" #headerContainer class="flex flex-row justify-between h-11 rounded-tr-2xl items-center border-y">
+			<div #headerTitle class="pl-4">
+				<ui5-title level="H5" class="noselect" i18n>Customer Schedule</ui5-title>
+			</div>
+			<div class="flex flex-row items-center justify-end">
+				<div id="headerItems" #headerItems class="flex flex-row items-center justify-end space-x-2 mr-2">
+					<div>
+						<div class="flex flex-row items-center justify-end">
+							<ui5-input
+								id="searchInput"
+								class="noselect mr-4"
+								slot="searchField"
+								placeholder="Search"
+								[(ngModel)]="searchedValue"
+								(input)="onSearchInput($event)">
+								<ui5-icon
+									name="search"
+									slot="icon"
+									ui5-icon=""></ui5-icon>
+							</ui5-input>
+						</div>
+					</div>
+					<div class="sm:hidden md:hidden lg:hidden xl:block 2xl:block">
+						<div class="flex flex-row items-center justify-end">
+							<ui5-label class="mr-1" show-colon i18n>Responsible User</ui5-label>
+							<ui5-multi-combobox slot="endContent" i18n-placeholder show-select-all placeholder="Select Responsible User"
+								(ui5SelectionChange)="selectResponsibleUser($event)">
+								<ui5-mcb-item [id]="user.id" [text]="user.name || 'No name found'" [selected]="user.id && selectedUsersIds.includes(user.id.toString())" *ngFor="let user of users"></ui5-mcb-item>
+							</ui5-multi-combobox>
+						</div>
+					</div>
+				</div>
+				<div id="overflowButton" #overflowButton class="pr-2">
+					<ui5-button (click)="openFilterPopover($event)">...</ui5-button>
+				</div>
+			</div>
+		</div>
+		<div
+			cdkScrollable class="overflow-auto h-[calc(100%-44px)]">
+			<ui5-table
+				[loading]="isLoading"
+				mode="None"
+				overflow-mode="Scroll"
+				class="h-[99%] rounded-bl-2xl">
+				<ui5-table-header-row
+					slot="headerRow"
+					sticky>
+					<ui5-table-header-cell
+						class="overflow-hidden border-solid border-x-0 border-b-0 border-color"
+						min-width="210px">
+						<ui5-title
+							level="H5"
+							i18n
+							class="noselect"
+							>Date</ui5-title
+						>
+					</ui5-table-header-cell>
+
+					<ui5-table-header-cell
+						*ngFor="let status of filteredCustomers.all_sales_statuses"
+						class="noselect border-l border-solid border-color border-b-0 border-r-0"
+						min-width="300px">
+						<ui5-title level="H5">{{ status.custom_id }}</ui5-title>
+					</ui5-table-header-cell>
+				</ui5-table-header-row>
+				<ui5-table-row
+					*ngFor="let filteredCustomer of filteredCustomers.data"
+					class="h-[170px]"
+                    >
+					<ui5-table-cell>
+						<div class="w-full flex flex-col justify-center">
+							<ui5-title
+								level="H5"
+								class="noselect ml-4"
+								>{{ filteredCustomer.date | date: "dd.MM.yyyy" }}</ui5-title
+							>
+						</div>
+					</ui5-table-cell>
+					<ui5-table-cell
+						*ngFor="let status of filteredCustomer.salesStatuses"
+						class="border-solid border-color border-y-0 border-r-0 p-0">
+						<div class="w-full h-full">
+							<div class="mt-[10px] ml-4 mr-4 h-[155px] overflow-auto mb-[10px]">
+								<ui5-list
+									#scrollEl
+									class="h-full overflow-auto"
+									cdkDropList
+									id="salesOrderList"
+									[cdkDropListAutoScrollStep]="35"
+									(cdkDropListDropped)="dropCustomer($event, filteredCustomer.date, status)"
+									[cdkDropListConnectedTo]="['customerBacklogList']"
+									[cdkDropListData]="selectedSalesStatusList">
+									@for (customer of status.data; track $index) {
+											<div
+												cdkDrag
+												id="{{ customer.id }}"
+												class="overflow-auto mr-[10px] mb-1.5 shadow-md rounded-xl">
+												<app-generic-tag
+													(dblclick)="customerDetails(customer)">
+													<div
+														class="ml-[11px] mr-[11px] flex direction-row items-center w-full">
+														<div
+															class="ml-[11px] mr-[11px] flex flex-col w-[90%]">
+															<ui5-title
+																id="filteredCustomerName-{{
+																	customer?.id
+																}}-{{ customer?.name }}"
+																level="H6"
+																class="noselect w-full overflow-hidden text-ellipsis whitespace-nowrap"
+																(mouseenter)="
+																	onMouseEnter(
+																		'filteredCustomerName',
+																		customer?.name,
+																		customer
+																	)
+																"
+																(mouseleave)="onMouseLeave()"
+																>
+																{{
+																	customer?.name || ""
+																}}
+															</ui5-title>
+														</div>
+													</div>
+												</app-generic-tag>
+											</div>
+									}
+								</ui5-list>
+							</div>
+						</div>
+					</ui5-table-cell>
+				</ui5-table-row>
+			</ui5-table>
+		</div>
+	</div>
+</div>
+<div *ngIf="isViewDialogOpen">
+	<app-details
+		[selectedCustomer]="selectedCustomer"
+		[isDialogOpen]="isDialogOpen"
+		[dialogTitle]="dialogTitle"
+		[customId]="this.selectedCustomer.custom_id || ''"
+		[customer]="selectedCustomer.id || 0"
+		[users]="users"
+		[revenueClassifications]="revenueClassifications || []"
+		[machineClassifications]="machineClassifications || []"
+		[employeeClassifications]="employeeClassifications || []"
+		[potentialClassifications]="potentialClassifications || []"
+		[marketSegments]="marketSegments || []"
+		[country]="countries || []"
+		[salesStatuses]="salesStatusAll"
+		(closeCRMDialog)="closeDialog()"
+		(customerUpdated)="handleCustomerUpdated($event)">
+	</app-details>
+</div>
+<ui5-popover
+	id="popOver"
+	[open]="showPopOver"
+	[opener]="opener"
+	placement="Bottom"
+	(after-close)="onMouseLeave()">
+	<div class="popover-content">
+		<ui5-text>{{ popoverText }}</ui5-text>
+	</div>
+</ui5-popover>

@@ -1,0 +1,230 @@
+<div class="h-full w-full sapBackgroundColor">
+	<div class="flex items-stretch gap-3 h-full">
+		<div class="h-full w-[50%] rounded-md sapBaseColor">
+			<div class="h-full">
+				<app-grid-table
+					#maintenanceTypeTable
+					headerTitle="Maintenance Type"
+					i18n-headerTitle
+					[showRowDataCount]="true"
+					[showAction]="true"
+					[showDownload]="false"
+					[columns]="maintenanceTypeColumns"
+					[showActiveButton]="false"
+					[showNewButton]="true"
+					[showSearch]="true"
+					url="/OperationPlans"
+					selectionMode="Single"
+					(newButtonClick)="onClickMaintenanceType()"
+					(deleteClick)="deleteMaintenanceType($event)"
+					[enableServerSideFiltering]="true"
+					keyForCacheCustomDataTableColumns="/OperationPlans"
+					addButtonText="New Maintenance Type"
+					(editClick)="maintenanceTypeEdit($event)"
+					(rowClick)="maintenanceTypeSelectionChange($event)"
+					(processData)="defaultRowSelection()"
+					(searchClick)="handleSearchClick($event)"
+					i18n-addButtonText>
+				</app-grid-table>
+			</div>
+		</div>
+		<div class="h-full w-[49%] rounded-md sapBaseColor">
+			<div class="h-full">
+				<app-grid-table
+				    [headerTitle]="maintenanceTypeId && selectedMaintenanceType ? selectedMaintenanceType.custom_id : noMaintenanceName"
+					i18n-headerTitle
+					url="/OperationPlanPos"
+					[showAction]="true"
+					[showDownload]="false"
+					[showRowDataCount]="true"
+					[columns]="maintenanceColumns"
+					[showActiveButton]="false"
+					[showNewButton]="true"
+					[showSearch]="true"
+					selectionMode="None"
+					(newButtonClick)="onClickNewMaintenance()"
+					(editClick)="onClickEditwMaintenance($event)"
+					[enableServerSideFiltering]="false"
+					addButtonText="New Maintenace"
+					[addButtonDisable]="true"
+					#maintenanceTable
+					i18n-addButtonText>
+				</app-grid-table>
+			</div>
+		</div>
+	</div>
+	<app-dialog [isDialogOpen]="isMaintenanceTypeDialog">
+		<div
+			slot="header"
+			class="w-100">
+			<div class="ml-[-10px]">
+				<ui5-title
+					class="pd-10"
+					level="H5"
+					>{{ maintenanceDialogTitle }}
+				</ui5-title>
+			</div>
+		</div>
+		<div class="h-[50px] w-[418px] form">
+			<form #createOrUpdateForm="ngForm">
+				<div class="flex-col-item w-full">
+					<ui5-label
+						i18n
+						required
+						showColon
+						>Maintenance Type</ui5-label
+					>
+					<ui5-input
+						#customId="ngModel"
+						[valueState]="
+							(customId.valid == false &&
+								(customId.touched || createOrUpdateForm.submitted)) ||
+							isMaintenanceTypeSaveError
+								? 'Negative'
+								: 'None'
+						"
+						class="w-full"
+						placeholder="Write Maintenance type name"
+						i18n-placeholder
+						name="operationPlanCustomId"
+						[required]="true"
+						[(ngModel)]="operationPlanCustomId"
+						id="maintenanceTypeInput">
+						<div
+							slot="valueStateMessage"
+							>
+							{{ maintenanceTypeValueStateText }}
+						</div>
+					</ui5-input>
+				</div>
+			</form>
+		</div>
+		<div
+			slot="footer"
+			class="dialog-footer">
+			<ui5-button
+				id="saveButton"
+				design="Emphasized"
+				(click)="onConfirm()"
+				[disabled]="disableButtonDuringRequest"
+				i18n>
+				Save</ui5-button>
+			<ui5-button
+				id="cancelButton"
+				class="ml-8 border-none"
+				(click)="onClose()"
+				i18n>
+				Close</ui5-button>
+		</div>
+	</app-dialog>
+	<app-dialog [isDialogOpen]="isMaintenanceDialog">
+		<div
+			slot="header"
+			class="w-100">
+			<div class="ml-[-10px]">
+				<ui5-title
+					class="pd-10"
+					level="H5"
+					>{{ maintenanceDialogTitle }}
+				</ui5-title>
+			</div>
+		</div>
+		<div class="h-[110px] w-[418px] form">
+			<form #createForm="ngForm">
+				<div class="flex-col-item w-full pb-2">
+					<ui5-label showColon i18n>Maintenance Type</ui5-label>
+					<ui5-input
+						readonly
+						class="w-full"
+						[value]="this.selectedMaintenanceType?.custom_id!"
+						id="maintenanceTypeInput">
+					</ui5-input>
+				</div>
+				<div class="flex-col-item w-full">
+					<ui5-label required showColon i18n>Maintenance</ui5-label>
+					<ui5-input
+						class="w-full"
+						#nameInput="ngModel"
+					    [valueState]="
+						nameInput.valid == false &&
+						(nameInput.touched || createForm.submitted) ||
+						isMaintenanceTypeSaveError
+						? 'Negative'
+						: state
+					    "
+						[required]="true"
+						placeholder="Write Maintenance name"
+						i18n-placeholder
+						[(ngModel)]="operationPlanPosCustomName"
+						(input)="onChangeNameInput($event)"
+						name="operationPlanPosCustomName"
+						id="maintenanceNameInput">
+						<div
+							slot="valueStateMessage"
+							>
+							{{ maintenanceValueStateText }}
+						</div>
+					</ui5-input>
+				</div>
+			</form>
+		</div>
+		<div
+			slot="footer"
+			class="dialog-footer">
+			<ui5-button
+				id="saveButton"
+				design="Emphasized"
+				(click)="saveMaintenance()"
+				i18n>
+				Save</ui5-button>
+			<ui5-button
+				id="cancelButton"
+				class="ml-8 border-none"
+				(click)="onCloseMaintenanceDialog()"
+				i18n>
+				Close</ui5-button>
+		</div>
+	</app-dialog>
+	<app-dialog
+		[isDialogOpen]="isWarningDialog"
+		state="Critical">
+		<div
+			slot="header"
+			class="w-100">
+			<div class="ml-[-10px]">
+				<ui5-title
+					class="pd-10"
+					level="H5"
+					i18n
+					>Warning</ui5-title>
+			</div>
+		</div>
+		<div class="w-[95%]">
+			{{ doYouWantToDeleteThisRecord }}</div>
+		<div class="flex flex-col-item">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				size="M">
+			</ui5-busy-indicator>
+		</div>
+		<div
+			slot="footer"
+			class="dialog-footer">
+			<ui5-button
+				id="saveButton"
+				design="Emphasized"
+				(click)="deleteMaintenanceTypeAndCloseDialog()"
+				[disabled]="disableButtonDuringRequest"
+				i18n>
+				Yes</ui5-button
+			>
+			<ui5-button
+				id="cancelButton"
+				class="ml-8 border-none"
+				(click)="onCancel()"
+				i18n>
+				Cancel</ui5-button
+			>
+		</div>
+	</app-dialog>
+</div>

@@ -1,0 +1,8 @@
+.header-flex {
+	display: flex;
+	padding: 16px 16px;
+    height: 16px;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: var(--light-border);
+}

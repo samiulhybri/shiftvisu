@@ -1,0 +1,31 @@
+<ui5-popover
+	#dynamicPopover
+	style="height: 500px; width: 20%"
+	[placement]="'End'"
+	[headerText]="title"
+	i18n-header-text>
+	<div>
+		<ui5-list
+			[loading]="loading"
+			[growing]="'Scroll'"
+			(ui5LoadMore)="onLoadMoreItems()"
+			(ui5ItemClick)="onItemSelect($event)">
+			<ng-container *ngFor="let singleData of data">
+				@if (singleData.name) {
+					<ui5-li
+						[id]="singleData.id"
+						[additionalText]="singleData.custom_id"
+						>{{ singleData.name }}
+					</ui5-li>
+				} @else {
+					<ui5-li
+						[style.cursor]="isListItemDuplicate(singleData?.custom_id) ? 'not-allowed' : ''"
+						[type]="isListItemDuplicate(singleData?.custom_id) ? 'Inactive' : 'Active'"
+						[id]="singleData?.id"
+						>{{ singleData?.custom_id }}
+					</ui5-li>
+				}
+			</ng-container>
+		</ui5-list>
+	</div>
+</ui5-popover>

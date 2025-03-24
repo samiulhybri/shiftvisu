@@ -1,0 +1,11 @@
+.editor-container {
+    width: inherit;
+    height: inherit;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid var(--div-border-color);
+    border-radius: var(--machineBoardCardBorderRadius);
+    box-shadow: 0 0 .125rem 0 rgba(34, 53, 72, .2), 0 .125rem .25rem 0 rgba(34, 53, 72, .2);
+    box-sizing: border-box;
+    overflow: auto;
+}

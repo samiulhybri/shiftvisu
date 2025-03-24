@@ -1,0 +1,224 @@
+<div class="p-4 overflow-x-auto">
+	<div class="grid gap-3 grid-cols-5 h-full">
+		<div class="flex flex-col col-span-2 carton-h-7vh">
+			<ui5-card class="h-2/4">
+				<ui5-card-header
+					slot="header"
+					title-text="Handling Unit"
+					i18n-title-text>
+					<ui5-button
+						design="Emphasized"
+						slot="action"
+						class="mt-[-12px] mb-[-8px] mr-2"
+						(click)="createHandlingUnit()"
+						i18n
+						>New HU</ui5-button
+					>
+					<ui5-button
+						design="Default"
+						slot="action"
+						class="mt-[-12px] mb-[-8px] mr-2"
+						(click)="selectHandlingUnit()"
+						i18n
+						>Select HU</ui5-button
+					>
+				</ui5-card-header>
+				<div class="divider"></div>
+				<ui5-busy-indicator
+					class="w-full"
+					style="display: block"
+					[active]="isLoadingHandlingUnit">
+					<div class="h-[28vh] w-full">
+						<app-grid-table
+							url=""
+							headerTitle=""
+							[columns]="handlingUnitColumn"
+							i18n-headerTitle
+							[showAction]="false"
+							[showSearch]="false"
+							[showDownload]="false"
+							[showActiveButton]="false"
+							selectionMode="Single"
+							[showNewButton]="false"
+							[enableServerSideFiltering]="false"
+							[data]="savedHandlingUnits"
+							[customData]="true"
+							(rowClick)="onHandlingUnitSelect($event)"
+							[selectedRowsId]="selectedRowsId"
+							#handlingUnitChildComponentRef>
+						</app-grid-table>
+					</div>
+				</ui5-busy-indicator>
+			</ui5-card>
+			<ui5-card class="h-2/4 pt-4">
+				<div class="h-full">
+					<ui5-bar
+						slot="header"
+						design="Header">
+						<ui5-title
+							level="H5"
+							slot="startContent"
+							i18n
+							>Packaging Position</ui5-title
+						>
+
+						<ui5-label
+							*ngIf="depackagingData.length || selectedPosHu.length"
+							level="H5"
+							slot="endContent">
+							<ui5-button
+								(ui5Click)="onClickDePack()"
+								id="package-multiple"
+								class="mr-1"
+								design="Transparent"
+								i18n>
+								De-Packaging
+							</ui5-button>
+						</ui5-label>
+					</ui5-bar>
+					<div class="h-[28vh] w-full">
+						<app-grid-table
+							headerTitle=""
+							url=""
+							[columns]="packagingPositionColumn"
+							i18n-headerTitle=""
+							[showSearch]="false"
+							[showDownload]="false"
+							[showAction]="false"
+							selectionMode="Multiple"
+							(rowClick)="multiplePosSelect($event)"
+							[data]="packagingPositionData"
+							[showActiveButton]="false"
+							[customData]="true"
+							[isBusy]="true"
+							#childComponentPackagingRef>
+						</app-grid-table>
+					</div>
+				</div>
+			</ui5-card>
+		</div>
+		<ui5-card class="col-span-3 carton-h-7vh">
+			<div class="h-full">
+				<ui5-bar
+					slot="header"
+					design="Header">
+					<ui5-title
+						level="H5"
+						slot="startContent"
+						i18n
+						>{{ isQuantitySelected ? "Items" : "Handling Units" }}
+					</ui5-title>
+					<div
+						slot="endContent">
+						<div class="flex items-end">
+							<ui5-button id="label-preview-btn" class="mr-1" design="Emphasized" [disabled]="" i18n>
+								Label Preview
+							</ui5-button>
+							<ui5-button (ui5Click)="onMultiplePackaging()" id="package-multiple" class="mr-1" design="Transparent"
+								[disabled]="!selectedStocks.length || isEmptyQuantitySelected" i18n>Package</ui5-button>
+							<ui5-segmented-button (ui5SelectionChange)="toggleSelectButton($event)">
+								<ui5-segmented-button-item id="stock-seg-btn" [selected]="isQuantitySelected">Items</ui5-segmented-button-item>
+								<ui5-segmented-button-item id="hu-seg-btn" [selected]="!isQuantitySelected">Handling
+									Units</ui5-segmented-button-item>
+							</ui5-segmented-button>
+						</div>
+					</div>
+				</ui5-bar>
+				<div class="carton-h-6vh w-full">
+					<app-grid-table
+						*ngIf="!isQuantitySelected"
+						headerTitle=""
+						[customUrl]="stockCustomUrl"
+						[expandQuery]="expandQuery"
+						[columns]="handlingUnitColumns"
+						i18n-headerTitle
+						[showSearch]="false"
+						[showDownload]="false"
+						[editPermission]="true"
+						selectionMode="{{ selectedHandlingUnit.custom_id ? 'Multiple' : 'None' }}"
+						(rowClick)="multipleRowSelect($event)"
+						[showAction]="false"
+						[showActiveButton]="false"
+						[customData]="false"
+						[useOdataStyles]="false"
+						[isTreeTable]="true"
+						[isTreeTableHookEnable]="false"
+						#childComponentRef>
+					</app-grid-table>
+					<app-grid-table
+						*ngIf="isQuantitySelected"
+						headerTitle=""
+						[customUrl]="stockCustomUrl"
+						[expandQuery]="expandQuery"
+						[columns]="quantityColumn"
+						i18n-headerTitle
+						[showSearch]="false"
+						[showDownload]="false"
+						[editPermission]="true"
+						selectionMode="{{ selectedHandlingUnit.custom_id ? 'Multiple' : 'None' }}"
+						(rowClick)="multipleRowSelect($event)"
+						[showAction]="false"
+						[showActiveButton]="false"
+						[customData]="false"
+						[useOdataStyles]="false"
+						#childComponentRef>
+					</app-grid-table>
+				</div>
+			</div>
+		</ui5-card>
+	</div>
+</div>
+
+<ng-template #showBusyIndicator>
+	<ui5-busy-indicator
+		[active]="true"
+		class="w-full h-full flex justify-start items-start"></ui5-busy-indicator>
+</ng-template>
+
+<app-entity-selection-dialog
+	*ngIf="onStorageLocationSelected"
+	entity="StorageLocations"
+	title="Select Storage Location"
+	i18n-title
+	searchKey="custom_id"
+	[searchQuery]="selectedGoodsReceiptStorageLocation?.custom_id ?? ''"
+	(entitySelected)="onStorageLocationSelected($event)">
+</app-entity-selection-dialog>
+
+<ui5-toast
+	*ngIf="toastMessage"
+	[open]="true"
+	(ui5Close)="toastMessage = ''"
+	>{{ toastMessage }}</ui5-toast
+>
+
+<ui5-dialog
+	[open]="isPrintDialogOpen"
+	[state]="printDialogType"
+	[headerText]="printDialogHeaderText"
+	(onBeforeClose)="closePrintDialog()">
+	<p>{{ printDialogMessage }}</p>
+
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closePrintDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog id="unlinkDialog" #unlinkDialog header-text="Warning" i18n-header-text state="Critical">
+	<p>{{unlinkDialogMessage}}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator [active]="isLoading" size="M"></ui5-busy-indicator>
+	</div>
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button id="confirmUnlinkButton" class="dialogSubmit" design="Emphasized"
+			[disabled]="disableButtonDuringRequest" (click)="confirmUnlink()">{{localization.yes}}</ui5-button>
+		<ui5-button design="Transparent" id="cancelUnlinkButton"
+			(click)="closeDialog()">{{localization.no}}</ui5-button>
+	</div>
+</ui5-dialog>

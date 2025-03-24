@@ -1,0 +1,244 @@
+<kendo-card width="100" *ngIf="meltAnalysis">
+	<div class="panelbar-wrapper">
+		<kendo-panelbar>
+			<kendo-panelbar-item i18n-title title="Jominy" [expanded]="false">
+				<ng-template kendoPanelBarContent>
+					<kendo-card-body class="table-content">
+						<div class="variant">
+							<table>
+								<thead>
+
+									<tr>
+										<td i18n>Variante</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<kendo-combobox [(ngModel)]="meltAnalysis.variant" [data]="variantData"
+															textField="text" [valuePrimitive]="true" name="" valueField="value"
+															[style.flex]="2">
+											</kendo-combobox>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="content">
+							<table class="table-head">
+								<thead>
+									<tr>
+										<td i18n style="text-align: left;">MM</td>
+										<td i18n *ngIf="meltAnalysis.variant==variant.VARIANT_2">1</td>
+										<td i18n *ngIf="meltAnalysis.variant==variant.VARIANT_1">1,5</td>
+										<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">2</td>
+										<td>3</td>
+										<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">4</td>
+										<td>5</td>
+										<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">6</td>
+										<td>7</td>
+										<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">8</td>
+										<td>9</td>
+										<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">10</td>
+										<td>11</td>
+										<td>13</td>
+										<td>15</td>
+										<td>20</td>
+										<td>25</td>
+										<td>30</td>
+										<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">35</td>
+										<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">40</td>
+										<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">45</td>
+										<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">50</td>
+									</tr>
+								</thead>
+
+								<tbody>
+
+								</tbody>
+
+								<tr>
+									<td i18n style="text-align: left;">HRC SW</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_1_sw name="j_1_sw"
+											[(ngModel)]="meltAnalysis.j_1_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_1_5_sw name="j_1_5_sw"
+											[(ngModel)]="meltAnalysis.j_1_5_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_2_sw name="j_2_sw"
+											[(ngModel)]="meltAnalysis.j_2_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_3_sw name="j_3_sw"
+											[(ngModel)]="meltAnalysis.j_3_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_4_sw name="j_4_sw"
+											[(ngModel)]="meltAnalysis.j_4_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_5_sw name="j_5_sw"
+											[(ngModel)]="meltAnalysis.j_5_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_6_sw name="j_6_sw"
+											[(ngModel)]="meltAnalysis.j_6_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_7_sw name="j_7_sw"
+											[(ngModel)]="meltAnalysis.j_7_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_8_sw name="j_8_sw"
+											[(ngModel)]="meltAnalysis.j_8_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_9_sw name="j_9_sw"
+											[(ngModel)]="meltAnalysis.j_9_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_10_sw name="j_10_sw"
+											[(ngModel)]="meltAnalysis.j_10_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" mn #j_11_sw name="j_11_sw"
+											[(ngModel)]="meltAnalysis.j_11_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_13_sw name="j_13_sw"
+											[(ngModel)]="meltAnalysis.j_13_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_15_sw name="j_15_sw"
+											[(ngModel)]="meltAnalysis.j_15_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_20_sw name="j_20_sw"
+											[(ngModel)]="meltAnalysis.j_20_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_25_sw name="j_25_sw"
+											[(ngModel)]="meltAnalysis.j_25_sw"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_30_sw name="j_30_sw"
+											[(ngModel)]="meltAnalysis.j_30_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_35_sw name="j_35_sw"
+											[(ngModel)]="meltAnalysis.j_35_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_40_sw name="j_40_sw"
+											[(ngModel)]="meltAnalysis.j_40_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_45_sw name="j_45_sw"
+											[(ngModel)]="meltAnalysis.j_45_sw"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_50_sw name="j_50_sw"
+											[(ngModel)]="meltAnalysis.j_50_sw"></kendo-numerictextbox>
+									</td>
+								</tr>
+
+								<tr>
+									<td i18n style="text-align: left;">HRC HWE</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_1_hwe name="j_1_hwe"
+											[(ngModel)]="meltAnalysis.j_1_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_1_5_hwe name="j_1_5_hwe"
+											[(ngModel)]="meltAnalysis.j_1_5_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_2_hwe name="j_3_hwe"
+											[(ngModel)]="meltAnalysis.j_2_hwe"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_3_hwe name="j_3_hwe"
+											[(ngModel)]="meltAnalysis.j_3_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_4_hwe name="j_4_hwe"
+											[(ngModel)]="meltAnalysis.j_4_hwe"></kendo-numerictextbox>
+									</td>
+
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_5_hwe name="j_5_hwe"
+											[(ngModel)]="meltAnalysis.j_5_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_6_hwe name="j_6_hwe"
+											[(ngModel)]="meltAnalysis.j_6_hwe"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_7_hwe name="j_7_hwe"
+											[(ngModel)]="meltAnalysis.j_7_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_8_hwe name="j_8_hwe"
+											[(ngModel)]="meltAnalysis.j_8_hwe"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_9_hwe name="j_9_hwe"
+											[(ngModel)]="meltAnalysis.j_9_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_2">
+										<kendo-numerictextbox [step]="0.1" #j_10_hwe name="j_10_hwe"
+											[(ngModel)]="meltAnalysis.j_10_hwe"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_11_hwe name="j_11_hwe"
+											[(ngModel)]="meltAnalysis.j_11_hwe"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_13_hwe name="j_13_hwe"
+											[(ngModel)]="meltAnalysis.j_13_hwe"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_15_hwe name="j_15_hwe"
+											[(ngModel)]="meltAnalysis.j_15_hwe"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_20_hwe name="j_20_hwe"
+											[(ngModel)]="meltAnalysis.j_20_hwe"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_25_hwe name="j_25_hwe"
+											[(ngModel)]="meltAnalysis.j_25_hwe"></kendo-numerictextbox>
+									</td>
+									<td>
+										<kendo-numerictextbox [step]="0.1" #j_30_hwe name="j_30_hwe"
+											[(ngModel)]="meltAnalysis.j_30_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_35_hwe name="j_35_hwe"
+											[(ngModel)]="meltAnalysis.j_35_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_40_hwe name="j_40_hwe"
+											[(ngModel)]="meltAnalysis.j_40_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_45_hwe name="j_45_hwe"
+											[(ngModel)]="meltAnalysis.j_45_hwe"></kendo-numerictextbox>
+									</td>
+									<td *ngIf="meltAnalysis.variant==variant.VARIANT_1">
+										<kendo-numerictextbox [step]="0.1" #j_50_hwe name="j_50_hwe"
+											[(ngModel)]="meltAnalysis.j_50_hwe"></kendo-numerictextbox>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</kendo-card-body>
+				</ng-template>
+			</kendo-panelbar-item>
+		</kendo-panelbar>
+	</div>
+</kendo-card>

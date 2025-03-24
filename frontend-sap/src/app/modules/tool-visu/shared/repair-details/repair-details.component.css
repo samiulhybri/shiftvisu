@@ -1,0 +1,204 @@
+.busy-indicator {
+	min-width: 50vw !important;
+	min-height: 50vh !important;
+}
+
+.required-asterisk {
+	color: var(--statnstill-color-compact-hover);
+	margin-left: 5px;
+}
+
+#tabContainer::part(content) {
+	background-color: var(--color-white);
+}
+
+.tableStandard_repair {
+	background: var(--sapBackgroundColor);
+	border-radius: 0.5rem 0.5rem 0.5rem 0.5rem;
+	height: 99.6%;
+	border: 1px solid #d1d5db;
+}
+
+.tab-details-section {
+	padding: 20px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.status-button {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.repair-body {
+	width: 75vw;
+	height: 80vh;
+}
+
+.left-details-section,
+.right-details-section {
+	height: inherit;
+	margin: 0 5px;
+}
+
+.repair-details-card {
+	height: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+	border: var(--card-border-color);
+	border-radius: var(--cardBorderRadius);
+	gap: 8px;
+	box-shadow: 0 0 .125rem 0 rgba(34, 53, 72, .2), 0 .125rem .25rem 0 rgba(34, 53, 72, .2);
+}
+
+.repair-details-card .card-header {
+	width: 100%;
+	height: 35px;
+	margin-top: 10px;
+	border-bottom: var(--card-border-color);
+}
+
+.left-details-section > .repair-details-card {
+	overflow: hidden auto;
+}
+
+.busy-indicator {
+	height: 100%;
+}
+
+.treeView {
+	height: 100%;
+}
+
+:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+    height: 59vh !important;
+    overflow: auto;
+}
+
+.tab-details-section {
+	height: 90% !important;
+}
+
+#activeSwitch {
+	transform: scale(1.2) !important; 
+    margin: 5px; 
+}
+
+::ng-deep .ui5-date-picker-input {
+	min-width: unset !important;
+}
+
+@media (min-width: 1921px) and (max-width: 2100px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 56vh !important;
+	}
+
+	.tab-details-section {
+		height: 88% !important;
+	}
+}
+
+@media (min-width: 1601px) and (max-width: 1920px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 43vh !important;
+	}
+
+	.tab-details-section {
+		height: 86% !important;
+	}
+
+	.repair-body {
+		height: 70vh !important;
+	}
+
+	.date-picker-section {
+		display: flex !important;
+		flex-direction: column !important;
+		justify-content: flex-start !important;
+		align-items: flex-start !important;
+	}
+
+	.prod-date {
+		margin-left: 0px !important;
+		margin-top: 10px !important;
+	}
+}
+
+@media (min-width: 1401px) and (max-width: 1600px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 40vh !important;
+	}
+
+	.repair-body {
+		height: 78vh !important;
+	}
+
+	.tab-details-section {
+		height: 86% !important;
+	}
+
+	.date-picker-section {
+		display: flex !important;
+		flex-direction: column !important;
+		justify-content: flex-start !important;
+		align-items: flex-start !important;
+	}
+
+	.prod-date {
+		margin-left: 0px !important;
+		margin-top: 10px !important;
+	}
+}
+
+@media (min-width: 1300px) and (max-width: 1599px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 32vh !important;
+	}
+
+	.repair-body {
+		height: 70vh !important;
+	}
+
+	.tab-details-section {
+		height: 90% !important;
+	}
+
+	.date-picker-section {
+		display: flex !important;
+		flex-direction: column !important;
+		justify-content: flex-start !important;
+		align-items: flex-start !important;
+	}
+
+	.prod-date {
+		margin-left: 0px !important;
+		margin-top: 10px !important;
+	}
+}
+
+
+@media (max-width: 1299px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 27vh !important;
+	}
+
+	.repair-body {
+		height: 70vh !important;
+	}
+
+	.tab-details-section {
+		height: 80% !important;
+	}
+
+	.date-picker-section {
+		display: flex !important;
+		flex-direction: column !important;
+		justify-content: flex-start !important;
+		align-items: flex-start !important;
+	}
+
+	.prod-date {
+		margin-left: 0px !important;
+		margin-top: 10px !important;
+	}
+}

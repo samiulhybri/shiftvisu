@@ -1,0 +1,72 @@
+$schertech-theme-bg: white;
+$schertech-body-padding: 12px;
+
+$header-height: 58px;
+$header-padding: 16px;
+
+$sidebar-padding: 12px;
+$sidebar-item-gap: 4px;
+$sidebar-width: 264px;
+$sidebar-height: calc(100vh - 98px);
+
+$standard-item-gap: 14px;
+
+$grid-inner-padding: 16px;
+$grid-toolbar-height: 55px;
+
+$standard-font-size: 14px;
+
+$kendo-card-header-height: 48px;
+
+// overwrites original kendo scss
+
+$kendo-toolbar-md-padding-x: 16px;
+$kendo-toolbar-md-padding-y: 8px;
+$kendo-toolbar-bg: #FFFFFF;
+$kendo-toolbar-font-size: 18px;
+
+$kendo-pager-md-padding-x: 16px;
+$kendo-pager-md-padding-y: 8px;
+$kendo-pager-bg: #FFFFFF;
+
+$kendo-appbar-padding-x: 16px;
+$kendo-appbar-padding-y: 0px;
+$kendo-appbar-bg: #FFFFFF;
+$kendo-appbar-box-shadow: 0px 0px 6px rgba(18, 29, 44, 0.12);
+
+$kendo-card-header-padding-x: 9px;
+$kendo-card-header-padding-y: 0px;
+$kendo-card-header-border :rgba(18, 29, 44, 0.08);
+$kendo-card-header-bg: #FFFFFF;
+
+$kendo-card-body-padding-x: 9px;
+$kendo-card-body-padding-y: 9px;
+
+$kendo-appbar-light-text: #005981 !important;
+$kendo-appbar-light-bg: #FFFFFF !important;
+$kendo-appbar-dark-text: #FFFFFF !important;
+$kendo-appbar-dark-bg: #005981 !important;
+
+$kendo-grid-border: rgba(18, 29, 44, 0.08);
+$kendo-grid-header-border: rgba(18, 29, 44, 0.08);
+$kendo-grid-focus-shadow: none;
+$kendo-grid-alt-bg: #F9FAFB;
+
+$kendo-input-border: rgba(18, 29, 44, 0.08);
+
+$kendo-picker-bg: $kendo-grid-alt-bg;
+$kendo-picker-gradient: unset;
+
+$kendo-checkbox-border: rgba(18, 29, 44, 0.08);
+
+$kendo-window-border-radius: 8px;
+
+$kendo-grid-command-cell-button-spacing: 5px;
+
+$kendo-table-header-bg: #FFFFFF;
+$kendo-table-th-bg: #F2F4F7;
+
+$kendo-listview-padding-y: 12px;
+$kendo-chart-container-padding: 12px;
+
+$kendo-calendar-view-width: 200px;

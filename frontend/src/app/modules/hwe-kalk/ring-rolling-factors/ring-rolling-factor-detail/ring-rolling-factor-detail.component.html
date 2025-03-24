@@ -1,0 +1,34 @@
+<div novalidate class="k-form">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+      <kendo-card [style.flex]="1">
+        <kendo-card-header i18n> Ring Rolling Factor </kendo-card-header>
+        <kendo-card-body class="additional-cost-details-body">
+          <kendo-stacklayout orientation="horizontal" [gap]="9">
+            <kendo-label [for]="weight_from" i18n i18n-text text="Weight From"
+              ></kendo-label
+            >
+            <kendo-numerictextbox  #weight_from name="weight_from" [step]="1" format="#.##\ kg" [decimals]="2"
+            [(ngModel)]="hweRingRollingFactor!.weight_from"></kendo-numerictextbox>
+          </kendo-stacklayout>
+
+          <kendo-stacklayout orientation="horizontal" class="input-field" [gap]="9">
+            <kendo-label [for]="weight_to" i18n i18n-text text="Weight To"
+              ></kendo-label
+            >
+            <kendo-numerictextbox #weight_to name="weight_to" [step]="1" format="#.##\ kg" [decimals]="2"
+            [(ngModel)]="hweRingRollingFactor!.weight_to"></kendo-numerictextbox>
+          </kendo-stacklayout>
+
+          <kendo-stacklayout orientation="horizontal" class="input-field" [gap]="9">
+            <kendo-label [for]="factor" i18n i18n-text text="Factor"
+              ></kendo-label
+            >
+            <kendo-numerictextbox #factor name="factor" [step]="1" format="n2"
+            [(ngModel)]="hweRingRollingFactor!.factor"></kendo-numerictextbox>
+          </kendo-stacklayout>
+
+        </kendo-card-body>
+      </kendo-card>
+    </kendo-stacklayout>
+  </div>
+  

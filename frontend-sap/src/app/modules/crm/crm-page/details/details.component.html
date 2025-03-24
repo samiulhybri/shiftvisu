@@ -1,0 +1,385 @@
+<app-dialog
+	id="addGroupDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="onBeforeClose($event)"
+	[title]="dialogTitle">
+	<div
+		slot="header"
+		class="w-[90vW]">
+		<div class="pd-header ml-[-12px]">
+			<ui5-title
+				level="H5"
+				class="mt-3"
+				>{{ dialogTitle }}</ui5-title
+			>
+			<ui5-tabcontainer
+				class="mt-[9px] ml-[-32px]"
+				(tab-select)="tabNavChanged($event)"
+				fixed
+				collapsed>
+				<ui5-tab
+					#overviewTab
+					i18n-text
+					text="Overview"
+					[selected]="selectedTab === 'overviewTab'"
+					id="overviewTab"
+					[disabled]="disableButtonDuringRequest"></ui5-tab>
+				<ui5-tab
+					#customerTab
+					i18n-text
+					text="Customer"
+					[selected]="selectedTab === 'customerTab'"
+					id="customerTab"
+					[disabled]="disableButtonDuringRequest"></ui5-tab>
+				<ui5-tab
+					#noteTab
+					i18n-text
+					text="Note"
+					[selected]="selectedTab === 'noteTab'"
+					id="noteTab"
+					[disabled]="disableButtonDuringRequest"></ui5-tab>
+				<ui5-tab
+					#attachmentTab
+					i18n-text
+					text="Attachment"
+					[selected]="selectedTab === 'attachmentTab'"
+					id="attachmentTab"
+					[disabled]="disableButtonDuringRequest"></ui5-tab>
+				<ui5-tab
+					#contactTab
+					i18n-text
+					text="Contact"
+					[selected]="selectedTab === 'contactTab'"
+					id="contactTab"
+					[disabled]="disableButtonDuringRequest"></ui5-tab>
+			</ui5-tabcontainer>
+		</div>
+	</div>
+	<div class="mx-[-16px] my-0">
+		<form
+			(ngSubmit)="onSubmit(createOrUpdateForm)"
+			#createOrUpdateForm="ngForm"
+			class="w-[87vw] h-[75vh]">
+			<ui5-busy-indicator
+				[active]="isLoading"
+				class="w-full"
+				size="L">
+				<div
+					class="body form w-full h-full"
+					*ngIf="selectedCustomer">
+					<div
+						class="h-full"
+						[hidden]="selectedTab !== 'overviewTab'">
+						<app-overview
+							#overviewComponentRef
+							[selectedCustomer]="selectedCustomer"
+							[nameText]="localization.name"
+							[userList]="users"
+							[revenueClassifications]="revenueClassifications || []"
+							[machineClassifications]="machineClassifications || []"
+							[employeeClassifications]="employeeClassifications || []"
+							[potentialClassifications]="potentialClassifications || []"
+							[marketSegments]="marketSegments || []"
+							[category]="category || []"
+							[salesStatuses]="salesStatuses"
+							(refreshGridTable)="refreshGridTable($event)"
+							[createOrUpdateForm]="createOrUpdateForm"></app-overview>
+					</div>
+					<div
+						[hidden]="selectedTab !== 'customerTab'"
+						class="w-full">
+						<div
+							class="w-full gap-2"
+							*ngIf="selectedCustomer">
+							<div class="flex flex-row gap-2 mt-3">
+								<div class="flex flex-col">
+									<ui5-label show-colon>{{ localization.active }}</ui5-label>
+									<ui5-switch
+										id="activeSwitch"
+										name="is_active"
+										[checked]="selectedCustomer.is_active"
+										[(ngModel)]="selectedCustomer.is_active"
+										[disabled]="shouldBeDisabled('is_active')">
+									</ui5-switch>
+								</div>
+							</div>
+							<div class="grid gap-x-2 gap-y-2 grid-cols-4 mt-3">
+								<div class="flex-column">
+									<ui5-label
+										show-colon
+										required
+										>{{ localization.id }}</ui5-label
+									>
+									<ui5-busy-indicator
+										[active]="isLoadingCustomId"
+										size="S">
+										<ui5-input
+											#customId="ngModel"
+											[valueState]="
+												customId.valid == false &&
+												(customId.touched || createOrUpdateForm.submitted)
+													? 'Negative'
+													: customIdState
+											"
+											[(ngModel)]="selectedCustomer.custom_id"
+											name="custom_id"
+											class="w-full"
+											(input)="onChangeCustomId()"
+											[disabled]="shouldBeDisabled('custom_id')"
+											[required]="true"
+											id="customId">
+											<div
+												*ngIf="customIdValueStateText"
+												slot="valueStateMessage">
+												{{ customIdValueStateText }}
+											</div>
+										</ui5-input>
+									</ui5-busy-indicator>
+								</div>
+
+								<div class="flex-column">
+									<ui5-label
+										show-colon
+										i18n
+										>Email</ui5-label
+									>
+
+									<ui5-input
+										#emailInput="ngModel"
+										[valueState]="
+											emailInput.valid == false && emailInput.touched
+												? 'Negative'
+												: 'None'
+										"
+										[(ngModel)]="selectedCustomer.email"
+										name="email"
+										[email]="true"
+										type="Email"
+										class="w-full"
+										(input)="onChangeCustomId()"
+										[disabled]="shouldBeDisabled('email')"
+										id="emailInput">
+									</ui5-input>
+								</div>
+
+								<div class="flex-column">
+									<ui5-label show-colon i18n>Website</ui5-label>
+									
+									<div class="flex flex-row gap-2">
+										<ui5-input #websiteInput="ngModel" [(ngModel)]="selectedCustomer.website" name="website" class="flex-grow"
+											[disabled]="shouldBeDisabled('website')" id="websiteInput">
+										</ui5-input>
+										<div class="flex items-center">
+											<ui5-button design="Emphasized" [disabled]="!selectedCustomer.website" (click)="goToWebsite()" i18n>Visit</ui5-button>
+										</div>
+									</div>
+								</div>
+
+								<div class="flex-column">
+									<ui5-label
+										show-colon
+										i18n
+										>Telephone</ui5-label
+									>
+									<ui5-input
+										#telephoneInput="ngModel"
+										[(ngModel)]="selectedCustomer.telephone"
+										[valueState]="
+											telephoneInput.valid == false && telephoneInput.touched
+												? 'Negative'
+												: 'None'
+										"
+										pattern="^\+?[1-9]\d{0,2}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$"
+										name="telephone"
+										class="w-full"
+										[disabled]="shouldBeDisabled('telephone')"
+										id="telephoneInput">
+									</ui5-input>
+								</div>
+								<div class="flex-column">
+									<ui5-label
+										i18n
+										show-colon
+										>Postal Code</ui5-label
+									>
+									<ui5-input
+										#postalCodeInput="ngModel"
+										[(ngModel)]="selectedCustomer.postal_code"
+										name="postal_code"
+										class="w-full"
+										[disabled]="shouldBeDisabled('postal_code')"
+										id="postalCodeInput">
+									</ui5-input>
+								</div>
+
+								<div class="flex-column">
+									<ui5-label
+										i18n
+										show-colon
+										>Address</ui5-label
+									>
+									<ui5-input
+										#addressInput="ngModel"
+										[(ngModel)]="selectedCustomer.address"
+										name="address"
+										class="w-full"
+										[disabled]="shouldBeDisabled('address')"
+										id="addressInput">
+									</ui5-input>
+								</div>
+
+								<div class="flex-column">
+									<ui5-label
+										i18n
+										show-colon
+										>Region</ui5-label
+									>
+									<ui5-input
+										#regionInput="ngModel"
+										[(ngModel)]="selectedCustomer.region"
+										name="region"
+										class="w-full"
+										[disabled]="shouldBeDisabled('region')"
+										id="regionInput">
+									</ui5-input>
+								</div>
+								
+								<div class="flex-column">
+									<ui5-label
+										show-colon
+										i18n
+										>Country</ui5-label
+									>
+									<ui5-combobox
+										#countryComboBox
+										id="countryComboBox"
+										[disabled]="shouldBeDisabled('country')"
+										class="w-full"
+										[value]="selectedCustomer.country?.name || ''"
+										(input)="onCountryInputChange($event)"
+										(selection-change)="onChangeCountry($event)">
+										<ui5-cb-item
+											id="{{ item.id }}"
+											text="{{ item.name }}"
+											[additionalText]="item.custom_id?.toString() || ''"
+											*ngFor="let item of country">
+										</ui5-cb-item>
+									</ui5-combobox>
+								</div>
+
+								<div class="flex-column">
+									<ui5-label
+										show-colon
+										i18n
+										>City</ui5-label
+									>
+									<ui5-input
+										#cityInput="ngModel"
+										[(ngModel)]="selectedCustomer.city"
+										name="city"
+										class="w-full"
+										[disabled]="shouldBeDisabled('city')"
+										id="cityInput">
+									</ui5-input>
+								</div>
+
+								<div class="flex-column">
+									<ui5-label
+										show-colon
+										i18n
+										>External ID</ui5-label
+									>
+									<ui5-input
+										#externalInput="ngModel"
+										[(ngModel)]="selectedCustomer.external_id"
+										name="external_id"
+										class="w-full"
+										[disabled]="shouldBeDisabled('external_id')"
+										id="externalInput">
+									</ui5-input>
+								</div>
+								<div class="flex-column">
+									<ui5-label
+										show-colon
+										i18n
+										>Created at</ui5-label
+									>
+									<ui5-date-picker
+										
+										[value]="selectedCustomer.created_at ? (selectedCustomer.created_at | dateFormat:'dd.MM.yyyy') : ''"
+										format-pattern="dd.MM.yyyy"
+										name="created_at"
+										class="w-full"
+										id="createdInput"
+										readonly>
+									</ui5-date-picker>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div
+						class="h-full"
+						[hidden]="selectedTab !== 'noteTab'">
+						<div
+							class="flex flex-row gap-2 mt-3 h-full"
+							*ngIf="selectedCustomer">
+							<div class="flex-column w-full h-full">
+								<app-text-editor
+									[notes]="selectedCustomer.note || ''"
+									(sendNotes)="onChangeNotes($event)"
+									class="w-full h-[74vh]">
+								</app-text-editor>
+							</div>
+						</div>
+					</div>
+					<div
+						class="h-full"
+						[hidden]="selectedTab !== 'attachmentTab'">
+						<app-attachment
+							#attachmentComponent
+							[selectedCustomer]="selectedCustomer"></app-attachment>
+					</div>
+					<div
+						class="h-full"
+						[hidden]="selectedTab !== 'contactTab'"
+						*ngIf="selectedCustomer">
+						<app-contact
+							#contactComponentRef
+							(loadFullCustomerData)="loadFullCusData()"
+							(refreshGridTable)="refreshGridTable($event)"
+							[selectedCustomer]="selectedCustomer">
+						</app-contact>
+					</div>
+				</div>
+			</ui5-busy-indicator>
+		</form>
+	</div>
+
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-24px] gap-2">
+		<ui5-button
+			id="saveButtonSVK"
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest"
+			>
+			{{ localization.save }}</ui5-button>
+		<ui5-button
+			class="ml-2"
+			id="cancelButtonSVK"
+			design="Transparent"
+			(click)="isConfirmationModalOpen = true"
+			>
+			{{ localization.close }}</ui5-button>
+	</div>
+</app-dialog>
+<ui5-dialog #confirmationModal id="confirmationModal" header-text="Warning" [open]="isConfirmationModalOpen"
+	state="Critical" i18n-header-text>
+	<p style="width: 100%;">{{confirmationText}}</p>
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button class="dialogSubmit" design="Emphasized" (click)="closeDialog()"
+			id="deleteSubmitButton">{{ localization.ok }}</ui5-button>
+		<ui5-button id="CloseButton" (click)="isConfirmationModalOpen = false;">{{ localization.cancel}}</ui5-button>
+	</div>
+</ui5-dialog>

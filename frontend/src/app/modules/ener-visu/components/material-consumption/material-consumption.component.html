@@ -1,0 +1,93 @@
+<kendo-card [width]="'inherit'" [style.height]="'inherit'">
+	<app-loader *ngIf="isLoading"></app-loader>
+	<kendo-card-header>
+		<span i18n>KPI Natural Gas/Kg Alu</span>
+		<kendo-grid-spacer></kendo-grid-spacer>
+		<app-popup 
+			[buttonText]="popupButtonText"
+			[icon]="'filter'"
+		>
+			<ng-template #content>
+				<app-report-header 
+					[selectedValue]="selectedValue"
+					[typeItems]="listItems"
+					[durationItems]="durationItems"
+					(loadData)="loadData($event)"
+					(refreshReport)="refreshReport($event)"
+				>
+				</app-report-header>
+			</ng-template>
+		</app-popup>
+	</kendo-card-header>
+	<kendo-card-body>
+		<kendo-gridlayout 
+			[rows]="['100%']"
+			[cols]="['18%', '82%']"
+			[gap]="12"
+		>
+			<kendo-gridlayout-item 
+				style="height: max-content"
+				[col]="1"
+				[row]="1"
+			>
+				<div class="container">
+					<app-bar-chart 
+						[legend]="legend"
+						[categories]="furnaceCategories"
+						[data]="furnaceSeriesData"
+						[titleIsVisible]="false"
+						[transitions]="false"
+						[seriesBorderOption]="seriesBorderOption"
+						[seriesLabelContent]="seriesLabelContent"
+						[valueAxisLabelContent]="valueAxisLabelContent"
+						[categoryAxisLabelContent]="categoryAxisLabelContent"
+						[maxValue]="furnaceMaxValue"
+						[majorGridLines]="majorGridLines"
+						[gap]="seriesGap"
+						(seriesClick)="furnaceSeriesEvent($event)"
+						[myHeight]="'calc(100vh - 130px)'"
+					></app-bar-chart>
+				</div>
+			</kendo-gridlayout-item>
+			<kendo-gridlayout-item [col]="2" [row]="1">
+				<div class="container" style="margin: 0 12px 12px 0;">
+					<app-bar-chart 
+						[legend]="legend"
+						[categories]="durationList"
+						[data]="periodSeriesData"
+						[type]="currentBarValue"
+						[titleIsVisible]="false"
+						[transitions]="false"
+						[seriesBorderOption]="seriesBorderOption"
+						[seriesLabelContent]="seriesLabelContent"
+						[valueAxisLabelContent]="valueAxisLabelContent"
+						[maxValue]="periodMaxValue"
+						[majorGridLines]="majorGridLines"
+						[gap]="seriesGap"
+						(seriesClick)="periodSeriesEvent($event)"
+						[myHeight]="'calc(25vh)'"
+					></app-bar-chart>
+				</div>
+				<div class="container" style="margin: 0 12px 0 0;" >
+					<kendo-grid-component
+						[gridItems]="gridItems"
+						[columns]="consumerGridColumns"
+						[state]="state"
+						[isLoadedEnabled]="false"
+						[isSortable]="false"
+						[isFilterable]="isFilterable"
+						[isGroupable]="false"
+						[isPageable]="false"
+						(emitState)="changeState($event)"
+						[editView]="editView"
+						(gridRowSelection)="consumerGridRowSelect($event)"
+						(gridRefersh)="sendRequest()"
+						[aggregates]="aggregateList"
+						style="height: calc(100vh - 25vh - 166px); display: block;"
+					>
+					</kendo-grid-component>
+				</div>
+			</kendo-gridlayout-item>
+		</kendo-gridlayout>
+	</kendo-card-body>
+</kendo-card>

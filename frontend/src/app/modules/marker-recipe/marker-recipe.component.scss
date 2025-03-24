@@ -1,0 +1,176 @@
+.marker-recipe-container {
+    width: 98.7vw;
+    height: 97vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    .recipe-section {
+        width: 50%;
+        height: 100%;
+
+        .recipe-header-container {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            .recipe-action-section {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+
+                .search-section,
+                .preview-section {
+                    margin-right: 10px;
+                }
+            }
+        }
+
+        .recipe-grid-layout {
+            height: 89vh;
+
+            .send-device-btn {
+                .k-button-text {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-around;
+                    align-items: center;
+                }
+            }
+        }
+    }
+
+    .recipe-child-section {
+        width: 50%;
+        height: 100%;
+        margin-left: 7px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+    }
+}
+
+.formError {
+    border: 1px solid red;
+}
+
+.recipe-form-body {
+    height: 100%;
+}
+
+.recipe-send-device-form {
+    height: 100%;
+    .counter-switch-label {
+        width: 50%;
+    }
+    .counter-switch-input {
+        width: 25%;
+        .counter-confirm-button {
+            width: 100%;
+        }
+    }
+    .counter-input-field {
+        width: 75%;
+    }
+}
+
+.recipe-form-body,
+.recipe-info-body,
+.recipe-send-device-form,
+.recipe-copy-form  {
+    .form-sections {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 10px;
+
+        .label-input-section {
+            width: 49%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .action-section {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .custom_id_field {
+            width: 100% !important;
+        }
+    }
+}
+
+.recipe-modal-action {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+
+    .recipe-modal-action-btn {
+        align-self: flex-end;
+    }
+}
+.delete-modal { 
+    justify-content: space-between !important;
+    .recipe-modal-action-btn {
+        width: 212px;
+    }
+}
+.copy-modal {
+    justify-content: space-between !important;
+    .recipe-modal-action-btn {
+        width: 162px;
+    }
+}
+
+.recipe-info-body {
+    height: 100%;
+    .request_pcc_section,
+    .send_data_printer_section,
+    .recipe-info-section {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: flex-start;
+    }
+    .send_data_printer_section,
+    .recipe-info-section {
+        margin-top: 10px;
+    }
+}
+
+.k-dialog-titlebar .k-dialog-titlebar-action {
+    .k-button-md.k-icon-button .k-button-icon {
+        display: none !important;
+    }
+}
+
+.k-window .k-dialog {
+    .k-window-titlebar .k-dialog-titlebar {
+        color: white !important;
+        background-color: #005981 !important;
+    }
+}
+
+.send-device-question {
+    margin-bottom: 20px;
+}
+
+.message-div {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

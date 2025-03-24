@@ -1,0 +1,29 @@
+<kendo-stacklayout [gap]="gap" [orientation]="orientation">
+  <kendo-daterange [hidden]="isHidden">
+    <kendo-label i18n i18n-text  text="Start">
+      <span class="title">
+          <kendo-dateinput
+          kendoDateRangeStartInput
+          autoCorrectOn="blur"
+          [(value)]="range.start"
+        ></kendo-dateinput>
+      </span>
+    </kendo-label>
+
+    <kendo-label i18n i18n-text text="End">
+      <span class="title">
+          <kendo-dateinput
+          kendoDateRangeEndInput
+          autoCorrectOn="blur"
+          [(value)]="range.end"
+        ></kendo-dateinput>
+      </span>
+    </kendo-label>
+    <kendo-daterange-popup
+      [title]="title"
+      [subtitle]="subtitle"
+      [animate]="animate"
+      (close)="closeDatePicker()"
+    ></kendo-daterange-popup>
+  </kendo-daterange>
+</kendo-stacklayout>

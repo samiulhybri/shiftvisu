@@ -1,0 +1,7 @@
+.sapBoxShadow {
+	box-shadow: var(--_ui5-v1-20-1_side_navigation_box_shadow);
+}
+
+.sapHeaderBackground {
+	background: var(--sapList_HeaderBackground);
+}

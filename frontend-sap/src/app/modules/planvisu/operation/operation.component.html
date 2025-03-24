@@ -1,0 +1,426 @@
+<app-dialog
+	[isDialogOpen]="true"
+	style="width: 95vw"
+	title="Operation Info"
+	i18n-title="Operation Info"
+	state="None"
+	#operationDialog
+	(onBeforeClose)="handleClose()">
+	<ui5-button
+		style="float: right"
+		*ngIf="prodOrderPosOperation.prodOrderPos?.calculation?.id"
+		(click)="calculationDetails(prodOrderPosOperation.prodOrderPos?.calculation?.id)"
+		>Calculation Details</ui5-button
+	>
+	<div style="display: flex; flex-direction: column;">
+		<ui5-title
+			level="H4"
+			style="margin-bottom: 5px"
+			>{{ prodOrderPosOperation.name }}</ui5-title
+		>
+
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Production Order</ui5-label>
+			<ui5-text>{{ prodOrderPosOperation.prodOrderPos?.prodOrder?.custom_id }}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Sales Order</ui5-label>
+			<ui5-text>{{ prodOrderPosOperation.prodOrderPos?.calculation?.sales_order }}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Drawing Id</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.drawing_id
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Client</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.offer?.customer?.name
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Material</ui5-label>
+			<ui5-text
+				>{{
+					prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.material?.custom_id
+				}}
+				|
+				{{
+					prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.material?.name
+				}}</ui5-text
+			>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Material Group</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.material
+					?.material_group_type
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Forging Temperature</ui5-label>
+			<ui5-text
+				>from:
+				{{
+					prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.material
+						?.forging_temperature_min
+				}}
+				to:
+				{{
+					prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.material
+						?.forging_temperature_max
+				}}</ui5-text
+			>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Delivery State</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.delivery_state
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Heat Treatment</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.heatTreatments?.length
+					? prodOrderPosOperation.prodOrderPos!.calculation!.heatTreatments![0].type
+					: ""
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Delivery Weight</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.delivery_weight
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Delivery Dimensions</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.outer_diameter_final +
+					" / " +
+					prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+						?.inner_diameter_final +
+					" x " +
+					prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.height_final +
+					" mm"
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Tolerances</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.outer_tolerance
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Cutting Allowance</ui5-label>
+			<ui5-text i18n
+				>min:
+				{{
+					prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+						?.min_allowance_outer_diameter_final
+				}}
+				max:
+				{{
+					prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+						?.max_allowance_outer_diameter_final
+				}}</ui5-text
+			>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Surface Quality</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.offerPos
+					?.outer_diameter_surface_final
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Testing Frequency</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.testingScope?.frequency
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Testing Sample Allowance</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.testingScope?.specimen_allowance
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Number of Sample Holders</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.testingScope?.quantity_testing_pieces
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Test Acceptance</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.testingScope?.attestation
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Item</ui5-label>
+			<ui5-text
+				>{{ prodOrderPosOperation.prodOrderPos?.item?.custom_id }} |
+				{{ prodOrderPosOperation.prodOrderPos?.item?.name }}</ui5-text
+			>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Product Type</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.product_type
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Quantity</ui5-label>
+			<ui5-text i18n>{{ prodOrderPosOperation.prodOrderPos?.quantity }}pcs</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Start Date</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.plan_start
+					? momentInstance(prodOrderPosOperation.plan_start).format("MMM DD, yyyy")
+					: prodOrderPosOperation.start
+						? momentInstance(prodOrderPosOperation.start).format("MMM DD, yyyy")
+						: ""
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>End Date</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.plan_end
+					? momentInstance(prodOrderPosOperation.plan_end).format("MMM DD, yyyy")
+					: prodOrderPosOperation.start
+						? momentInstance(prodOrderPosOperation.end).format("MMM DD, yyyy")
+						: ""
+			}}</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Total Time</ui5-label>
+			<ui5-text i18n>{{ prodOrderPosOperation.getHour() }}h</ui5-text>
+		</div>
+		<div class="div-row mb-1">
+			<ui5-label
+				style="margin-right: 10px"
+				i18n
+				show-colon
+				>Linked Operations</ui5-label>
+			<ui5-text>{{
+				prodOrderPosOperation.prodOrderPos?.calculation?.note_linked_operations
+			}}</ui5-text>
+		</div>
+		<ui5-title
+			tabindsex="0"
+			level="H4"
+			id="title"
+			slot="startContent"
+			*ngIf="prodOrderPosOperation.prodOrderPos?.bomPos?.length"
+			i18n
+			>Bill of Material</ui5-title
+		>
+		<ui5-table
+			*ngIf="prodOrderPosOperation.prodOrderPos?.bomPos?.length"
+			style="height: 100px">
+			<ui5-table-header-row slot="headerRow">
+				<ui5-table-header-cell
+					id="melt"
+					i18n
+					>Melt</ui5-table-header-cell
+				>
+				<ui5-table-header-cell
+					id="blockNumber"
+					i18n
+					>Block Number</ui5-table-header-cell
+				>
+				<ui5-table-header-cell
+					id="material"
+					i18n
+					>Material</ui5-table-header-cell
+				>
+				<ui5-table-header-cell
+					i18n
+					>Number of pieces</ui5-table-header-cell
+				>
+				<ui5-table-header-cell
+					i18n
+					>Dimension1 [mm]</ui5-table-header-cell
+				>
+				<ui5-table-header-cell
+					i18n
+					>Dimension2 [mm]</ui5-table-header-cell
+				>
+				<ui5-table-header-cell
+					i18n
+					>Block format</ui5-table-header-cell
+				>
+				<ui5-table-header-cell
+					i18n
+					>Long [mm]</ui5-table-header-cell
+				>
+				<ui5-table-header-cell
+					i18n
+					>Operational weight</ui5-table-header-cell
+				>
+				<ui5-table-header-cell
+					i18n
+					>Material number</ui5-table-header-cell
+				>
+			</ui5-table-header-row>
+			<ui5-table-row *ngFor="let bom of prodOrderPosOperation.prodOrderPos?.bomPos">
+				<ui5-table-cell
+					><ui5-label>{{ getMelt(bom.classifications)}}</ui5-label></ui5-table-cell
+				>
+				<ui5-table-cell
+					><ui5-label>{{ getBlockNumber(bom.classifications)}}</ui5-label></ui5-table-cell
+				>
+				<ui5-table-cell
+					><ui5-label>{{ prodOrderPosOperation.prodOrderPos?.calculation?.offerPos?.material?.name }}</ui5-label></ui5-table-cell
+				>
+
+				<ui5-table-cell
+					><ui5-label>{{
+						bom.qty_for_one_parent ?? 0
+					}}</ui5-label></ui5-table-cell
+				>
+				<ui5-table-cell
+					><ui5-label>{{
+						getDimension1(bom.classifications)
+					}}</ui5-label></ui5-table-cell
+				>
+				<ui5-table-cell
+					><ui5-label>{{
+						getDimension2(bom.classifications)
+					}}</ui5-label></ui5-table-cell
+				>
+				<ui5-table-cell
+					><ui5-label>{{
+						getBlockFormat(bom.classifications)
+					}}</ui5-label></ui5-table-cell
+				>
+				<ui5-table-cell
+					><ui5-label>{{
+						getLong(bom.classifications)
+					}}</ui5-label></ui5-table-cell
+				>
+				<ui5-table-cell
+					><ui5-label>{{
+						getOperationalWeight(bom.classifications)
+					}}</ui5-label></ui5-table-cell
+				>
+				<ui5-table-cell
+					><ui5-label>{{
+						bom.item?.custom_id
+					}}</ui5-label></ui5-table-cell
+				>
+			</ui5-table-row>
+		</ui5-table>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			class="ml-8"
+			(click)="handleClose()"
+			>
+			{{ localization.cancel }}</ui5-button>
+	</div>
+	<app-hwe-kalk-calculation-details
+		(closeHweDialog)="closeHweDialog($event)"
+		[calculationId]="calculationId"
+		[openDialog]="openCalDetails"></app-hwe-kalk-calculation-details>
+</app-dialog>

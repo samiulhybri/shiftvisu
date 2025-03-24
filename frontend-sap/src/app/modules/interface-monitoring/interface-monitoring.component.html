@@ -1,0 +1,51 @@
+<div
+	class="pt-0 pb-2 box-border grid gap-2 grid-rows-[auto,1fr] grid-cols-[auto,1fr] h-screen bg-custom-background">
+	<app-header-nav
+		class="col-span-2 row-start-1 row-end-2"
+		title='Interface Monitoring'
+		[isHomePage]="false"
+		(logOutDialogEvent)="logoutDialogOpen()"
+		(isSidebarCollapse)="onChangeSidebar()">
+	</app-header-nav>
+
+	<app-sidebar 
+		[sidebars]="sidebar" 
+		[isSideNavCollapsed]="isSideNavCollapsed"
+		(selectedMenu)="navigateSection($event)">
+	</app-sidebar>
+	
+	<div class="content">
+		<router-outlet></router-outlet>
+	</div>
+</div>
+
+<ui5-dialog
+	header-text="Confirm"
+	[open]="isLogOutDialogOpen"
+	state="Critical"
+	(beforeClose)="closeDialog()">
+	<div class="flex flex-col-item">
+		<ui5-text i18n> Do you want to logout? </ui5-text>
+		<ui5-busy-indicator
+			size="M"
+			[active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		class="footer-style gap-8"
+		slot="footer">
+		<ui5-button
+			design="Emphasized"
+			class="mr5"
+			i18n
+			id="logoutConfirmButton"
+			(click)="logOut()"
+			>Confirm</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			id="logoutCancelButton"
+			i18n
+			>Cancel</ui5-button
+		>
+	</div>
+</ui5-dialog>

@@ -1,0 +1,44 @@
+.docVisuTable {
+	background: var(--color-white);
+	border-radius: 0.5rem 0.5rem 0 0;
+	height: calc(88% + 10px);
+	/* width: calc(98% + 10px); */
+}
+
+.truncate-text {
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor: pointer;
+}
+
+.folderCell,
+.fileCell,
+.ui5-tree-item-custom {
+	cursor: pointer;
+}
+
+.folderCell:hover,
+.fileCell:hover,
+.ui5-tree-item-custom:hover {
+	cursor: pointer;
+}
+
+.fileCell::part(native-li) {
+    height: 48px !important;
+}
+
+ui5-tree-item-custom::part(native-li){
+	background-color: var(--color-white) !important;
+}
+
+ui5-tree-item-custom[selected]::part(native-li) {
+    background-color: #EAF8FF !important;
+}
+
+.fileCell::part(icon) {
+    width: 22px !important;
+    height: 32px !important;
+	fontSize: 16px !important;
+}

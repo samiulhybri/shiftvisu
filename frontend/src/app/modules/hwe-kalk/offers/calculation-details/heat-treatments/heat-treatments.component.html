@@ -1,0 +1,50 @@
+<div class="heat-treatment" *ngIf="heatTreatments"  [ngClass]="{'disabled': !isPermissionValidate()}">
+    <div class="buttons k-w-full k-d-flex" [ngClass]="{'disabled': !hweService.fromCalDetail || hweService.disableTabs}">
+        <button kendoButton themeColor="error" [disabled]="!heatTreatments.length || isDeletedAll" (click)="deleteAll()" i18n>
+            <span class="k-icon icon-trash"></span> Delete all
+        </button>
+        <kendo-grid-spacer></kendo-grid-spacer>
+        <button class="right" kendoButton themeColor="primary" (click)="add()" i18n>
+            <span class="k-icon icon-add"></span> New
+        </button>
+    </div>
+    <div [ngClass]="{'disabled': !hweService.fromCalDetail || hweService.disableTabs}" *ngIf="heatTreatments.length" class="k-w-full">
+        <table class="heat-treatment-pos k-w-full">
+            <thead>
+                <tr *ngIf="!isDeletedAll">
+                    <th i18n>Pos <span class="k-text-error k-pl-1">*</span></th>
+                    <th i18n>Type <span class="k-text-error k-pl-1">*</span></th>
+                    <th i18n>Internal Note</th>
+                    <th i18n class="k-text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let data of heatTreatments|orderByKey:'pos';let i = index">
+                    <ng-container *ngIf="!data.isDeleted">
+                        <td>
+                            <kendo-numerictextbox #pos name="pos" [(ngModel)]="data.pos" [step]="1" format="##"></kendo-numerictextbox>
+                        </td>
+                        <td style="width: 700px">
+                            <kendo-combobox #type name="type" [(ngModel)]="data.type" [data]="heatTreatmentTypeDataSource" textField="text"
+                                valueField="value" [filterable]="true" [valuePrimitive]="true" (filterChange)="handleFilter($event, 'type')"
+                                (valueChange)="heatTreatmentType(data)">
+                            </kendo-combobox>
+                        </td>
+                        <td>
+                            <kendo-textbox #internal_note name="internal_note"
+                                [(ngModel)]="data.internal_note"></kendo-textbox>
+                        </td>
+                        <td class="k-text-end">
+                            <button kendoButton themeColor="primary" (click)="deleteOne(i)">
+                                <span class="k-icon icon-trash"></span>
+                            </button>
+                        </td>
+                    </ng-container>
+                </tr>
+            </tbody>
+        </table>
+        <div *ngIf="hasValidationErrorHeatTreatment" class="k-text-error k-fs-sm" i18n>
+            Error! Pos and Type are required.
+        </div>
+    </div>
+</div>

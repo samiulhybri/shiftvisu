@@ -1,0 +1,42 @@
+<div
+	class="gt-main"
+	(mouseenter)="onHover()"
+	(mouseleave)="onHoverOff()"
+	[ngStyle]="{
+		'background-color':
+			type == genericTagType.Error && !isHovered
+				? '#f98585'
+				: type == genericTagType.Info && !isHovered
+				? '#E1F4FF'
+				: type == genericTagType.Error && isHovered
+				? '#f9b4b4'
+				: type == genericTagType.Info && isHovered
+				? '#d1e9fd'
+				: type == genericTagType.ProductionError && isHovered
+				? 'var(--production-error-color)'
+				: type == genericTagType.ProductionError && !isHovered
+				? 'var(--sapErrorBackground)'
+				: type == genericTagType.None && isHovered
+				? 'var(--card-border-color)'
+				: type == genericTagType.None && !isHovered
+				? 'var(--card-border-color)'
+				: '#F5FAE5'
+	}">
+	<div
+		class="gt-sub"
+		[ngStyle]="{
+			'background-color':
+				type == genericTagType.Error
+					? 'var(--statnstill-color)'
+					: type == genericTagType.Info
+					? '#0070F2'
+					: type == genericTagType.ProductionError
+					? 'var(--statnstill-color)': type ==genericTagType.Warning?'var(--yellowHoverColor)'
+					: type == genericTagType.None
+					?'var(--gray)'
+					: 'var(--production-color)'
+		}"></div>
+	<div style="margin-top: 4.5px; margin-bottom: 4.5px; display: flex; width: 100%">
+		<ng-content></ng-content>
+	</div>
+</div>

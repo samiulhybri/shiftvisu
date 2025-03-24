@@ -1,0 +1,209 @@
+<ui5-card class="flex justify-center items-center h-full w-full">
+	<ui5-card-header
+		slot="header"
+		title-text="Order Details"
+		i18n-title-text>
+		<ui5-button
+			design="Emphasized"
+			*ngIf="showPreviewButton"
+			slot="action"
+			class="mt-[-12px] mb-[-8px]"
+			(click)="onPreviewClick()"
+			i18n
+			>Label Preview</ui5-button
+		>
+	</ui5-card-header>
+
+	<div
+		class="order-buttons-wrapper w-full gap-8 py-2 px-4"
+		*ngIf="hasOperation()">
+		<div
+			class="gap-8 flex"
+			id="orderButtons">
+			<ui5-toolbar
+                align-content="Start"
+                class="hide-bottom-border">
+                <ng-container *ngFor="let operation of orderDetails">
+                    <ui5-toolbar-button
+                        text="{{ operation?.prodOrderCustomId }} -
+                    {{ operation?.prodOrderPosOperationPosition }}"
+                        (click)="selectedOperation(operation?.id)"
+                        [design]="getButtonStatus(selectedId === operation?.id)">
+                    </ui5-toolbar-button>
+                </ng-container>
+            </ui5-toolbar>
+		</div>
+	</div>
+	<div
+		class="grid xl:grid-cols-2 lg:grid-cols-2 gap-2 p-4 border-top"
+		*ngIf="selectedOperations?.prodOrderPosOperationPosition; else noContent"
+		id="orderCards">
+		<div
+			class="order-card"
+			*ngIf="showPreviewButton">
+			<ui5-title
+				level="H5"
+				id="operation"
+				>{{ currentMachine?.custom_id }}</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Machine Id</span
+			>
+		</div>
+		<div
+			class="order-card"
+			*ngIf="showPreviewButton">
+			<ui5-title level="H5">{{ currentMachine?.name }}</ui5-title>
+			<span
+				class="label-style"
+				i18n
+				>Machine Name</span
+			>
+		</div>
+
+		<div class="order-card">
+			<ui5-title
+				level="H5"
+				id="operation"
+				>{{ selectedOperations?.prodOrderPosOperationPosition }}
+				-
+				{{ selectedOperations?.prodOrderPosOperationName }}</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Operation</span
+			>
+		</div>
+		<div class="order-card">
+			<ui5-title level="H5"
+				>{{ selectedOperations?.goodItemsCount }} {{ selectedOperations?.unitOfMeasureCustomId }} |
+				{{ selectedOperations?.reworkItemsCount }} {{ selectedOperations?.unitOfMeasureCustomId }}</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Good | Rework</span
+			>
+		</div>
+		<div class="order-card">
+			<ui5-title level="H5">{{ selectedOperations?.itemId }}</ui5-title>
+
+			<span
+				class="label-style"
+				i18n
+				>Item Id</span
+			>
+		</div>
+		<div class="order-card">
+			<ui5-title
+				id="scrap"
+				level="H5"
+				>{{ selectedOperations?.badItemsCount }} {{ selectedOperations?.unitOfMeasureCustomId }}</ui5-title
+			>
+			<span
+        class="label-style"
+        i18n
+      >Scrap</span>
+		</div>
+		<div
+			class="label-style"
+			class="order-card">
+			<ui5-title
+				id="itemName"
+				level="H5"
+				(mouseenter)="onMouseEnter()"
+				(mouseleave)="onMouseLeave()">
+				{{ selectedOperations?.itemName || "" | truncate: 30 }}</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Item Name</span
+			>
+		</div>
+		<div class="order-card">
+			<ui5-title
+				id="standardCycle"
+				level="H5"
+				>{{ selectedOperations?.standardCycle | number: '2.0-2' }} {{ localizedSec }}</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Standard Cycle</span
+			>
+		</div>
+		<div class="order-card">
+			<ui5-title
+				id="expectedEndTime"
+				level="H5"
+				>{{prodOrderPosOperation.getExpectedEndDate(selectedOperations?.expectedEndTimeWithCapacityErrorCode, selectedOperations?.expectedEndTimeWithCapacity)}}</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Expected End Time</span
+			>
+		</div>
+		<div class="order-card">
+			<ui5-title
+				id="currentCycle"
+				level="H5"
+				>{{ selectedOperations?.effectiveTime | number: '2.0-2' }} {{ localizedSec }}</ui5-title
+			>
+			<span
+				class="label-style"
+				i18n
+				>Effective Cycle</span
+			>
+		</div>
+		<div class="order-card">
+			<ui5-title
+				id="orderQuantity"
+				level="H5"
+				>{{ selectedOperations?.orderQuantity }} | {{selectedOperations?.residualQuantity}} {{selectedOperations?.unitOfMeasureCustomId}}</ui5-title
+			>
+			<ui5-label wrapping-type="None" class="label-style">{{orderText | truncate: 5}} | {{resQuantityText | truncate:
+				17}}</ui5-label>
+		</div>
+		<div class="order-card">
+			<ui5-progress-indicator
+				id="progressIndicator"
+				[value]="selectedOperations?.orderProgression || 0"></ui5-progress-indicator>
+			<span
+				class="label-style margin-top--10"
+				i18n
+				>Order Progression</span
+			>
+		</div>
+	</div>
+
+	<ng-template #noContent>
+		<div
+			class="w-full h-full flex justify-center items-center min-height-order-details"
+			[ngStyle]="isOneId ? { minHeight: '450px' } : {}">
+			<span *ngIf="isLoading; else noContentFound">
+				<ui5-busy-indicator
+					size="M"
+					active></ui5-busy-indicator>
+			</span>
+			<ng-template #noContentFound>
+				<label i18n>No data found!</label>
+			</ng-template>
+		</div>
+	</ng-template>
+	<ui5-popover
+		id="popOver"
+		[open]="showPopOver"
+		[opener]="opener"
+		placement="Bottom"
+		(after-close)="onMouseLeave()">
+		<div class="popover-content">
+			<ui5-text>{{ selectedOperations?.itemName }}</ui5-text>
+		</div>
+	</ui5-popover>
+</ui5-card>
+

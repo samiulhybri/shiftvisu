@@ -1,0 +1,877 @@
+<ui5-busy-indicator
+	[active]="isLoadingPage"
+	size="L" class="h-full w-full">
+<div class="h-full grid grid-flow-col grid-cols-10"
+[ngClass]="{ 'w-[71vw]': isMachineBoardActive, 'w-full': !isMachineBoardActive }">	
+	<div
+		class="grid"
+		[ngClass]="{
+			'h-[76vh]': isMachineBoardActive,
+			'h-full': !isMachineBoardActive,
+			'col-span-3': showTreeView && showItemDetails,
+			'col-span-4': showTreeView && !showItemDetails,
+			'hidden': !showTreeView
+		  }">
+			<div class="overflow-hidden h-full bg-white rounded-2xl shadow-xl">
+
+					<app-doc-visu-directory-view
+						#directoryViewComponent
+						[title]="directories?.name ?? ''"
+						[structure]="directories"
+						[showExpandButton]="true"
+						[folderActionButtons]="folderOptions"
+						[fileActionButtons]="fileOptions"
+						[fileClick]="onFileSelect"
+						[showLinks]="true"
+						[processClick]="onProcessSelect"
+						[processActionButtons]="processOptions"
+						[onBackButton]="onBackButtonClick"
+						[folderClick]="onFolderSelect"
+						[needToShowActionButton]="!isMachineBoardActive"
+						class="overflow-x-hidden overflow-y-scroll"></app-doc-visu-directory-view>
+				
+			</div>
+		</div>
+
+	<div
+		class="grid custom-grid overflow-hidden"
+		[ngClass]="{
+			'h-[76vh]': isMachineBoardActive,
+			'h-full': !isMachineBoardActive,
+			'col-span-5': showTreeView && showItemDetails,
+			'col-span-7': showItemDetails && !showTreeView,
+			'col-span-6': showTreeView && !showItemDetails,
+			'col-span-10': !showTreeView && !showItemDetails
+		  }">
+		<div
+			class="grid-child-narrow flex justify-center items-center overflow-hidden">
+			<ui5-button
+				class="fixed top-1/2 transform -translate-y-1/2 z-50 shadow-lg bg-white rounded-full"
+				(click)="toggleTreeView()"
+				[icon]="showTreeView ? 'slim-arrow-left' : 'slim-arrow-right'"
+				design="Transparent"></ui5-button>
+		</div>
+
+		<div class="grid-child-bigger rounded-2xl shadow-xl bg-white overflow-hidden">
+			@if (filePreview) {
+				<div class="h-full overflow-hidden">
+					<app-doc-visu-file-preview
+						#showMediaPreview
+						[selectedFile]="selectedFile"></app-doc-visu-file-preview>
+				</div>
+			} @else if (filePreview === false && createDocuments === true) {
+				<div>
+					<div
+						slot="header"
+						class="header-flex">
+						<span
+							class="text-base font-bold"
+							i18n
+							>Create Document</span
+						>
+					</div>
+					<div class="h-[86%] p-4">
+						<ui5-label
+							show-colon
+							i18n
+							>File Name</ui5-label
+						>
+						<ui5-input class="w-full mb-2"></ui5-input>
+						<ui5-label
+							show-colon
+							i18n
+							class="mb-2"
+							>Description</ui5-label
+						>
+						<app-text-editor class="pb-4 h-[89%]"></app-text-editor>
+					</div>
+					<div
+						slot="footer"
+						class="flex items-center justify-end flex-row w-full pt-2">
+						<ui5-button
+							design="Emphasized"
+							id="saveButtonUserGroup"
+							[disabled]="
+								disableButtonDuringRequest && this.filename.trim().length < 0
+							">
+							{{ localization.save }}
+						</ui5-button>
+						<ui5-button
+							class="ml-8 border-none mr-2"
+							id="cancelButtonUserGroup"
+							(click)="cancelButton()">
+							{{ localization.cancel }}
+						</ui5-button>
+					</div>
+				</div>
+			} @else {
+				<ui5-illustrated-message
+					name="NoData"
+					class="bg-white rounded-2xl shadow-xl">
+					<ui5-title
+						slot="title"
+						level="H1"
+						i18n
+						>No Preview Available</ui5-title
+					>
+				</ui5-illustrated-message>
+			}
+		</div>
+
+		<div
+			class="grid-child-narrow flex justify-center items-center overflow-hidden">
+			<ui5-button
+				class="fixed top-1/2 transform -translate-y-1/2 z-50 shadow-lg bg-white rounded-full"
+				(click)="toggleDetails()"
+				[icon]="showItemDetails ? 'slim-arrow-right' : 'slim-arrow-left'"
+				design="Transparent"></ui5-button>
+		</div>
+	</div>
+
+	<div
+		class="grid bg-white rounded-2xl shadow-xl h-[76vh]"
+		[ngClass]="{
+			'h-[76vh]': isMachineBoardActive,
+			'h-full': !isMachineBoardActive,
+			'col-span-2': showTreeView && showItemDetails,
+			'col-span-3': showItemDetails && !showTreeView,
+			'hidden': !showItemDetails
+		  }">
+		<div class="rounded-lg">
+			<div slot="header" class="header-flex flex justify-between items-center">
+				<div class="flex items-center space-x-2">
+					@if (selectedSegment === "menu") {
+						<span class="text-base font-bold" i18n>Details</span>
+					}
+					@if (filePreview && selectedSegment === "history") {
+						<span class="text-base font-bold" i18n>History</span>
+					}
+					@if (selectedSegment === "notification") {
+						<span class="text-base font-bold" i18n>File Note</span>
+					}
+				</div>
+			
+				<div class="flex items-center space-x-2">
+					@if (selectedSegment === "notification" && !isMachineBoardActive) {
+						<ui5-button
+							design="Emphasized"
+							id="saveButtonUserGroup"
+							[disabled]="!selectedFile"
+							(click)="newNoteButtonClick()"
+							i18n-text>
+							Add
+						</ui5-button>
+					}
+					<ui5-segmented-button>
+						<ui5-segmented-button-item
+							tooltip="Menu"
+							icon="menu"
+							[selected]="selectedSegment === 'menu'"
+							(click)="onSegmentSelect('menu')">
+						</ui5-segmented-button-item>
+						@if (filePreview) {
+							<ui5-segmented-button-item
+								tooltip="History"
+								icon="history"
+								[selected]="selectedSegment === 'history'"
+								(click)="onSegmentSelect('history')">
+							</ui5-segmented-button-item>
+							<ui5-segmented-button-item
+								tooltip="Notification"
+								icon="notification-2"
+								[selected]="selectedSegment === 'notification'"
+								(click)="onSegmentSelect('notification')">
+							</ui5-segmented-button-item>
+						}
+					</ui5-segmented-button>
+				</div>
+			</div>
+			<div>
+				@if (selectedSegment === "menu") {
+					@if (
+						selectedFile !== null &&
+						selectedFolder === null &&
+						selectedProcess === null
+					) {
+						<div class="h-full p-4">
+							<ui5-label
+								show-colon
+								i18n
+								>File Name</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="fileDetails[0]?.file_name"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>File Type</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="fileDetails[0]?.mime_type"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>File Created</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="
+									(fileDetails[0]?.created_at | date: 'dd.MM.yyyy HH:mm') ??
+									''
+								"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>File Creator</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="fileDetails[0]?.creator"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>Last Updated</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="
+									(fileDetails[0]?.updated_at | date: 'dd.MM.yyyy HH:mm') ??
+									''
+								"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>File Size</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="fileDetails[0]?.size | fileSize"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>Version</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="fileDetails[0]?.version?.toString()"></ui5-input>
+						</div>
+					} @else if (
+						selectedFile === null &&
+						selectedFolder !== null &&
+						selectedProcess === null
+					) {
+						<div class="h-full p-4">
+							<ui5-label
+								show-colon
+								i18n
+								>Folder Name</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="folderDetail[0]?.folder_name"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>Parent Folder</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="folderDetail[0]?.parent_name"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>Folder Created</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="
+									(folderDetail[0]?.created_at | date: 'dd.MM.yyyy HH:mm') ??
+									''
+								"></ui5-input>
+							<ui5-label
+								show-colon
+								i18n
+								>Last Updated</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="
+									(folderDetail[0]?.updated_at | date: 'dd.MM.yyyy HH:mm') ??
+									''
+								"></ui5-input>
+							<ui5-label
+								show-colon
+								i18n
+								>Version</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="folderDetail[0]?.version"></ui5-input>
+						</div>
+					} @else if (
+						selectedProcess !== null &&
+						selectedFolder === null &&
+						selectedFile === null
+					) {
+						<div class="h-full p-4">
+							<ui5-label
+								show-colon
+								i18n
+								>Process Name</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="processDetails[0]?.process_name"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>Model Type</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="processDetails[0]?.sectionable_type"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>Document Section</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="processDetails[0]?.document_section"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>Directory Structure</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="processDetails[0]?.directory_structure"></ui5-input>
+
+							<ui5-label
+								show-colon
+								i18n
+								>Process Created</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="
+									(processDetails[0]?.created_at
+										| date: 'dd.MM.yyyy HH:mm') ?? ''
+								">
+							</ui5-input>
+							<ui5-label
+								show-colon
+								i18n
+								>Last Updated</ui5-label
+							>
+							<ui5-input
+								class="w-full mb-2"
+								readonly
+								[value]="
+									(processDetails[0]?.updated_at
+										| date: 'dd.MM.yyyy HH:mm') ?? ''
+								">
+							</ui5-input>
+						</div>
+					}
+				}
+				@if (filePreview && selectedSegment === "history") {
+					<div class="h-full overflow-auto">
+						@for (history of historyList; track $index) {
+							<div class="content overflow-auto mb-2 mt-2 customBorder">
+								<div class="mb-2 flex items-center justify-between px-4">
+									<!-- Title on the left -->
+									<ui5-title
+										level="H6"
+										i18n-text
+										>New version {{ history.version }}</ui5-title
+									>
+
+									<!-- Buttons on the right -->
+									<div class="flex space-x-2">
+										<ui5-button
+											#downloadSelected
+											i18n
+											icon="download"
+											(click)="downloadFile(history)"
+											design="Transparent"></ui5-button>
+										<ui5-button
+											#viewFileSelected
+											i18n
+											icon="vds-file"
+											(click)="viewFile(history)"
+											design="Transparent"></ui5-button>
+									</div>
+								</div>
+								<div class="mb-2 px-4">
+									<ui5-label i18n-text
+										>Changed by {{ history.creator.name }}</ui5-label
+									>
+								</div>
+								<div class="mb-2 px-4">
+									<ui5-label i18n-text
+										>Changes on
+										{{
+											history.created_at | date: "dd-MM-yy HH:mm"
+										}}</ui5-label
+									>
+								</div>
+							</div>
+						}
+					</div>
+				}
+
+				@if (filePreview && selectedSegment === "notification") {
+					<ui5-busy-indicator [active]="isLoading" class="w-full">
+					<div class="flex justify-between w-full h-full overflow-auto">
+							<div class="w-full">
+								@for (note of selectedFile?.notes; track $index) {
+									<div  class="customBorder">
+	
+										<div [innerHTML]="note.note" class="pl-4 pr-4">{{ note.note }}</div>
+										<ui5-label class="pl-4 pr-4 pb-[10px]">{{ note.creator?.name }} • {{ note.created_at | date: "dd.MM.yyyy HH:mm" }} </ui5-label>
+									</div>
+								}
+							</div>
+						</div>
+					</ui5-busy-indicator>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+</ui5-busy-indicator>
+
+<ui5-dialog
+	id="addGroupDialog"
+	#addGroupDialog
+	[headerText]="dialogTitle"
+	i18n-headerText>
+	<ui5-busy-indicator [active]="isLoading" class="">
+		<div>
+			<div>
+				<ui5-label
+					show-colon
+					i18n
+					>File Note</ui5-label
+				>
+			</div>
+			<div class="editor-div">
+				<app-text-editor
+					[notes]="fileNotes"
+					(sendNotes)="onChangeNotes($event)"
+					style="height: 100%">
+				</app-text-editor>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button
+			design="Emphasized"
+			id="saveButtonUserGroup"
+			(click)="onNoteSave()"
+			[disabled]="disableButtonDuringRequest || !fileNotes.trim()"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="cancelButtonUserGroup"
+			(click)="customClose()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="isNewFolderDialogOpen"
+	#isNewFolderDialogOpen
+	[headerText]="newFolderDialogTitle"
+	i18n-headerText>
+	<ui5-busy-indicator [active]="isLoading" class="">
+		<div class="w-[450px] h-full">	
+			<div class="flex flex-col w-full">
+				<div class="flex flex-col">
+					<ui5-label required show-colon required>{{ titleName }}</ui5-label>
+					<ui5-input [required]="true" [(ngModel)]="folderName" class="w-full" #nameInput="ngModel"
+						(input)="onChangeFolderNameInput($event)" [valueState]="valueState">
+					</ui5-input>
+				</div>
+			</div>	
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button
+			design="Emphasized"			
+			(click)="createNewFolder()"
+			[disabled]="disableButtonDuringRequest"
+			id="saveButton"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="cancelButtonUserGroup"
+			(click)="customClose()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="isRenameFileDialogOpen"
+	#isRenameFileDialogOpen
+	[headerText]="isFileDialogOpen"
+	i18n-headerText>
+	<ui5-busy-indicator [active]="isLoading" class="">
+		<div class="w-[450px] h-full">
+			<div class="flex flex-col w-full">
+				<div class="flex flex-col">
+					<ui5-label
+						show-colon
+						i18n
+						required
+						>File Name</ui5-label
+					>
+					<ui5-input
+						[required]="true"
+						[(ngModel)]="fileName"
+						[valueState]="filenameValueState"
+						(input)="onChangeFileNameInput($event)"
+						class="w-full"></ui5-input>
+				</div>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button
+			design="Emphasized"
+			(click)="renameFile()"
+			[disabled]="inProgress"
+			id="saveButton"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="cancelButtonUserGroup"
+			(click)="customClose()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="deleteDialog"
+	#deleteDialog
+	header-text="Warning"
+	i18n-header-text
+	state="Critical">
+	<ui5-text>
+		<span i18n
+			>All files will be deleted from this folder. Do you really want to delete this</span
+		><strong>&nbsp;“{{ folderName }}”&nbsp;</strong> <span i18n>folder?</span>
+	</ui5-text>
+	<div class="flex flex-col gap-[5px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			[disabled]="disableButtonDuringRequest"
+			(click)="deleteFolderOrFile()"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="isAddFileDialogOpen"
+	#isAddFileDialogOpen
+	[headerText]="addFileDialogTitle"
+	i18n-headerText>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		size="L">
+		<div class="form w-[1200px] h-full">
+			<div class="grid grid-flow-col grid-cols-2 gap-x-[10px]">
+				<div class="grid col-span-1 h-full">
+					<div class="h-[86%]">
+						<ui5-label
+							show-colon
+							required
+							i18n
+							>File Name</ui5-label
+						>
+						<ui5-input
+							id="nameInput"
+							[required]="true"
+							[(ngModel)]="filename"
+							#nameInput="ngModel"
+							class="w-full mb-2"
+							[valueState]="filenameValueState"
+							(input)="onChangeFileNameInput($event)">
+							<div
+								slot="valueStateMessage"
+								i18n
+								>Upload File First!</div
+							>
+						</ui5-input>
+						<ui5-label
+							show-colon
+							class="mb-2"
+							i18n
+							show-colon
+							>File Note (Please document the modification here)</ui5-label
+						>
+						<app-text-editor
+							[notes]="fileNotes"
+							(sendNotes)="onChangeNotes($event)"
+							class="pb-4">
+						</app-text-editor>
+					</div>
+				</div>
+				<div class="grid col-span-1 h-full overflow-hidden rounded-2xl">
+					<app-attachment-upload
+						[model]="'model'"
+						[uploadedFiles]="tempFiles"
+						[deletedFiles]="deletedSavedFiles"
+						[checkNewFiles]="checkForNewAttachments"
+						[fileCount]="tempFiles.length"
+						[fileFormat]="''"
+						[maxAllowFiles]="1"
+						[updatedStandardFile]="selectedStandardFile"
+						(tempFilesChanged)="onAttachmentChanges($event, 'onUpload')"
+						(deletedFilesChanged)="onAttachmentChanges($event, 'onDelete')"
+						(standardFileSelected)="onAttachmentChanges($event, 'onStandardSelect')"
+						(newFilesCount)="onAttachmentChanges($event, 'fileCount')"
+						class="h-full w-full overflow-hidden">
+					</app-attachment-upload>
+				</div>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button
+			design="Emphasized"
+			id="saveButtonUserGroup"
+			(click)="uploadAttachments()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="cancelButtonUserGroup"
+			(click)="customClose()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	dialogId="isLinkDialogOpen"
+	#isLinkDialogOpen
+	[headerText]="linkDialogTitle"
+	i18n-headerText
+	(onBeforeClose)="closeDialog()">
+	<ui5-busy-indicator
+	[active]="isLoadingLink"
+	size="L">
+		<div class=" w-[1080px]">
+			<form>
+				<div class="grid grid-flow-col grid-cols-2 gap-x-[10px]">
+					<div class="grid col-span-1 grid-rows-4 h-full gap-y-4">
+						<ui5-card class=" grid row-span-1">
+							<div class="p-4">
+								<div>
+									<ui5-label
+										required
+										class="mb-[4px]"
+										show-colon
+										i18n>
+										Selection Section
+									</ui5-label>
+								</div>
+								<div class="mb-3">
+									
+										<ui5-combobox class="w-full" [required]="true" #sectionCombobox id="sectionCombobox"
+											(selection-change)="onChangeSelectionSection($event)">
+											@for (section of documentSections; track $index) {
+												<ui5-cb-item
+													[text]="section.name"
+													[id]="section.id">
+												</ui5-cb-item>
+											}
+										</ui5-combobox>
+									
+								</div>								
+								<div>
+									<ui5-label
+										show-colon
+										i18n>
+										Select Structure
+									</ui5-label>
+								</div>
+								<div>
+									<ui5-busy-indicator class="w-full " [active]="isSelectStructure">
+										<ui5-combobox #directoryStructureComboBox id="directoryStructureComboBox" class="w-full"
+											(selection-change)="onChangeDirectoryStructure($event)">
+											@for (structure of directoryStructures; track $index) {
+											<ui5-cb-item [text]="structure.name"> </ui5-cb-item>
+											}
+										</ui5-combobox>
+									</ui5-busy-indicator>
+								</div>
+							</div>
+						</ui5-card>
+						<ui5-card class=" grid row-span-3">
+							<div class="h-[422px] m-4">
+								<div class="mb-3">
+									<ui5-label
+										show-colon
+										i18n
+										>Selected Documents</ui5-label
+									>
+								</div>
+									@if (clonedStructure) {
+										<app-doc-visu-directory-view
+											[showExpandButton]="true"
+											class="w-full overflow-auto"
+											[processClick]="processClick"
+											[structure]="clonedStructure">
+										</app-doc-visu-directory-view>
+									}
+								</div>
+						</ui5-card>
+					</div>
+					<ui5-card class="pl-2 h-full">
+						<div class="ui5-card-header">
+							<ui5-title
+								class="mb-2"
+								level="H4"
+								size="H4"
+								i18n
+								>Selected Document</ui5-title
+							>
+							<ui5-busy-indicator
+								class="w-full h-full"
+								[active]="isStructureLoading">
+								@if (linkedStructure) {
+									<app-doc-visu-directory-view
+										class="w-full overflow-auto h-[549px]"
+										[showExpandButton]="true"
+										[structure]="linkedStructure"
+										[processClick]="processClick"
+										[fileClick]="fileClick"
+										></app-doc-visu-directory-view>
+								}
+							</ui5-busy-indicator>
+						</div>
+					</ui5-card>
+				</div>
+			</form>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button
+			design="Emphasized"
+			id="saveButtonUserGroup"
+			[disabled]="disableButtonDuringRequest"
+			(click)="onSaveCloned()"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8 border-none"
+			id="cancelButtonUserGroup"
+			(click)="customClose()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog #confirmationModal id="confirmationModal" header-text="Warning" [open]="isConfirmationModalOpen"
+	state="Critical" i18n-header-text>
+	<p style="width: 100%;">{{confirmationText}}</p>
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button class="dialogSubmit" design="Emphasized" (click)="closeDialog()" id="deleteSubmitButton">{{localization.ok }}</ui5-button>
+		<ui5-button id="CloseButton" (click)="isConfirmationModalOpen = false;">{{ localization.cancel}}</ui5-button>
+	</div>
+</ui5-dialog>

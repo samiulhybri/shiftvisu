@@ -1,0 +1,31 @@
+.close-button {
+    margin-right: -1.7vw;
+    padding: 10px 20px;
+}
+
+.main-div {
+    margin-left: -30px;
+    margin-right: -30px;
+    height: 100%;
+}
+
+.staging-area-wraper {
+    display: flex;
+    gap: .75rem;
+}
+
+.packaging-instruction-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.packaging-instruction-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 25px;
+}
+
+.description-text-color {
+    color: var(--list-description-text-color);
+}

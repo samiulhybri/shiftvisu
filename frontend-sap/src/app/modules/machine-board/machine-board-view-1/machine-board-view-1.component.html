@@ -1,0 +1,65 @@
+<div class="p-2">
+	<div class="grid gap-2 xl:grid-cols-7 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2">
+		<div class="col-span-1 overflow-auto md:h-screen md:sticky md:top-0" [ngStyle]="{'height': pageHeight}">
+			<app-prod-order-pos-operation-status
+				*ngIf="machineBoardStateTypeClass.getStateValue(machine?.machine_board_state_type) == machineBoardStateType.OPERATION_STATE"
+				[selectedOperation]="selectedOperation">
+			</app-prod-order-pos-operation-status>
+			<app-machine-state-current 
+				*ngIf="machineBoardStateTypeClass.getStateValue(machine?.machine_board_state_type) != machineBoardStateType.OPERATION_STATE">
+			</app-machine-state-current>
+			<!--TEST PURPOSE-->
+			<div class="mt-2">
+				<app-machine-board-sidebar
+					class="sidebar"
+					[display]="'calc(100vh - 365px)'"
+					[machine]="machine"
+					[operationId]="selectedOperation?.id"></app-machine-board-sidebar>
+			</div>
+		</div>
+	
+		<div class="xl:col-span-6 lg:col-span-3 md:col-span-2 sm:col-span-2 md:overflow-y-auto" [ngStyle]="{'height': pageHeight}">
+			<div class="grid gap-2 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-1 sm:grid-cols-1" style="height: calc(100% - 5px);">
+				<div class="xl:col-span-2 lg:col-span-3 flex flex-col justify-between">
+					<div class="w-full grow">
+						<app-order-details
+							(triggerEvent)="changeMachItem($event)"
+							(selectedOperationEvent)="onSelectOperation($event)"
+							[prodOrderPosOperationsIds]="prodOrderPosOperations">
+						</app-order-details>
+					</div>
+					<div class="w-full">
+						<app-item-image
+							#appItemImage
+							[height]="cardHeight"
+							[headerTitle]="'Item Image'"
+							[itemId]="machItem?.id"
+							[isCard]="true"
+							[isSingleImage]="true"
+							style="width: 100%; height: 100%">
+						</app-item-image>
+					</div>
+				</div>
+				<div class="xl:col-span-2 lg:col-span-3 flex flex-col justify-between">
+					<div class="w-full" style="height: 32%;">
+						<app-machine-state-timeline
+							[machine]="machine"
+							[isBusy]="isBusy">
+						</app-machine-state-timeline>
+					</div>
+
+					<div class="w-full" style="height: 26%;">
+						<app-machine-kpi-1 [machine]="machine"></app-machine-kpi-1>
+					</div>
+					<div class="w-full" style="height: 40%;">
+						<app-quantity-chart
+							#quantityChart
+							[chartHeight]="graphHeight"
+							[machineId]="machine?.id">
+						</app-quantity-chart>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,122 @@
+<app-dialog
+	[isDialogOpen]="open"
+	#addOrEditIssueTypeDialog
+	[title]="saveMode == 'post' ? 'Add' : 'Edit'"
+	i18n-title>
+	<ui5-busy-indicator [active]="areActionsDisabled">
+		<form
+			#taskForm="ngForm"
+			class="max-w-[900px] grid grid-col-2 gap-[10px]">
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					required
+					>Task Name</ui5-label
+				>
+				<ui5-input
+					class="w-full"
+					#name="ngModel"
+					i18n-placeholder
+					required
+					placeholder="Task Name"
+					[(ngModel)]="task.name"
+					name="name"
+					[valueState]="name.touched && !name.valid ? 'Negative' : 'None'">
+					<div
+						slot="valueStateMessage"
+						i18n
+						>Task Name is required.</div
+					>>
+				</ui5-input>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Responsible</ui5-label
+				>
+				<ui5-combobox
+					class="w-full"
+					i18n-placeholder
+					placeholder="Select Responsible"
+					[(ngModel)]="responsibleText"
+					noTypeahead
+					name="responsible"
+					(ui5SelectionChange)="setResponsible($event)"
+					(blur)="checkResponsibleOnBlur()">
+					@for (member of teamMembers; track $index) {
+						<ui5-mcb-item
+							[text]="member.name"
+							[id]="member.id"></ui5-mcb-item>
+					}
+				</ui5-combobox>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>End Date</ui5-label
+				>
+				<ui5-date-picker
+					class="w-full"
+					i18n-placeholder
+					formatPattern="dd.MM.yyyy"
+					name="end_date"
+					[(ngModel)]="task.end_date">
+				</ui5-date-picker>
+			</div>
+
+			<div class="flex !flex-col">
+				<ui5-label
+					i18n
+					show-colon
+					>Status</ui5-label
+				>
+				<ui5-slider
+					class="w-full"
+					[min]="0"
+					[max]="100"
+					[step]="25"
+					[labelInterval]="1"
+					showTickmarks
+					[ngModelOptions]="{ standalone: true }"
+					[(ngModel)]="task.progress">
+				</ui5-slider>
+			</div>
+
+			<div class="col-span-2 row-span-6">
+				<ui5-label show-colon>{{ descriptionName }}</ui5-label>
+				<ckeditor
+					tagName="textarea"
+					[editor]="classicEditor"
+					[config]="config"
+					[(ngModel)]="task.description"
+					name="description"
+					class="w-full">
+				</ckeditor>
+			</div>
+		</form>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButtonId"
+			[disabled]="areActionsDisabled"
+			design="Emphasized"
+			(ui5Click)="popupSaveClick(taskForm)">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			id="CancelButtonId"
+			[disabled]="areActionsDisabled"
+			(ui5Click)="popupCloseClick()">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</app-dialog>

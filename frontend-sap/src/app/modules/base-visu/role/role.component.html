@@ -1,0 +1,66 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Roles"
+		url="/Roles"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showSearch]="true"
+		[showDownload]="false"
+		[model]="role"
+		[editPermission]="authService.isPermissionValid('BASEVISU_ROLES_EDIT')"
+		addButtonText="New"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		selectionMode="Single"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		(newButtonClick)="newButtonClick()"
+		(editClick)="editClick($event)"
+		(deleteClick)="deleteClick($event)"
+		expandQuery="$expand=permissions"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		#childComponentRef>
+	</app-grid-table>
+</div>
+
+<ui5-dialog [class.dim-content]="isIndicator" id="deleteDialog" header-text="Warning" state="Critical">
+    <p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isIndicator"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+    <div slot="footer" class="footer-style gap-8">
+        <ui5-button class="dialogSubmit" design="Emphasized" [disabled]="isIndicator" (click)="deleteSubmit()">{{ localization.ok }}</ui5-button>
+        <ui5-button design="Transparent" (click)="closeDialogDelete()">{{ localization.close }}</ui5-button>
+    </div>
+</ui5-dialog>
+
+<ng-template #dialogDynamic></ng-template>
+<ui5-dialog
+		#deleteErrorDialogRoles
+		id="deleteErrorDialogRoles"
+		state="Negative"
+		header-text="Error">
+		<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+		<div
+			slot="footer"
+			class="deleteErrorDialogFooter">
+			<ui5-button
+				design="Transparent"
+				class="dialogCloser"
+				(click)="closeDeleteErrorDialog()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>
+

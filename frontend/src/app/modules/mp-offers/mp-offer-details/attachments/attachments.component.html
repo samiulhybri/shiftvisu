@@ -1,0 +1,57 @@
+<kendo-card class="attachment-container">
+    <form novalidate class="k-form" [formGroup]="form" *ngIf="data">
+        <kendo-card-body style="height: 33.5vh;"> 
+            <kendo-tabstrip style="width: 99%; height: 100%;" (tabSelect)="onTabSelect($event)">
+                <kendo-tabstrip-tab i18n i18n-title title="Gallery" [selected]="isTabGalleySelected">
+                    <ng-template kendoTabContent>
+                        <kendo-scrollview [data]="filesArr" [animate]="true" [width]="'100%'" [height]="'100%'"
+                            [arrows]="true" [pageable]="true" *ngIf="filesArr.length">
+                            <ng-template let-item="item">
+                                <img width="auto" height="98%" [src]="item.original_url" [alt]='item.file_name'
+                                    draggable="false" />
+                            </ng-template>
+                        </kendo-scrollview>
+                    </ng-template>
+                </kendo-tabstrip-tab>
+                <kendo-tabstrip-tab i18n i18n-title title="Upload" [selected]="isTabUpSelected"
+                    [disabled]="data.is_closed">
+                    <ng-template kendoTabContent>
+                        <kendo-upload #file formControlName="file" 
+                            [restrictions]="fileRestrictions"
+                            [removeUrl]="uploadRemoveUrl" 
+                            [autoUpload]="false" 
+                            [(ngModel)]="filesArr"
+                            (upload)="upload($event)" 
+                            (remove)="remove($event)" 
+                            (select)="select($event)"
+                            (clear)="clear()"
+                            [disabled]="data.is_closed">
+                            <ng-template kendoUploadFileTemplate let-files let-state="state">
+                                <div class="attachment_details_section" *ngIf="isFileValid(files[0])">
+                                    <div class="attachment_details">
+                                        <input #isStandard class="file_selection" type="radio" kendoRadioButton [checked]="files[0]?.is_selected"
+                                            name="'fileSelection_' + files[0]?.id" (click)="onfileSelect(files[0])" />
+                                        <img src="assets/icons/image-icon.png" width="20" height="20">
+                                        <div class="files_details">
+                                            <span class="file_name">{{ files[0].name }}</span>
+                                            <span class="file_size">{{ files[0].size / 1024 }} KB</span>
+                                        </div>
+                                    </div>
+                                    <kendo-button iconClass='k-icon icon-trash'
+                                        (click)="deleteFile(files[0])"></kendo-button> 
+                                </div>
+                            </ng-template>
+                        </kendo-upload>
+                    </ng-template>
+                </kendo-tabstrip-tab>
+            </kendo-tabstrip>
+        </kendo-card-body>
+        <kendo-card-footer class="attachment-footer-section">
+            <button *ngIf="isFileClicked && !isNewFiles" class="file-update-btn" kendoButton 
+                [primary]="true" icon="edit" (click)="updateSelection()" i18n>Update
+            </button>
+        </kendo-card-footer>
+    </form>
+</kendo-card>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

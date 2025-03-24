@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<link rel="manifest" href="./manifest.json" />
+	<title>SCHERTECH</title>
+	<base href="/">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/x-icon" href="favicon.ico">
+	<style>
+		.k-i-loading {
+			position: absolute !important;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			font-size: 64px;
+			background-color: rgba(255, 255, 255, 0.3);
+			color: #005981 !important;
+			z-index: 999999;
+		}
+	</style>
+</head>
+
+<body>
+	<app-root>
+		<div class="k-i-loading"></div>
+	</app-root>
+</body>
+<script>
+	window.addEventListener("message", function (e) {
+		try {
+			const data = JSON.parse(e.data)
+			if (typeof data.token !== "undefined") {
+				data.token ? localStorage.setItem("LaravelToken", data.token) : localStorage.removeItem("LaravelToken")
+			}
+		} catch (err) { }
+	})
+</script>
+
+</html>

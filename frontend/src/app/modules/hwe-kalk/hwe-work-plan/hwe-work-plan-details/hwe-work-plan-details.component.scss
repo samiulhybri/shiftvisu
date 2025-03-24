@@ -1,0 +1,13 @@
+.cost-details-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.work-plan {
+  margin-top: 12px;
+  .heat-treatment {
+    max-height: calc(100vh - 581px);
+    overflow: auto;
+  }
+}

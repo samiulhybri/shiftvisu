@@ -1,0 +1,87 @@
+<div class="heat-treatment"  [ngClass]="{'disabled': !isPermissionValidate()}">
+    <div class="buttons k-w-full k-d-flex">
+        <kendo-grid-spacer></kendo-grid-spacer>
+        <button [ngClass]="{'disabled':  !hweService.fromCalDetail}" class="right" kendoButton themeColor="primary" [disabled]="checkHeatTreatMent()" (click)="addHeatTreatment()" i18n>
+            <span class="k-icon icon-add"></span> New
+        </button>
+    </div>
+    <div class="k-w-full">
+        <table class="heat-treatment-pos k-w-full" *ngIf="opPlanPos?.operationPlanPosHeatTreatments.length">
+            <thead>
+                <tr>
+                    <th i18n>Quenching Medium</th>
+                    <th i18n>Hardness</th>
+                    <th i18n>Temperature min</th>
+                    <th i18n>Temperature max</th>
+                    <th i18n>Annealing temperature</th>
+                    <th i18n>Heating Time</th>
+                    <th i18n>Holding Time</th>
+                    <th i18n>Cooldown rate</th>
+                    <th i18n>Cross-section</th>
+                    <th i18n>Internal note</th>
+                    <th i18n>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let data of opPlanPos?.operationPlanPosHeatTreatments; let i = index">
+                    
+                    <ng-container *ngIf="!data.isDeleted">
+                        <td>
+                            <kendo-combobox #quenching_medium name="quenching_medium" [(ngModel)]="data.quenching_medium" [data]="hweQuenchingMediumDataSource" textField="text"
+                                valueField="value" [filterable]="true" [valuePrimitive]="true">
+                            </kendo-combobox>
+                        </td>
+                        <td>
+                            <kendo-numerictextbox #hardness name="hardness" [(ngModel)]="data.hardness" [step]="0.1">
+                            </kendo-numerictextbox>
+                        </td>
+                        <td>
+                            <kendo-numerictextbox #temperature_min name="temperature_min" [(ngModel)]="data.temperature_min"
+                                [step]="0.1">
+                            </kendo-numerictextbox>
+                        </td>
+                        <td>
+                            <kendo-numerictextbox #temperature_max name="temperature_max" [(ngModel)]="data.temperature_max"
+                                [step]="0.1">
+                            </kendo-numerictextbox>
+                        </td>
+                        <td>
+                            <kendo-numerictextbox #annealing_temperature name="annealing_temperature"
+                                [(ngModel)]="data.annealing_temperature" [step]="0.1">
+                            </kendo-numerictextbox>
+                        </td>
+                        <td>
+                            <kendo-numerictextbox #heating_time name="heating_time"
+                                [(ngModel)]="data.heating_time" [step]="0.1" format="n2">
+                            </kendo-numerictextbox>
+                        </td>
+                        <td>
+                            <kendo-numerictextbox #holding_time name="holding_time"
+                                [(ngModel)]="data.holding_time" [step]="0.1" format="n2">
+                            </kendo-numerictextbox>
+                        </td>
+                        <td>
+                            <kendo-numerictextbox #cooldown_rate name="cooldown_rate"
+                                [(ngModel)]="data.cooldown_rate" [step]="0.1" format="n2">
+                            </kendo-numerictextbox>
+                        </td>
+                        <td>
+                            <kendo-numerictextbox #cross_section name="cross_section"
+                                [(ngModel)]="data.cross_section" [step]="0.1" format="n1">
+                            </kendo-numerictextbox>
+                        </td>
+                        <td>
+                            <kendo-textbox #internal_note name="internal_note"
+                                [(ngModel)]="data.internal_note"></kendo-textbox>
+                        </td>
+                        <td class="k-text-center">
+                            <button kendoButton themeColor="primary" (click)="deleteOne(i)">
+                                <span class="k-icon icon-trash"></span>
+                            </button>
+                        </td>
+                    </ng-container>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

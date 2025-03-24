@@ -1,0 +1,41 @@
+<div
+	class="div-col"
+	style="width: 100%">
+	<div id="bar" class="bar" (mouseenter)="onMouseEnterBar()"
+				(mouseleave)="onMouseLeaveTimeline()">
+		<ui5-busy-indicator
+			[active]="isBusy"
+			class="busy-indicator-design">
+			<div
+			*ngFor="let machineStateTime of machineStateTimes;index as i"
+			id="a{{i}}"
+				class="time"
+				[style.left]="getPosition(machineStateTime?.start? machineStateTime?.start?.toString()??'0':'0') + '%'"
+				[style.width]="
+					getWidth(
+						machineStateTime!.start!.toString(),
+						machineStateTime?.end?machineStateTime!.end!.toString():''
+					) + '%'
+				"
+				[style.backgroundColor]="
+					'#' + machineStateTime.machineState?.color
+				"
+				(mouseenter)="onMouseEnterTimeline($event, machineStateTime,i)"
+				(mouseleave)="onMouseLeaveTimeline()"
+				>
+				
+			</div>
+		</ui5-busy-indicator>
+	</div>
+	<div class="hours">
+		<ui5-label *ngFor="let hour of hours">{{ hour}}</ui5-label>
+	</div>
+	<ui5-popover id="popOver" [open]="showPopOver" [opener]="opener" (after-close)="close()" placement="Bottom" style="width: 250px;">
+		<div class="div-col" *ngIf="this.isNoDataPointer==false">
+			<ui5-text class="machine-state-name-pop-over">{{hoveredMachine?.machineState?.name}}</ui5-text>
+			<ui5-text class="machine-state-name-time">{{hoveredMachine?.start?(hoveredMachine?.start+ 'Z'|date:'dd.MM.YYYY HH:mm'):''}} - {{hoveredMachine?.end ? (hoveredMachine?.end+ 'Z'|date:'dd.MM.YYYY HH:mm') :''}}</ui5-text>
+		</div>
+	
+		<ui5-text *ngIf="this.isNoDataPointer" i18n>No State is available for this time</ui5-text>
+	</ui5-popover>
+</div>

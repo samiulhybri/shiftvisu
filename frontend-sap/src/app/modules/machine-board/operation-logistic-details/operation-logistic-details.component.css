@@ -1,0 +1,30 @@
+
+.align-center {
+	align-items: center;
+}
+
+.flex-container {
+	display: flex; 
+	justify-content: space-between;
+}
+
+.sapPositiveColor {
+	color: var(--sapPositiveColor);
+}
+
+.sapNegativeColor {
+	color: var(--sapNegativeColor);
+}
+
+.sapNegativeColor {
+	color: var(--sapNegativeColor);
+}
+
+.sapTextColor{
+	color: var(--sapTextColor);
+}
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}

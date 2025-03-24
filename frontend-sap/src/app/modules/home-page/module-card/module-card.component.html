@@ -1,0 +1,26 @@
+<ui5-card class="ui5-card-design">
+  <a [routerLink]="moduleData.route"
+     class="card-div"
+     style="text-decoration: none;"
+  >
+    <div>
+      <div class="ui5-card-header">
+        <ui5-text
+          class="card-header-text"
+          style="cursor: pointer;"
+        >{{ moduleData.module_name }}
+        </ui5-text>
+      </div>
+    </div>
+    <div
+      id="content-area"
+      class="mt-10">
+      <div class="content-group">
+        <ui5-icon [name]="moduleData.icon"></ui5-icon>
+      </div>
+      <div class="content-group">
+        {{ moduleData.module_name }}
+      </div>
+    </div>
+  </a>
+</ui5-card>

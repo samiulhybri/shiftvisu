@@ -1,0 +1,33 @@
+<kendo-grid-component
+  [gridItems]="gridItems"
+  [columns]="columns"
+  [state]="state"
+  [isLoadedEnabled]="isLoadedEnabled"
+  [isSortable]="isSortable"
+  [isFilterable]="isFilterable"
+  [isGroupable]="isGroupable"
+  [isPageable]="isPageable"
+  [toolbarConfig]="toolbarConfig"
+  (emitState)="changeState($event)"
+  [editView]="editView"
+  (deleteDataItem)="deleteDataItem($event)"
+  (gridRefersh)="sendRequest()"
+  (filterState)="changeGridFilter($event)"
+>
+
+  <ng-template #toolBarBeforeSearchContent>
+    <app-date-range (close)="closeDatePicker($event)"></app-date-range>
+  </ng-template>
+  
+  <ng-template #toolBarAfterSearchContent>
+    <button kendoButton [primary]="true" icon="reset" (click)="reset()" i18n>
+      Reset
+    </button>
+
+    <button kendoButton [primary]="true" icon="add" (click)="navigateToEntryPage()" i18n>
+      New
+    </button>
+  </ng-template>
+</kendo-grid-component>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

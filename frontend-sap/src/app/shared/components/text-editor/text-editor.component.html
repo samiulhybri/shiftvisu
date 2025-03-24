@@ -1,0 +1,11 @@
+<div class="editor-container">
+    <ckeditor 
+        tagName="textarea" 
+        [editor]="classicEditor" 
+        [config]="config" 
+        [(ngModel)]="notes" 
+        [disabled]="isReadOnly"
+        (change)="onChange($event)"
+        class="w-full h-[80vh]">
+    </ckeditor>
+</div>

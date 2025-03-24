@@ -1,0 +1,461 @@
+<app-dialog
+	id="machineDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="ml-[-24px]">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ dialogTitle }}
+			</ui5-title>
+		</div>
+	</div>
+	<div class="h-[635px] w-[1168px] mx-[-16px]">
+		<ui5-busy-indicator [active]="isLoading" size="L">
+			<div class="w-full h-full flex flex-row gap-4">
+				<ui5-card class="h-[634px] w-[385px]">
+					<ui5-card-header
+						slot="header"
+						i18n-title-text
+						title-text="Maintenance Details">
+					</ui5-card-header>
+					<div class="divider"></div>
+	
+					<div class="form m-4">
+						<form #createOrUpdateForm="ngForm" (ngSubmit)="onSubmit(createOrUpdateForm)">
+							<div class="flex-col-item w-full pb-[10px]">
+								<ui5-label required showColon i18n>Order No</ui5-label>
+								<ui5-input
+								class="w-full"
+						        [(ngModel)]="selectedProdOrder.custom_id"
+								#customId="ngModel"
+								[valueState]="
+								   customId.valid == false &&
+								   (customId.touched || createOrUpdateForm.submitted)
+									  ? 'Negative'
+									  : customIdState
+							    "
+								id="customId"
+								name="custom_id">
+						        </ui5-input>
+							</div>
+							<div class="flex-col-item w-full pb-[10px]">
+								<ui5-label required showColon i18n>Maintenance Type</ui5-label>
+								<ui5-input
+									slot="endContent"
+									class="w-full"
+									placeholder="Select Maintenace"
+									[(ngModel)]="selectedMaintenanceAfterSaving.custom_id"
+									#maintenanceInput="ngModel"
+									[required]="true"
+		                         	[valueState]="
+										maintenanceInput.valid == false &&
+										(maintenanceInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+										"
+									name="customId"
+									i18n-placeholder>
+									<ui5-icon
+										id="valueHelpIcon"
+										class="cursor-pointer" 
+										slot="icon"
+										name="value-help"
+										(click)="
+											valueHelperButtonClick(valueHelperType.MaintenenceType)
+										"></ui5-icon>
+								</ui5-input>
+							</div>
+							<div class="flex-col-item w-full pb-[10px]">
+								<ui5-label required showColon i18n>Start Date</ui5-label>
+								<ui5-datetime-picker
+									id="startDatePicker"
+									name="selectedStart"
+									[(ngModel)]="selectedStart"
+									[valueState]="
+										startInput.valid == false &&
+										(startInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+										"
+									[required]="true"
+									(change)="compareTimes()"
+									#startInput="ngModel"
+									format-pattern="dd.MM.yyyy, HH:mm">
+								</ui5-datetime-picker>
+							</div>
+							<div class="flex-col-item w-full pb-[10px]">
+								<ui5-label required showColon i18n>End Date</ui5-label>
+								<ui5-datetime-picker
+									id="endDatePicker"
+									name="selectedEnd"
+									[(ngModel)]="selectedEnd"
+									[required]="true"
+									#endInput="ngModel"
+									(change)="compareTimes()"
+									[valueState]="
+										endInput.valid == false &&
+										(endInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+										"
+									format-pattern="dd.MM.yyyy, HH:mm">
+									<div slot="valueStateMessage" *ngIf="endDateValueStateText">
+										{{ endDateValueStateText }}
+									</div>
+								</ui5-datetime-picker>
+							</div>
+							<div class="flex-col-item w-full pb-[10px]">
+								<ui5-label required showColon i18n>Machine</ui5-label>
+								<ui5-input
+									slot="endContent"
+									class="w-full cursor-pointer"
+									placeholder="Select Machine"
+									#machineInput="ngModel"
+									[required]="true"
+								
+									[valueState]="
+										machineInput.valid == false &&
+										(machineInput.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+										"
+									[(ngModel)]="selectedMachineAfterSaving.name"
+									name="name"
+									i18n-placeholder>
+									<ui5-icon
+										id="valueHelpIcon"
+										slot="icon"
+										name="value-help"
+										(click)="
+											valueHelperButtonClick(valueHelperType.Machine)
+										"></ui5-icon>
+								</ui5-input>
+							</div>
+							<div class="flex-col-item w-full pb-[10px]">
+								<ui5-label required showColon i18n>Item</ui5-label>
+								<ui5-input
+									slot="endContent"
+									class="w-full  cursor-pointer"
+									placeholder="Select Item"
+									#itemName="ngModel"
+									[required]="true"
+									[(ngModel)]="selectedItemAfterSaving.name"
+									[valueState]="
+										itemName.valid == false &&
+										(itemName.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: 'None'
+										"
+									name="itemName"
+									i18n-placeholder>
+									<ui5-icon
+										id="valueHelpIcon"
+										slot="icon"
+										name="value-help"
+										(click)="
+											valueHelperButtonClick(valueHelperType.Item)
+										"></ui5-icon>
+								</ui5-input>
+							</div>
+						</form>
+					</div>
+				</ui5-card>
+				<ui5-card class="h-[634px] w-[770px]">
+					<ui5-card-header
+						slot="header"
+						i18n
+						title-text="Details">
+					</ui5-card-header>
+					<div class="divider"></div>
+					<div class="flex flex-col h-[590px] w-[740px] justify-between p-4">
+						<ui5-card class="pb-3">
+							<div class="h-[270px]">
+								<app-grid-table
+									#maintenanceTable
+									headerTitle="Maintenance"
+									i18n-headerTitle
+									[showRowDataCount]="true"
+									[columns]="maintenanceColumns"
+									[showAction]="true"
+									[showDownload]="false"
+									[showActiveButton]="false"
+									[showNewButton]="true"
+									[showSearch]="true"
+									selectionMode="None"
+									(newButtonClick)="onClickMaintenance()"
+									(editClick)="onEditMaintenance($event)"
+									(deleteClick)="deleteMaintenance($event)"
+									(onSearchOnKeyUp)="onSearchOnChangeInput($event, 'maintenance')"
+									[enableServerSideFiltering]="false"
+									addButtonText="New Maintenace"
+									[customData]="true"
+									[data]="maintenances"
+									i18n-addButtonText>
+								</app-grid-table>
+							</div>
+						</ui5-card>
+						<ui5-card>
+							<div class="h-[270px]">
+								<app-grid-table
+									headerTitle="BOM"
+									i18n-headerTitle
+									[showRowDataCount]="true"
+									[columns]="bomColumns"
+									[showAction]="true"
+									[showDownload]="false"
+									[showNewButton]="true"
+									[showSearch]="true"
+									(newButtonClick)="onClickNewBom()"
+									(editClick)="onClickEditBom($event)"
+									(deleteClick)="deleteBom($event)"
+									selectionMode="None"
+									[enableServerSideFiltering]="false"
+									(onSearchOnKeyUp)="onSearchOnChangeInput($event, 'bom')"
+									addButtonText="New BOM"
+									[customData]="true"
+									[data]="bomPos"
+									#bomTable
+									i18n-addButtonText>
+								</app-grid-table>
+							</div>
+						</ui5-card>
+					</div>
+				</ui5-card>
+			</div>
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			(click)="onSaveManageMaintenance()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button>
+	</div>
+</app-dialog>
+
+
+
+<app-dialog [isDialogOpen]="isValueHelpDialog">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="ml-[-10px]">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				i18n
+				>{{
+					selectedValueHelperType == valueHelperType.MaintenenceType
+						? "Maintenance Type"
+						: selectedValueHelperType == valueHelperType.Machine
+							? "Machine"
+							: "Item"
+				}}
+			</ui5-title>
+		</div>
+	</div>
+	<div class="h-[620px] w-[450px] mx-4 my-[-16px]">
+		<app-grid-table
+			[headerTitle]="
+				selectedValueHelperType == valueHelperType.MaintenenceType
+					? 'Maintenance Type'
+					: selectedValueHelperType == valueHelperType.Machine
+						? 'Machine'
+						: 'Item'
+			"
+			i18n-headerTitle
+		
+			[showAction]="false"
+			[showDownload]="false"
+			[showNewButton]="false"
+			[showRowDataCount]="true"
+			[columns]="
+				selectedValueHelperType == valueHelperType.MaintenenceType
+					? maintenanceTypeColumns
+					: selectedValueHelperType == valueHelperType.Machine
+						? machineColumns
+						: itemColumns
+			"
+			[showActiveButton]="false"
+			[showSearch]="true"
+			[isBaseVisu]="true"
+			[showTableSettingBtn]="false"
+			selectionMode="Single"
+			[enableServerSideFiltering]="true"
+			[filterQuery]="getFilterQuery()"
+			(rowClick)="clickOnValueHelpDialog($event)"
+			[url]="getValueHelperUrl()"
+			[limit]="topValue"
+			(processData)="defaultRowSelection()"
+			#valuehelpTable>
+		</app-grid-table>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			(click)="onSave()">
+			{{ localization.save }}</ui5-button>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="onCloseValueHelp()"
+			>
+			{{ localization.close }}</ui5-button>
+	</div>
+</app-dialog>
+<app-dialog [isDialogOpen]="isMaintenanceDialog">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="ml-[-10px]">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ maintenanceDialogTitle }}
+			</ui5-title>
+		</div>
+	</div>
+	<div class="h-[50px] w-[418px] form">
+		<form>
+			<div class="flex-col-item w-full">
+				<ui5-label showColon i18n required>Maintenance Name</ui5-label>
+				<ui5-input
+					class="w-full"
+					placeholder="Write Maintenance name"
+					i18n-placeholder
+					[(ngModel)]="newMaintenanceText"
+					[valueState]="valueStateMaintenance"
+					(input)="changeMaintenanceName()"
+					name="newMaintenanceText"
+					id="maintenanceNameInput">
+					<div
+						slot="valueStateMessage">
+						{{ valueStateMaintenanceText }}
+					</div>
+				</ui5-input>
+			</div>
+		</form>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			[disabled]="disableButtonDuringRequest"
+			(click)="saveMaintenance()">{{ localization.save }}</ui5-button>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="onClose()"
+			>{{ localization.close }}</ui5-button>
+	</div>
+</app-dialog>
+<app-dialog
+	id="valueHelpDialog"
+	[isDialogOpen]="isBomDialog">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="ml-[-10px]">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ bomDialogTitle }}
+			</ui5-title>
+		</div>
+	</div>
+	<div class="flex-col-item h-[120px] w-[418px] form">
+		<form>
+			<div class="flex-col-item w-full pb-2">
+				<ui5-label showColon i18n required>Quantity</ui5-label>
+				<ui5-input
+					class="w-full"
+					placeholder="Write Quantity"
+					i18n-placeholder
+					type="Number"
+					[(ngModel)]="currentBomPos.qty_for_one_parent"
+					name="currentBomPos.qty_for_one_parent"
+					[valueState]="valueStateBOMQuantity"
+					(input)="changeBOMQuantity()"
+					id="quantityInput">
+					<div
+						slot="valueStateMessage">
+						{{ valueStateBOMQuantityText }}
+					</div>
+				</ui5-input>
+			</div>
+			<div class="flex-col-item w-full pb-2">
+				<ui5-label showColon i18n required>Item</ui5-label>
+				<ui5-input
+					slot="endContent"
+					class="w-full cursor-pointer"
+					[valueState]="valueState"
+					placeholder="Select Item"
+					[value]="currentBomPos.item?.name ?? ''"
+					i18n-placeholder>
+					<ui5-icon
+						id="valueHelpIcon"
+						slot="icon"
+						name="value-help"
+						(click)="valueHelperButtonClick(valueHelperType.Item, true)"></ui5-icon>
+						<div slot="valueStateMessage">
+							{{ currentBomPosValueStateText }}
+						</div>
+				</ui5-input>
+			</div>
+		</form>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			(click)="saveBom()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="onClose()"
+			>{{ localization.close }}</ui5-button>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogMaintenance
+	id="errorDialogMachineStates"
+	header-text="Error"
+	state="Negative">
+	<p i18n>Maintenance name field is empty.</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

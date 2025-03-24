@@ -1,0 +1,305 @@
+<div class="grid grid-flow-col grid-cols-2 gap-x-2 h-full border-none default-bg">
+	<div class="h-full border border-solid border-gray-300 shadow-lg rounded-xl overflow-hidden">
+		<app-grid-table
+			headerTitle="Scheduled Commands"
+			i18n-headerTitle
+			url="/CommandSchedules"
+			[showRowDataCount]="true"
+			[columns]="columns"
+			[showAction]="true"
+			[showDownload]="false"
+			[showEditButton]="false"
+			[showDeleteButton]="true"
+			[showSearch]="true"
+			[isBaseVisu]="true"
+			selectionMode="Single"
+			[showActiveButton]="true"
+			addButtonText="New"
+			button1Text="All"
+			button2Text="Inactive"
+			button3Text="Active"
+			sortBy="priority"
+			i18n-addButtonText
+			i18n-button1Text
+			i18n-button2Text
+			i18n-button3Text
+			[editPermission]="authService.isPermissionValid('COMMAND_SCHEDULES_EDIT')"
+			[showNewButton]="true"
+			(deleteClick)="deleteClick($event)"
+			(rowClick)="handleRowClick($event)"
+			(processData)="processDataExportData($event)"
+			[enableServerSideFiltering]="true"
+			(segmentedButtonClick)="handleSegmentedButtonClick($event)"
+			(searchClick)="handleSearchClick($event)"
+			#childComponentRef>
+		</app-grid-table>
+	</div>
+	<form
+		(ngSubmit)="onSubmit(createOrUpdateForm)"
+		#createOrUpdateForm="ngForm">
+		<div
+			class="flex flex-col border border-solid border-gray-300 shadow-lg rounded-xl overflow-hidden mr-3"
+			style="background: var(--sapList_HeaderBackground)">
+			<ui5-bar design="Header">
+				<ui5-title
+					level="H4"
+					slot="startContent"
+					class="text-[18.72px]"
+					>{{ detailsTitle }}</ui5-title
+				>
+				<ui5-button
+					slot="endContent"
+					i18n
+					*ngIf="authService.isPermissionValid(PermissionEnum.COMMAND_SCHEDULES_EDIT) && showDetailsBody && selectedRowValue.isSelected && !(!selectedRowValue.is_active || isEditMode)"
+					(click)="runCommandManually(selectedRowValue)"
+					design="Emphasized"
+					class="flex justify-end"
+					>Run</ui5-button
+				>
+				<ui5-button
+					slot="endContent"
+					i18n
+					*ngIf="authService.isPermissionValid(PermissionEnum.COMMAND_SCHEDULES_EDIT) && showDetailsBody && selectedRowValue.isSelected && !isEditMode"
+					(click)="handleEdit()"
+					design="Default"
+					>Edit</ui5-button
+				>
+			</ui5-bar>
+			<ui5-busy-indicator
+				[active]="isLoading"
+				class="overflow-auto flex-1">
+				<div class="w-full flex flex-col !h-[calc(100vh-160px)]" *ngIf="showDetailsBody; else noDataFound">
+					<div class="ml-4 flex flex-row mb-1 p-3">
+						<div class="flex flex-col w-1/2">
+							<ui5-label
+								show-colon
+								i18n
+								>Active</ui5-label
+							>
+							<ui5-switch
+								name="is_active"
+								[(ngModel)]="selectedRowValue.is_active"
+								[disabled]="!isEditMode">
+							</ui5-switch
+						></div>
+					</div>
+					<div class="grid grid-flow-row p-3 mb-1">
+						<ui5-label
+							show-colon
+							i18n
+							>Priority</ui5-label>
+						<ui5-input
+							name="priority"
+							class="w-100"
+							type="Number"
+							[(ngModel)]="selectedRowValue.priority"
+							[disabled]="!isEditMode"></ui5-input>
+					</div>
+					<div class="grid grid-flow-row p-3 mb-1">
+						<ui5-label
+							show-colon
+							i18n
+							>Command</ui5-label
+						>
+						<ui5-input
+							name="command"
+							class="w-100"
+							[(ngModel)]="selectedRowValue.command"
+							[disabled]="!isEditMode"></ui5-input>
+					</div>
+					<div class="flex flex-row gap-2 p-3">
+						<div class="flex-column w-1/2">
+							<ui5-label
+							show-colon
+							i18n
+							>Cron Expression</ui5-label>
+							<ui5-input
+								name="cron_expression"
+								class="w-100"
+								(input)="onChangeCronExpression($event)"
+								[(ngModel)]="selectedRowValue.cron_expression"
+								[disabled]="!isEditMode"></ui5-input>
+						</div>
+						<div class="flex-column w-1/2">
+							<ui5-label></ui5-label>
+							<ui5-input
+								id="cron_expression_details"
+								[readonly]="true"
+								class="w-100"
+								[disabled]="!isEditMode"></ui5-input>
+						</div>
+					</div>
+					<div class="grid grid-flow-row p-3 mb-1">
+						<ui5-label
+							show-colon
+							i18n
+							>Last Run At (Local Timezone)</ui5-label
+						>
+						<ui5-date-picker
+							name="last_run_at"
+							class="w-100"
+							[(ngModel)]="selectedRowValue.last_run_at"
+							[disabled]="true"></ui5-date-picker>
+					</div>
+					<div class="flex-grow flex flex-col p-3 mb-1">
+						<ui5-label
+							show-colon
+							i18n
+							>Last Output</ui5-label
+						>
+						<ui5-textarea
+							name="last_output"
+							class="h-full"
+							[readonly]="true"
+							[(ngModel)]="selectedRowValue.last_output"></ui5-textarea>
+					</div>
+				</div>
+				<ng-template #noDataFound>
+					<p class="flex justify-center items-center" style="height: 75vh;" i18n>No data</p>
+				</ng-template>
+			</ui5-busy-indicator>
+			<ui5-bar design="Footer" *ngIf="showDetailsBody && selectedRowValue.isSelected">
+				<ui5-button
+					slot="endContent"
+					i18n
+					*ngIf="authService.isPermissionValid(PermissionEnum.COMMAND_SCHEDULES_EDIT)"
+					(click)="saveClick()"
+					design="Emphasized"
+					[disabled]="!isEditMode"
+					>Save</ui5-button
+				>
+				<ui5-button
+					slot="endContent"
+					i18n
+					*ngIf="authService.isPermissionValid(PermissionEnum.COMMAND_SCHEDULES_EDIT) && !isEditMode"
+					(click)="deleteClick(selectedRowValue)"
+					design="Default"
+					[disabled]="isEditMode"
+					>Delete</ui5-button
+				>
+				<ui5-button
+					slot="endContent"
+					i18n
+					*ngIf="authService.isPermissionValid(PermissionEnum.COMMAND_SCHEDULES_EDIT) && isEditMode"
+					(click)="cancelClick()"
+					design="Emphasized"
+					class="flex justify-end bg-white text-blue-500 border-blue-500"
+					>Cancel</ui5-button
+				>
+			</ui5-bar>
+		</div>
+	</form>
+</div>
+<ui5-dialog
+	id="deleteDialog"
+	header-text="Warning"
+	state="Critical">
+	<p>{{ doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteSubmit()"
+			i18n
+			>OK</ui5-button
+		>
+		<ui5-button
+			i18n
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#errorDialogScheduledCommands
+	id="errorDialogScheduledCommands"
+	header-text="Error"
+	state="Negative">
+	<p>{{ someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			i18n
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="saveDialog"
+	[headerText]="warning"
+	state="Critical">
+	<p>{{ doYouWantToSaveThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="onSave()"
+			i18n
+			>OK</ui5-button
+		>
+		<ui5-button
+			i18n
+			design="Transparent"
+			(click)="closeDialogSave()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="cancelDialog"
+	[headerText]="warning"
+	state="Critical">
+	<p>{{ doYouWantToRemoveAllTheChanges }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="handleDetailsCancel()"
+			i18n
+			>OK</ui5-button
+		>
+		<ui5-button
+			i18n
+			design="Transparent"
+			(click)="closeDialogCancel()"
+			>Close</ui5-button
+		>
+	</div>
+</ui5-dialog>

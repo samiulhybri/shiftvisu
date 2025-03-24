@@ -1,0 +1,106 @@
+<div class="tableStandard">
+    <app-grid-table headerTitle="Energy Meter" url="/EnergyMeters" [model]="energyMeterModel" i18n-headerTitle [showRowDataCount]="true"
+        [columns]="columns" [showAction]="true" [showSearch]="true" [showDownload]="false" [showActiveButton]="false"
+        addButtonText="New" i18n-addButtonText [showNewButton]="true" (newButtonClick)="newButtonClick()"
+        [isBaseVisu]="true" (editClick)="editClick($event)" expandQuery="$expand=energyConsumer" 
+        [editPermission]="authService.isPermissionValid('BASEVISU_ENERGY_METER_EDIT')" 
+        (deleteClick)="deleteClick($event)" [enableServerSideFiltering]="false" selectionMode="Single" #childComponentRef>
+    </app-grid-table>
+
+    <ui5-dialog id="deleteDialogEnergyMeter" header-text="Warning" i18n-header-text state="Critical">
+        <p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+        <div class="flex flex-col gap-[5px]">
+            <ui5-busy-indicator [active]="isLoading" size="M">
+            </ui5-busy-indicator>
+        </div>
+        <div slot="footer" class="footer-style gap-8">
+            <ui5-button class="dialogSubmit" design="Emphasized" (click)="deleteSubmit()"
+                [disabled]="disableButtonDuringRequest">{{ localization.ok }}</ui5-button>
+            <ui5-button design="Transparent" (click)="closeDialogDelete()">{{ localization.close }}</ui5-button>
+        </div>
+    </ui5-dialog>
+</div>
+
+<app-dialog id="addGroupDialog" [isDialogOpen]="isDialogOpen" (onBeforeClose)="closeDialog()" [title]="dialogTitle">
+    <ui5-busy-indicator [active]="isLoading" size="L">
+        <form (ngSubmit)="onSubmit(createOrUpdateForm)" #createOrUpdateForm="ngForm">
+            <div class="energy-meter-dialog-body form w-[418px] ">
+                <div class="flex">
+                    <div class="flex flex-col">
+                        <ui5-label show-colon>{{ localization.active }}</ui5-label>
+                        <ui5-switch [(ngModel)]="selectedEnergyMeter.is_active" name="is_active"
+                            id="is_active"></ui5-switch>
+                    </div>
+                </div>
+                <div class=" w-full mt-2">
+                    <div class="flex-col flex gap-[5px]" *ngIf="selectedEnergyMeter">
+                        <ui5-label show-colon required>{{ localization.id }}</ui5-label>
+                        <ui5-busy-indicator [active]="isLoadingCustomId" size="S">
+                            <ui5-input [(ngModel)]="selectedEnergyMeter.custom_id" #customId="ngModel" 
+                               [valueState]="customId.valid == false && (customId.touched || createOrUpdateForm.submitted)? 'Negative':customIdState"
+                               (input)="onChangeCustomId()" class="w-full" id="customId" name="custom_id" [required]="true">
+                                <div slot="valueStateMessage">
+                                    {{ customIdValueStateText }}
+                                </div>
+                            </ui5-input>
+                        </ui5-busy-indicator>
+                    </div>
+                </div>
+                <div class=" w-full mt-2">
+                    <div class="flex-col flex gap-[5px]" *ngIf="selectedEnergyMeter">
+                        <ui5-label show-colon required>{{ localization.name }}</ui5-label>
+                        <ui5-input class="w-full" id="nameInput" #nameInput="ngModel"
+                            [(ngModel)]="selectedEnergyMeter.name" name="name" [required]="true"
+                            [valueState]="nameInput.valid == false &&(nameInput.touched || createOrUpdateForm.submitted)? 'Negative': 'None'">
+                        </ui5-input>
+                    </div>
+                </div>
+                <div class="flex-col flex mt-2 gap-[5px]">
+                    <ui5-label i18n show-colon required>Energy Type </ui5-label>
+                    <ui5-combobox id="energyTypeCombobox" #energy_type [required]="true" class="w-full"
+                        [value]="selectedEnergyMeter.energy_type" (input)="onEnergyTypeInputChange($event)"
+                        (selection-change)="onChangeTypes($event)"
+                        (change)="inputEntryRestrict($event,selectedEnergyMeter.energy_type)">
+                        <ng-container *ngFor="let type of energyTypeItems">
+                            <ui5-cb-item id="{{ type.value }}" text="{{ type.text }}"></ui5-cb-item>
+                        </ng-container>
+                    </ui5-combobox>
+                </div>
+                <div class="flex-col flex mt-2 gap-[5px]">
+                    <ui5-label i18n show-colon required>Energy Consumer </ui5-label>
+                    <ui5-combobox id="energyMeterCombobox" #energyMeterCombobox [required]="true" class="w-full"
+                        [value]="selectedEnergyMeter.energyConsumer.name || ''" (selection-change)="onChangEnergyConsumer($event)"
+                        (input)="onInputChange($event)"
+                        (change)="inputInvalidEntryRestrict($event, selectedEnergyMeter.energyConsumer.name)">
+                        <ng-container *ngFor="let item of energyConsumers">
+                            <ui5-cb-item id="{{ item.id }}" text="{{ item.name }}" [additionalText]="item.custom_id"></ui5-cb-item>
+                        </ng-container></ui5-combobox>
+                </div>
+            </div>
+        </form>
+    </ui5-busy-indicator>
+
+    <div slot="footer" style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+        <ui5-button design="Emphasized" (click)="onSave()" [disabled]="disableButtonDuringRequest">
+            {{ localization.save }}</ui5-button>
+        <ui5-button class="ml-8" design="Transparent" (click)="closeDialog()">
+            {{ localization.close }}</ui5-button>
+    </div>
+</app-dialog>
+
+<ui5-dialog #errorDialogEnergyMeter id="errorDialogEnergyMeter" header-text="Error" state="Negative">
+    <p>{{ localization.someThingWentWrong }}</p>
+    <div class="flex flex-col-item">
+        <ui5-busy-indicator [active]="isLoading" size="M">
+        </ui5-busy-indicator>
+    </div>
+    <div slot="footer" class="footer-style gap-8">
+        <ui5-button design="Transparent" (click)="closeErrorDialog()">{{ localization.close }}</ui5-button>
+    </div>
+</ui5-dialog>

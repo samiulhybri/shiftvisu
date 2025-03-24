@@ -1,0 +1,193 @@
+<app-dialog
+	[isDialogOpen]="isCapacityChangeDialogOpen"
+	id="shiftChange"
+	(onBeforeClose)="handleChangeShiftClose()">
+	<ui5-bar
+		slot="header"
+		class="w-full">
+		<ui5-title
+			class="h-10 flex items-center ml-[-26px] text-base"
+			i18n
+			slot="startContent"
+			>Shift Change For Time Range</ui5-title
+		>
+		<ui5-title
+			class="h-10 flex items-center mr-[-20px] text-blue-600 text-sm"
+			slot="endContent">
+			{{ hoursLeftTitle }} {{ getTotalHours() }}
+		</ui5-title>
+	</ui5-bar>
+	<ui5-busy-indicator
+		[active]="isLoading"
+		class="w-100"
+		size="L">
+		<ui5-card
+			class="w-[80vw] 2xl:h-[616px] xl:h-[616px] lg:h-[350px] md:h-[320px] ml-[-16px] mr-[-16px]">
+			<div class="2xl:h-[616px] xl:h-[616px] lg:h-[350px]">
+				<div
+					class="flex flex-row pt-1 pl-3 gap-2 items-center"
+					*ngIf="isCapacityChangeDialogOpen">
+					<ui5-label
+						required
+						i18n
+						show-colon
+						>Date Range</ui5-label
+					>
+					<ui5-daterange-picker
+						[minDate]="minDate"
+						maxDate="{{ year }}-12-31"
+						(change)="onDateRangeChanged($event)"
+						format-pattern="dd.MM.YYYY"></ui5-daterange-picker>
+				</div>
+				<app-grid-table
+					headerTitle="Shifts"
+					[data]="selectedCapacities"
+					i18n-headerTitle
+					[columns]="columns"
+					[showAction]="model === 'user'"
+					[showSearch]="true"
+					[showDeleteButtonInHeader]="true"
+					[editPermission]="editPermission"
+					[showDownload]="false"
+					[showActiveButton]="false"
+					[showEditButton]="false"
+					addButtonText="Add Shift"
+					i18n-addButtonText
+					i18n-deleteButtonText
+					[showDeleteButton]="true"
+					[customData]="true"
+					deleteButtonText="Delete"
+					[showDeleteButton]="true"
+					[showNewButton]="true"
+					(rowClick)="onRowSectionChange($event)"
+					(deleteButtonClick)="deleteMultipleShift()"
+					(newButtonClick)="newButtonClick()"
+					(deleteClick)="deleteClick($event)"
+					#childComponentRef>
+				</app-grid-table>
+			</div>
+		</ui5-card>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-32px]">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			[disabled]="totalHours > 24 || isLoading || !selectedDateArray.length"
+			(click)="updateOrDeleteCapacity()">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="handleChangeShiftClose()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<app-dialog
+	[isDialogOpen]="isAddShiftDialogOpen"
+	id="shiftChange"
+	(onBeforeClose)="handleAddShiftClose()">
+	<ui5-bar
+		slot="header"
+		class="w-full">
+		<ui5-title
+			class="h-10 flex items-center ml-[-26px] text-base"
+			i18n
+			slot="startContent"
+			>Add Shift</ui5-title
+		>
+	</ui5-bar>
+	<ui5-card
+		class="w-[80vw] 2xl:h-[616px] xl:h-[616px] lg:h-[350px] ml-[-16px] mr-[-16px]"
+		*ngIf="isAddShiftDialogOpen">
+		<div class="2xl:h-[616px] xl:h-[616px] lg:h-[350px] md:h-[320px]">
+			<app-grid-table
+				headerTitle="Shift Lists"
+				i18n-headerTitle
+				[columns]="shiftsColumns"
+				[showAction]="false"
+				[showSearch]="true"
+				[showDownload]="false"
+				[showActiveButton]="false"
+				i18n-addButtonText
+				[editPermission]="authService.isPermissionValid('BASEVISU_CAPACITIES_EDIT')"
+				i18n-deleteButtonText
+				[showDeleteButton]="true"
+				deleteButtonText="Delete"
+				additionalFilterQuery="&$filter=is_active eq true"
+				[data]="allShifts"
+				[customData]="true"
+				[showNewButton]="false"
+				(rowClick)="onRowSectionChangeForAddShift($event)"
+				#childComponentForAllShiftsRef>
+			</app-grid-table>
+		</div>
+	</ui5-card>
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-32px]">
+		<ui5-button
+			id="saveButton"
+			design="Emphasized"
+			(click)="onSaveShifts()">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			id="cancelButton"
+			class="ml-8 border-none"
+			(click)="handleAddShiftClose()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	id="overlappedDialog"
+	#overlappedDialog
+	header-text="Warning"
+	state="Negative">
+	<p>{{ localization.shiftsTimeOverlapped }}</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			(click)="closeDialogOverlapped()"
+			id="closeOverlapButton"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="waringDialog"
+	header-text="Warning"
+	state="Critical">
+	<p i18n>This action will erase all capacities between the selected dates. Do you want to proceed?</p>
+	<div class="flex flex-col gap-[5px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="saveShiftsToCapacity()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeWaringPopup()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

@@ -1,0 +1,137 @@
+<div class="repice-pos-container">
+    <div class="repice-pos-section">
+        <kendo-card width="100%" height="100%">
+            <kendo-card-header>
+                <div class="pos-header-container">
+                    <div class="header-title">
+                        <span i18n>Data Sets</span>
+                    </div>
+                    <div class="pos-action-section">
+                        <div class="new-creation-section">
+                            <button kendoButton [primary]="true" icon="add" (click)="addNewPos()" [disabled]="isNewBtnDisable || !isMachineMatched || !hasUpdatePermission" i18n>
+                                New
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </kendo-card-header>
+            <kendo-card-body [ngClass]="!isGridVisible ? 'block-card-body' : ''">
+                <div class="recipe-pos-grid-layout"  *ngIf="isGridVisible">
+                    <kendo-grid-component 
+                        [moduleName]="'marker-recipe-pos'"
+                        [gridItems]="gridItems" [columns]="columns"
+                        [state]="state" [isLoadedEnabled]="isLoadedEnabled" [isSortable]="false"
+                        [isFilterable]="false" [isGroupable]="false" [isPageable]="isPageable" [editView]="editView"
+                        [isActionSticky]="true" [initialSelection]="rowSelected"
+                        [isEditDisabled]="isEditDisabled || !hasUpdatePermission"
+                        [isDeleteDisabled]="isDeleteDisabled || !hasUpdatePermission"
+                        (gridRefersh)="sendRequest()"
+                        (filterState)="changeGridFilter($event)"
+                        (gridCellClicked)="onPosClicked($event, 'grid')"
+                        (deleteDataItem)="deleteDataItem($event)"
+                        (emitSelectedItem)="onSelectedPos($event)">
+                        <ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+                            <ng-container *ngIf="column.name == 'marker_pos_type'">
+                                <div>{{ getEnumTranslateGrid(dataItem.marker_pos_type) }}</div>
+                            </ng-container>
+                        </ng-template>
+                    </kendo-grid-component>
+                </div>
+            </kendo-card-body>
+        </kendo-card>
+    </div>
+    <div class="recipe-block-section">
+        <app-marker-block [pos]="selectedRecipePos" [isMachineMatched]="isMachineMatched" [isGridVisible]="isViewBlockGrid" [isNewBtnDisable]="isNewBlockDisable"></app-marker-block>
+    </div>
+</div>
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>
+
+<kendo-dialog i18n-title [title]="modalTitle" *ngIf="isOpenAddPosModal" (close)="closePosModal()" 
+    [width]="585" [minWidth]="450" [minHeight]="425" [maxHeight]="545">
+    <kendo-card width="100%">
+        <kendo-card-body class="pos-form-body">
+            <form novalidate class="k-form" [formGroup]="form">
+                <div class="form-sections">
+                    <div class="label-input-section custom_id_field">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Marker Recipe ID" i18n>:</kendo-label>
+                        <kendo-textbox #markerRecipe formControlName="markerRecipe" [(ngModel)]="posData.markerRecipe.custom_id"
+                            [readonly]="true"></kendo-textbox>
+                    </div>
+                </div>
+                <div class="form-sections">
+                    <div class="label-input-section"> 
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Sequence" i18n>:</kendo-label>
+                        <kendo-numerictextbox #pos formControlName="pos" [(ngModel)]="posData.pos" i18n-placeholder placeholder="Insert position"
+                            format="####" [spinners]="false" 
+                            [step]="1" [min]="1" [decimals]="0"
+                            required [class.formError]="form.get('pos').invalid"></kendo-numerictextbox>
+                    </div>
+                    <div class="label-input-section" [ngStyle]="{ 'margin-left': '10px' }">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Marker Position Type" i18n>:</kendo-label>
+                        <kendo-combobox #marker_pos_type formControlName="marker_pos_type" [(ngModel)]="posData.marker_pos_type" [data]="posTypeList" 
+                            textField="text" valueField="value" [filterable]="false" 
+                            [valuePrimitive]="true" (valueChange)="OnChangePosType($event)" 
+                            i18n-placeholder placeholder="Select position type"
+                            required [class.formError]="form.get('marker_pos_type').invalid">
+                        </kendo-combobox>
+                    </div>
+                </div>
+                <div class="form-sections">
+                    <div class="label-input-section"> 
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="X" i18n>:</kendo-label>
+                        <kendo-numerictextbox #pos_x formControlName="pos_x" class="number-right-align" [(ngModel)]="posData.pos_x" 
+                            format="####" [spinners]="true" 
+                            [step]="1" [min]="0" [max]="9999" [decimals]="0"
+                            i18n-placeholder placeholder="Insert position X"></kendo-numerictextbox>
+                    </div>
+                    <div class="label-input-section" [ngStyle]="{ 'margin-left': '10px' }">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Y" i18n>:</kendo-label>
+                        <kendo-numerictextbox #pos_y formControlName="pos_y" class="number-right-align" [(ngModel)]="posData.pos_y" 
+                            format="####" [spinners]="true" 
+                            [step]="1" [min]="0" [max]="9999" [decimals]="0"
+                            i18n-placeholder placeholder="Insert position Y"></kendo-numerictextbox>
+                    </div>
+                </div>
+                <div class="form-sections">
+                    <div class="label-input-section"> 
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Z" i18n>:</kendo-label>
+                        <kendo-numerictextbox #pos_z formControlName="pos_z" class="number-right-align" [(ngModel)]="posData.pos_z" 
+                            format="####" [spinners]="true" 
+                            [step]="1" [min]="0" [max]="9999" [decimals]="0"
+                            i18n-placeholder placeholder="Insert position Z"></kendo-numerictextbox>
+                    </div>
+                    <div class="label-input-section" [ngStyle]="{ 'margin-left': '10px' }">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Angle" i18n>:</kendo-label>
+                        <kendo-numerictextbox #angle formControlName="angle" class="number-right-align" [(ngModel)]="posData.angle" 
+                            format="###" [spinners]="true" 
+                            [step]="1" [min]="0" [max]="359" [decimals]="0"
+                            i18n-placeholder placeholder="Insert angle"></kendo-numerictextbox>
+                    </div>
+                </div>
+                <div class="form-sections switch-section">
+                    <div class="label-input-section">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Font Height" i18n>:</kendo-label>
+                        <kendo-numerictextbox #font_height formControlName="font_height" class="number-right-align" [(ngModel)]="posData.font_height" 
+                            format="####" [spinners]="true" 
+                            [step]="1" [min]="1" [max]="9999" [decimals]="0"
+                            i18n-placeholder placeholder="Insert font height"></kendo-numerictextbox>
+                    </div>
+                    <div class="label-input-section" [ngStyle]="{ 'margin-left': '10px' }">
+                        <kendo-label class="k-text-left header-lbl-format" i18n-text text="Touch" i18n>:</kendo-label>
+                        <kendo-switch #should_touch_probe formControlName="should_touch_probe" [(ngModel)]="posData.should_touch_probe" [ngStyle]="{ 'margin-left': '10px' }"></kendo-switch>
+                    </div>
+                </div>
+            </form>
+        </kendo-card-body>
+    </kendo-card>
+    <kendo-dialog-actions class="pos-modal-action" [layout]="end">
+        <button class="block-modal-cancel-btn" kendoButton iconClass="k-icon k-i-close" (click)="closePosModal()" 
+            i18n>Close
+    </button>
+        <button class="pos-modal-action-btn" kendoButton iconClass="k-icon icon-save" (click)="saveRecipePos()" themeColor="primary">
+            <span *ngIf="isNewPos" i18n>Save</span>
+            <span *ngIf="!isNewPos" i18n>Update</span>
+        </button>
+    </kendo-dialog-actions>
+</kendo-dialog>

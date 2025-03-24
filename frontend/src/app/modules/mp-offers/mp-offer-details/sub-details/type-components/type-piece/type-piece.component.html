@@ -1,0 +1,31 @@
+<div [formGroup]="form" *ngIf="data != undefined">
+    <kendo-gridlayout [gap]="{ cols: 10 }" [cols]="[{width: 267 },{width: 'auto' },{width: 145 },{width: 175 },{width: 150 }]">
+        <kendo-gridlayout-item class="label-format" [row]="index" [col]="1">
+            <label [textContent]="data.name"></label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="2">
+            <kendo-textbox #note [(ngModel)]="data.note"
+            formControlName="note" [disabled]="isFieldDisabled" style="float: right;"></kendo-textbox>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="3">
+            <kendo-label style="justify-content: flex-end;" class="k-form" i18n i18n-text text="Q.tà">
+                <kendo-numerictextbox #price class="number-right-align" [(ngModel)]="data.quantity"
+                    formControlName="quantity" [style.width.px]="70" format="n" [spinners]="false" [disabled]="isFieldDisabled">
+                </kendo-numerictextbox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="index" [col]="4">
+            <kendo-label style="justify-content: space-between;" class="k-form" i18n i18n-text text="Costo Cad">
+                <kendo-numerictextbox #price class="number-right-align" [(ngModel)]="data.price" formControlName="price"
+                    format="c2" [style.width.px]="90" [spinners]="false" style="float: right;" [disabled]="isFieldDisabled">
+                </kendo-numerictextbox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+
+        <kendo-gridlayout-item [row]="index" [col]="5" style="text-align: right;">
+            <kendo-numerictextbox #total placeholder="{{intl.formatNumber(data.getTotal(), 'c', 'it')}}" class="number-right-align" tabindex="-1"
+                formControlName="total" [style.width.px]="150" format="c2" [spinners]="false" [disabled]="true"
+                [readonly]="true"></kendo-numerictextbox>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>

@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+# Send a large number of messages
+
+for i in $(seq 2000 2999); do
+    php artisan chat:send_message 2 "Generated test message $i";
+done

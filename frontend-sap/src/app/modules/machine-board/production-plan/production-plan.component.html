@@ -1,0 +1,216 @@
+<ui5-dialog [open]="true" id="productionPlanPage"
+            class="w-[85vw] bg-gray-100 h-[80vh] max-h-[790px]" (ui5BeforeClose)="closeDialogProductionPlanPage()">
+    <div class="main-div">
+        <div class=" grid grid-cols-1 gap-3 h-full">
+            <ui5-card class="">
+                <div slot="header">
+                    <div>
+                        <ui5-tabcontainer (tab-select)="changeStage($event)" fixed collapsed>
+                            <ui5-tab id="Planned" i18n-text text="Planned" [disabled]="isDisabledTab"></ui5-tab>
+                            <ui5-tab id="Preparation" i18n-text
+                                     *ngIf="productionPlanType.SETUP_1 == machine?.production_plan_type"
+                                     text="Preparation({{countOperations.IN_PREPARATION}})"
+                                     [disabled]="isDisabledTab"></ui5-tab>
+                            <ui5-tab id="Setup" i18n-text
+                                     *ngIf="productionPlanType.SETUP_2 == machine?.production_plan_type || productionPlanType.SETUP_1 == machine?.production_plan_type"
+                                     text="Setup/Teardown({{countOperations.IN_SETUP}})" [disabled]="isDisabledTab" i18n-text></ui5-tab>
+                            <ui5-tab id="Production" i18n-text
+                                     text="Production({{countOperations.IN_PRODUCTION}})"
+                                     [disabled]="isDisabledTab"></ui5-tab>
+                        </ui5-tabcontainer>
+                    </div>
+                </div>
+
+                <div class="p-3 max-h-[650px] h-[calc(70vh-100px)]">
+                    <ui5-card class="">
+                        <div class="h-[calc(70vh-105px)] max-h-[645px]">
+                            <app-grid-table [headerTitle]="headerTitle" *ngIf="customUrl!=''" i18n-headerTitle
+                                            (productionPlanDefaultButton)="setUpButtonClick()"
+                                            [productionPlanDefaultButtonText]="productionPlanDefaultButtonText"
+                                            [multipleButtons]="multipleButtons"
+                                            [isButtonDisabled]="isButtonDisabled"
+                                            [columns]="columns"
+                                            [showAction]="false"
+                                            [showSearchScanner]="true"
+                                            [showDownload]="false" [showActiveButton]="false"
+                                            [showTableSettingBtn]="false"
+                                            [limit]="1000" [showSearch]="true" [customUrl]="customUrl"
+                                            [showNewButton]="false"
+                                            [isCozy]="true"
+                                            [isBusy]="true"
+                                            [enableServerSideFiltering]="false"
+                                            [isBaseVisu]="false" (rowClick)="rowClick($event)"
+                                            (processData)="processData($event)"
+                                            [useOdataStyles]="false"
+                                            selectionMode="Multiple" #gridTable>
+                            </app-grid-table>
+                        </div>
+
+                    </ui5-card>
+                </div>
+
+            </ui5-card>
+            <ui5-toast [open]="showWarehouseQuantity">
+                <span i18n>Quantity:</span>  {{warehouseQuantity}}
+            </ui5-toast>
+        </div>
+    </div>
+
+    <ui5-toast #toastForPrint [duration]="3000" i18n>Print Successfully!</ui5-toast>
+
+ <div slot="footer" class="footer-style rounded-es-xl rounded-ee-xl">
+     <div class="flex flex-row-reverse">
+          <ui5-button
+              design="Transparent"
+              id="close-edit-dialog"
+              (click)="closeDialogProductionPlanPage()"
+              i18n>Close</ui5-button>
+                    </div>
+                </div>
+
+</ui5-dialog>
+<ui5-dialog id="deleteDialog" header-text="Info" state="Information" class="max-w-[492px] w-[80vh]">
+    <div id="dialogContent">
+        <div *ngIf="linkOperations.length " class="gap-1 hidden" >
+            <p i18n>Changing the state will affect also the following linked order(s)</p>
+            <ui5-button *ngFor="let linkOperation of linkOperations" color-scheme="6" [ngClass]="'p-1'">
+                {{ linkOperation }}
+            </ui5-button>
+            <hr>
+        </div>
+        <div *ngIf="isProductionOrderCached  && !inSetupOperations.length">
+            <p i18n>Already in Production</p>
+            <div class="flex justify-start flex-wrap gap-1">
+              <ui5-button *ngFor="let inProductionOperation of inProductionOperations" color-scheme="6"
+                          [ngClass]="'p-1'">
+                {{ inProductionOperation }}
+            </ui5-button>
+            </div>
+            <div class="m-2" *ngIf="countOperations?.IN_PRODUCTION">
+              <p i18n class="mb-1"> Chose One</p>
+              <ui5-radio-button hidden  [checked]="checkStateStatus === prodOrderPosOperationStatus.CLOSED" i18n i18n-text (click)="checkStateStatus=prodOrderPosOperationStatus.CLOSED"
+                                name="checkStateStatus" text="Close"></ui5-radio-button>
+              <ui5-radio-button  [checked]="checkStateStatus === prodOrderPosOperationStatus.SUSPENDED" i18n i18n-text (click)="checkStateStatus=prodOrderPosOperationStatus.SUSPENDED"
+                                name="checkStateStatus" text="Suspend"></ui5-radio-button>
+              <ui5-radio-button  [checked]="checkStateStatus === prodOrderPosOperationStatus.IN_PRODUCTION" *ngIf="machine?.supports_parallel_operations" i18n i18n-text
+                                (click)="checkStateStatus=prodOrderPosOperationStatus.IN_PRODUCTION"
+                                name="checkStateStatus" text="Production"></ui5-radio-button>
+            </div>
+        </div>
+         <div *ngIf="isShowSetUpOrder">
+            <p i18n>Already in Setup</p>
+            <div class="flex justify-start flex-wrap gap-1">
+              <ui5-button *ngFor="let inSetupOperation of inSetupOperations" color-scheme="6"
+                          [ngClass]="'p-1'">
+                {{ inSetupOperation }}
+            </ui5-button>
+            </div>
+            <div class="m-2">
+              <p i18n class="mb-1"> Chose One</p>
+              <ui5-radio-button hidden  [checked]="checkStateStatus === prodOrderPosOperationStatus.CLOSED" i18n i18n-text (click)="checkStateStatus=prodOrderPosOperationStatus.CLOSED"
+                                 name="checkStateStatus" text="Close"></ui5-radio-button>
+              <ui5-radio-button  [checked]="checkStateStatus === prodOrderPosOperationStatus.SUSPENDED" i18n i18n-text (click)="checkStateStatus=prodOrderPosOperationStatus.SUSPENDED"
+                                 name="checkStateStatus" text="Suspend"></ui5-radio-button>
+              <ui5-radio-button  [checked]="checkStateStatus === prodOrderPosOperationStatus.IN_PRODUCTION" *ngIf="machine?.supports_parallel_operations" i18n i18n-text
+                                 (click)="checkStateStatus=prodOrderPosOperationStatus.IN_PRODUCTION"
+                                 name="checkStateStatus" text="Production"></ui5-radio-button>
+            </div>
+        </div>
+    </div>
+    <div slot="footer" class="footer-style gap-8">
+        <ui5-button class="dialogSubmit" design="Emphasized" (click)="updateProdOrderOperationStatus(true)" i18n>OK</ui5-button>
+        <ui5-button (click)="closeDialogWarning()" i18n>Close</ui5-button>
+    </div>
+
+</ui5-dialog>
+
+    <ui5-dialog id="operationControlProfileDialog" header-text="Warning" state="Negative" class="max-w-[492px] w-[80vh]">
+    <div id="operationControlProfileContent">
+
+            <div class="flex justify-start flex-wrap gap-1">
+                <p>
+                    @if(selectedOperationControlProfile?.operationControlProfile?.confirmation_type === operationControlProfileConfirmationType.MILESTONE){
+                        <span i18n> Previous Milestone </span>
+                    }
+                    @if(selectedOperationControlProfile?.operationControlProfile?.confirmation_type === operationControlProfileConfirmationType.REQUIRED){
+                        <span i18n> Previous Operation</span>
+                    }
+
+                <span> {{ selectedOperationControlProfile?.pos }} {{selectedOperationControlProfile?.name}}</span>
+                <span i18n> has not yet been started. Do you want to start anyways?</span>
+            </div>
+    </div>
+    <div slot="footer" class="footer-style gap-8">
+        <ui5-button class="dialogSubmit" design="Emphasized" (click)="clickProfileOk()" i18n>OK</ui5-button>
+        <ui5-button (click)="clickProfileClose()" i18n>Close</ui5-button>
+    </div>
+
+</ui5-dialog>
+<ui5-dialog id="orderDetails" class="w-[70vw] bg-gray-100 h-[90vh] max-h-[710px]">
+    <div class="info-main-div">
+        <div class="h-full w-full grid grid-cols-3 grid-row-2 gap-2">
+            <app-order-details class="col-span-2 row-span-2 pb-1" (selectedOperationEvent)="selectedOperationEvent($event)"
+                               [prodOrderPosOperationsIds]="prodOrderPosOperationsIds"></app-order-details>
+            <app-tool-details class="col-span-1 row-span-1" [toolbarId]="toolbarId"></app-tool-details>
+            <app-item-image class="col-span-1 row-span-1 pb-4" [height]="'300'"
+                            [itemId]="machItem?.id"
+                            class="w-full"
+                            [isCard]="true"
+                            [isSingleImage]="true">
+             </app-item-image>
+     </div>
+    </div>
+  <div
+      slot="footer"
+      class="footer-style rounded-es-xl rounded-ee-xl">
+		<div class="flex flex-row-reverse">
+			<ui5-button
+                design="Transparent"
+                (click)="closeOrderDetails()"
+                i18n>Close</ui5-button>
+
+		</div>
+	</div>
+
+</ui5-dialog>
+<ui5-dialog id="closed-warning-modal" header-text="Warning" state="Negative" class="max-w-[492px] w-[80vh]">
+    <div class="flex justify-start flex-wrap gap-1">
+        <span i18n>This action closes the operation. Are you sure to proceed?</span>
+    </div>
+<div slot="footer" class="footer-style gap-8">
+    <ui5-button class="dialogSubmit" design="Emphasized" (click)="closedOrder()" i18n>OK</ui5-button>
+    <ui5-button (click)="closedWarning(false)" i18n>Close</ui5-button>
+</div>
+
+</ui5-dialog>
+<app-material-consumption
+    *ngIf="operationSelectedRowId"
+    [fromTransportOrder]="fromTransportOrder"
+    [fromProductionPlan]="true"
+    [prodOrderPosId]="operationSelectedRowId"
+    [posSelectedRowId]="posSelectedRowId"
+    (onClickCreateOrderEmitter)="onClickCreateOrderEmitter()"
+    [machine]="machine">
+</app-material-consumption>
+
+
+<ui5-dialog id="exit-warning-modal" [open]="isWarningForExitOpen" header-text="Warning" i18n-header-text state="Negative" class="max-w-[492px] w-[80vh]">
+    <div class="flex justify-start flex-wrap gap-1">
+        <span i18n>Material associated in exit. Are you sure you want to proceed?</span>
+    </div>
+    <div slot="footer" class="footer-style gap-8">
+        <ui5-button class="dialogSubmit" design="Emphasized" (click)="setUpButtonClick(false, false)" i18n>OK</ui5-button>
+        <ui5-button (click)="closedExitWarningPopup()" i18n>Close</ui5-button>
+    </div>
+
+</ui5-dialog>
+
+<ui5-dialog id="exit-warning-modal" [open]="isWarningForInspectionPointOpen" header-text="Warning" i18n-header-text state="Negative" class="max-w-[492px] w-[80vh]">
+    <div class="flex justify-start flex-wrap gap-1">
+        <span i18n>Operation status can not be changed. Please check open inspections.</span>
+    </div>
+    <div slot="footer" class="footer-style gap-8">
+        <ui5-button (click)="closedExitWarningPopup()" i18n>Close</ui5-button>
+    </div>
+
+</ui5-dialog>

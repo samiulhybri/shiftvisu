@@ -1,0 +1,29 @@
+<ui5-dialog (beforeClose)="closeDialog($event)" [open]="isDialogOpen">
+	<ui5-bar
+		slot="header"
+		design="Header">
+		<ui5-title
+			level="H5"
+			i18n
+			slot="startContent">
+			{{ qualiVisuPage }}
+		</ui5-title>
+	</ui5-bar>
+	<div>
+		<app-inspection-point-list
+			[operationIds]="operationIds"
+			(onSelectedInspectionOperationChange)="updateTitle($event)"></app-inspection-point-list>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+
+		@if(!isUserBlocked) {
+			<ui5-button
+				design="Transparent"
+				(click)="closeDialog($event)"
+				>{{ localization.close }}</ui5-button
+			>
+		}
+	</div>
+</ui5-dialog>

@@ -1,0 +1,331 @@
+<form novalidate class="k-form" [formGroup]="form" *ngIf="offerPos" >
+	<kendo-stacklayout orientation="horizontal" [gap]="12"  >
+		<kendo-card [style.flex]="4" class="window-scroll-content"
+					>
+			<kendo-card-header i18n [ngClass]="{'disabled':  !hweKalkService.fromCalDetail
+					|| hweKalkService.disableTabs
+					|| !offerPosPermission(permissionEnum.HWEKALK_OFFER_POS_EDIT) }">
+				<span class="responsive_label">Informations</span>
+				<kendo-grid-spacer></kendo-grid-spacer>
+				<button kendoButton type="button" id="without_assessment_copy"  *ngIf="offerPosPermission(permissionEnum.HWEKALK_OFFER_POS_COPY) && hasCopyOfferAssessmentPermission" (click)="showMatchOfferPos(true)" class="responsive_btn" themeColor="primary" > Copy Offer pos Except Assessment</button>
+				<button kendoButton type="button" id="with_assessment_copy"  *ngIf="offerPosPermission(permissionEnum.HWEKALK_OFFER_POS_COPY) && hasCopyOfferPermission" (click)="showMatchOfferPos()" class="k-ml-2.5 responsive_btn" themeColor="primary"> Copy Offer pos</button>
+			</kendo-card-header>
+			
+			<kendo-card-body class="calculation-details-body" [ngClass]="{'disabled':  !hweKalkService.fromCalDetail
+					|| hweKalkService.disableTabs
+					|| !offerPosPermission(permissionEnum.HWEKALK_OFFER_POS_EDIT) }">
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label [for]="offer" text="pos" i18n>Offer </label>
+
+					<kendo-textbox #offer  disabled="true" [value]="offers">
+					</kendo-textbox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label [for]="pos" text="pos" i18n>Position: <span class="k-text-error k-pl-1">*</span> </label>
+					<div>
+						<kendo-textbox #pos 
+							[(ngModel)]="offerPos.pos"
+							formControlName="pos"
+						>
+						</kendo-textbox>
+							<div *ngIf="form.controls['pos'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+								Pos is required.
+							</div>
+						
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label [for]="transfer_form"  i18n>Transfer from: </label>
+					<div>
+						<kendo-textbox #transfer_form
+									     [value]="copyForm"
+									    disabled="true"
+						>
+						</kendo-textbox>
+
+
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label [for]="pos" text="pos" i18n>Is Commision: </label>
+					<div>
+						<input type="checkbox" kendoCheckBox 
+									[(ngModel)]="offerPos.is_commission" 
+									[ngModelOptions]="{standalone: true}"
+								/>
+					</div>
+					
+				</kendo-stacklayout>
+
+				<ng-container *ngIf="calculation && offerPos.is_commission" formGroupName="calculation">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="status" i18n i18n-text text="Status">
+						</kendo-label>
+						<kendo-combobox
+							#status 
+							[ngModelOptions]="{standalone: true}"  	
+							[(ngModel)]="offerPos.status" 
+							[data]="offerPosStatus" 
+							[valuePrimitive]="true" 
+							textField="text"
+							valueField="value"
+							>
+						</kendo-combobox>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<label [for]="sales_order" text="sales_order" i18n>Sales Order: </label>
+						<kendo-textbox #sales_order 
+							[(ngModel)]="calculation.sales_order"
+							formControlName="sales_order"
+						>
+						</kendo-textbox>
+					</kendo-stacklayout>
+
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<label [for]="sales_order_pos" text="sales_order_pos" i18n>Sales Order Position: </label>
+						<kendo-textbox #sales_order_pos 
+							[(ngModel)]="calculation.sales_order_pos"
+							formControlName="sales_order_pos"
+						>
+						</kendo-textbox>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<label [for]="prod_order_pos" text="prod_order_pos" i18n>Prod Order Position: </label>
+						<kendo-multiselect
+                            #prod_order_pos 
+							formControlName="prod_order_pos"
+                            [(ngModel)]="selectCalProdOrderPos" 
+                            [data]="prodOrderPosList"
+                            [filterable]="true"
+                            textField="custom"
+                            valueField="id"
+                            name="prod_order_pos"
+                            (filterChange)="handleFilter($event,'prod_order_pos')">
+						</kendo-multiselect>
+					</kendo-stacklayout>
+				</ng-container>
+
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label [for]="product_type" text="product_type" i18n>Product Type:<span class="k-text-error k-pl-1">*</span>  </label>
+					
+					<div>
+						<kendo-combobox
+						#product_type 	
+						[(ngModel)]="offerPos.product_type" 
+						[data]="offerPosProductType" 
+						[valuePrimitive]="true" 
+						textField="text"
+						valueField="value"
+						(valueChange)="onDimensionChange()"
+						formControlName="product_type"
+						>
+					</kendo-combobox>	
+							<div *ngIf="form.controls['product_type'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+								Product Type is required.
+							</div>
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label [for]="item_name" text="item_name" i18n>Item Name: </label>
+					<kendo-textbox #item_name 
+						[(ngModel)]="offerPos.item_name"
+						formControlName="item_name"
+					>
+					</kendo-textbox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label [for]="customer_material_number" text="customer_material_number" i18n>Customer Material Number: </label>
+					<kendo-textbox #customer_material_number 
+						[(ngModel)]="offerPos.customer_material_number"
+						formControlName="customer_material_number"
+					>
+					</kendo-textbox>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label id="label_for_delivery_state" [for]="delivery_state" text="delivery_state" i18n>Delivery State: <span class="k-text-error k-pl-1">*</span></label>
+					
+					<div>
+						<kendo-combobox
+						#delivery_state  	
+						[(ngModel)]="offerPos.delivery_state" 
+						[data]="deliveryState"
+						[valuePrimitive]="true" 
+						textField="text"
+						valueField="value"
+						formControlName="delivery_state"
+						>
+					</kendo-combobox>
+							<div *ngIf="form.controls['delivery_state'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+								Delevery State is required.
+							</div>
+					</div>
+				</kendo-stacklayout>
+
+				
+				<kendo-stacklayout orientation="horizontal"  class="calculation-tab" [gap]="9">
+					<label [for]="material"  i18n>Material: </label>
+					
+					<div>
+						<kendo-combobox 
+						#material 
+						[(ngModel)]="offerPos.material"
+						formControlName="material"
+						[data]="materials"
+						textField="custom_id" 
+						valueField="id"
+						[style.width]="'100%'"
+						[filterable]="true"
+						(filterChange)="handleFilter($event, 'material')"
+						(valueChange)="onDimensionChange()"
+					>
+				   </kendo-combobox>
+					
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label [for]="quantity" text="quantity" i18n>Quantity:<span class="k-text-error k-pl-1">*</span>  </label>
+					
+				<div>
+					<kendo-numerictextbox
+					    #quantity
+						[(ngModel)]="offerPos.quantity"
+						formControlName="quantity"
+						[step]="1"
+						[decimals]="0"
+						format="#.##\ St"
+						[min]="1"
+					>
+				</kendo-numerictextbox>
+							<div *ngIf="form.controls['quantity'].invalid && submitted" class="k-text-error k-fs-sm" i18n>
+								Quantity is  required.
+							</div>
+				</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<label [for]="drawing_id" text="drawing_id" i18n>Drawing Id: </label>
+					<kendo-textbox #drawing_id 
+					[(ngModel)]="offerPos.drawing_id"
+					formControlName="drawing_id">
+					</kendo-textbox>
+				</kendo-stacklayout>
+				
+				<ng-container *ngIf="calculation" formGroupName="calculation">
+				
+
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<label [for]="revision" text="revision" i18n>Revision: </label>
+						<kendo-textbox #revision 
+						[(ngModel)]="calculation.revision"
+						formControlName="revision">
+						</kendo-textbox>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<label [for]="delivery_weight" text="delivery_weight" i18n>Delivery Weight: </label>
+						<kendo-numerictextbox #delivery_weight 
+						[(ngModel)]="calculation.delivery_weight" [decimals]="2"  format="#.##\ Kg"
+						formControlName="delivery_weight" >
+						</kendo-numerictextbox>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<label [for]="note" text="pos" i18n>Specification relevant for offer</label>
+						<kendo-textarea #note [rows]="5"
+						[(ngModel)]="calculation.specification_note"
+						formControlName="specification_note">
+						</kendo-textarea>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<label [for]="note" text="pos" i18n>Machining restriction note</label>
+						<kendo-textarea #note [rows]="5"
+						[(ngModel)]="calculation.note_machining"
+						formControlName="note_machining">
+						</kendo-textarea>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<label [for]="internal_note" text="internal" i18n>Internal Note </label>
+						<kendo-textarea #internal_note [rows]="5"
+						[(ngModel)]="calculation.internal_note"
+						formControlName="internal_note">
+						</kendo-textarea>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<label [for]="note_linked_operations" i18n>Linked operations </label>
+						<kendo-textarea #note_linked_operations [rows]="5"
+										[(ngModel)]="calculation.note_linked_operations"
+										formControlName="note_linked_operations">
+						</kendo-textarea>
+					</kendo-stacklayout>
+				</ng-container>
+				<kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="is_rejected" i18n i18n-text text="Is Rejected">
+					</kendo-label>
+					<div>
+						<input type="checkbox" kendoCheckBox 
+							[(ngModel)]="offerPos.is_rejected" 
+							[ngModelOptions]="{standalone: true}" #is_rejected />
+					</div>
+				</kendo-stacklayout>
+				<kendo-stacklayout *ngIf="offerPos.is_rejected" orientation="horizontal" [gap]="9">
+					<kendo-label [for]="rejected" i18n i18n-text text="Rejection Type">
+					</kendo-label>
+					<kendo-combobox
+						#rejected 
+						[ngModelOptions]="{standalone: true}"  	
+						[(ngModel)]="offerPos.rejection_type" 
+						[data]="rejects" 
+						[valuePrimitive]="true" 
+						textField="text"
+						valueField="value"
+						>
+					</kendo-combobox>
+				</kendo-stacklayout>
+
+			</kendo-card-body>
+		</kendo-card>
+		<kendo-card [style.flex]="10" >
+		
+			<kendo-card-body >
+					<app-tabstrip 
+						[offerPosData]="offerPos" 
+						[calculation]="calculation"
+						[offerPosSelectedMaterial]="selectedMaterial"
+						[isMaterialChanged]="isMaterialChanged"
+						[isWindowLoaderEnabled]="true"
+						[opPlanPos]="opPlanPos"
+						[calculationHeatTreatments]="calculationHeatTreatments"
+						[calculationAdditionalHeatTreatments]="calculationAdditionalHeatTreatments"
+						[hasValidationErrorHeatTreatment]="hasValidationErrorHeatTreatment"
+						[hasValidationErrorAdditionalHeatTreatment]="hasValidationErrorAdditionalHeatTreatment"
+						[submitted]="submitted"
+						[isValid]="!isValidate"
+						(addEmiter)="addOpperations($event)"
+                        (deleteEmiter)="removeOperations($event)"
+					>
+					</app-tabstrip>			
+			</kendo-card-body>
+			
+			
+		</kendo-card>
+	</kendo-stacklayout>
+</form>
+
+
+	<kendo-dialog
+		i18n-title
+		title="Offer Pos"
+		*ngIf="matchOfferPosPopUpShow"
+		(close)="close('dialog')"
+		width="80%"
+	>
+		<!-- Display a list of logs -->
+		<div class="copy-page">
+			<app-offer-pos-copy-popup  (copyOfferPoseEmitter)="copyOfferPosdata($event)"
+				[fetchUrl]="offerPosFetchUrl"
+				[offerPos]="offerPos"
+			>
+			</app-offer-pos-copy-popup>
+
+		</div>
+	</kendo-dialog>
+
+
+<app-loader *ngIf="isWindowLoaderEnabled"></app-loader>

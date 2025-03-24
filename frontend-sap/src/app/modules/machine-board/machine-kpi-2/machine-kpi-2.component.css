@@ -1,0 +1,87 @@
+ui5-card {
+	width: 100% !important;
+	height: 100%;
+}
+.kpi-box {
+	flex: 1;
+	padding: 1rem;
+	border-radius: 8px;
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: start;
+	color: var(--sapBlockLayer_Background);
+	background-color: var(--card-background-color);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	font-size: 1.25rem;
+}
+.oee {
+	display: flex !important;
+	flex-direction: row !important;
+	justify-content: space-between !important;
+	align-items: center !important;
+	height: 100% !important;
+	width: 100%;
+}
+.kpi-box.important {
+	background-color: var(--sapBrandColor);
+	color: var(--sapBaseColor);
+}
+.kpi-value {
+	font-size: 32px;
+	font-weight: bold;
+}
+.kpi-label {
+	font-size: 16px;
+}
+.kpi-scrap {
+	color: var(--scrap-color);
+}
+.kpi-box-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: start;
+	gap: 4px;
+	height: 100%;
+}
+
+.ui5-card-header-text {
+	display: flex !important;
+	justify-content: space-between !important;
+}
+.ui5-card-header {
+	border-bottom: var(--red-color-1-px-solid);
+}
+.header-flex {
+	display: flex;
+	padding: 8px 16px;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: var(--card-border-color);
+}
+.header-title {
+	font-size: 1rem;
+	font-weight: bold;
+}
+.header-subtitle {
+	font-size: 1rem;
+	color: var(--gray);
+}
+.second-box-div .kpi-box {
+	width: 33.33% !important;
+}
+
+.small-container .kpi-box-container .kpi-label {
+	display: none;
+}
+
+.small-container .kpi-box-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: start;
+	gap: 2px;
+	height: 100%;
+	font-size: 32px !important;
+}

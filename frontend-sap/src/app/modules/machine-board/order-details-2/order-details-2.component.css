@@ -1,0 +1,51 @@
+.order-buttons-wrapper {
+	border-top: var(--card-border-color);
+	height: Hug (52px) px;
+}
+
+.order-cards {
+	gap: 0.5rem;
+	padding: 16px;
+}
+
+.order-card {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+	border-radius: 0.5rem;
+	background-color: var(--card-background-color);
+	height: 44px;
+	gap: 8px;
+}
+
+.firstItem {
+	grid-column: span 3;
+}
+
+.label-style {
+	font-size: var(--title-text-font-size);
+	color: var(--list-description-text-color);
+	font-weight: 400;
+}
+
+.min-height-order-details {
+	min-height: 420px;
+	border-top: var(--card-border-color);
+}
+
+#progressIndicator::part(bar) {
+	background-color: var(--progressbar-information-bar-color);
+	z-index: 5;
+}
+
+#progressIndicator::part(remaining-bar) {
+	background-color: var(--progressbar-information-remaining-bar-color);
+}
+
+.border-top {
+	border-top: var(--card-border-color);
+}
+
+.hide-bottom-border {
+	border-bottom-color: transparent;
+}

@@ -1,0 +1,25 @@
+.legend {
+	border-radius: 0.5rem;
+	box-shadow: var(--_ui5-v1-20-1_side_navigation_box_shadow);
+	height: 100%;
+	overflow: hidden;
+	background: var(--sapList_HeaderBackground);
+	width: 224px;
+	display: flex;
+	flex-direction: column;
+}
+
+.divider {
+	width: 100%;
+	background-color: var(--sapList_BorderColor);
+	height: 2px;
+	margin-top: 10px;
+}
+
+.title-layout{
+	align-items: center; width: 100%; margin-top: 10px; height: auto
+}
+
+.card-layout{
+	align-items: center; justify-content: space-around
+}

@@ -1,0 +1,602 @@
+<kendo-grid
+	*ngIf="!editView.isOnPageFilter"
+	[data]="gridItems"
+	[pageable]="isPageable"
+	[sortable]="isSortable"
+	[filterable]="isFilterable"
+	[filter]="state.filter"
+	[loading]="isLoadedEnabled"
+	[pageSize]="state.take"
+	[skip]="state.skip"
+	[sort]="state.sort"
+	[groupable]="isGroupable"
+	[resizable]="isResizable"
+	[columnMenu]="columnMenu"
+	[group]="state.group"
+	(dataStateChange)="dataStateChange($event)"
+	(remove)="removeHandler($event)"
+	(edit)="editHandler($event)"
+	(add)="addHandler($event)"
+	[selectable]="editView.isSelection"
+	[reorderable]="isReorderable"
+	(selectionChange)="selectionHandler($event)"
+	(columnVisibilityChange)="columnMenuChangeEvent($event)"
+	(columnReorder)="columnMenuReorderEvent($event)"
+	(cellClick)="cellClickHandler($event)"
+	kendoGridSelectBy
+	[selectedKeys]="initialSelection"
+	(dblclick)="dblClickHandler($event)"
+	[rowClass]="rowCallback">
+	<ng-template
+		kendoGridToolbarTemplate
+		*ngIf="toolbarConfig">
+		<kendo-label text="{{ toolbarConfig.title }}"></kendo-label>
+		<kendo-grid-spacer></kendo-grid-spacer>
+		<ng-container [ngTemplateOutlet]="toolBarBeforeSearchContent"></ng-container>
+		<kendo-textbox
+			*ngIf="toolbarConfig.hasSearch"
+			[style.width.px]="191"
+			i18n
+			i18n-placeholder
+			placeholder="Search All Column"
+			[(ngModel)]="gridSearchKey"
+			(keyup)="onFilter($event)"
+			(ngModelChange)="onGridSearchChange($event)"
+			[clearButton]="true">
+			<ng-template kendoTextBoxSuffixTemplate>
+				<kendo-textbox-separator></kendo-textbox-separator>
+				<button
+					kendoButton
+					fillMode="flat"
+					icon="search"
+					(click)="onFilter($event, true)"></button>
+			</ng-template>
+		</kendo-textbox>
+
+		<ng-container [ngTemplateOutlet]="toolBarAfterSearchContent"></ng-container>
+		<button
+			kendoGridAddCommand
+			[primary]="true"
+			*ngIf="toolbarConfig.hasAddCommand"
+			i18n>
+			<span class="k-icon icon-add"></span> New
+		</button>
+	</ng-template>
+
+	<kendo-grid-column
+		kendoGridCellTemplate
+		*ngFor="let column of columns"
+		[field]="column.name"
+		[title]="column.title"
+		[filter]="column.filterType ? column.filterType : 'text'"
+		[filterable]="column.filterable ?? true"
+		[sortable]="column.sortable ?? true"
+		[aggregates]="aggregateResult"
+		[footerTemplate]="column.hasFooter ? aggregateResult?.sum : null"
+		[width]="column.width ?? null"
+		[style]="{ 'text-align': column.textAlign ?? null }"
+		[headerClass]="column.textAlign ?? null"
+		[columnMenu]="!column.hideColumnMenu"
+		[hidden]="hiddenColumns.includes(column.title)">
+		<ng-container *ngIf="column.filterType != 'enum' && column.filterType != 'multiLayer'">
+			<ng-container *ngIf="column.filterType === 'date'; else textFilterTemplate">
+				<ng-template
+					kendoGridFilterMenuTemplate
+					let-filter
+					let-column="column"
+					let-filterService="filterService">
+					<kendo-grid-date-filter-menu
+						operator="eq"
+						[column]="column"
+						[filter]="filter"
+						[filterService]="filterService"
+						[extra]="false">
+					</kendo-grid-date-filter-menu>
+				</ng-template>
+			</ng-container>
+			<ng-template
+				#textFilterTemplate
+				kendoGridFilterMenuTemplate
+				let-filter
+				let-column="column"
+				let-filterService="filterService">
+				<kendo-grid-string-filter-menu
+					operator="contains"
+					[column]="column"
+					[filter]="filter"
+					[filterService]="filterService"
+					[extra]="false">
+				</kendo-grid-string-filter-menu>
+			</ng-template>
+		</ng-container>
+
+		<ng-container *ngIf="column.filterType === 'enum'">
+			<ng-template
+				kendoGridFilterMenuTemplate
+				let-filter="filter"
+				let-filterService="filterService">
+				<kendo-dropdownlist
+					[value]="filter.text"
+					[data]="column.dropdownFilterableList"
+					[filter]="filter"
+					[(ngModel)]="gridEnumFilterKey"
+					(valueChange)="onFilterRelationalData(column)"
+					(filterChange)="enumFilterChange($event, column)"
+					[textField]="'text'"
+					[valueField]="'value'"
+					[filterable]="true"
+					[valuePrimitive]="true"
+					[filterService]="filterService"></kendo-dropdownlist>
+			</ng-template>
+		</ng-container>
+
+		<ng-container *ngIf="column.filterType === 'multiLayer'">
+			<ng-template
+				kendoGridFilterMenuTemplate
+				let-filter="filter"
+				let-filterService="filterService">
+				<kendo-textbox
+					kendofilterinput
+					[(ngModel)]="gridRelationalFilterKey"
+					[filter]="filter"
+					[input]="filter.value"
+					[filterService]="filterService"
+					(keypress)="
+						$event.keyCode == 13
+							? filterCustomColumns($event.target.value, column.name)
+							: onFilterRelationalData(column)
+					">
+				</kendo-textbox>
+			</ng-template>
+		</ng-container>
+
+		<ng-template
+			kendoGridFooterTemplate
+			*ngIf="column.hasFooter">
+			<div
+				*ngIf="!column.footerTemplate"
+				style="width: 100%; text-align: center">
+				{{
+					aggregateFields.includes(column.name) && sumation[column.name]
+						? sumation[column.name].toLocaleString()
+						: 0
+				}}
+			</div>
+			<div *ngIf="column.footerTemplate">{{ column.footerTemplate }}</div>
+		</ng-template>
+		<ng-container *ngIf="column.booleanValue">
+			<ng-template
+				kendoGridCellTemplate
+				let-dataItem>
+				<input
+					type="checkbox"
+					readonly="true"
+					disabled="true"
+					[checked]="dataItem[column.name]"
+					kendoCheckBox />
+			</ng-template>
+		</ng-container>
+
+		<ng-container *ngIf="column.filterType === 'date'">
+			<ng-template
+				kendoGridCellTemplate
+				let-dataItem>
+				{{
+					dataItem[column.name]
+						| date : column.dateFormat ?? "dd.MM.yyyy" : "utcTimestamp" : "en-US"
+				}}
+			</ng-template>
+		</ng-container>
+		<ng-container *ngIf="column.template">
+			<ng-template
+				kendoGridCellTemplate
+				let-dataItem>
+				<span *ngFor="let value of column.key; let i = index">
+					{{
+						column.isRelation
+							? dataItem[column.name]
+								? dataItem[column.name][value]
+								: null
+							: dataItem[value] ?? null
+					}}
+					<span *ngIf="i < column.key.length - 1"> - </span>
+				</span>
+			</ng-template>
+		</ng-container>
+		<ng-container *ngIf="column.filterType === 'template'">
+			<ng-template
+				kendoGridCellTemplate
+				let-dataItem>
+				<div
+					*ngFor="let hero of dataItem[column.name]"
+					style="display: inline">
+					<span *ngFor="let value of column.sub_field; let i = index">
+						{{ hero[value] ?? null }}
+						<span *ngIf="i < column.sub_field.length - 1"> - </span>
+					</span>
+				</div>
+			</ng-template>
+		</ng-container>
+		<ng-container *ngIf="column.isCustomCell">
+			<ng-template
+				kendoGridCellTemplate
+				let-dataItem>
+				<ng-container
+					[ngTemplateOutlet]="gridColumnContent"
+					[ngTemplateOutletContext]="{
+						column: column,
+						dataItem: dataItem
+					}"></ng-container>
+			</ng-template>
+		</ng-container>
+		<ng-container *ngIf="column.type === 'number'">
+			<ng-template
+				kendoGridCellTemplate
+				let-dataItem>
+				{{ dataItem[column.name].toLocaleString() }}
+			</ng-template>
+		</ng-container>
+	</kendo-grid-column>
+
+	<kendo-grid-command-column
+		[columnMenu]="false"
+		[reorderable]="false"
+		i18n
+		i18n-title
+		title="Action"
+		[hidden]="hiddenColumns.includes('Action')"
+		[width]="editView.actionColumnWidth ?? 134"
+		*ngIf="!editView.custom && !editView.isHiddenActionColumn"
+		[sticky]="isActionSticky">
+		<ng-template
+			kendoGridCellTemplate
+			let-dataItem>
+			<button
+				kendoGridEditCommand
+				[primary]="editView.editCommandTitle ? true : false"
+				*ngIf="editView.hasEditCommand !== false">
+				<span
+					*ngIf="editView.hasEditCommandIcon !== false && !editView.hasLinkIcon"
+					class="k-icon icon-edit"></span>
+				<span
+					*ngIf="editView.hasEditCommandIcon !== false && editView.hasLinkIcon"
+					class="k-icon icon-link"></span>
+				{{
+					editView.editCommandTitle
+						? dataItem[editView.editCommandCustomColumn]?.custom_id ??
+						  editView.editCommandTitle
+						: ""
+				}}
+			</button>
+			<ng-container
+				[ngTemplateOutlet]="actionColumnContent"
+				[ngTemplateOutletContext]="{ $implicit: dataItem }"></ng-container>
+			<button
+				kendoGridRemoveCommand
+				*ngIf="editView.hasRemoveCommand !== false">
+				<span class="k-icon icon-trash"></span>
+			</button>
+			<ng-container
+				[ngTemplateOutlet]="actionColumnAfterCommonContent"
+				[ngTemplateOutletContext]="{ $implicit: dataItem }"></ng-container>
+
+		</ng-template>
+
+	</kendo-grid-command-column>
+
+	<kendo-grid-column
+		[columnMenu]="false"
+		[reorderable]="false"
+		i18n
+		i18n-title
+		title="Action"
+		[hidden]="hiddenColumns.includes('Action')"
+		[width]="editView.actionColumnWidth ?? 130"
+		[sticky]="isActionSticky"
+		*ngIf="editView.custom && !editView.isHiddenActionColumn"
+		class="custom-command-col">
+		<ng-template
+			kendoGridCellTemplate
+			let-dataItem>
+			<!-- <button kendoButton [routerLink]="(editView.routeLink ?? '') + dataItem.id">
+				<span class="k-icon icon-edit"></span>
+			</button> -->
+			<button
+				[disabled]="isEditDisabled"
+				kendoButton
+				(click)="onClickEditItem(editView.routeLink, dataItem.id)">
+				<span class="k-icon icon-edit"></span>
+			</button>
+			<ng-container
+				[ngTemplateOutlet]="actionColumnContent"
+				[ngTemplateOutletContext]="{ $implicit: dataItem }"></ng-container>
+			<button
+				kendoGridRemoveCommand
+				*ngIf="editView.hasRemoveCommand !== false"
+				[disabled]="isDeleteDisabled">
+				<span class="k-icon icon-trash"></span>
+			</button>
+			<ng-container
+				[ngTemplateOutlet]="actionColumnAfterCommonContent"
+				[ngTemplateOutletContext]="{ $implicit: dataItem }"></ng-container>
+		</ng-template>
+	</kendo-grid-column>
+
+	<kendo-grid-command-column
+		[columnMenu]="false"
+		[reorderable]="false"
+		i18n
+		i18n-title
+		title="Action"
+		[hidden]="hiddenColumns.includes('Action')"
+		[width]="editView.actionColumnWidth ?? 134"
+		*ngIf="editView.custom && editView.isHiddenActionColumn"
+		[sticky]="isActionSticky">
+		<ng-template
+			kendoGridCellTemplate
+			let-dataItem>
+			<ng-container
+				[ngTemplateOutlet]="actionColumnContent"
+				[ngTemplateOutletContext]="{ $implicit: dataItem }"></ng-container>
+		</ng-template>
+	</kendo-grid-command-column>
+
+	<ng-template kendoPagerTemplate>
+		<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+		<kendo-pager-numeric-buttons [buttonCount]="buttonCount"></kendo-pager-numeric-buttons>
+		<kendo-pager-next-buttons></kendo-pager-next-buttons>
+		<kendo-pager-info></kendo-pager-info>
+		<kendo-pager-page-sizes [pageSizes]="pageSizes"></kendo-pager-page-sizes>
+	</ng-template>
+</kendo-grid>
+
+<kendo-grid
+	*ngIf="editView.isOnPageFilter"
+	[kendoGridBinding]="gridItems"
+	[pageable]="isPageable"
+	[sortable]="isSortable"
+	[filterable]="isFilterable"
+	[filter]="state.filter"
+	[loading]="isLoadedEnabled"
+	[pageSize]="state.take"
+	[skip]="state.skip"
+	[sort]="state.sort"
+	[groupable]="isGroupable"
+	[resizable]="isResizable"
+	[columnMenu]="columnMenu"
+	[group]="state.group"
+	(dataStateChange)="dataStateChange($event)"
+	(remove)="removeHandler($event)"
+	(edit)="editHandler($event)"
+	(add)="addHandler($event)"
+	[selectable]="editView.isSelection"
+	[reorderable]="isReorderable"
+	(selectionChange)="selectionHandler($event)"
+	(columnVisibilityChange)="columnMenuChangeEvent($event)"
+	(columnReorder)="columnMenuReorderEvent($event)"
+	[rowClass]="rowCallback"
+>
+	<ng-template
+		kendoGridToolbarTemplate
+		*ngIf="toolbarConfig">
+		<kendo-label text="{{ toolbarConfig.title }}"></kendo-label>
+		<kendo-grid-spacer></kendo-grid-spacer>
+		<ng-container [ngTemplateOutlet]="toolBarBeforeSearchContent"></ng-container>
+		<kendo-textbox
+			*ngIf="toolbarConfig.hasSearch"
+			[style.width.px]="191"
+			i18n
+			i18n-placeholder
+			placeholder="Search All Column"
+			[(ngModel)]="gridSearchKey"
+			(keyup)="onPageFilter($event)"
+			(ngModelChange)="onGridSearchChange($event)">
+		</kendo-textbox>
+
+		<ng-container [ngTemplateOutlet]="toolBarAfterSearchContent"></ng-container>
+		<button
+			kendoGridAddCommand
+			[primary]="true"
+			*ngIf="toolbarConfig.hasAddCommand"
+			i18n>
+			<span class="k-icon icon-add"></span> New
+		</button>
+	</ng-template>
+
+	<kendo-grid-column
+		kendoGridCellTemplate
+		*ngFor="let column of columns"
+		[field]="column.name"
+		[title]="column.title"
+		[filter]="column.filterType ? column.filterType : 'text'"
+		[filterable]="column.filterable ?? true"
+		[sortable]="column.sortable ?? true"
+		[aggregates]="aggregateResult"
+		[footerTemplate]="column.hasFooter ? aggregateResult?.sum : null"
+		[width]="column.width ?? null"
+		[style]="{ 'text-align': column.textAlign ?? null }"
+		[headerClass]="column.textAlign ?? null"
+		[columnMenu]="!column.hideColumnMenu"
+		[hidden]="hiddenColumns.includes(column.title)">
+
+		<ng-container *ngIf="column.booleanValue">
+			<ng-template
+				kendoGridCellTemplate
+				let-dataItem>
+				<input
+					type="checkbox"
+					readonly="true"
+					disabled="true"
+					[checked]="dataItem[column.name]"
+					kendoCheckBox />
+			</ng-template>
+		</ng-container>
+		<ng-container *ngIf="column.filterType === 'date'">
+			<ng-template
+				kendoGridCellTemplate
+				let-dataItem>
+				{{
+					dataItem[column.name]
+						| date : column.dateFormat ?? "dd.MM.yyyy" : "utcTimestamp" : "en-US"
+				}}
+			</ng-template>
+		</ng-container>
+		<ng-container *ngIf="column.filterType === 'enum'">
+			<ng-template
+				kendoGridFilterMenuTemplate
+				let-filter="filter"
+				let-filterService="filterService">
+				<kendo-dropdownlist
+					[value]="filter.text"
+					[data]="column.dropdownFilterableList"
+					[filter]="filter"
+					[(ngModel)]="gridEnumFilterKey"
+					(valueChange)="onFilterRelationalData(column)"
+					(filterChange)="enumFilterChange($event, column)"
+					[textField]="'text'"
+					[valueField]="'value'"
+					[filterable]="true"
+					[valuePrimitive]="true"
+					[filterService]="filterService"></kendo-dropdownlist>
+			</ng-template>
+		</ng-container>
+		<ng-container *ngIf="column.filterType === 'multiLayer'">
+			<ng-template
+				kendoGridFilterMenuTemplate
+				let-filter="filter"
+				let-filterService="filterService">
+				<kendo-textbox
+					kendofilterinput
+					[(ngModel)]="gridRelationalFilterKey"
+					[filter]="filter"
+					[input]="filter.value"
+					[filterService]="filterService"
+					(keypress)="
+						$event.keyCode == 13
+							? filterCustomColumns($event.target.value, column.name)
+							: onFilterRelationalData(column)
+					">
+				</kendo-textbox>
+			</ng-template>
+		</ng-container>
+		<ng-container *ngIf="column.isCustomCell">
+			<ng-template
+				kendoGridCellTemplate
+				let-dataItem>
+				<ng-container
+					[ngTemplateOutlet]="gridColumnContent"
+					[ngTemplateOutletContext]="{
+						column: column,
+						dataItem: dataItem
+					}"></ng-container>
+			</ng-template>
+		</ng-container>
+	</kendo-grid-column>
+
+	<kendo-grid-command-column
+		[columnMenu]="false"
+		[reorderable]="false"
+		i18n
+		i18n-title
+		title="Action"
+		[hidden]="hiddenColumns.includes('Action')"
+		[width]="editView.actionColumnWidth ?? 134"
+		*ngIf="!editView.custom && !editView.isHiddenActionColumn">
+
+		<ng-template
+			kendoGridCellTemplate
+			let-dataItem>
+			<button
+				kendoGridEditCommand
+				[primary]="editView.editCommandTitle ? true : false"
+				*ngIf="editView.hasEditCommand !== false">
+				<span
+					*ngIf="editView.hasEditCommandIcon !== false && !editView.hasLinkIcon"
+					class="k-icon icon-edit"></span>
+				<span
+					*ngIf="editView.hasEditCommandIcon !== false && editView.hasLinkIcon"
+					class="k-icon icon-link"></span>
+				{{
+					editView.editCommandTitle
+						? dataItem[editView.editCommandCustomColumn]?.custom_id ??
+						  editView.editCommandTitle
+						: ""
+				}}
+			</button>
+			<ng-container
+				[ngTemplateOutlet]="actionColumnContent"
+				[ngTemplateOutletContext]="{ $implicit: dataItem }"></ng-container>
+			<button
+				kendoGridRemoveCommand
+				*ngIf="editView.hasRemoveCommand !== false">
+				<span class="k-icon icon-trash"></span>
+			</button>
+			<ng-container
+				[ngTemplateOutlet]="actionColumnAfterCommonContent"
+				[ngTemplateOutletContext]="{ $implicit: dataItem }"></ng-container>
+		</ng-template>
+
+	</kendo-grid-command-column>
+
+	<kendo-grid-column
+		[columnMenu]="false"
+		[reorderable]="false"
+		i18n
+		i18n-title
+		title="Action"
+		[hidden]="hiddenColumns.includes('Action')"
+		[width]="editView.actionColumnWidth ?? 130"
+		*ngIf="editView.custom && !editView.isHiddenActionColumn"
+		class="custom-command-col">
+		<ng-template
+			kendoGridCellTemplate
+			let-dataItem>
+			<!-- <button kendoButton [routerLink]="(editView.routeLink ?? '') + dataItem.id">
+			<span class="k-icon icon-edit"></span>
+		</button> -->
+
+			<button
+				kendoButton
+				(click)="onClickEditItem(editView.routeLink, dataItem.id)">
+				<span class="k-icon icon-edit"></span>
+			</button>
+			<ng-container
+				[ngTemplateOutlet]="actionColumnContent"
+				[ngTemplateOutletContext]="{ $implicit: dataItem }"></ng-container>
+			<button
+				kendoGridRemoveCommand
+				*ngIf="editView.hasRemoveCommand !== false">
+				<span class="k-icon icon-trash"></span>
+			</button>
+			<ng-container
+				[ngTemplateOutlet]="actionColumnAfterCommonContent"
+				[ngTemplateOutletContext]="{ $implicit: dataItem }"></ng-container>
+		</ng-template>
+
+	</kendo-grid-column>
+
+	<ng-template kendoPagerTemplate>
+		<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+		<kendo-pager-numeric-buttons [buttonCount]="buttonCount"></kendo-pager-numeric-buttons>
+		<kendo-pager-next-buttons></kendo-pager-next-buttons>
+		<kendo-pager-info></kendo-pager-info>
+		<kendo-pager-page-sizes [pageSizes]="pageSizes"></kendo-pager-page-sizes>
+	</ng-template>
+</kendo-grid>
+
+<kendo-grid-edit-window
+	*ngIf="!editView.custom"
+	[model]="editDataItem"
+	[isNew]="isNew"
+	[windowCustomTitle]="windowCustomTitle"
+	[detailsWindowCustomTitle]="detailsWindowCustomTitle"
+	[width]="editView.modalWidth"
+	[showCloseButton]="editView.showCloseButton ?? true"
+	[closeGridWindow]="closeGridWindow"
+	[isWindowLoaderEnabled]="isWindowLoaderEnabled"
+	(cancel)="cancelHandler()"
+	(save)="saveHandler($event)">
+	<div #modalBody></div>
+</kendo-grid-edit-window>
+
+<div kendoDialogContainer></div>

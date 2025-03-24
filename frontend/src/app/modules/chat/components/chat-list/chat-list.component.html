@@ -1,0 +1,65 @@
+<div class="chat-list-header">
+  <span class="chat-list-title">Chat</span>
+  <ng-template [ngIf]="(selectedModule | async) === null">
+    <button
+      #popupAnchor
+      kendoButton
+      class="chat-list-action"
+      imageUrl="assets/images/svg/plus.svg"
+      (click)="createChatPopupOpen = !createChatPopupOpen"
+    ></button>
+    <kendo-popup
+      [anchor]="popupAnchor.element"
+      [anchorAlign]="{ horizontal: 'left', vertical: 'bottom' }"
+      [popupAlign]="{ horizontal: 'left', vertical: 'top' }"
+      *ngIf="createChatPopupOpen"
+    >
+      <button
+        kendoButton
+        (click)="openNewChatDialog(false)"
+        fillMode="clear"
+        rounded="none"
+        i18n="Open 'create new 1-to-1 chat' popup button"
+      >
+        New Chat
+      </button>
+      <button
+        kendoButton
+        (click)="openNewChatDialog(true)"
+        fillMode="clear"
+        rounded="none"
+        i18n="Open 'create new group chat' popup button"
+      >
+        New Group
+      </button>
+    </kendo-popup>
+  </ng-template>
+</div>
+
+<kendo-textbox
+  class="search-box"
+  (valueChange)="searchTerm = $event"
+  i18n-placeholder="Placeholder text in search box for chats"
+  placeholder="Search"
+  [style.width]="'auto'"
+>
+  <ng-template kendoTextBoxSuffixTemplate>
+    <kendo-icon name="search"></kendo-icon>
+  </ng-template>
+</kendo-textbox>
+
+<div class="chat-list">
+  <!-- This is shown if we are in the process of creating a 1-1 chat with a user: -->
+  <app-user-chat-tile
+    *ngIf="selectedUser | async as user"
+    [userOrChat]="user"
+    [selected]="true"
+  ></app-user-chat-tile>
+
+  <app-user-chat-tile
+    *ngFor="let chat of matchingChats()"
+    [userOrChat]="chat"
+    [selected]="(selectedChat | async)?.id === chat.id"
+    (selectUserOrChat)="selectChat(chat)"
+  ></app-user-chat-tile>
+</div>

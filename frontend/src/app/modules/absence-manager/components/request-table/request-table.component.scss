@@ -1,0 +1,31 @@
+@import '/schertech-theme/dist/scss/tokens';
+
+.badge{
+    padding: 4px;
+    border-radius: 10px;
+    min-width: 51%;
+    color: white;
+    font-weight: 700;;
+    text-align: center;
+    font-size: 10px;
+    position: relative;
+}
+.note-text-color{
+    color:  #005981;
+    text-align: center;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+}
+.k-radio-label{
+    margin-left: 0;
+}
+
+::ng-deep .dialog-container .k-window{
+    border: 1px solid #121D2C14;
+    border-radius: $kendo-border-radius;
+}
+::ng-deep .dialog-container .k-window-titlebar{
+    border-top-left-radius: $kendo-border-radius !important;
+    border-top-right-radius: $kendo-border-radius !important;
+}

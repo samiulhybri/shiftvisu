@@ -1,0 +1,515 @@
+<div class="grid grid-cols-1 gap-2">
+	<ui5-card
+		[ngStyle]="{ 'height.px': heightForMachineTree }"
+		class="col-span-1">
+		<div [ngStyle]="{ 'height.px': heightForMachineTree - 44 }">
+			<ui5-bar
+				slot="header"
+				class="h-[44px]"
+				design="Header">
+				<ui5-title
+					level="H5"
+					slot="startContent"
+					i18n
+					>Machines</ui5-title
+				>
+
+				<ui5-input
+					[value]="globalSearchValue"
+					slot="endContent"
+					(change)="onGlobalSearch($event)">
+					<ui5-icon
+						id="valueHelpIcon"
+						slot="icon"
+						name="search"></ui5-icon>
+				</ui5-input>
+			</ui5-bar>
+			<app-grid-table
+				headerTitle=""
+				url=""
+				[columns]="column"
+				[showSearch]="false"
+				[showDownload]="false"
+				[showAction]="false"
+				[showAction]="false"
+				[isTreeTable]="true"
+				[isBaseVisu]="true"
+				[customData]="true"
+				(processData)="processData($event)"
+				(rowClick)="onRowSelectionChange($event)"
+				selectionMode="Single"
+				[showActiveButton]="false"
+				[enableServerSideFiltering]="false"
+				[isBusy]="true"
+				#childComponentRef>
+			</app-grid-table>
+		</div>
+	</ui5-card>
+
+	<ui5-card
+		class="col-span-1 overflow-auto">
+		<ui5-bar
+			slot="header"
+			class="h-[44px]"
+			design="Header">
+			<ui5-title
+				level="H5"
+				slot="startContent"
+				i18n
+				>Capacities
+				{{
+					selectedRow?.hallCustomId
+						? "( " + selectedRow?.hallName + " - " + selectedRow?.hallCustomId + " )"
+						: selectedRow?.machineCustomId
+							? "( " +
+								selectedRow?.machineName +
+								" - " +
+								selectedRow?.machineCustomId +
+								" )"
+							: ""
+				}}
+			</ui5-title>
+
+			<div
+				class="flex h-[20px] ml-15"
+				slot="startContent">
+				<ui5-icon
+					name="slim-arrow-left"
+					class="iconStyle"
+					(click)="changeYear(-1)"
+					slot="icon"></ui5-icon>
+
+				<ui5-label
+					level="H5"
+					class="iconStyle mx-4"
+					>{{ year }}</ui5-label
+				>
+				<ui5-icon
+					class="iconStyle"
+					name="slim-arrow-right"
+					(click)="changeYear(1)"
+					slot="icon"></ui5-icon>
+			</div>
+
+			<span slot="endContent">
+				<ui5-button
+					design="Emphasized"
+					*ngIf="obj.keys(capacities).length > 0 && authService.isPermissionValid('BASEVISU_CAPACITIES_EDIT'); else noDataButton"
+					id="saveButtonShiftModel"
+					slot="endContent"
+					(click)="onAddShiftModel(true)"
+					i18n>Change shift</ui5-button
+				>
+				<ui5-button
+					design="Transparent"
+					id="infoOpen"
+					class="ml-2"
+					icon="sap-icon://information"
+					[disabled]="obj.keys(capacities).length == 0"
+					slot="endContent"
+					(click)="onInfoOpen()"
+					i18n>
+				</ui5-button>
+			</span>
+
+			<ng-template
+				#noDataButton
+				slot="endContent">
+				<ui5-button
+					design="Emphasized"
+					id="addShiftModel"
+					slot="endContent"
+					*ngIf="authService.isPermissionValid('BASEVISU_CAPACITIES_EDIT'); else noDataButton"
+					[disabled]="!selectedRow || isCapacityLoading"
+					(click)="onAddShiftModel(false)"
+					i18n>
+					Add Shift Model</ui5-button
+				>
+			</ng-template>
+		</ui5-bar>
+		<ui5-busy-indicator
+			[active]="isCapacityLoading"
+			class="w-full h-full overflow-auto">
+			<div class="w-full" [ngStyle]="{ 'height.px': heightForCalender }">
+				<div
+					class="w-full overflow-x-scroll"
+					*ngIf="obj.keys(capacities).length; else noDataContainer">
+					<table class="table-auto border border-collapse w-full">
+						<thead>
+							<tr>
+								<th
+									class="border border-solid border-gray-300 pl-2 py-1 text-start w-[80px]"
+									i18n>
+									Months</th
+								>
+								<th
+									class="border border-solid border-gray-300 px-1 py-1"
+									*ngFor="let day of maxDays">
+									{{ day }}
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								*ngFor="let month of months; let i = index"
+								[ngStyle]="{ 'height.px': heightForRows }">
+								<th
+									class="border-solid border border-gray-300 pl-2 py-1 text-start">
+									{{ month | truncate: 9 }}
+								</th>
+								<td
+									*ngFor="let day of maxDays"
+									class="border-gray-300 border border-solid text-center px-1 py-1">
+									<div class="w-full flex justify-center items-center">
+										<div
+											id="{{ day }}-{{ i }}-{{ year }}"
+											*ngIf="day <= getDaysInMonth(i).length"
+											(mouseenter)="onMouseEnter($event, day, i, year)"
+											(mouseleave)="onMouseLeave()"
+											(click)="onDateClick(day, i, year)"
+											class="w-3 h-3 xl:w-4 xl:h-4 rounded border border-solid border-gray-500 text-center cursor-pointer"
+											[ngClass]="isCompactHeight ? 'w-3 h-3' : 'w-4 h-4'"
+											[ngStyle]="{
+												'background-color': getColor(day, i, year),
+											}"></div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<ng-template #noDataContainer>
+					<div
+						[ngStyle]="{ 'height.px': heightForCalenderEmptyData }"
+						class="w-full flex items-center justify-center">
+						<div class="w-full text-center">
+							<ui5-title
+								level="H5"
+								i18n
+								>No shift model applied yet</ui5-title
+							>
+							<div
+								level="H6"
+								i18n>
+								Please add shift model</div
+							>
+						</div>
+					</div>
+				</ng-template>
+			</div>
+		</ui5-busy-indicator>
+	</ui5-card>
+	<ui5-popover
+		id="popOver"
+		[open]="showPopOver"
+		[opener]="opener"
+		(after-close)="popOverClose()">
+		<div class="popover-content">
+			<div>
+				<ui5-label
+					show-colon
+					i18n
+					>Date</ui5-label
+				>
+				<ui5-text>{{ popoverDate }}</ui5-text>
+			</div>
+			<div class="pt-1">
+				<ui5-label
+					show-colon
+					i18n
+					>Weekday</ui5-label
+				>
+				<ui5-text>{{ popoverDay }}</ui5-text>
+			</div>
+		</div>
+	</ui5-popover>
+</div>
+
+<app-dialog
+	id="addShiftDialog"
+	[isDialogOpen]="isDialogOpenForAddShift"
+	(onBeforeClose)="handleAddShiftClose()"
+	[title]="dialogTitleForAddShift">
+	<div
+		slot="header"
+		class="ml-[-24px] w-full">
+		<div class="ml-[-16px]">
+			<ui5-title
+				class="pt-[10px] pl-8"
+				level="H5"
+				>{{ dialogTitleForAddShift }}</ui5-title
+			>
+			<ui5-tabcontainer
+				(tab-select)="tabNavChanged($event)"
+				fixed
+				collapsed>
+				<ui5-tab
+					#generalTab
+					i18n-text
+					text="Shift Details"
+					[selected]="selectedTab === 'shiftDetailsTab'"
+					id="shiftDetailsTab"></ui5-tab>
+				<ui5-tab
+					#associateMachineTab
+					i18n-text
+					text="Holidays"
+					[selected]="selectedTab === 'holidaysTab'"
+					id="holidaysTab"></ui5-tab>
+			</ui5-tabcontainer>
+		</div>
+	</div>
+	<ui5-busy-indicator
+		[active]="isLoadingShiftModelProcessing"
+		size="L">
+		<div class="2xl:h-[450px] xl:h-[400px] lg:h-[360px] md:h-[360px] 2xl:w-[900px] xl:w-[900px] lg:w-[900px] md:w-[700px] ml-[-15px]">
+			<div
+				[hidden]="selectedTab !== 'shiftDetailsTab'"
+				class="w-[102%]">
+				<div>
+					<ui5-label
+						show-colon
+						i18n
+						required
+						>Select Shift Model</ui5-label
+					>
+
+					<ui5-combobox
+						id="shiftCombobox"
+						(selectionChange)="onSelectShiftModel($event)"
+						class="w-full pt-[2px]">
+						<ui5-mcb-item
+							*ngFor="let shiftModel of shiftModels"
+							id="{{ shiftModel.id }}"
+							[selected]="shiftModel.isSelected"
+							text="{{ shiftModel.name }}"></ui5-mcb-item>
+					</ui5-combobox>
+				</div>
+				<div class="flex flex-row justify-center">
+					<ui5-busy-indicator [active]="isLoadingShiftModelDetails"></ui5-busy-indicator>
+				</div>
+				<div
+					class="flex flex-row gap-2.5"
+					*ngIf="showShiftModelDetails">
+					<div class="flex flex-col w-6/12">
+						<ui5-label
+							show-colon
+							i18n
+							>Workdays</ui5-label
+						>
+
+						<ui5-input
+							class="w-full"
+							[(ngModel)]="weekdaysInputValue"
+							readonly></ui5-input>
+					</div>
+					<div class="flex flex-col w-6/12">
+						<ui5-label
+							show-colon
+							i18n
+							>Total Working Hours/Week</ui5-label
+						>
+						<ui5-input
+							class="w-full"
+							[(ngModel)]="totalWorkingHourInputValue"
+							readonly></ui5-input>
+					</div>
+				</div>
+				<div
+					class="mt-4"
+					*ngIf="showShiftModelDetails">
+					<ui5-card class="2xl:h-[325px] xl:h-[280px] lg:h-[230px]">
+						<div class="2xl:h-[325px] xl:h-[280px] lg:h-[230px]">
+							<app-grid-table
+								headerTitle="Weekly Shift View"
+								url=""
+								[columns]="weeklyShiftColumn"
+								[showSearch]="false"
+								[showDownload]="false"
+								[showAction]="false"
+								[showNewButton]="false"
+								[isTreeTable]="false"
+								[isBaseVisu]="false"
+								[customData]="true"
+								(processData)="processDataForWeeklyShift($event)"
+								selectionMode="None"
+								[showActiveButton]="false"
+								[enableServerSideFiltering]="false"
+								[isBusy]="true"
+								#weeklyShiftComponentRef>
+							</app-grid-table>
+						</div>
+					</ui5-card>
+				</div>
+			</div>
+			<div
+				[hidden]="selectedTab !== 'holidaysTab'"
+				class="">
+				<div class="col-span-1 w-[102%] mb-2 flex-col">
+					<ui5-label
+						show-colon
+						i18n
+						>Possible Holiday(s)</ui5-label
+					>
+					<ui5-date-picker
+						minDate="{{ year }}-01-01"
+						maxDate="{{ year }}-12-31"
+						formatPattern="dd.MM.YYYY"
+						placeholder="Select dates"
+						i18n-placeholder
+						[value]="possibleHoliday"
+						(change)="onPossibleHolidaysAdded($event)">
+					</ui5-date-picker>
+				</div>
+
+				<div class="col-span-1 w-full mb-2 2xl:h-[410px] xl:h-[370px] lg:h-[310px] overflow-scroll">
+					<ui5-list
+						selection-mode="Delete"
+						(itemDelete)="onDateDelete($event)">
+						<ui5-li
+							(itemDelete)="onDateDelete($event)"
+							*ngFor="let date of selectedDatesForHolidays"
+							id="{{ date }}"
+							>{{ date }}</ui5-li
+						>
+					</ui5-list>
+				</div>
+			</div>
+		</div>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButtonId"
+			design="Emphasized"
+			(click)="onAddShiftSave()"
+			[disabled]="!selectedShiftModelForAddShift">
+			{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-8"
+			id="CancelButtonId"
+			(click)="handleAddShiftClose()">
+			{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+
+
+<div *ngIf="shiftModels">
+	<app-capacity-change
+		#capacityChangeComponentRef
+		[shiftModels]="shiftModels"
+		[year]="year"
+		[selectedRow]="selectedRow"
+		[editPermission]="authService.isPermissionValid('BASEVISU_CAPACITIES_EDIT')"
+		(refreshTable)="loadCapacitiesForHallOrMachine($event)"
+		[weekDays]="weekDays"></app-capacity-change>
+</div>
+
+<app-dialog
+	id="infoDialogOpen"
+	[isDialogOpen]="isInfoDialogOpen"
+	(onBeforeClose)="onInfoClose()">
+	<ui5-bar
+		slot="header"
+		class="w-full ml-[-30px]">
+		<ui5-title
+			level="H5"
+			slot="startContent">
+			{{ dialogTitleInfo }} ({{ year }})
+		</ui5-title>
+	</ui5-bar>
+
+	<div
+		class="w-full mb-2"
+		i18n>
+		Legend:</div
+	>
+	<div class="grid grid-cols-5 gap-11">
+		<div class="flex items-center justify-start gap-2">
+			<div
+				[ngStyle]="{
+					'background-color': getBackgroundColor(0),
+				}"
+				class="info-shifts-color"></div>
+			<div i18n>Off Days</div>
+		</div>
+		<div class="flex items-center justify-start gap-2">
+			<div
+				class="info-shifts-color"
+				[ngStyle]="{
+					'background-color': getBackgroundColor(25),
+				}"></div>
+			<div i18n>25% Filled Up</div>
+		</div>
+		<div class="flex items-center justify-start gap-2">
+			<div
+				class="info-shifts-color"
+				[ngStyle]="{
+					'background-color': getBackgroundColor(50),
+				}"></div>
+			<div i18n>50% Filled Up</div>
+		</div>
+		<div class="flex items-center justify-start gap-2">
+			<div
+				class="info-shifts-color"
+				[ngStyle]="{
+					'background-color': getBackgroundColor(75),
+				}"></div>
+			<div i18n>75% Filled Up</div>
+		</div>
+		<div class="flex items-center justify-start gap-2">
+			<div
+				class="info-shifts-color"
+				[ngStyle]="{
+					'background-color': getBackgroundColor(100),
+				}"></div>
+			<div i18n>100% Filled Up</div>
+		</div>
+	</div>
+	<div class="w-full mt-7">
+		<label
+			i18n
+			show-colon>
+			Total Capacity vs Appointed Ratio</label>
+		<ui5-progress-indicator
+			id="totalVsAppointedRatio"
+			class="mt-2"
+			[value]="totalVsAppointedRatio"></ui5-progress-indicator>
+	</div>
+
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			(click)="onInfoClose()"
+			id="closeOverlapButton"
+			design="Transparent"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogCapacities
+	id="errorDialogCapacities"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

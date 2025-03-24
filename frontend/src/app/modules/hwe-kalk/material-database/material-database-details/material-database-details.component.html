@@ -1,0 +1,88 @@
+<form novalidate class="k-form" *ngIf="materialDatabase">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="1">
+            <kendo-card-header i18n>
+                Informations
+            </kendo-card-header>
+            <kendo-card-body class="material-database-details-body">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"><span
+                                class="k-text-error k-pl-1">*</span></kendo-label>
+                        <kendo-textbox #custom_id name="custom_id"
+                            [(ngModel)]="materialDatabase.custom_id"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="name" i18n i18n-text text="Database Name"></kendo-label>
+                        <kendo-textbox #name name="name" [(ngModel)]="materialDatabase.name"></kendo-textbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <label [for]="material_id" i18n>Material Id: </label>
+                    <kendo-combobox #material_id name="material_id" [(ngModel)]="materialDatabase.material"
+                        [data]="materials" textField="custom_id" valueField="id" [filterable]="true"
+                        (filterChange)="handleFilter($event, 'material')">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="heat_treatment" i18n i18n-text text="Heat Treatment"></kendo-label>
+                        <kendo-combobox #heat_treatment name="heat_treatment" [data]="heatTreatmentTypeDataSource" textField="text"
+                        valueField="value" [filterable]="true" [valuePrimitive]="true"
+                            [(ngModel)]="materialDatabase.heat_treatment">
+                        </kendo-combobox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="tensile_strength" i18n i18n-text text="Min Tensile Strength"></kendo-label>
+                        <kendo-numerictextbox format="#.##\ 'N/mm²'"   #tensile_strength name="min_tensile_strength"
+                            [(ngModel)]="materialDatabase.min_tensile_strength"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="tensile_strength" i18n i18n-text text="Max Tensile Strength"></kendo-label>
+                        <kendo-numerictextbox [format]="'#.##\ N/mm²'" #tensile_strength name="max_tensile_strength"
+                            [(ngModel)]="materialDatabase.max_tensile_strength"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout class="input-field" orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="hardness" i18n i18n-text text="Hardness"></kendo-label>
+                        <kendo-numerictextbox format="#.##\ HB"  #hardness name="hardness" [step]="1" [decimals]="0"
+                            [(ngModel)]="materialDatabase.hardness"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>                
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="temperature" i18n i18n-text text="Temperature"></kendo-label>
+                        <div>
+                            <kendo-combobox 
+                                #temperature 
+                                [(ngModel)]="materialDatabase.temperature" 
+                                [data]="materialTemperatureTypes"
+                                textField="text" 
+                                valueField="value"
+                                [valuePrimitive]="true"
+                                [filterable]="true"
+                                name="temperature"
+                            >
+                           </kendo-combobox>
+                        </div>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

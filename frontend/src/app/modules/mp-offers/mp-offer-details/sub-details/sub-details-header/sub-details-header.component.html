@@ -1,0 +1,57 @@
+<div *ngIf="cost_sub_group == 'MATERIAL_INTERNAL'">
+    <kendo-gridlayout class="flexible-header-layout" [gap]="{ cols: 10 }" [cols]="[{width: 250 },{ width: 'auto' },{width: 100 },{width: 70 },{width: 70 },{width: 70 },{width: 150 }]">
+        <kendo-gridlayout-item [row]="1" [col]="2">
+            <div class="header k-text-inverse k-font-weight-bold" i18n>Material</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="3">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header">&euro;/kg</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="4">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header-0pad">L(mm)</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="5">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header-0pad">W(mm)</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="6">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header-0pad">H(mm)</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="7">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header" i18n>Cost</div>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>
+
+<div *ngIf="cost_sub_group == 'MATERIAL_ACQUIRED' || cost_sub_group == 'EXTERNAL' ">
+    <kendo-gridlayout [gap]="{ cols: 10 }">
+        <kendo-gridlayout-item [row]="1" [col]="1">
+            <div class="header k-text-inverse k-font-weight-bold" i18n>Details</div>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>
+
+<div
+    *ngIf="cost_sub_group == 'INTERNAL_TECH_OFFICE' || cost_sub_group == 'INTERNAL_MACHINING' || cost_sub_group == 'INTERNAL_EROSION' || cost_sub_group == 'INTERNAL_ASSEMBLY' || cost_sub_group == 'INTERNAL_SAMPLING' || cost_sub_group == 'INTERNAL_QUALITY'">
+    <kendo-gridlayout class="flexible-header-layout" [gap]="{ cols: 10 }" [cols]="[{ width: 300 },{width: 'auto' },{width: 90 },{width: 90 },{width: 90 },{width: 90 },{width: 150 }]">
+        <kendo-gridlayout-item [row]="1" [col]="1">
+            <div class="header k-text-inverse k-font-weight-bold" i18n>Details</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="2">
+            <div class="header k-text-inverse k-font-weight-bold" i18n>Machine</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="3">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header" i18n>Pers. Hours</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="4">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header" i18n>Mach. Hours</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="5">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header" i18n>Cost P.</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="6">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header"  i18n>Cost M.</div>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="1" [col]="7">
+            <div class="header k-text-inverse k-font-weight-bold left-aligned-header" i18n>Total</div>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</div>

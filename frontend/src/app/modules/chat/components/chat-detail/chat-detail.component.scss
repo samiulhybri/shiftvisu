@@ -1,0 +1,199 @@
+:host {
+  display: flex;
+  flex-direction: row;
+  box-shadow: 0px 0px 6px rgba(18, 29, 44, 0.12);
+  border-radius: 8px;
+}
+
+.chat-header {
+  padding: 9px 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  border-bottom: 1px solid rgba(18, 29, 44, 0.08);
+
+  &.clickable {
+    cursor: pointer;
+  }
+
+  .chat-name-email {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 36px;
+
+    .chat-name {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .chat-email {
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 14px;
+      color: #344054;
+    }
+  }
+}
+
+#messages-list {
+  margin: 8px;
+  border-radius: 8px;
+
+  max-width: unset;
+
+  .message-body {
+    display: flex;
+    flex-direction: column;
+
+    .message-author {
+      font-weight: 500;
+      font-size: 14px;
+      padding-bottom: 8px;
+    }
+
+    .message-editing-input {
+      height: unset !important;
+    }
+  }
+
+  ::ng-deep {
+    .k-author {
+      display: none;
+    }
+
+    .k-message {
+      margin: 16px 0 0 0;
+    }
+
+    .k-message-list-content {
+      padding-bottom: 0px;
+    }
+
+    .k-message-group.k-alt {
+      margin-top: 0;
+
+      .message-body {
+        align-items: flex-end;
+      }
+
+      .k-author {
+        display: none;
+      }
+
+      .k-bubble {
+        border-radius: 12px 12px 2px 12px;
+      }
+
+      .message-popup-button {
+        margin-right: -8px;
+      }
+
+      .k-popup {
+        border-radius: 4px;
+
+        .message-popup-content {
+          display: flex;
+          flex-direction: column;
+          min-width: 174px;
+
+          .k-button {
+            justify-content: start;
+          }
+        }
+      }
+    }
+
+    .k-message-group:not(.k-alt) {
+      .k-bubble {
+        border-radius: 12px 12px 12px 2px;
+      }
+
+      .message-body {
+        align-items: start;
+      }
+    }
+
+    kendo-chat-message-attachments {
+      display: none;
+    }
+  }
+}
+
+.message-attachments {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+
+  .message-attachment {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    gap: 6px;
+    border-radius: 4px;
+
+    border: 1px solid rgba(18, 29, 44, 0.08);
+  }
+
+  &.attachments-after-message {
+    padding-top: 8px;
+  }
+}
+
+::ng-deep .k-message-group.k-alt {
+  .message-attachment {
+    border: 1px solid #ffffff !important;
+  }
+}
+
+.message-box-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 12px 8px;
+
+  .message-box-inputs {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 8px;
+
+    .message-box {
+      border: 1px solid rgba(18, 29, 44, 0.08) !important;
+    }
+
+    .message-send-button {
+      width: 30px;
+      height: 30px;
+    }
+  }
+}
+.expand {
+  flex: 1 1 1px;
+}
+
+.detail-left-pane {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.detail-right-pane-container {
+  width: 0;
+  overflow: hidden;
+  transition: width 0.3s ease-in-out;
+
+  &.open {
+    width: 300px;
+  }
+}
+
+.detail-right-pane {
+  width: calc(300px - 20px);
+  padding: 10px;
+}

@@ -1,0 +1,23 @@
+<kendo-grid-component 
+    [gridItems]="gridItems"
+    [columns]="columns"
+    [state]="state"
+    [isLoadedEnabled]="isLoadedEnabled"
+    [isSortable]="isSortable"
+    [isFilterable]="isFilterable"
+    [isGroupable]="isGroupable"
+    [isPageable]="isPageable"
+    [toolbarConfig]="toolbarConfig"
+    (emitState)="changeState($event)"
+    (emitData)="changeState($event)"
+    (gridRefersh)="sendRequest()"
+    (deleteDataItem)="deleteDataItem($event)"
+    [editView]="editView"
+    (filterState)="changeGridFilter($event)"
+>
+    <ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+        <ng-container *ngIf="column.name == 'material_group_type'">
+            <div>{{ getEnumTranslateGrid('material_group_type', dataItem.material_group_type) }}</div>
+        </ng-container>
+    </ng-template>
+</kendo-grid-component>

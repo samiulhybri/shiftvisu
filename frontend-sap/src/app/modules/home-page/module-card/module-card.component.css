@@ -1,0 +1,23 @@
+ui5-card{
+    height: 176px;
+    width: 176px;
+    margin: 0 16px 16px 0;
+    cursor: pointer;
+}
+ui5-card-header{
+    font-size: 14px;
+    color: #1D2D3E;
+    font-weight: 700;
+}
+ui5-icon{
+    height: 31px;
+    width: 25px;
+    color: #556B82;
+}
+#content-area{
+    padding: 66px 16px 16px 16px;
+}
+.content-group{
+    color: #556B82;
+    font-weight: 400;
+}

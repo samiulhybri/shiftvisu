@@ -1,0 +1,65 @@
+<ui5-bar design="Header">
+	<a
+		routerLink="/"
+		slot="startContent">
+		<img
+			id="schertech_logo"
+			src="./assets/images/derga_logo.png" />
+	</a>
+	<div
+		id="header-user-part"
+		slot="endContent">
+		<ui5-busy-indicator [active]="isBusy">
+			<div
+				class="flex"
+				id="hoverTexts"
+				#hoverText>
+				<ui5-label class="sapHighlightColor fw-600">
+					{{ getUserNames() }}
+				</ui5-label>
+				<ui5-text class="sapHighlightColor fw-600 mr-5">
+					({{ selectedMachineUserTimes.length }})</ui5-text
+				>
+			</div>
+		</ui5-busy-indicator>
+		<ui5-popover
+			id="popover"
+			#popover
+			opener="number-button"
+			placement="Bottom">
+			<div 
+				*ngIf="selectedMachineUserTimes?.length; else noUserContent">
+				<div
+					class="popover-content"
+					*ngFor="let data of selectedMachineUserTimes">
+					<ui5-icon
+						id="personIcon"
+						slot="icon"
+						name="person-placeholder"></ui5-icon>
+					<div class="content">
+						<ui5-label class="sapTextColor">
+							{{ data.user?.name }}  
+							@if(data.qualified_clockin_user_ids.length && data.qualified_clockin_user_ids.includes(data.user.id)){
+								<span i18n >(Qualified)</span>
+							}
+							@else{
+								<span i18n>(Not Qualified)</span>
+							}
+						</ui5-label>
+						<ui5-label class="sapTextColor">
+							{{ data.start }}
+						</ui5-label>
+					</div>
+				</div>
+			</div>
+
+			<ng-template #noUserContent>
+				<div class="popover-content">
+				  <ui5-label class="sapTextColor" i18n>No User Clocked In </ui5-label>
+				</div>
+			  </ng-template>
+		</ui5-popover>
+		<app-translation></app-translation>
+	</div>
+	<ui5-title level="H4">Machineboard</ui5-title>
+</ui5-bar>

@@ -1,0 +1,287 @@
+<div class="main-div rounded-lg m-[10px]">
+
+	<ui5-card class="h-full">
+
+		<div class="flex-col gap-2 overflow-hidden rounded-lg w-full" style="height: calc(100vh - 74px);">
+			<div class="flex gap-2 w-[calc(100%-1px)]  rounded-lg" style="height: 50%;">
+				<div class="w-2/5 border border-solid border-gray-300 bg-white rounded-lg overflow-hidden">
+					<app-grid-table headerTitle="Orders" i18n-headerTitle [columns]="columns" [customData]="true"
+						[data]="prodOrderAllData" [showDownload]="false" [showActiveButton]="false"
+						[showEditButton]="false" [showDeleteButton]="true" button1Text="All" button2Text="Inactive"
+						button3Text="Active" addButtonText="New" i18n-addButtonText i18n-button1Text i18n-button2Text
+						i18n-button3Text [showNewButton]="true" [isBaseVisu]="false" (newButtonClick)="newButtonClick()"
+						(rowClick)="prodOrderGridRowClick($event)" (deleteClickNew)="openDeleteModal($event, 'order')"
+						[enableServerSideFiltering]="false" [showAction]="true" [showSearch]="false"
+						selectionMode="Single" [addButtonDisable]="prodOrderAllData.length == 1" #prodOrderGrid [editPermission]="authService.isPermissionValid('PLANVISU_ORDER_CREATE_PAGE_EDIT')">
+					</app-grid-table>
+				</div>
+				<div class="w-3/5 border border-solid border-gray-300 bg-white rounded-lg">
+					<app-grid-table [headerTitle]="orderCustomid !='' ? 'Positions' + '('+ orderCustomid  + ')' : 'Positions'" i18n-headerTitle
+						[columns]="prodOrderPosColumns" [customData]="true" [showDownload]="false"
+						[showActiveButton]="false" [showEditButton]="false" [showDeleteButton]="true" button1Text="All"
+						button2Text="Inactive" button3Text="Active" addButtonText="New" i18n-addButtonText
+						i18n-button1Text i18n-button2Text i18n-button3Text [showNewButton]="true" [isBaseVisu]="false"
+						(newButtonClick)="positionNewButtonClick()" (rowClick)="positionGridRowClick($event)"
+						(deleteClickNew)="openDeleteModal($event, 'position')" [enableServerSideFiltering]="false"
+						[showAction]="true" [showSearch]="false" [addButtonDisable]="positionAddButtonDisable" selectionMode="Single"
+						#prodOrderPosGrid [editPermission]="authService.isPermissionValid('PLANVISU_ORDER_CREATE_PAGE_EDIT')"></app-grid-table>
+				</div>
+			</div>
+			<div class="border border-solid border-gray-300 shadow-lg rounded-lg bg-white" style="height: 50%;">
+				<div class="rounded-lg overflow-hidden h-full">
+					<app-grid-table headerTitle="Operations" i18n-headerTitle [columns]="prodOrderPosOperationsColumns"
+						[customData]="true" (newButtonClick)="operationNewButtonClick('new',{})"
+						(extraButtonClick)="extraButtonClick()" (deleteClickNew)="openDeleteModal($event, 'operation')"
+						[showDownload]="false" [showActiveButton]="false" showExtraButton="true"
+						extraButtonText="Generate" [showEditButton]="false" [showDeleteButton]="true" button1Text="All"
+						button2Text="Inactive" button3Text="Active" addButtonText="New" i18n-addButtonText
+						i18n-button1Text i18n-extraButtonText i18n-button2Text i18n-button3Text [showNewButton]="true"
+						[isBaseVisu]="false" [enableServerSideFiltering]="false" [showAction]="true" [extraButtonDisable]="operationAddButtonDisable || selectedMachineId !== undefined" [addButtonDisable]="operationAddButtonDisable" [showSearch]="false"
+						selectionMode="Single" #prodOrderPosOperationGrid [editPermission]="authService.isPermissionValid('PLANVISU_ORDER_CREATE_PAGE_EDIT')"></app-grid-table>
+				</div>
+			</div>
+			<ui5-card-header class="flex items-center justify-end p-3"
+				style="height: 30px; border-top: 1px solid gray;">
+				<div slot="action"><ui5-button (click)="saveFullData()" [disabled]="isFinalDataDisabled">Final Save</ui5-button></div>
+			</ui5-card-header>
+		</div>
+
+	</ui5-card>
+
+</div>
+
+<app-dialog id="addGroupDialog" [isDialogOpen]="isDialogOpen" [title]="dialogTitle">
+	<ui5-busy-indicator [active]="isLoading" *ngIf="isDialogOpen" size="L">
+		<form #createOrUpdateForm="ngForm">
+			<div class="prodOrder-dialog-body form w-[40vw]">
+				<div class="w-full">
+					<div class="flex gap-[30px] w-full" *ngIf="selectedProdOrder">
+						<div class="flex-col flex gap-[5px] w-[40%]">
+							<div class="flex flex-col gap-[5px] w-full">
+								<ui5-label show-colon required >Id</ui5-label>
+								<ui5-busy-indicator [active]="isLoadingCustomId" size="S">
+									<ui5-input [(ngModel)]="selectedProdOrder.custom_id" class="w-full" #customId="ngModel" [valueState]="
+										customId.valid == false &&
+										(customId.touched || createOrUpdateForm.submitted)
+											? 'Negative'
+											: customIdState
+									" (input)="onChangeCustomId()" class="w-full" id="customId" name="custom_id" [required]="true">
+										<div slot="valueStateMessage">
+											{{ customIdValueStateText }}
+										</div>
+									</ui5-input>
+								</ui5-busy-indicator>
+							</div>
+							<div class="flex-col flex  gap-[5px] w-full">
+								<ui5-label show-colon i18n >CallOff</ui5-label>
+								<ui5-input  value-state="None" readonly placeholder="Select CallOff" class="w-full" name="call_off" [(ngModel)]="finalSelectedCallOff.custom_id">
+									<ui5-icon name="add" slot="icon" style="cursor: pointer;" (click)="openCallOffDialog()"></ui5-icon>
+								</ui5-input>
+							</div>
+						</div>
+						<div class="w-[60%]">
+							@if(this.finalSelectedCallOff.custom_id){
+								<div class="w-full flex flex-col gap-2">
+									<div class="flex gap-1">
+										<ui5-label show-colon>Item Id</ui5-label>
+										<span>{{finalSelectedCallOff?.item?.custom_id ?? ''}}</span>
+									</div>
+									<div class="flex gap-1">
+										<ui5-label show-colon>Customer</ui5-label>
+										<span>{{ finalSelectedCallOff?.item?.customer.length > 0 ? finalSelectedCallOff?.item?.customer[0]?.name : '' }}</span>
+									</div>
+									<div class="flex gap-1">
+										<ui5-label show-colon>Item</ui5-label>
+										<span>{{finalSelectedCallOff?.item?.name ?? ''}}</span>
+									</div>
+									<div class="flex gap-1">
+										<ui5-label show-colon>Item Name</ui5-label>
+										<span>{{finalSelectedCallOff?.item?.name2 ?? ''}}</span>
+									</div>
+									<div class="flex gap-1">
+										<ui5-label show-colon>Quantity</ui5-label>
+										<span>{{ finalSelectedCallOff?.quantity ?? '' }}</span>
+									</div>
+									<div class="flex gap-1">
+										<ui5-label show-colon>Date</ui5-label>
+										<span>{{ finalSelectedCallOff?.date ?? '' }}</span>
+									</div>
+									<div class="flex gap-1">
+										<ui5-label show-colon>Recurring</ui5-label>
+										<span>{{ finalSelectedCallOff.custom_id ? finalSelectedCallOff?.is_internal ? 'Yes' : 'No' : ''}}</span>
+									</div>
+									<div class="flex items-center gap-[5px] w-full" *ngIf="finalSelectedCallOff?.item?.batch_quantity">
+										<ui5-label show-colon i18n>Batch Quantity</ui5-label>
+										<ui5-input  value-state="None" readonly placeholder="Select CallOff" class="w-[100px]" name="call_off" [value]="finalSelectedCallOff?.item?.batch_quantity"></ui5-input>
+										<ui5-checkbox
+											id="batch-quantity"
+											(change)="changeBatchQuantityFlag()"
+											[(ngModel)]="isBatchQuantity"
+											i18n-text>
+										</ui5-checkbox>
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</ui5-busy-indicator>
+	<div slot="footer" style="
+			display: flex;
+			align-items: center;
+			justify-content: end;
+			flex-direction: row;
+			width: 100%;
+		">
+		<ui5-button design="Emphasized" (click)="checkCustomId()" [disabled]="isLoading || !selectedProdOrder.custom_id">
+			{{ localization.save }}</ui5-button>
+		<ui5-button class="ml-8" design="Transparent" (click)="closeDialog()">
+			{{ localization.close }}</ui5-button>
+	</div>
+</app-dialog>
+
+<ui5-dialog #errorDialogProdOrder id="errorDialogProdOrder" header-text="Error" state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator [active]="isLoading" size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button design="Transparent" (click)="closeErrorDialog()">{{ localization.close }}</ui5-button>
+	</div>
+</ui5-dialog>
+
+<!-- Item dialog -->
+<ui5-dialog id="dialog" [open]="isItemValueHelpDialog" *ngIf="isItemValueHelpDialog">
+	<ui5-bar slot="header" class="w-full ml-[-30px]">
+		<ui5-title level="H5" slot="startContent">
+		</ui5-title>
+	</ui5-bar>
+	<div class="h-[604px]  mx-2 my-[-16px]" style="width: 70vw;">
+		<app-grid-table [headerTitle]="valueHelperTitle" 
+			[customUrl]="valueHelperCustomUrl"
+			i18n-headerTitle
+			[isCustomApiCall]="true"
+			[useOdataStyles]="false"
+			[columns]="valueHelperColumns" 
+			[showAction]="false" 
+			[showDownload]="false" 
+			[showActiveButton]="false"
+			[showNewButton]="false" 
+			[isBaseVisu]="false" 
+			[showTableSettingBtn]="false" 
+			[enableServerSideFiltering]="true"
+			[showSearch]="true" 
+			selectionMode="Single" 
+			(processData)="itemProcess($event)"
+			(onSearchForCustomAPI)="onSearchItemsWithCustomer($event)"
+			(onLoadMoreForCustomAPI)="onLoadMoreItemsWithCustomer()"
+			(rowClick)="valueHelperGridRowClick($event)" 
+			#valuEHelperGrid>
+		</app-grid-table>
+	</div>
+
+	<ui5-toolbar slot="footer">
+		<ui5-toolbar-button class="" design="Emphasized" text="Save" (click)="onSaveValueHelpDialog()">
+		</ui5-toolbar-button>
+		<ui5-toolbar-button class="" design="Transparent" text="Cancel" (click)="isItemValueHelpDialog = false">
+		</ui5-toolbar-button>
+	</ui5-toolbar>
+</ui5-dialog>
+
+<!-- Machine dialog -->
+<ui5-dialog id="machineDialog" [open]="isMachineValueHelpDialog" *ngIf="isMachineValueHelpDialog">
+	<ui5-bar slot="header" class="w-full ml-[-30px]">
+		<ui5-title level="H5" slot="startContent">
+		</ui5-title>
+	</ui5-bar>
+	<div class="h-[604px] mx-2 my-[-16px]" style="width: 70vw;">
+		<app-grid-table [headerTitle]="machineValueHelperTitle" (processData)="machineProcess($event)" url="/Machines"
+			[filterQuery]="machineFilterQuery"
+			i18n-headerTitle [columns]="machineValueHelperColumns" [showAction]="false" [showDownload]="false"
+			[showActiveButton]="false" [showNewButton]="false"  [showTableSettingBtn]="false" [isBaseVisu]="true" [enableServerSideFiltering]="true"
+			[showSearch]="true" sortBy="custom_id" selectionMode="Single"
+			(rowClick)="machineValueHelperGridRowClick($event)" #machineValuEHelperGrid>
+		</app-grid-table>
+	</div>
+
+	<ui5-toolbar slot="footer">
+		<ui5-toolbar-button class="" design="Emphasized" text="Save" (click)="onSaveMachineValueHelpDialog()">
+		</ui5-toolbar-button>
+		<ui5-toolbar-button class="" design="Transparent" text="Cancel" (click)="isMachineValueHelpDialog = false;">
+		</ui5-toolbar-button>
+	</ui5-toolbar>
+</ui5-dialog>
+
+<!-- callOff dialog -->
+<ui5-dialog id="callOffDialog" [open]="isCallOffValueHelpDialog" *ngIf="isCallOffValueHelpDialog">
+	<ui5-bar slot="header" class="w-full ml-[-30px]">
+		<ui5-title level="H5" slot="startContent">
+		</ui5-title>
+	</ui5-bar>
+	<div class="h-[604px] mx-2 my-[-16px]" style="width: 70vw;">
+		<app-grid-table [headerTitle]="callOffseValueHelperTitle"  
+			[customUrl]="callOffsCustomUrl"
+			i18n-headerTitle 
+			[isCustomApiCall]="true"
+			[useOdataStyles]="false"
+			[columns]="callOffsValueHelperColumns" 
+			[showAction]="false" 
+			[showDownload]="false"
+			[showDateRangePicker]="true" 
+			[dateRangePickerPlaceholder]="callOffsDateRangePickerPlaceholder" 
+			(changeRangeDatePicker)="onChangeCallOffsDateRange($event)"
+			[showActiveButton]="false" 
+			[showNewButton]="false" 
+			[isBaseVisu]="false" 
+			[enableServerSideFiltering]="true"
+			[showSearch]="true" 
+			selectionMode="Single"
+			(processData)="callOffDataProcess($event)"
+			(onSearchForCustomAPI)="onSearchCallOffsCustomer($event)"
+			(onLoadMoreForCustomAPI)="onLoadMoreCallOffsWithCustomer()"
+			(rowClick)="callOffsValueHelperGridRowClick($event)"
+			[segmentButtonItems]="segmentButtonItems"
+			(segmentButtonChange)="segmentButtonChange($event)"
+			[isComboBoxOneActive]="true"
+			comboBoxOneLabelText="Internal"
+			i18n-comboBoxOneLabelText 
+			[comboBoxOneData]="internalFilterItems"
+			(comboBoxOneSelectionChanged)="interlFilter($event)"
+			#callOffsValuEHelperGrid>
+		</app-grid-table>
+	</div>
+
+	<ui5-toolbar slot="footer">
+		<ui5-toolbar-button class="" design="Emphasized" i18n-text text="Save" (click)="onSaveCallOff()">
+		</ui5-toolbar-button>
+		<ui5-toolbar-button class="" design="Default" i18n-text text="Cancel" (click)="closeCallOffDialog()">
+		</ui5-toolbar-button>
+	</ui5-toolbar>
+</ui5-dialog>
+
+<ui5-dialog #deleteModal id="deleteDialogShift" header-text="Warning" [open]="isDeleteModalOpen" state="Critical"
+	i18n-header-text>
+	<ui5-busy-indicator [active]="isDeleteModalLoading" size="L" #deleteDialogLoader>
+		<p style="width: 100%;">{{deleteModalText}}</p>
+	</ui5-busy-indicator>
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button class="dialogSubmit" design="Emphasized" (click)="DeleteSelectedData()" id="deleteSubmitButton">{{
+			localization.ok }}</ui5-button>
+		<ui5-button id="deleteCloseButton" (click)="isDeleteModalOpen = false;">{{ localization.close}}</ui5-button>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog #operationExistModal id="operationExistModal" header-text="Warning" [open]="isOperationExistModalOpen"
+	state="Critical" i18n-header-text>
+	<ui5-busy-indicator [active]="isDeleteModalLoading" size="L" #deleteDialogLoader>
+		<p style="width: 100%;">{{operationExistModalText}}</p>
+	</ui5-busy-indicator>
+	<div slot="footer" class="footer-style gap-8">
+		<ui5-button class="dialogSubmit" design="Emphasized" (click)="proceedOperationfetchData()"
+			id="deleteSubmitButton">{{ localization.ok }}</ui5-button>
+		<ui5-button id="CloseButton" (click)="isOperationExistModalOpen = false;">{{ localization.close}}</ui5-button>
+	</div>
+</ui5-dialog>

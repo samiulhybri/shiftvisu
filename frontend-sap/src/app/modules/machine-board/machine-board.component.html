@@ -1,0 +1,13 @@
+<app-machine-board-header></app-machine-board-header>
+<main *ngIf="!isBusy">
+	<app-machine-board-view-1
+		*ngIf="machineBoardTypeClass.getStateValue(machine?.machine_board_type) != MachineBoardType.VIEW_2"
+		[machine]="machine"
+		[isBusy]="isBusy"
+		[prodOrderPosOperations]="prodOrderPosOperations"></app-machine-board-view-1>
+	<app-machine-board-view-2
+		*ngIf="machineBoardTypeClass.getStateValue(machine?.machine_board_type) == MachineBoardType.VIEW_2"
+		[machine]="machine"
+		[isBusy]="isBusy"
+		[prodOrderPosOperations]="prodOrderPosOperations"></app-machine-board-view-2>
+</main>

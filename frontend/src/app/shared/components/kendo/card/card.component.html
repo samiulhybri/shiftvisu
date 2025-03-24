@@ -1,0 +1,30 @@
+<kendo-card class="card" width="'20%'">
+  <kendo-card-header>
+    <div>{{ title }}</div>
+    <kendo-grid-spacer></kendo-grid-spacer>
+    <button (click)="reset()" kendoButton themeColor="primary" icon="reset" i18n>
+      Reset
+    </button>
+  </kendo-card-header>
+  <kendo-card-body>
+    <kendo-stacklayout orientation="vertical" [gap]="9">
+      <ng-container *ngIf="data.length > 0; else noRecord">
+          <button
+          *ngFor="let dataItem of data; let i = index"
+          kendoButton
+          [primary]="dataItem.isSelected"
+          (click)="onClick(i)"
+        >
+          <span *ngIf="showCustomId && !showOnlyCustomId">{{ dataItem.custom_id }} - {{ dataItem?.name }}</span>
+          <span *ngIf="!showCustomId && !showOnlyCustomId">{{ dataItem?.name }}</span>
+          <span *ngIf="showOnlyCustomId">{{ dataItem?.custom_id }}</span>
+        </button>
+      </ng-container>
+      <ng-template #noRecord>
+        <div class="k-text-center" i18n>
+          No Records
+        </div>
+      </ng-template>
+    </kendo-stacklayout>
+  </kendo-card-body>
+</kendo-card>

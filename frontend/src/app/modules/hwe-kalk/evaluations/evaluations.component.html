@@ -1,0 +1,33 @@
+<kendo-grid-component
+	[gridItems]="gridItems"
+	[columns]="columns"
+	[state]="state"
+	[isLoadedEnabled]="isLoadedEnabled"
+	[isSortable]="isSortable"
+	[isFilterable]="isFilterable"
+	[isGroupable]="isGroupable"
+	[isPageable]="isPageable"
+	[toolbarConfig]="toolbarConfig"
+	(emitState)="changeState($event)"
+	(emitData)="changeState($event)"
+	(gridRefersh)="sendRequest()"
+	[editView]="editView"
+	[addWindowEvent]="addWindowEvent"
+	(filterState)="changeGridFilter($event)">
+	<ng-template #toolBarAfterSearchContent>
+		<button
+			kendoButton
+			[primary]="true"
+			(click)="onArchivedButtonClicked()">
+			<span class="k-icon icon-archive-nav"></span>
+			<span i18n>{{ isArchived ? "Archived" : "Unarchived" }}</span>
+		</button>
+		<button
+			kendoButton
+			[primary]="true"
+			(click)="downloadExcel()"
+			i18n>
+			<span class="k-icon k-i-excel"></span> Export Excel
+		</button>
+	</ng-template>
+</kendo-grid-component>

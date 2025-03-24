@@ -1,0 +1,54 @@
+<div class="content">
+    <div class="" style="height: calc(100% - 49px)">
+        <header>
+            <div class="input-group ng-binding" style="font-size: 18px;">
+                API Interfaces
+            </div>
+        </header>
+
+        <content>
+            <ui5-busy-indicator class="content_" [active]="isBusy">
+                <div class="mt-[25px]">
+                    <div class="button-container gap-2" (click)="selectedContainer = 0">
+                        <div class="label gap-2" [class.lavel-select]="selectedContainer === 0">
+                            <ui5-icon name="open-folder"></ui5-icon>
+                            <span i18n>ERP Orders</span>--&gt; <span i18n>MES</span>
+                        </div>
+                        <div *ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_EXPORT_IMPORT_EDIT)" class="run run-select  gap-2" (click)="runOperation('import/prod-orders')"
+                            [class.run-select]="selectedContainer === 0">
+                            <ui5-icon name="media-play" [design]="selectedContainer === 0 ?'Contrast': 'Default' "></ui5-icon>
+                            <span i18n>Run</span>
+                        </div>
+                    </div>
+                    <div class="button-container gap-2" (click)="selectedContainer = 1" [class.disabledBlock]="environment.clientName=='volaplast'">
+                        <div class="flex flex-col" [class.lavel-select]="selectedContainer === 1">
+                            <div class="label gap-2">
+                                <ui5-icon name="open-folder" ></ui5-icon>
+                                <span i18n>Single Orders: ERP</span>--&gt; <span i18n>MES</span>
+                            </div>
+                            <div class="pl-[34px] w-[416px]">
+                                <ui5-input class="w-[80%]" id="orderNo" name="orderNo" [(ngModel)]="orderNo" 
+                                    [placeholder]="orderPLaceholder">
+                                </ui5-input>
+                            </div>
+                        </div>
+                        <div *ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_EXPORT_IMPORT_EDIT)" class="run gap-2" (click)="runOperation('import/prod-orders',true)" [class.run-select]="selectedContainer === 1">
+                            <ui5-icon name="media-play" [design]="selectedContainer === 1 ?'Contrast': 'Default' "></ui5-icon>
+                            <span i18n>Run</span>
+                        </div>
+                    </div>
+                    <div class="button-container gap-2" (click)="selectedContainer = 2" [class.disabledBlock]="environment.clientName=='volaplast'">
+                        <div class="label gap-2" [class.lavel-select]="selectedContainer === 2">
+                            <ui5-icon  name="open-folder"></ui5-icon>
+                            <span i18n>Planning MES</span>--&gt; <span i18n>ERP</span>
+                        </div>
+                        <div *ngIf="authService.isPermissionValid(permissionEnums.PLANVISU_EXPORT_IMPORT_EDIT)" class="run gap-2" (click)="runOperation('plan_visu/export_prod_orders')" [class.run-select]="selectedContainer === 2">
+                            <ui5-icon [design]="selectedContainer === 2 ?'Contrast': 'Default' " name="media-play"></ui5-icon>
+                            <span i18n>Run</span>
+                        </div>
+                    </div>
+                </div>
+            </ui5-busy-indicator>
+        </content>
+    </div>
+</div>

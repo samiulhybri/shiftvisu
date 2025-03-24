@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('hwe_certificates', function (Blueprint $table) {
+            $table->string('test_result_note')->nullable();
+            $table->string('hardness_note')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('hwe_certificates', function (Blueprint $table) {
+            $table->dropColumn(['test_result_note', 'hardness_note']);
+        });
+    }
+};

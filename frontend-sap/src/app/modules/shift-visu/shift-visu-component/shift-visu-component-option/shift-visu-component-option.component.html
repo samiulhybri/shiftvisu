@@ -1,0 +1,113 @@
+<ui5-card>
+	<div class="h-[calc(100vh-72px)]">
+		<app-grid-table
+			[headerTitle]="component.id ? component.name : gridDefaultTitle"
+			[data]="component && component.id ? data : []"
+			[columns]="columns"
+			[showAction]="true"
+			[showSearch]="isOptionCreationEnabled"
+			[showActiveButton]="false"
+			[showTableSettingBtn]="true"
+			addButtonText="New"
+			i18n-addButtonText
+			[showNewButton]="isOptionCreationEnabled"
+			[showDownload]="false"
+			[editPermission]="authService.isPermissionValid(shiftVisuAdminPermission)"
+			(newButtonClick)="newButtonClick()"
+			(deleteClick)="deleteClick($event)"
+			(editClick)="editClick($event)"
+			selectionMode="None"
+			[customData]="true"
+			keyForCacheCustomDataTableColumns="shiftVisuComponentOptions"
+			#componentOptionsRef></app-grid-table>
+	</div>
+</ui5-card>
+
+<app-dialog
+	#addOrEditOptionDialog
+	[title]="saveMode == 'post' ? 'Add' : 'Edit'"
+	title-i18n>
+	<ui5-busy-indicator [active]="isSavingOrDeletingOption">
+		<form
+			#addOrEditOptionForm="ngForm"
+			class="w-[450px] flex flex-col">
+			<div class="w-full">
+				<ui5-label
+					i18n
+					show-colon
+					>Component Name</ui5-label
+				>
+				<ui5-input
+					disabled
+					class="w-full"
+					[value]="component.name ?? ''"></ui5-input>
+			</div>
+			<div class="w-full">
+				<ui5-label
+					i18n
+					show-colon
+					required
+					>Option</ui5-label
+				>
+				<ui5-input
+					#optionName="ngModel"
+					class="w-full"
+					i18n-placeholder
+					sanitize-input
+					placeholder="Write option name"
+					required
+					[valueState]="optionName.touched && !optionName.valid ? 'Negative' : 'None'"
+					[(ngModel)]="modalOption.option"
+					name="optionName">
+					<div
+						slot="valueStateMessage"
+						i18n
+						>Option name is required.</div
+					>
+				</ui5-input>
+			</div>
+		</form>
+	</ui5-busy-indicator>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			id="saveButtonId"
+			design="Emphasized"
+			[disabled]="isSavingOrDeletingOption || !optionName.valid"
+			(click)="onComponentDetailSave(addOrEditOptionForm)">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			id="CancelButtonId"
+			[disabled]="isSavingOrDeletingOption"
+			(click)="handleOptionPopupClose(addOrEditOptionForm)">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	#deleteOptionDialog
+	i18n-header-text
+	header-text="Warning"
+	state="Critical">
+	<p i18n>Do you really want to delete this option?</p>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteOption()"
+			[disabled]="isSavingOrDeletingOption"
+			>{{ localization.yes }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="handleOptionPopupClose()"
+			>{{ localization.cancel }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

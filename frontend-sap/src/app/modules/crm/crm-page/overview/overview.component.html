@@ -1,0 +1,357 @@
+<div class="w-full gap-2">
+	<div class="flex flex-row gap-2 mt-3">
+		<div class="flex-column w-full">
+			<ui5-label
+				show-colon
+				required
+				>{{ nameText }}</ui5-label
+			>
+
+			<ui5-input
+				#nameInput="ngModel"
+				[valueState]="
+					nameInput.valid == false && (nameInput.touched || createOrUpdateForm.submitted)
+						? 'Negative'
+						: 'None'
+				"
+				[(ngModel)]="selectedCustomer.name"
+				name="name"
+				class="w-full"
+				[required]="true"
+				id="nameInput">
+			</ui5-input>
+		</div>
+		<div class="flex-column w-full">
+			<ui5-label show-colon i18n>Category</ui5-label>
+			<ui5-combobox #categoryComboBox id="categoryComboBox" class="w-full"
+				(input)="onEmployeeClassificationInputChange($event)" [value]="selectedCustomer.category?.name || ''"
+				(selection-change)="onChangeCustomerCategory($event)">
+				<ng-container *ngFor="let item of category">
+					<ui5-cb-item *ngIf="item.is_active" id="{{ item.id }}" text="{{ item.name }}">
+					</ui5-cb-item>
+				</ng-container>
+			</ui5-combobox>
+		</div>
+	</div>
+	<div class="flex flex-row gap-2 mt-3">
+		<div class="flex-column w-1/4">
+			<ui5-label
+				i18n
+				show-colon
+				>Responsible User</ui5-label
+			>
+			<ui5-combobox
+				#userComboBox
+				id="userComboBox"
+				[value]="selectedCustomer.responsibleUser?.name || ''"
+				class="w-full"
+				(input)="onUserInputChange($event)"
+				(selection-change)="onChangeUser($event)">
+				<ui5-cb-item
+					id="{{ item.id }}"
+					text="{{ item.name }}"
+					*ngFor="let item of userList">
+				</ui5-cb-item>
+			</ui5-combobox>
+		</div>
+		<div class="flex-column w-1/4">
+			<ui5-label
+				show-colon
+				i18n
+				>Follow Up Date</ui5-label
+			>
+
+			<ui5-date-picker
+				id="date_follow_up"
+				name="date_follow_up"
+				class="w-100"
+				format-pattern="dd.MM.yyyy"
+				[value]="selectedCustomer.date_follow_up | dateFormat: 'dd.MM.yyyy'"
+				(change)="onUpdateDate($event)">
+			</ui5-date-picker>
+		</div>
+
+		<div class="flex-column w-1/4">
+			<ui5-label
+				show-colon
+				i18n
+				>Sales Status</ui5-label
+			>
+
+			<ui5-combobox
+				#salesStatusComboBox
+				id="salesStatusComboBox"
+				class="w-full"
+				(input)="onSalesStatusInputChange($event)"
+				[value]="selectedCustomer.salesStatus?.custom_id || ''"
+				(selection-change)="onChangeSalesStatus($event)">
+				<ui5-cb-item
+					id="{{ item.id }}"
+					text="{{ item.custom_id }}"
+					*ngFor="let item of salesStatuses">
+				</ui5-cb-item>
+			</ui5-combobox>
+		</div>
+
+		<div class="flex-column w-1/4">
+			<ui5-label
+				show-colon
+				i18n
+				>Progress</ui5-label
+			>
+			<ui5-slider
+				[value]="selectedCustomer.progress || 0"
+				[min]="0"
+				class="overflow-hidden"
+				(change)="onProgressChanged($event)"
+				[max]="100"
+				[step]="25"
+				show-tickmarks
+				name="progress"
+				label-interval="1"></ui5-slider>
+		</div>
+	</div>
+
+	<div class="flex flex-row gap-2 mt-3">
+		<div class="flex-column w-1/4">
+			<ui5-label
+				show-colon
+				i18n
+				>Revenue Classification</ui5-label
+			>
+			<ui5-combobox
+				#revenueClassificationComboBox
+				id="revenueClassificationComboBox"
+				class="w-full"
+				(input)="onRevenueClassificationInputChange($event)"
+				[value]="selectedCustomer.revenueClassification?.name || ''"
+				(selection-change)="onChangeRevenueClassification($event)">
+				<ng-container *ngFor="let item of revenueClassifications">
+					<ui5-cb-item
+						*ngIf="item.is_active"
+						id="{{ item.id }}"
+						text="{{ item.name }}">
+					</ui5-cb-item>
+				</ng-container>
+			</ui5-combobox>
+		</div>
+
+		<div class="flex-column w-1/4">
+			<ui5-label
+				show-colon
+				i18n
+				>Market Segment</ui5-label
+			>
+			<ui5-combobox
+				#marketSegmentComboBox
+				id="marketSegmentComboBox"
+				class="w-full"
+				(input)="onMarketInputChange($event)"
+				[value]="selectedCustomer.marketSegment?.name || ''"
+				(selection-change)="onChangeMarketSegment($event)">
+				<ng-container *ngFor="let item of marketSegments">
+					<ui5-cb-item
+						*ngIf="item.is_active"
+						id="{{ item.id }}"
+						text="{{ item.name }}">
+					</ui5-cb-item>
+				</ng-container>
+			</ui5-combobox>
+		</div>
+
+		<div class="flex-column w-1/4">
+			<ui5-label
+				show-colon
+				i18n
+				>Machine Classification</ui5-label
+			>
+			<ui5-combobox
+				#machineClassificationComboBox
+				id="machineClassificationComboBox"
+				class="w-full"
+				(input)="onMachineClassificationInputChange($event)"
+				[value]="selectedCustomer.machineClassification?.name || ''"
+				(selection-change)="onChangeMachineClassification($event)">
+				<ng-container *ngFor="let item of machineClassifications">
+					<ui5-cb-item
+						*ngIf="item.is_active"
+						id="{{ item.id }}"
+						text="{{ item.name }}">
+					</ui5-cb-item>
+				</ng-container>
+			</ui5-combobox>
+		</div>
+		<div class="flex-column w-1/4">
+			<ui5-label
+				show-colon
+				i18n
+				>Employee Classification</ui5-label
+			>
+			<ui5-combobox
+				#employeeClassificationComboBox
+				id="employeeClassificationComboBox"
+				class="w-full"
+				(input)="onEmployeeClassificationInputChange($event)"
+				[value]="selectedCustomer.employeeClassification?.name || ''"
+				(selection-change)="onChangeEmployeeClassification($event)">
+				<ng-container *ngFor="let item of employeeClassifications">
+					<ui5-cb-item
+						*ngIf="item.is_active"
+						id="{{ item.id }}"
+						text="{{ item.name }}">
+					</ui5-cb-item>
+				</ng-container>
+			</ui5-combobox>
+		</div>
+	</div>
+
+	<div class="flex flex-row gap-2" style="height: 50vh" *ngIf="selectedCustomer && selectedCustomer.id">
+		<div  class="bg-gray-100 rounded-lg shadow-lg flex flex-col chat-body mt-3 w-3/6">
+			<div class="pl-3 bg-white border-t border-gray-300 rounded-t-lg h-[50px] flex items-center">
+				<h3>Chat</h3>
+			</div>
+			<!-- Messages Section with fixed height -->
+	
+			<div
+				class="p-4 space-y-4 flex-grow overflow-y-auto"
+				#messageContainer
+				(scroll)="onScroll()">
+				<!-- Grouped chat messages go here -->
+	
+				<div
+					*ngFor="let group of groupedNotes"
+					class="relative">
+					<!-- Date -->
+					<div class="text-center text-xs text-gray-500 mb-2">
+						{{ group.date | date: "dd/MM/yyyy" }}
+					</div>
+	
+					<!-- Messages -->
+					<div
+						*ngFor="let note of group.notes"
+						class="flex w-full mb-2"
+						[ngClass]="{
+							'justify-end': note.sender?.id === authService.loggedInUser.id,
+							'justify-start': note.sender?.id !== authService.loggedInUser.id,
+						}">
+						<div
+							id="{{ note.created_at }}{{note.id}}"
+							class="bg-white rounded-md shadow p-3 w-[45%] relative"
+							[ngClass]="{
+								'ml-auto': note.sender?.id === authService.loggedInUser.id,
+								'mr-auto': note.sender?.id !== authService.loggedInUser.id,
+							}">
+							<div class="flex justify-between items-center">
+								<span class="text-sm font-bold text-gray-700">
+									{{ note.sender?.name }}
+								</span>
+								<span class="text-xs text-gray-500">
+									{{ note.created_at | date: "HH:mm" }}
+								</span>
+							</div>
+	
+							<div class="flex justify-between items-center">
+								<p
+									class="mt-2 text-sm text-gray-800"
+									*ngIf="!note.media"
+									[innerHTML]="formattedNote(note.content)"
+									>{{ note.content }}</p
+								>
+								<p
+									class="mt-2 text-sm text-gray-800"
+									*ngIf="note.media">
+									<img
+										src="{{ note.media.original_url }}"
+										width="200px"
+										height="200px"
+										class="cursor-pointer"
+										(click)="openInNewTab(note?.media?.original_url)"
+										/>
+								</p>
+								<ui5-button
+									design="Transparent"
+									icon="sap-icon://edit"
+									*ngIf="note.sender?.id === authService.loggedInUser.id"
+									(click)="onShowPopup(note)">
+								</ui5-button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<div *ngIf="previewImagesData.length" class="image-preview-container">
+				<div class="preview-wrapper" *ngFor="let previewImage of previewImagesData, let i = index">
+					<img [src]="previewImage" alt="Pasted Image" class="preview-image" />
+					<ui5-button icon="delete" class="remove-button" design="Default" tooltip="Remove Image" (click)="removeImagePreview(i)"></ui5-button>
+				</div>
+			</div>
+			<!-- Input Area -->
+			<div class="p-3 bg-white border-t border-gray-300 rounded-b-lg">
+				<div class="flex items-center space-x-2">
+					<ui5-file-uploader
+						#fileUploader
+						hide-input
+						accept="image/*"
+						multiple (change)="onFileChange($event)">
+						<ui5-button design="Transparent" [disabled]="!selectedCustomer.id">
+							<span class="text-lg"> + </span>
+						</ui5-button>
+					</ui5-file-uploader>
+					
+					<textarea
+						#messageTextarea
+						[(ngModel)]="newNote"
+						name="newNote"
+						(keydown)="handleKeyDown($event)"
+						(input)="onInputMessage($event)"
+						(paste)="onPaste($event)"
+						placeholder="Write your message here..."
+						[disabled]="!selectedCustomer.id"
+						i18n-placeholder
+						class="w-11/12 border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none"
+						required
+						[style.overflowY]="msgInputIsScrollable ? 'auto' : 'hidden'" [style.maxHeight.px]="msgInputMaxHeight" rows="1"></textarea>
+	
+					<ui5-button
+						id="sendButton"
+						design="Emphasized"
+						class="w-16"
+						[disabled]="!selectedCustomer.id"
+						(click)="onclickSendMessage($event)"
+						i18n
+						>Send</ui5-button
+					>
+				</div>
+			</div>
+		</div>
+		<div class="bg-gray-100 rounded-lg shadow-lg flex flex-col chat-body mt-3 w-3/6" style="height: 50vh">
+			<app-crm-action-logs #crmActionLogs [customer]="selectedCustomer" [tableHeight]="'calc(50vh)'" (onActionLogCreated)="onActionLogCreated($event)"></app-crm-action-logs>
+		</div>
+
+	</div>
+
+</div>
+
+<ui5-popover
+	id="popOver"
+	[open]="showPopOver"
+	[opener]="opener"
+	(after-close)="popOverClose()">
+	<div class="w-[100px]">
+		<ui5-button
+			design="Default"
+			*ngIf="!selectedMessage?.media"
+			icon="sap-icon://edit"
+			class="w-[100px]"
+			(click)="editMessage($event)">
+			{{ localizedEditText }}
+		</ui5-button> </div
+	><ui5-button
+		design="Emphasized"
+		class="w-[100px] mt-3"
+		icon="sap-icon://delete"
+		(click)="deleteMessage($event)"
+		>{{ localizedDeleteText }}</ui5-button
+	>
+</ui5-popover>

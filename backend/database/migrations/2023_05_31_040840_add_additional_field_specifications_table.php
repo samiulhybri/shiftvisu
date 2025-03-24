@@ -1,0 +1,166 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('specifications', function (Blueprint $table) {
+            $table->string('work_sequence_text_field',100)->nullable();
+            $table->string('work_instruction',100)->nullable();
+            $table->string('grain_size_text_field',100)->nullable();
+            $table->boolean('cleanliness_astm_e_45')->default(false);
+            $table->boolean('cleanliness_nfa_04_106')->default(false);
+            $table->string('cleanliness_text_field',100)->nullable();
+            $table->string('microstructure_text_field',100)->nullable();
+            $table->string('ultrasound_norm_1',100)->nullable();
+            $table->string('ultrasound_output_1',100)->nullable();
+            $table->string('ultrasound_scope_inspection_1',100)->nullable();
+            $table->string('ultrasound_testing_area_1',100)->nullable();
+            $table->double('ultrasound_efg_max_1')->nullable();
+            $table->double('ultrasound_test_duration_1')->nullable();
+            $table->string('ultrasound_norm_2',100)->nullable();
+            $table->string('ultrasound_output_2',100)->nullable();
+            $table->string('ultrasound_scope_inspection_2',100)->nullable();
+            $table->string('ultrasound_testing_area_2',100)->nullable();
+            $table->double('ultrasound_efg_max_2')->nullable();
+            $table->double('ultrasound_test_duration_2')->nullable();
+            $table->string('ultrasound_norm_3',100)->nullable();
+            $table->string('ultrasound_output_3',100)->nullable();
+            $table->string('ultrasound_scope_inspection_3',100)->nullable();
+            $table->string('ultrasound_testing_area_3',100)->nullable();
+            $table->double('ultrasound_efg_max_3')->nullable();
+            $table->double('ultrasound_test_duration_3')->nullable();
+            $table->string('ultrasound_text_field',100)->nullable();
+            $table->string('residual_magnetic_field_strength',100)->nullable();
+            $table->string('mt_norm_1',100)->nullable();
+            $table->string('mt_output_1',100)->nullable();
+            $table->string('mt_test_criteria_1',100)->nullable();
+            $table->string('mt_scope_inspection_1',100)->nullable();
+            $table->double('mt_test_duration_1')->nullable();
+            $table->string('mt_norm_2',100)->nullable();
+            $table->string('mt_output_2',100)->nullable();
+            $table->string('mt_test_criteria_2',100)->nullable();
+            $table->string('mt_scope_inspection_2',100)->nullable();
+            $table->double('mt_test_duration_2')->nullable();
+            $table->string('mt_norm_3',100)->nullable();
+            $table->string('mt_output_3',100)->nullable();
+            $table->string('mt_test_criteria_3',100)->nullable();
+            $table->string('mt_scope_inspection_3',100)->nullable();
+            $table->double('mt_test_duration_3')->nullable();
+            $table->string('mt_text_field',100)->nullable();
+            $table->string('pt_norm_1',100)->nullable();
+            $table->string('pt_output_1',100)->nullable();
+            $table->string('pt_test_criteria_1',100)->nullable();
+            $table->string('pt_scope_inspection_1',100)->nullable();
+            $table->double('pt_test_duration_1')->nullable();
+            $table->string('pt_norm_2',100,100)->nullable();
+            $table->string('pt_output_2',100)->nullable();
+            $table->string('pt_test_criteria_2',100)->nullable();
+            $table->string('pt_scope_inspection_2',100)->nullable();
+            $table->double('pt_test_duration_2')->nullable();
+            $table->string('pt_norm_3',100)->nullable();
+            $table->string('pt_output_3',100)->nullable();
+            $table->string('pt_test_criteria_3',100)->nullable();
+            $table->string('pt_scope_inspection_3',100)->nullable();
+            $table->double('pt_test_duration_3')->nullable();
+            $table->string('pt_text_field',100)->nullable();
+            $table->string('vt_output_1',100)->nullable();
+            $table->string('vt_test_criteria_1',100)->nullable();
+            $table->string('vt_scope_inspection_1',100)->nullable();
+            $table->double('vt_test_duration_1')->nullable();
+            $table->string('vt_text_field',100)->nullable();
+            $table->string('deviations_customer',100)->nullable();
+            $table->boolean('deviations_customer_confirmation_1')->default(false);
+            $table->boolean('deviations_customer_confirmation_2')->default(false);
+            $table->boolean('deviations_customer_confirmation_3')->default(false);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('specifications', function (Blueprint $table) {
+            $table->dropColumn('work_sequence_text_field');
+            $table->dropColumn('work_instruction');
+            $table->dropColumn('grain_size_text_field');
+            $table->dropColumn('cleanliness_astm_e_45');
+            $table->dropColumn('cleanliness_nfa_04_106');
+            $table->dropColumn('cleanliness_text_field');
+            $table->dropColumn('microstructure_text_field');
+            $table->dropColumn('ultrasound_norm_1');
+            $table->dropColumn('ultrasound_output_1');
+            $table->dropColumn('ultrasound_scope_inspection_1');
+            $table->dropColumn('ultrasound_testing_area_1');
+            $table->dropColumn('ultrasound_efg_max_1');
+            $table->dropColumn('ultrasound_test_duration_1');
+            $table->dropColumn('ultrasound_norm_2');
+            $table->dropColumn('ultrasound_output_2');
+            $table->dropColumn('ultrasound_scope_inspection_2');
+            $table->dropColumn('ultrasound_testing_area_2');
+            $table->dropColumn('ultrasound_efg_max_2');
+            $table->dropColumn('ultrasound_test_duration_2');
+            $table->dropColumn('ultrasound_norm_3');
+            $table->dropColumn('ultrasound_output_3');
+            $table->dropColumn('ultrasound_scope_inspection_3');
+            $table->dropColumn('ultrasound_testing_area_3');
+            $table->dropColumn('ultrasound_efg_max_3');
+            $table->dropColumn('ultrasound_test_duration_3');
+            $table->dropColumn('ultrasound_text_field');
+            $table->dropColumn('residual_magnetic_field_strength');
+            $table->dropColumn('mt_norm_1');
+            $table->dropColumn('mt_output_1');
+            $table->dropColumn('mt_test_criteria_1');
+            $table->dropColumn('mt_scope_inspection_1');
+            $table->dropColumn('mt_test_duration_1');
+            $table->dropColumn('mt_norm_2');
+            $table->dropColumn('mt_output_2');
+            $table->dropColumn('mt_test_criteria_2');
+            $table->dropColumn('mt_scope_inspection_2');
+            $table->dropColumn('mt_test_duration_2');
+            $table->dropColumn('mt_norm_3');
+            $table->dropColumn('mt_output_3');
+            $table->dropColumn('mt_test_criteria_3');
+            $table->dropColumn('mt_scope_inspection_3');
+            $table->dropColumn('mt_test_duration_3');
+            $table->dropColumn('mt_text_field');
+            $table->dropColumn('pt_norm_1');
+            $table->dropColumn('pt_output_1');
+            $table->dropColumn('pt_test_criteria_1');
+            $table->dropColumn('pt_scope_inspection_1');
+            $table->dropColumn('pt_test_duration_1');
+            $table->dropColumn('pt_norm_2');
+            $table->dropColumn('pt_output_2');
+            $table->dropColumn('pt_test_criteria_2');
+            $table->dropColumn('pt_scope_inspection_2');
+            $table->dropColumn('pt_test_duration_2');
+            $table->dropColumn('pt_norm_3');
+            $table->dropColumn('pt_output_3');
+            $table->dropColumn('pt_test_criteria_3');
+            $table->dropColumn('pt_scope_inspection_3');
+            $table->dropColumn('pt_test_duration_3');
+            $table->dropColumn('pt_text_field');
+            $table->dropColumn('vt_output_1');
+            $table->dropColumn('vt_test_criteria_1');
+            $table->dropColumn('vt_scope_inspection_1');
+            $table->dropColumn('vt_test_duration_1');
+            $table->dropColumn('vt_text_field');
+            $table->dropColumn('deviations_customer');
+            $table->dropColumn('deviations_customer_confirmation_1');
+            $table->dropColumn('deviations_customer_confirmation_2');
+            $table->dropColumn('deviations_customer_confirmation_3');
+        });
+    }
+};

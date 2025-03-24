@@ -1,0 +1,17 @@
+git:
+  filters:
+  - filter_type: file
+    translation_files_expression: 'frontend/src/locale/messages.<lang>.xlf'
+    source_file: frontend/src/locale/messages.xlf
+    file_format: XLIFF
+    source_language: en
+  - filter_type: file
+    translation_files_expression: 'frontend-sap/src/locale/messages.<lang>.xlf'
+    source_file: frontend-sap/src/locale/messages.xlf
+    file_format: XLIFF
+    source_language: en
+  - filter_type: file
+    translation_files_expression: 'backend/resources/lang/<lang>.json'
+    source_file: backend/resources/lang/en.json
+    file_format: KEYVALUEJSON
+    source_language: en

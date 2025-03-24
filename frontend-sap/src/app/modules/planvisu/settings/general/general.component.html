@@ -1,0 +1,9 @@
+<div *ngIf="divHeight !== 'hide'" [ngStyle]="{'height': divHeight}">
+    <ui5-checkbox 
+        text="Customer" 
+        i18n-text 
+        [checked]="switchValue" 
+        (change)="toggleSwitch()"
+        >
+    </ui5-checkbox>
+</div>

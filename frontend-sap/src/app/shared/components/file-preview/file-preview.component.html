@@ -1,0 +1,155 @@
+<div class="grid gap-4 grid-cols-4">
+	<div class="col-span-1">
+		<ui5-card class="preview-card" [ngStyle]="{ 'height.px': filePreviewHeight }">
+			<ui5-card-header
+				slot="header"
+				titleText="{{ documentTitle }} ({{ filesCount }})"
+				i18n-title-text>
+			</ui5-card-header>
+			<div class="divider list-border-bottom"></div>
+			<div class="preview-card-body" [ngStyle]="{ 'height.px': filePreviewHeight - 64 }">
+				<ui5-busy-indicator
+					[active]="isLoading"
+					class="w-full h-full">
+					<ui5-list
+						growing="Scroll"
+						class="h-full list-border-bottom"
+						mode="Single"
+						(itemClick)="selectFile($event)">
+						<ui5-upload-collection-item
+							*ngFor="let file of files"
+							[fileName]="file.name"
+							[id]="file.path"
+							[hideDeleteButton]="true"
+							[selected]="file.path === selectedFile.path"
+							(detailClick)="selectFile(file)"
+							upload-state="Complete">
+							<div>
+								{{ uploadedOn }}
+								{{ file.getFormattedDate() }}
+							</div>
+							{{ fileSize }}: {{ file.getFileSizeInKB() }}
+
+							<img
+								[src]="file.path"
+								slot="thumbnail"
+								*ngIf="file.checkFileType() === 'image'"
+								width="40px" />
+
+							<ui5-icon
+								name="doc-attachment"
+								class="file-icon"
+								slot="thumbnail"
+								*ngIf="file.checkFileType() === 'document'"></ui5-icon>
+
+							<ui5-icon
+								name="pdf-attachment"
+								class="file-icon"
+								slot="thumbnail"
+								*ngIf="file.checkFileType() === 'pdf'"></ui5-icon>
+
+							<ui5-icon
+								name="excel-attachment"
+								class="file-icon"
+								slot="thumbnail"
+								*ngIf="file.checkFileType() === 'excel'"></ui5-icon>
+
+							<ui5-icon
+								name="ppt-attachment"
+								class="file-icon"
+								slot="thumbnail"
+								*ngIf="file.checkFileType() === 'powerpoint'"></ui5-icon>
+
+							<ui5-icon
+								name="document-text"
+								class="file-icon"
+								slot="thumbnail"
+								*ngIf="file.checkFileType() === 'text'"></ui5-icon>
+
+							<ui5-icon
+								name="email"
+								class="file-icon"
+								slot="thumbnail"
+								*ngIf="file.checkFileType() === 'message'"></ui5-icon>
+
+							<ui5-icon
+								name="document"
+								class="file-icon"
+								slot="thumbnail"
+								*ngIf="file.checkFileType() === null"></ui5-icon>
+						</ui5-upload-collection-item>
+					</ui5-list>
+				</ui5-busy-indicator>
+			</div>
+		</ui5-card>
+	</div>
+	<div class="col-span-3">
+		<ui5-card
+			[ngStyle]="{ 'height.px': filePreviewHeight }"
+			class="file-preview">
+			<ui5-card-header
+				slot="header"
+				title-text="Preview"
+				i18n-title-text>
+			</ui5-card-header>
+			<div class="divider list-border-bottom"></div>
+			<span
+				[ngStyle]="{ 'height.px': filePreviewHeight - 64 }"
+				class="w-full preview-card-body">
+				<div
+					[ngStyle]="{ 'height.px': filePreviewHeight - 80, 'margin-top.px': 15 }"
+					class="preview-div mx-3 border border-solid border-gray-200 h-full flex justify-center items-center overflow-hidden rounded-lg">
+					<ng-container [ngSwitch]="selectedFile?.checkFileType()" *ngIf="selectedFile?.path">
+						<iframe
+							*ngSwitchCase="'pdf'"
+							[src]="selectedFile?.path | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+
+						<img
+							*ngSwitchCase="'image'"
+							[src]="selectedFile?.path"
+							alt="{{ selectedFile.name }}"
+							style="max-height: 98% ; max-width: 98%" />
+
+						<iframe
+							*ngSwitchCase="'document'"
+							[src]="selectedFile?.getGoogleDocViewerUrl() | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+
+						<iframe
+							*ngSwitchCase="'powerpoint'"
+							[src]="selectedFile?.getGoogleDocViewerUrl() | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+
+						<iframe
+							*ngSwitchCase="'excel'"
+							[src]="selectedFile?.getGoogleDocViewerUrl() | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+
+						<iframe
+							*ngSwitchCase="'xls'"
+							[src]="selectedFile?.getGoogleDocViewerUrl() | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+
+						<iframe
+							*ngSwitchCase="'message'"
+							[srcdoc]="selectedFile?.getDocumentUrl()"
+							width="98%"
+							height="98%"></iframe>
+
+						<iframe
+							*ngSwitchDefault
+							[src]="selectedFile?.path | safeUrl"
+							width="98%"
+							height="98%"></iframe>
+					</ng-container>
+				</div>
+			</span>
+		</ui5-card>
+	</div>
+</div>

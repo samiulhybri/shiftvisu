@@ -1,0 +1,6 @@
+<app-header [ngStyle]="{'display': !hweService.fromCalDetail ? 'none' : 'block'}" [firstTitle]="headerFirstTitle" [secondTitle]="headerSecondTitle"></app-header>
+<app-sidebar [ngStyle]="{'display': !hweService.fromCalDetail ? 'none' : 'block'}" [sidebarMenu]="sidebarMenu" [setting]="setting" > </app-sidebar>
+
+<div [ngStyle]="{'display': !hweService.fromCalDetail ? 'block' : 'none'}">
+    <router-outlet></router-outlet>
+</div>

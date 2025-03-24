@@ -1,0 +1,38 @@
+<div class="p-0 pb-2 box-border grid gap-2 grid-rows-[auto_1fr] grid-cols-[auto_1fr] h-full">
+	<app-header-nav
+		class="col-span-2 row-start-1 row-end-2"
+		[homeRouteLink]="dynamicHomeRouteLink"
+		[isHomePage]="false"
+		title='ShiftVisu'
+		(logOutDialogEvent)="logoutDialogOpen()"
+		(isSidebarCollapse)="toggleSideNavCollpaseState()"></app-header-nav>
+	<ui5-side-navigation
+	    [collapsed]="isSideNavCollapsed"
+		(selection-change)="sideNavigationSelectionChange($event)"
+		class="rounded-lg shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] h-full ml-[12px]">
+		@for (item of navItems; track item) {
+			@if (!item.children || filterPermittedChildren(item.children).length) {
+				<ui5-side-navigation-item
+					[id]="item.id"
+					text="{{ item.label }}"
+					[selected]="item.routerLink ? router.url === item.routerLink : false"
+					[icon]="item.icon"
+					[expanded]="item.expanded"
+					(click)="onSideNavItemClick($event, item)">
+					@for (child of item.children; track $index) {
+						@if (authService.isPermissionValid(child.permission)) {
+							<ui5-side-navigation-sub-item
+								[selected]="router.url === child.routerLink"
+								[text]="child.label"
+								[routerLink]="child.routerLink"
+								(click)="stopPropagation($event)"></ui5-side-navigation-sub-item>
+						}
+					}
+				</ui5-side-navigation-item>
+			}
+		}
+	</ui5-side-navigation>
+	<div class="border h-full mr-3 sapBoxShadow sapHeaderBackground rounded-md">
+		<router-outlet></router-outlet>
+	</div>
+</div>

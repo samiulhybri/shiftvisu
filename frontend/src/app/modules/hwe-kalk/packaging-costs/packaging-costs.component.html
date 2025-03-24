@@ -1,0 +1,22 @@
+<kendo-grid-component 
+    [gridItems]="gridItems"
+    [columns]="columns"
+    [state]="state"
+    [isLoadedEnabled]="isLoadedEnabled"
+    [isSortable]="isSortable"
+    [isFilterable]="isFilterable"
+    [isGroupable]="isGroupable"
+    [isPageable]="isPageable"
+    [toolbarConfig]="toolbarConfig"
+    (emitState)="changeState($event)"
+    [editView]="editView"
+    (deleteDataItem)="deleteDataItem($event)"
+    (gridRefersh)="sendRequest()"
+    (filterState)="changeGridFilter($event)"
+>
+    <ng-template #gridColumnContent let-column="column" let-dataItem="dataItem">
+        <ng-container *ngIf="column.name == 'packaging_cost_unit'">
+            <div>{{ getEnumTranslateGrid('packaging_cost_unit', dataItem.packaging_cost_unit) }}</div>
+        </ng-container>
+    </ng-template>
+</kendo-grid-component>

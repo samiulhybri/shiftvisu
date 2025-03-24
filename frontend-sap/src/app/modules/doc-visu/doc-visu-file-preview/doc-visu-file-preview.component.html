@@ -1,0 +1,70 @@
+<ui5-busy-indicator
+	class="h-full w-full overflow-hidden"
+	[active]="isLoading">
+	<div class="file-preview bg-white h-full w-full overflow-hidden">
+		<div
+			slot="header"
+			class="h-[47px] flex items-center overflow-hidden">
+			<span class="px-3 text-base font-bold">{{ filename }}</span>
+		</div>
+		<div class="divider list-border-bottom overflow-hidden"></div>
+		@if (file?.path) {
+			<div
+				[ngStyle]="{ 'margin-top.px': 15, 'margin-bottom.px': 15 }"
+				class="2xl:h-[90%] lg:h-[86%] overflow-hidden preview-div mx-3 border border-solid border-gray-200 flex justify-center items-center rounded-lg">
+				@if (file) {
+					@switch (file?.checkFileType()) {
+						@case ("pdf") {
+							<iframe
+								[src]="file?.path | safeUrl"
+								width="98%"
+								height="98%"></iframe>
+						}
+						@case ("image") {
+							<img
+								[src]="file?.path | safeUrl"
+								alt="{{ file.name }}"
+								style="max-height: 98%; max-width: 98%" />
+						}
+						@case ("document") {
+							<iframe
+								[src]="file?.getGoogleDocViewerUrl() | safeUrl"
+								width="98%"
+								height="98%"></iframe>
+						}
+						@case ("powerpoint") {
+							<iframe
+								[src]="file?.getGoogleDocViewerUrl() | safeUrl"
+								width="98%"
+								height="98%"></iframe>
+						}
+						@case ("excel") {
+							<iframe
+								[src]="file?.getGoogleDocViewerUrl() | safeUrl"
+								width="98%"
+								height="98%"></iframe>
+						}
+						@case ("xls") {
+							<iframe
+								[src]="file?.getGoogleDocViewerUrl() | safeUrl"
+								width="98%"
+								height="98%"></iframe>
+						}
+						@case ("message") {
+							<iframe
+								[srcdoc]="file?.getDocumentUrl()"
+								width="98%"
+								height="98%"></iframe>
+						}
+						@default {
+							<iframe
+								[src]="file?.path | safeUrl"
+								width="98%"
+								height="98%"></iframe>
+						}
+					}
+				}
+			</div>
+		}
+	</div>
+</ui5-busy-indicator>

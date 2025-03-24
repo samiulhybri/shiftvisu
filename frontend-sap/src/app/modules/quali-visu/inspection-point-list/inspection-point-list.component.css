@@ -1,0 +1,8 @@
+ui5-tabcontainer::part(content) {
+	padding: 0;
+	background-color: white;
+}
+
+ui5-tabcontainer::part(tabstrip) {
+	padding: 0;
+}

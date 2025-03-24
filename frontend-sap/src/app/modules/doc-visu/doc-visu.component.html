@@ -1,0 +1,74 @@
+<div class="p-0 pb-2 box-border grid gap-2 grid-rows-[auto_1fr] grid-cols-[auto_1fr] h-full">
+	<app-header-nav
+		class="col-span-2 row-start-1 row-end-2"
+		[homeRouteLink]="dynamicHomeRouteLink"
+		title="DocVisu"
+		[showPlantSelector]="true"
+		(isSidebarCollapse)="toggleSideNavCollpaseState()"
+		(logOutDialogEvent)="logoutDialogOpen()">
+	</app-header-nav>
+
+	<ui5-busy-indicator
+		[active]="isLoadingNavItems"
+		class="rounded-lg shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] h-full ml-[12px]">
+		<ui5-side-navigation [collapsed]="isSideNavCollapsed" class="rounded-lg">
+			@if (!isLoadingNavItems) {
+				@for (item of navItems; track item) {
+					<ui5-side-navigation-item
+						[id]="item.id"
+						text="{{ item.title }}"
+						[selected]="
+							router.url == item.route || router.url.includes(item.route + '/')
+						"
+						[routerLink]="item.route"
+						(ui5Click)="onDocumentSectionClick(item.docSection)"
+						[icon]="item.icon ?? 'business-suite/icon-undesirable-customer'"
+						>
+					</ui5-side-navigation-item>
+				}
+			}
+
+			<ui5-side-navigation-item
+				i18n-text
+				slot="fixedItems"
+				text="Settings"
+				icon="action-settings"
+				[selected]="router.url.includes('doc-visu/settings')"
+				[routerLink]="'/doc-visu/settings'"></ui5-side-navigation-item>
+		</ui5-side-navigation>
+	</ui5-busy-indicator>
+	<div class="content border h-full mr-3 sapBoxShadow sapHeaderBackground rounded-md">
+		<router-outlet></router-outlet>
+	</div>
+</div>
+
+<ui5-dialog
+	header-text="Confirm"
+	[open]="isLogOutDialogOpen"
+	state="Critical"
+	(beforeClose)="closeDialog()">
+	<div class="flex flex-col-item">
+		<ui5-text i18n>Do you want to logout?</ui5-text>
+		<ui5-busy-indicator
+			size="M"
+			[active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		class="footer-style gap-8"
+		slot="footer">
+		<ui5-button
+			design="Emphasized"
+			class="mr5"
+			i18n
+			id="logoutConfirmButton"
+			(click)="logOut()"
+			>Confirm</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			id="logoutCancelButton"
+			i18n
+			>Cancel</ui5-button
+		>
+	</div>
+</ui5-dialog>

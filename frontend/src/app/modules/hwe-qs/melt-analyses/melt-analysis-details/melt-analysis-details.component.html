@@ -1,0 +1,19 @@
+<form novalidate class="k-form main-div" *ngIf="meltAnalysis">
+    <app-melt-analysis-details-header [meltAnalysis]="meltAnalysis"></app-melt-analysis-details-header>
+   <app-melt-analysis-details-grain-size [meltAnalysis]="meltAnalysis"></app-melt-analysis-details-grain-size>
+   <app-melt-analysis-details-purity-determination [meltAnalysis]="meltAnalysis"></app-melt-analysis-details-purity-determination>
+   <app-melt-analysis-details-forehead-quenching [meltAnalysis]="meltAnalysis"></app-melt-analysis-details-forehead-quenching>
+   <app-melt-analysis-note [meltAnalysis]="meltAnalysis"></app-melt-analysis-note>
+   <app-melt-analysis-chemical-analysis [meltAnalysis]="meltAnalysis"></app-melt-analysis-chemical-analysis>
+    <kendo-card width="100" >
+        <footer class="k-text-right k-mr-1">
+            <button type="button" kendoButton  [routerLink]="['/hwe-qs/melt-analyses']"  i18n class=" k-m-1">
+                <span class="k-icon icon-close"></span> Cancel
+            </button>
+            <button type="button" kendoButton themeColor="primary" (click)="saveOrUpdate()" i18n class="k-m-1 ">
+               <span> <span class="k-icon icon-save"></span> {{ meltAnalysisId? 'Update' : 'Save' }}</span>
+            </button>
+        </footer>
+    </kendo-card>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

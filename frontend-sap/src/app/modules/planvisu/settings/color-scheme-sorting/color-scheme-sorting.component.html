@@ -1,0 +1,301 @@
+<div class="tableStandard"> </div>
+<ui5-card
+	class="grid col-span-2 sm:h-[50vh] lg:h-[61vh] md:h-[60vh] xl:h-[70vh] 2xl:h-[80vh] xxl:h-[85vh]">
+	<div class="sm:h-[50vh] lg:h-[65vh] md:h-[60vh] xl:h-[70vh] 2xl:h-[80vh] xxl:h-[85vh]">
+		<app-grid-table
+			headerTitle="Color Scheme Sortings"
+			url="/PlanVisuColorSchemeSortings"
+			i18n-headerTitle
+			[showRowDataCount]="true"
+			[columns]="columns"
+			[showAction]="true"
+			[showDownload]="false"
+			[showActiveButton]="false"
+			[editPermission]="authService.isPermissionValid('BASEVISU_ITEM_STATES_EDIT')"
+			addButtonText="New"
+			i18n-addButtonText
+			expandQuery="$expand=colorScheme"
+			[showNewButton]="true"
+			[isBaseVisu]="true"
+			(newButtonClick)="newButtonClick()"
+			(deleteClick)="deleteClick($event)"
+			(editClick)="editClick($event)"
+			[showSearch]="true"
+			[enableServerSideFiltering]="true"
+			selectionMode="None"
+			#childComponentRef>
+		</app-grid-table>
+	</div>
+</ui5-card>
+<app-dialog
+	id="planVisuColorSchemeSortingDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div>
+			<ui5-title
+				class="pd-10 ml-[-10px]"
+				level="H5"
+				>{{ dialogTitle }}
+			</ui5-title>
+		</div>
+	</div>
+	<form
+		(ngSubmit)="onSubmit(create0rUpdateForm)"
+		#create0rUpdateForm="ngForm"
+		class="w-[620px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			class="w-full"
+			size="L">
+			<div class="w-full">
+				<div class="grid grid-cols-2 w-full gap-2">
+					<div class="grid h-full w-full" *ngIf="isDialogOpen">
+						<ui5-label
+							show-colon
+							required
+							i18n
+							>Color Scheme</ui5-label
+						>
+						<ui5-combobox
+							#colorSchemeCombobox
+							id="colorSchemeCombobox"
+							[value]="selectedColorSchemeSorting.colorScheme?.custom_id || ''"
+							filter="None"
+							(selection-change)="onChangeColorScheme($event)"
+							[loading]="colorSchemeComboboxLoading"
+							class="w-full">
+							>
+							<ng-container *ngFor="let colorScheme of colorSchemes">
+								<ui5-cb-item
+									id="{{ colorScheme.id }}"
+									text="{{ colorScheme.custom_id }}">
+								</ui5-cb-item
+							></ng-container>
+							<div *ngIf="valueStateTextColorScheme" slot="valueStateMessage">
+								{{ valueStateTextColorScheme }}
+							</div>
+						</ui5-combobox>
+					</div>
+
+					<div class="grid h-full">
+						<ui5-label
+							i18n
+							show-colon
+							required
+							>Sorting</ui5-label
+						>
+						<ui5-input
+							id="sorting"
+							class="w-100"
+							[required]="true"
+							#sortingInput="ngModel"
+							pattern="^[0-9]*$"
+							type="Number"
+							(input)="onChangeSorting()"
+							[(ngModel)]="selectedColorSchemeSorting.sorting"
+							[valueState]="
+								(sortingInput.valid == false &&
+								(sortingInput.touched || create0rUpdateForm.submitted)) || valueStateText
+									? 'Negative'
+									: 'None'
+							"
+							name="sorting">
+							<div *ngIf="valueStateText" slot="valueStateMessage">
+								{{ valueStateText }}
+							</div>
+						</ui5-input>
+					</div>
+					<div class="grid h-full">
+						<ui5-label
+							i18n
+							show-colon
+							>Model Type</ui5-label
+						>
+						<ui5-input
+							id="model_type"
+							class="w-100"
+							#model_typeInput="ngModel"
+							[(ngModel)]="selectedColorSchemeSorting.model_type"
+							name="model_type">
+						</ui5-input>
+					</div>
+					<div class="grid h-full">
+						<ui5-label
+							i18n
+							show-colon
+							>Model Column</ui5-label
+						>
+						<ui5-input
+							id="model_column"
+							class="w-100"
+							#model_columnInput="ngModel"
+							[(ngModel)]="selectedColorSchemeSorting.model_column"
+							name="model_column">
+						</ui5-input>
+					</div>
+					<div class="grid h-full">
+						<ui5-label
+							i18n
+							show-colon
+							>Value String</ui5-label
+						>
+						<ui5-input
+							id="value_string"
+							class="w-100"
+							#value_stringInput="ngModel"
+							[(ngModel)]="selectedColorSchemeSorting.value_string"
+							name="value_string">
+						</ui5-input>
+					</div>
+					<div class="grid h-full">
+						<ui5-label
+							i18n
+							show-colon
+							>Color</ui5-label
+						>
+						<div class="flex gap-1">
+							<div
+								[style.background-color]="'#' + selectedColorSchemeSorting.color"
+								class="h-[26px] w-[26px] mt-[3px] rounded"
+								id="colorPalette"
+								(click)="openColorPicker()"></div>
+							<ui5-input
+								id="valueHelpInput"
+								class="w-full"
+								#colorInput="ngModel"
+								[required]="true"
+								[valueState]="
+									colorInput.valid == false &&
+									(colorInput.touched || create0rUpdateForm.submitted)
+										? 'Negative'
+										: 'None'
+								"
+								placeholder="Enter Color"
+								[(ngModel)]="selectedColorSchemeSorting.color"
+								name="color">
+							</ui5-input>
+						</div>
+					</div>
+				</div>
+			</div>
+		</ui5-busy-indicator>
+	</form>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest">
+			{{ localization.save }}
+		</ui5-button>
+		<ui5-button
+			class="ml-8"
+			design="Transparent"
+			(click)="closeDialog()">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</app-dialog>
+
+<ui5-dialog
+	#planVisuColorSchemeSortingDialog
+	id="planVisuColorSchemeSortingDialog"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#deleteErrorDialogColorSchemeSorting
+	id="deleteErrorDialogColorSchemeSorting"
+	state="Negative"
+	header-text="Error">
+	<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+	<div
+		slot="footer"
+		class="deleteErrorDialogFooter">
+		<ui5-button
+			class="dialogCloser"
+			design="Transparent"
+			(click)="closeDeleteErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	id="deleteDialogColorSchemes"
+	header-text="Warning"
+	state="Critical">
+	<p>{{ localization.doYouWantToDeleteThisRecord }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			(click)="deleteSubmit()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-responsive-popover
+	opener="colorPalette"
+	id="popover"
+	header-text="Default Color"
+	placement-type="Top"
+	hide-arrow="true"
+	#popover
+	i18n-header-text>
+	<div>
+		<ng-container *ngFor="let color of colorPaletteKeys">
+			<ui5-color-palette-item
+				[value]="'#' + color"
+				#colorItem
+				(click)="itemclicked(color)"></ui5-color-palette-item>
+		</ng-container>
+	</div>
+	<div
+		slot="footer"
+		class="responsive-dialog-footer">
+		<ui5-button
+			id="closeButton"
+			class="ml-8"
+			design="Transparent"
+			(click)="closeResponsiveDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-responsive-popover>

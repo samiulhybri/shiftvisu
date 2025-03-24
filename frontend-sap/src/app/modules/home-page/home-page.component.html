@@ -1,0 +1,49 @@
+<app-header-nav [showPlantSelector]="true" [isHomePage]="true" (logOutDialogEvent)="logoutDialogOpen()"></app-header-nav>
+<div id="main-container">
+	<div id="shopfloor-label">Shopfloor Suite</div>
+	<div id="module-container" class="grid-list">
+		<div
+			*ngFor="let module of moduleList"
+			class="module-card">
+			<ui5-busy-indicator
+				[active]="module.isBusy"
+				*ngIf="module.active && module.permission"
+				><app-module-card
+					[id]="module.module_name"
+					[moduleData]="module"
+					(outputEvent)="goToModule($event, module)"></app-module-card>
+            </ui5-busy-indicator>
+		</div>
+	</div>
+	<div id="version-container">
+		<span i18n>Version</span> 12.1 &nbsp;<span i18n>Release</span> {{ releaseText }}
+	</div>
+</div>
+<ui5-dialog
+	header-text="Confirm"
+	[open]="isLogOutDialogOpen"
+	state="Critical"
+	(beforeClose)="closeDialog()">
+	<div class="logout-content">
+		<ui5-text i18n> Do you want to logout? </ui5-text>
+		<ui5-busy-indicator
+			size="M"
+			[active]="isBusy"></ui5-busy-indicator>
+	</div>
+	<div
+		class="logout-footer"
+		slot="footer">
+		<ui5-button
+			design="Emphasized"
+			class="mr5"
+			i18n
+			(click)="logOut()"
+			>Confirm</ui5-button
+		>
+		<ui5-button
+			(click)="closeDialog()"
+			i18n
+			>Cancel</ui5-button
+		>
+	</div>
+</ui5-dialog>

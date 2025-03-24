@@ -1,0 +1,45 @@
+<div novalidate class="k-form">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="1">
+            <kendo-card-header i18n>
+                Sample Number Informations
+            </kendo-card-header>
+            <kendo-card-body class="sample-number-details-body">
+                
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="custom_id" i18n i18n-text text="Sample Number"><span
+                                class="k-text-error k-pl-1">*</span></kendo-label>
+                        <kendo-textbox #custom_id name="custom_id"
+                            [(ngModel)]="sampleNumber!.custom_id"></kendo-textbox>
+                    </kendo-stacklayout>
+                    
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label i18n i18n-text text="Date"> </kendo-label>
+                        <kendo-datepicker 
+                            [(ngModel)]="sampleNumber!.date">
+                        </kendo-datepicker>
+                    </kendo-stacklayout>
+
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="temperature" i18n i18n-text text="Order Number"></kendo-label>
+                        <div>
+                            <kendo-combobox 
+                                #temperature 
+                                [data]="orderNumbers"
+                                textField="text" 
+                                valueField="value"
+                                [valuePrimitive]="true"
+                                [filterable]="true"
+                                name="Order Number"
+                                (valueChange)="onSelectOrder($event)"
+                                [(ngModel)]="prodOrderPosValue!.id"
+								(filterChange)="handleFilter($event, 'Order')"
+                            >
+                           </kendo-combobox>
+                        </div>
+                    </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+</div>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

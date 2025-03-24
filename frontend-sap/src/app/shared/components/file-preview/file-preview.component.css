@@ -1,0 +1,23 @@
+@media (min-width: 1401px) and (max-width: 1600px) {
+    .preview-card,
+    .preview-card-body,
+    .file-preview {
+        height: 75vh !important;
+    }
+
+    .preview-div {
+        height: 64vh !important;
+    }
+}
+
+@media (max-width: 1400px) {
+	.preview-card,
+    .preview-card-body,
+    .file-preview {
+        height: 70vh !important;
+    }
+
+    .preview-div {
+        height: 67vh !important;
+    }
+}

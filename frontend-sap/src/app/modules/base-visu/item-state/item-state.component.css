@@ -1,0 +1,34 @@
+.item-state-dialog-body {
+	width: 860px;
+	height: 60vh;
+	max-height: 582px;
+}
+
+ui5-responsive-popover {
+	margin-left: 90px !important;
+	width: 230px;
+	margin-top: -10px !important;
+}
+
+.sapHoverColor {
+	background-color: var(--sapHoverColor);
+}
+
+#popover::part(header) {
+	display: flex;
+	justify-content: center;
+}
+
+.flex-row-item {
+	display: flex;
+	flex-direction: row;
+	gap: 5px;
+}
+
+.pd-header {
+	padding: 11px 0px 0px 0px;
+}
+
+.sapTextColor {
+	color: var(--sapTextColor);
+}

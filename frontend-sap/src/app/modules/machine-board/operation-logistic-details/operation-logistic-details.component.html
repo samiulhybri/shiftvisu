@@ -1,0 +1,43 @@
+<ui5-card class="justify-center w-full" class="pb-3">
+	<div class="grid gap-2 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-2">
+		<div class="flex flex-column m-4 align-center gap-2">
+			<ui5-label class="sapTextColor" i18n>Quantity Proposed</ui5-label>
+			<div class="min-h-9">
+				<ui5-label class="sapTextColor text-4xl">{{ quantityProposed }}</ui5-label>
+			</div>
+		</div>
+		<div class="flex flex-column m-4 align-center gap-2">
+			<ui5-label class="sapTextColor" i18n>Quantity per HU</ui5-label>
+			<div class="min-h-9">
+				<ui5-label class="sapTextColor text-4xl">{{ quantityPerHu }}</ui5-label>
+			</div>
+		</div>
+		<div class="flex flex-column m-4 align-center gap-2">
+			<ui5-label class="sapTextColor" i18n>Quantity in HU</ui5-label>
+			<div class="min-h-9">
+				<ui5-label class="sapTextColor text-4xl">{{ quantityInHu }}</ui5-label>
+			</div>
+		</div>
+		<div class="flex flex-column m-4 align-center gap-2">
+			<ui5-label class="flex sapTextColor" i18n>Next Stop</ui5-label>
+			<div class="min-h-9">
+				<ui5-label class="sapTextColor text-4xl">{{ nextStop }}</ui5-label>
+			</div>
+		</div>
+	</div>
+
+	<div class="grid gap-2 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-2">
+		<div class="flex flex-column m-4 align-center gap-2">
+			<ui5-label class="sapTextColor" i18n>Quantity per Parent HU</ui5-label>
+			<div class="min-h-9">
+				<ui5-label class="sapTextColor text-4xl">{{ quantityPerParentHU }}</ui5-label>
+			</div>
+		</div>
+		<div class="flex flex-column m-4 align-center gap-2">
+			<ui5-label class="sapTextColor" i18n>Quantity in Parent HU</ui5-label>
+			<div class="min-h-9">
+				<ui5-label class="sapTextColor text-4xl">{{ quantityInParentHU }}</ui5-label>
+			</div>
+		</div>
+	</div>
+</ui5-card>

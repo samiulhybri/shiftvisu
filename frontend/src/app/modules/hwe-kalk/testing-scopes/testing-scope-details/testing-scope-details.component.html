@@ -1,0 +1,571 @@
+<form novalidate class="k-form" *ngIf="testingScope">
+    <kendo-stacklayout orientation="horizontal" [gap]="12">
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n class="k-font-bold">
+                Variant-specific
+            </kendo-card-header>
+            <kendo-card-body class="testing-scope-details-body input-field">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="custom_id" i18n i18n-text text="Custom ID"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #custom_id name="custom_id" [disabled]="isAllDisabled || fromCalculation" [(ngModel)]="testingScope.custom_id"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="name" i18n i18n-text text="Name"></kendo-label>
+                    <kendo-textbox #name name="name" [disabled]="isAllDisabled" [(ngModel)]="testingScope.name"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="issue_revision" i18n i18n-text text="Issue / Revision"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-textbox #issue_revision name="issue_revision"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.issue_revision"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="attestation" i18n i18n-text text="Attestation"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-combobox #attestation name="attestation" [disabled]="isAllDisabled" [(ngModel)]="testingScope.attestation"
+                        [data]="attestationData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="attestation_following_regulation" i18n i18n-text text="Attestation Following Regulation"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="attestation_following_regulation  "
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.attestation_following_regulation  " #attestation_following_regulation   />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="attestation_entity" i18n i18n-text text="Attestation Entity"></kendo-label>
+                        <kendo-multiselect
+                            #attestation_entity
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.attestationEntities" 
+                            [data]="attestationEntityData"
+                            [filterable]="true"
+                            textField="text"
+                            valueField="value"
+                            name="attestation_entity"
+                            (filterChange)="handleFilter($event,'attestation_entity')"
+                        >
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="frequency" i18n i18n-text text="frequency"><span class="k-text-error k-pl-1">*</span></kendo-label>
+                    <kendo-combobox #frequency name="frequency" [disabled]="isAllDisabled" [(ngModel)]="testingScope.frequency"
+                        [data]="frequencyData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="frequency_at_3_2" i18n i18n-text text="Extended Sample Size"></kendo-label>
+                    <kendo-combobox #frequency_at_3_2 [disabled]="isAllDisabled"
+                        [(ngModel)]="testingScope.frequency_at_3_2" [data]="extendedSampleSizeData" textField="text"
+                        [valuePrimitive]="true" name="frequency_at_3_2" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="specimen_material" i18n i18n-text text="Specimen Material"></kendo-label>
+                    <kendo-combobox #specimen_material name="specimen_material" [disabled]="isAllDisabled" [(ngModel)]="testingScope.specimen_material"
+                        [data]="specimenMaterialData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="specimen_allowance" i18n i18n-text text="Specimen Allowance"></kendo-label>
+                    <kendo-textarea #specimen_allowance name="specimen_allowance"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.specimen_allowance"></kendo-textarea>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="sample_depth" i18n i18n-text text="Sample depth"></kendo-label>
+                    <kendo-multiselect
+                        #sample_depth
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.sampleDepths" 
+                        [data]="sampleDepthData"
+                        [filterable]="true"
+                        textField="text"
+                        valueField="value"
+                        name="sample_depth"
+                    >
+            </kendo-multiselect>
+                </kendo-stacklayout>
+                
+            <kendo-stacklayout orientation="horizontal" [gap]="9">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="max_sample_depth" i18n i18n-text text="Max. Sample depth"></kendo-label>
+                    <kendo-textbox #max_sample_depth  name="Max_Sample_depth"
+                    [disabled]="isAllDisabled" [(ngModel)]="testingScope.max_sample_depth"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="buffer_90_mm" i18n i18n-text text="Buffer 90 mm"></kendo-label>
+                    <input type="checkbox" kendoCheckBox name="buffer_90_mm"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.buffer_90_mm" #buffer_90_mm />
+                </kendo-stacklayout>
+            </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="quantity_testing_pieces" i18n i18n-text text="Qty pieces with testing"></kendo-label>
+                    <kendo-numerictextbox [step]="1" format="n0" #quantity_testing_pieces name="quantity_testing_pieces"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.quantity_testing_pieces"></kendo-numerictextbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="specimen_rest_material" i18n i18n-text text="Specimen Rest Material"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="specimen_rest_material"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.specimen_rest_material" #specimen_rest_material />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9"></kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="specimen_dimension" i18n i18n-text text="Specimen Dimension"></kendo-label>
+                    <kendo-combobox #specimen_dimension [disabled]="isAllDisabled"
+                        [(ngModel)]="testingScope.specimen_dimension" [data]="specimenDimensionData" textField="text"
+                        [valuePrimitive]="true" name="specimen_dimension" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="bhp_dimension" i18n i18n-text text="BHP Dimension"></kendo-label>
+                    <kendo-combobox #bhp_dimension name="bhp_dimension" [disabled]="isAllDisabled" [(ngModel)]="testingScope.bhp_dimension"
+                        [data]="bhpDimensionData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="specimen_location" i18n i18n-text text="Specimen Location"></kendo-label>
+                    <kendo-combobox #specimen_location name="specimen_location" [disabled]="isAllDisabled" [(ngModel)]="testingScope.specimen_location"
+                        [data]="specimenLocationData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="lotweight" i18n i18n-text text="lotweight"></kendo-label>
+                        <kendo-numerictextbox format="##\ "  #lotweight name="lotweight" [disabled]="isAllDisabled" [(ngModel)]="testingScope.lotweight" [decimal]="0"
+                            ></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="max_lotsize" i18n i18n-text text="max. lotsize"></kendo-label>
+                        <kendo-numerictextbox format="##\ kg" #max_lotsize name="max_lotsize" [disabled]="isAllDisabled" [(ngModel)]="testingScope.max_lotsize" [decimal]="0"
+                            ></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="max_ht_weight_lot_testing" i18n i18n-text text="max. HT weight lot testing"></kendo-label>
+                        <kendo-numerictextbox format="##\ kg" #max_ht_weight_lot_testing name="max_ht_weight_lot_testing" [disabled]="isAllDisabled" [decimal]="0" [(ngModel)]="testingScope.max_ht_weight_lot_testing"
+                            ></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="kbz" i18n i18n-text text="Notched bar impact test at RT"></kendo-label>
+                        <kendo-numerictextbox #kbz name="kbz" [disabled]="isAllDisabled" [(ngModel)]="testingScope.kbz"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>  
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="kbz_0" i18n i18n-text text="Notched bar impact test 0°C"></kendo-label>
+                        <kendo-numerictextbox #kbz_0 name="kbz_0" [disabled]="isAllDisabled" [(ngModel)]="testingScope.kbz_0"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="kbz_m_20" i18n i18n-text text="Notched bar impact test -20°C"></kendo-label>
+                        <kendo-numerictextbox #kbz_m_20 name="kbz_m_20" [disabled]="isAllDisabled" [(ngModel)]="testingScope.kbz_m_20"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout> 
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="kbz_m_50" i18n i18n-text text="Notched bar impact test -50°C"></kendo-label>
+                        <kendo-numerictextbox #kbz_m_50 name="kbz_m_50" [disabled]="isAllDisabled" [(ngModel)]="testingScope.kbz_m_50"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="kbz_m_60" i18n i18n-text text="Notched bar impact test -60°C"></kendo-label>
+                        <kendo-numerictextbox #kbz_m_60 name="kbz_m_60" [disabled]="isAllDisabled" [(ngModel)]="testingScope.kbz_m_60"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>  
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="zug" i18n i18n-text text="Hot tensile test at RT"></kendo-label>
+                        <kendo-numerictextbox #zug name="zug" [disabled]="isAllDisabled" [(ngModel)]="testingScope.zug"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout> 
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="zug_gt_40" i18n i18n-text text="Hot tensile test at > 40°C"></kendo-label>
+                        <kendo-numerictextbox #zug_gt_40 name="zug_gt_40" [disabled]="isAllDisabled" [(ngModel)]="testingScope.zug_gt_40"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout> 
+                </kendo-stacklayout>      
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                 
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="zug_300" i18n i18n-text text="Hot tensile test at 300°C"></kendo-label>
+                        <kendo-numerictextbox #zug_300 name="zug_300" [disabled]="isAllDisabled" [(ngModel)]="testingScope.zug_300"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="test_fold_and_bending" i18n i18n-text text="Test fold and bending"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="test_fold_and_bending"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.test_fold_and_bending" #test_fold_and_bending />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                   
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="test_blue_structure" i18n i18n-text text="Test blue structure"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="test_blue_structure"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.test_blue_structure" #test_blue_structure />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="test_pin" i18n i18n-text text="test pin"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="test_pin"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.test_pin" #test_pin />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="test_baumann_imprint" i18n i18n-text text="Test baumann imprint"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="test_baumann_imprint"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.test_baumann_imprint" #test_baumann_imprint />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="test_us_calibration" i18n i18n-text text="test us calibration"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="test_us_calibration"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.test_us_calibration" #test_us_calibration />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="is_classified_steel_plant " i18n i18n-text text="Classified Steel Plant "></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="is_classified_steel_plant "
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.is_classified_steel_plant " #is_classified_steel_plant  />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="is_eu_material" i18n i18n-text text="Eu Material"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="is_eu_material"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.is_eu_material" #is_eu_material />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="me_quality" i18n i18n-text text="ME Quality"></kendo-label>
+                    <kendo-combobox #hardness_test_type name="me_quality" [disabled]="isAllDisabled" [(ngModel)]="testingScope.me_quality"
+                        [data]="meQualityData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="mq_quality" i18n i18n-text text="MQ Quality"></kendo-label>
+                    <kendo-combobox #hardness_test_type name="mq_quality" [disabled]="isAllDisabled" [(ngModel)]="testingScope.mq_quality"
+                        [data]="mqQualityData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="melting_types" i18n i18n-text text="Melting Types"></kendo-label>
+                        <kendo-multiselect
+                            #melting_types
+                            [(ngModel)]="testingScope.meltingTypes" 
+                            [data]="meltingTypeData"
+                            [filterable]="true"
+                            textField="text"
+                            valueField="value"
+                            [ngModelOptions]="{standalone: true}"
+                            name="melting_types"
+                            (filterChange)="handleFilter($event,'melting_types')"
+                            [disabled]="isAllDisabled" 
+                        >
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="classified_bies" i18n i18n-text text="Classified Bies"></kendo-label>
+                        <kendo-multiselect
+                            #classified_bies
+                            [(ngModel)]="testingScope.classifiedBies" 
+                            [data]="classifiedByData"
+                            [filterable]="true"
+                            textField="text"
+                            valueField="value"
+                            [ngModelOptions]="{standalone: true}"
+                            name="classified_bies"
+                            (filterChange)="handleFilter($event,'classified_bies')"
+                            [disabled]="isAllDisabled" 
+                        >
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+        <kendo-card [style.flex]="6">
+            <kendo-card-header i18n class="k-font-bold">
+                Mechanical properties
+            </kendo-card-header>
+            <kendo-card-body class="testing-scope-details-body input-field">
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="according_to_tensile_test" i18n i18n-text text="Tensile Test according to"></kendo-label>
+                        <kendo-multiselect
+                            #according_to_tensile_test
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.accordingToTensileTests" 
+                            [data]="accordingToTensileTestData"
+                            [filterable]="true"
+                            textField="text"
+                            valueField="value"
+                            name="according_to_tensile_test"
+                            (filterChange)="handleFilter($event,'according_to_tensile_test')"
+                        >
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="temperature_wzv" i18n i18n-text text="Temperature Wzv"></kendo-label>
+                    <kendo-numerictextbox [step]="1" format="n0" #quantity_testing_pieces name="temperature_wzv"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.temperature_wzv"></kendo-numerictextbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="tensile_test_external_testing" i18n i18n-text text="Tensile Test External Testing"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="tensile_test_external_testing"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.tensile_test_external_testing" #tensile_test_external_testing />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="impact_test_external_testing" i18n i18n-text text="Impact Test External Testing"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="impact_test_external_testing"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.impact_test_external_testing" #impact_test_external_testing />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="reh_min" i18n i18n-text text="Reh Min"></kendo-label>
+                        <kendo-numerictextbox #reh_min name="reh_min" [disabled]="isAllDisabled" [(ngModel)]="testingScope.reh_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="reh" i18n i18n-text text="Reh/Rp0,2"></kendo-label>
+                        <kendo-numerictextbox #reh name="reh" [disabled]="isAllDisabled" [(ngModel)]="testingScope.reh"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rp_1_0" i18n i18n-text text="RP1,0"></kendo-label>
+                        <kendo-numerictextbox #rp_1_0 name="rp_1_0" [disabled]="isAllDisabled" [(ngModel)]="testingScope.rp_1_0"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rm_min" i18n i18n-text text="RM Min"></kendo-label>
+                        <kendo-numerictextbox #rm_min name="rm_min" [disabled]="isAllDisabled" [(ngModel)]="testingScope.rm_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rm" i18n i18n-text text="RM Max"></kendo-label>
+                        <kendo-numerictextbox #rm name="rm" [disabled]="isAllDisabled" [(ngModel)]="testingScope.rm"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="a5_min" i18n i18n-text text="A5 Min"></kendo-label>
+                        <kendo-numerictextbox #a5_min name="a5_min" [disabled]="isAllDisabled" [(ngModel)]="testingScope.a5_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="a4_min" i18n i18n-text text="A4 Min"></kendo-label>
+                        <kendo-numerictextbox #a4_min name="a4_min" [disabled]="isAllDisabled" [(ngModel)]="testingScope.a4_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="z_min" i18n i18n-text text="Constriction (Zmin) %"></kendo-label>
+                        <kendo-numerictextbox #z_min name="z_min" [disabled]="isAllDisabled" [(ngModel)]="testingScope.z_min"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="rp_rm_ratio" i18n i18n-text text="Yield strength ratio (Reh-Rp0.2)/Rm"></kendo-label>
+                        <kendo-numerictextbox #rp_rm_ratio name="rp_rm_ratio" [disabled]="isAllDisabled" [(ngModel)]="testingScope.rp_rm_ratio"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="min_hbw_on_the_component" i18n i18n-text text="Min HBW on the Component"></kendo-label>
+                        <kendo-numerictextbox #min_hbw_on_the_component name="min_hbw_on_the_component" [disabled]="isAllDisabled" [(ngModel)]="testingScope.min_hbw_on_the_component"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="max_hbw_on_the_component" i18n i18n-text text="Max HBW on the Component"></kendo-label>
+                        <kendo-numerictextbox #max_hbw_on_the_component name="max_hbw_on_the_component" [disabled]="isAllDisabled" [(ngModel)]="testingScope.max_hbw_on_the_component"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="min_hbw_on_sample" i18n i18n-text text="Min HBW on sample"></kendo-label>
+                        <kendo-numerictextbox #min_hbw_on_sample name="min_hbw_on_sample" [disabled]="isAllDisabled" [(ngModel)]="testingScope.min_hbw_on_sample"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="max_hbw_on_sample" i18n i18n-text text="Max HBW on sample"></kendo-label>
+                        <kendo-numerictextbox #max_hbw_on_sample name="max_hbw_on_sample" [disabled]="isAllDisabled" [(ngModel)]="testingScope.max_hbw_on_sample"
+                            [step]="0.1"></kendo-numerictextbox>
+                    </kendo-stacklayout>
+                   
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="tensile_test_details" i18n i18n-text text="Tensile Test Details"></kendo-label>
+                    <kendo-textbox #tensile_test_details name="tensile_test_details"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.tensile_test_details"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="according_to_impact_test" i18n i18n-text text="Impact Test according to"></kendo-label>
+                        <kendo-multiselect
+                            #according_to_impact_test
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.accordingToImpactTests" 
+                            [data]="accordingToImpactTestData"
+                            [filterable]="true"
+                            textField="text"
+                            valueField="value"
+                            name="according_to_impact_test"
+                            (filterChange)="handleFilter($event,'according_to_impact_test')"
+                        >
+                    </kendo-multiselect>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="impact_test_typ" i18n i18n-text text="Sample form KBZ"></kendo-label>
+                    <kendo-combobox #impact_test_typ name="impact_test_typ" [disabled]="isAllDisabled" [(ngModel)]="testingScope.impact_test_typ"
+                        [data]="impactTestTypeData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="toughness" i18n i18n-text text="Toughness"></kendo-label>
+                    <kendo-numerictextbox #toughness name="toughness" [disabled]="isAllDisabled" [(ngModel)]="testingScope.toughness"
+                        [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="impact_energy_av" i18n i18n-text text="Impact energy Av"></kendo-label>
+                    <kendo-numerictextbox #impact_energy_av name="impact_energy_av" [disabled]="isAllDisabled" [(ngModel)]="testingScope.impact_energy_av"
+                                          [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="lateral_expansion" i18n i18n-text text="Lateral Expansion"></kendo-label>
+                    <kendo-numerictextbox #lateral_expansion name="lateral_expansion" [disabled]="isAllDisabled" [(ngModel)]="testingScope.lateral_expansion"
+                        [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="impact_test_temperature" i18n i18n-text text="Temperature KBZ"></kendo-label>
+                    <kendo-numerictextbox #impact_test_temperature name="impact_test_temperature" [disabled]="isAllDisabled" [(ngModel)]="testingScope.impact_test_temperature"
+                        [step]="0.1"></kendo-numerictextbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="impact_test_details" i18n i18n-text text="Impact Test Details"></kendo-label>
+                    <kendo-textbox #impact_test_details name="impact_test_details"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.impact_test_details"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="tensile_test_warm_according_to" i18n i18n-text text="Tensile Test Warm according to"></kendo-label>
+                    <kendo-combobox #tensile_test_warm_according_to name="tensile_test_warm_according_to" [disabled]="isAllDisabled" [(ngModel)]="testingScope.tensile_test_warm_according_to"
+                        [data]="tensileTestWarmAccordingToData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="tensile_test_warm_details" i18n i18n-text text="Tensile Test Warm Details"></kendo-label>
+                    <kendo-textbox #tensile_test_warm_details name="tensile_test_warm_details"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.tensile_test_warm_details"></kendo-textbox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="setpoint_hot_tensile_test" i18n i18n-text text="Setpoint hot tensile test"></kendo-label>
+                    <kendo-textbox #setpoint_hot_tensile_test name="setpoint_hot_tensile_test"
+                                   [disabled]="isAllDisabled" [(ngModel)]="testingScope.setpoint_hot_tensile_test"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="tensile_test_warm_external_testing" i18n i18n-text text="Tensile Test Warm External Testing"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="tensile_test_warm_external_testing"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.tensile_test_warm_external_testing" #tensile_test_warm_external_testing />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="jominy_test" i18n i18n-text text="Jominy Test"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="jominy_test"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.jominy_test" #jominy_test />
+                    </kendo-stacklayout>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="hardness_test_details" i18n i18n-text
+                        text="Hardness test on the component"></kendo-label>
+                    <kendo-textbox #hardness_test_details name="hardness_test_details"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.hardness_test_details"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="hardness_details" i18n i18n-text
+                        text="Hardness test on the sample"></kendo-label>
+                    <kendo-textbox #hardness_details name="hardness_details"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.hardness_details"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="hardness_test_type" i18n i18n-text text="Hardness Test Type"></kendo-label>
+                    <kendo-combobox #hardness_test_type name="hardness_test_type" [disabled]="isAllDisabled" [(ngModel)]="testingScope.hardness_test_type"
+                        [data]="hardnessTestTypeData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="hardness_test_location" i18n i18n-text text="Hardness test location"></kendo-label>
+                    <kendo-combobox #hardness_test_location name="hardness_test_location" [disabled]="isAllDisabled" [(ngModel)]="testingScope.hardness_test_location"
+                        [data]="hardnessTestLocationData" [valuePrimitive]="true" textField="text" valueField="value">
+                    </kendo-combobox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="jominy_details" i18n i18n-text
+                        text="Jominy details"></kendo-label>
+                    <kendo-textbox #jominy_details name="jominy_details"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.jominy_details"></kendo-textbox>
+                </kendo-stacklayout>
+                
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-label [for]="further_testing" i18n i18n-text
+                        text="Further testing"></kendo-label>
+                    <kendo-textbox #further_testing name="further_testing"
+                        [disabled]="isAllDisabled" [(ngModel)]="testingScope.further_testing"></kendo-textbox>
+                </kendo-stacklayout>
+
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+                    <kendo-stacklayout orientation="horizontal" [gap]="9">
+                        <kendo-label [for]="further_testing_external" i18n i18n-text text="Further Testing External"></kendo-label>
+                        <input type="checkbox" kendoCheckBox name="further_testing_external"
+                            [disabled]="isAllDisabled" [(ngModel)]="testingScope.further_testing_external" #further_testing_external />
+                    </kendo-stacklayout>
+                    <kendo-stacklayout orientation="horizontal" [gap]="9"></kendo-stacklayout>
+                </kendo-stacklayout>
+                <kendo-stacklayout orientation="horizontal" [gap]="9">
+					<kendo-label [for]="offer_note" i18n i18n-text text="Offer note">
+					</kendo-label>
+					<kendo-textarea [disabled]="isAllDisabled" [(ngModel)]="testingScope.offer_note" name="offer_note"> 
+					</kendo-textarea>
+				</kendo-stacklayout>
+            </kendo-card-body>
+        </kendo-card>
+    </kendo-stacklayout>
+
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

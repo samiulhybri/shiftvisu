@@ -1,0 +1,383 @@
+<div class="tableStandard">
+	<app-grid-table
+		headerTitle="Item States"
+		url="/ItemStates"
+		i18n-headerTitle
+		[showRowDataCount]="true"
+		[columns]="columns"
+		[showAction]="true"
+		[showDownload]="false"
+		[showActiveButton]="true"
+		[editPermission]="authService.isPermissionValid('BASEVISU_ITEM_STATES_EDIT')"
+		button1Text="All"
+		button2Text="Inactive"
+		button3Text="Active"
+		addButtonText="New"
+		i18n-addButtonText
+		i18n-button1Text
+		i18n-button2Text
+		i18n-button3Text
+		expandQuery="$expand=itemStateGroup,machines"
+		[showNewButton]="true"
+		[isBaseVisu]="true"
+		(newButtonClick)="newButtonClick()"
+		(deleteClick)="deleteClick($event)"
+		(editClick)="editClick($event)"
+		[showSearch]="true"
+		[enableServerSideFiltering]="true"
+		selectionMode="Single"
+		sortBy="custom_id"
+		#childComponentRef>
+	</app-grid-table>
+</div>
+<app-dialog
+	id="itemStateDialog"
+	[isDialogOpen]="isDialogOpen"
+	(onBeforeClose)="closeDialog()">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="pd-header ml-[-12px]">
+			<ui5-title level="H5">{{ dialogTitle }}</ui5-title>
+			<ui5-tabcontainer
+				class="mt-[9px] ml-[-32px]"
+				(tab-select)="tabNavChanged($event)"
+				fixed
+				collapsed>
+				<ui5-tab
+					#generalTab
+					i18n-text
+					text="Core"
+					[selected]="selectedTab ==='generalTab'"
+					id="generalTab"
+					[disabled]="disableButtonDuringRequest"></ui5-tab>
+				<ui5-tab
+					#associateMachineTab
+					i18n-text
+					text="Associated Machines"
+					[selected]="selectedTab ==='associateMachineTab'"
+					id="associateMachineTab"
+					[disabled]="disableButtonDuringRequest"></ui5-tab>
+			</ui5-tabcontainer>
+		</div>
+	</div>
+	<div class="mx-[-16px] my-0 h-[60vh]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			*ngIf="itemState"
+			size="L">
+			<div class="item-state-dialog-body form">
+				<form
+					(ngSubmit)="onSubmit(bprform)"
+					#bprform="ngForm">
+					<div [hidden]="selectedTab !== 'generalTab'">
+						<div class="flex mb-[5px]">
+							<div class="flex flex-col w-full">
+								<ui5-label show-colon>{{ localization.active }}</ui5-label>
+								<ui5-switch
+									name="is_active"
+									id="isActiveSwitch"
+									[(ngModel)]="itemState.is_active"
+									[disabled]="shouldBeDisabled('is_active')">
+								</ui5-switch>
+							</div>
+						</div>
+
+						<div class="flex mb-10 gap-2.5">
+							<div class="flex flex-col w-6/12">
+								<ui5-label
+									show-colon
+									required
+									>{{ localization.id }}</ui5-label
+								>
+								<ui5-busy-indicator
+									[active]="isLoadingCustomId"
+									size="S">
+									<ui5-input
+										#customId="ngModel"
+										[required]="true"
+										[valueState]="
+											customId.valid == false &&
+											(customId.touched || bprform.submitted)
+												? 'Negative'
+												: customIdState
+										"
+										[(ngModel)]="itemState.custom_id"
+										(input)="onChangeCustomId()"
+										name="custom_id"
+										[disabled]="shouldBeDisabled('custom_id')"
+										class="w-full"
+										id="customIdInput">
+										<div
+											slot="valueStateMessage"
+											>
+											{{ customIdValueStateText }}
+										</div>
+									</ui5-input>
+								</ui5-busy-indicator>
+							</div>
+							<div class="flex flex-col w-6/12">
+								<ui5-label
+									show-colon
+									required
+									>{{ localization.name }}</ui5-label
+								>
+								<ui5-input
+									id="nameInput"
+									name="name"
+									class="w-full"
+									#nameInput="ngModel"
+									[disabled]="shouldBeDisabled('name')"
+									[required]="true"
+									[valueState]="
+										nameInput.valid == false &&
+										(nameInput.touched || bprform.submitted)
+											? 'Negative'
+											: 'None'
+									"
+									[(ngModel)]="itemState.name">
+								</ui5-input>
+							</div>
+						</div>
+						<div class="flex mb-10 gap-2.5">
+							<div class="flex flex-col w-6/12">
+								<ui5-label
+									show-colon
+									required
+									i18n
+									>Item State Type</ui5-label
+									>
+								<ui5-combobox
+									id="itemStateTypeCombobox"
+									class="w-[98%]"
+									#item_state_type
+									[value]="itemState.item_state_type"
+									(selection-change)="onChangeItemType($event)"
+									[disabled]="shouldBeDisabled('item_state_type')"
+									(change)="
+										inputValueRestrict($event, itemState.item_state_type)
+									">
+									<ui5-cb-item
+										*ngFor="let item of itemStateTypeItems"
+										text="{{ item.text }}"></ui5-cb-item
+								></ui5-combobox>
+							</div>
+							<div class="flex flex-col w-6/12">
+								<ui5-label
+									show-colon
+									i18n
+									>Item State Group</ui5-label
+									>
+								<ui5-combobox
+									class="w-full"
+									id="itemStateGroupCombobox"
+									[value]="itemState.itemStateGroup?.name || ''"
+									[disabled]="shouldBeDisabled('itemStateGroup')"
+									(input)="onInputChange($event)"
+									(selection-change)="onChangeItemStateChange($event)">
+									<ng-container *ngFor="let itemStateGroup of itemStateGroups">
+										<ui5-cb-item
+											*ngIf="itemStateGroup.is_active"
+											id="{{ itemStateGroup.id }}"
+											[additionalText]="itemStateGroup.custom_id"
+											text="{{ itemStateGroup.name }}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div
+						class="h-full"
+						[hidden]="selectedTab !== 'associateMachineTab'">
+						<ui5-card>
+							<div class="h-[60vh] max-h-[579px]">
+								<app-grid-table
+									headerTitle="Associated Machines"
+									[showRowDataCount]="true"
+									i18n-headerTitle
+									[showAction]="false"
+									[showDownload]="false"
+									[showActiveButton]="false"
+									[addButtonText]="addButtonText"
+									[columns]="machineColumns"
+									expandQuery="$expand=machines&select=machines"
+									selectionMode="None"
+									(newButtonClick)="associateButtonClick()"
+									(onSearchOnKeyUp)="onSearchOnChangeInput($event)"
+									[data]="copyMachinesData"
+									[customData]="true"
+									[showSearch]="true"
+									#childComponentAssociateMachine>
+								</app-grid-table>
+							</div>
+						</ui5-card>
+				</div>
+				
+			</div>
+		</ui5-busy-indicator>
+	</div>
+
+	<div
+		slot="footer"
+		class="dialog-footer mr-[-24px]">
+		<ui5-button
+			id="saveButtonItemStates"
+			design="Emphasized"
+			(click)="onSave()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			class="ml-1"
+			id="cancelButtonItemStates"
+			design="Transparent"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<ui5-dialog
+	#errorDialogItemState
+	id="errorDialogItemState"
+	header-text="Error"
+	state="Negative">
+	<p>{{ localization.someThingWentWrong }}</p>
+	<div class="flex flex-col-item">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeErrorDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<ui5-dialog
+	#deleteDialogItemState
+	id="deleteDialogItemState"
+	header-text="Warning"
+	i18n-header-text
+	state="Critical">
+	<ui5-label class="sapTextColor">{{ localization.doYouWantToDeleteThisRecord }}</ui5-label>
+	<div
+		class="flex flex-col-item"
+		*ngIf="isLoading">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="M">
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			class="dialogSubmit"
+			design="Emphasized"
+			[disabled]="disableButtonDuringRequest"
+			(click)="deleteSubmit()"
+			>{{ localization.ok }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialogDelete()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>
+
+<app-dialog [isDialogOpen]="isAssociateDialogOpen">
+	<div
+		slot="header"
+		class="w-100">
+		<div class="flex flex-row justify-between">
+			<ui5-title
+				class="pd-10"
+				level="H5"
+				>{{ associateDialogTitle }}</ui5-title
+			>
+			<app-associate-selector
+				(selectionEvent)="selectAllAssociate($event)"
+				[enableSelection]="isDeselectEnable"></app-associate-selector>
+		</div>
+		<ui5-input
+			id="searchInput"
+			class="w-100"
+			slot="searchField"
+			[(ngModel)]="searchedValue"
+			(input)="onSearchInput($event)">
+			<ui5-icon
+				name="search"
+				slot="icon"></ui5-icon>
+		</ui5-input>
+	</div>
+	<div class="sm:max-h-[545px] xl:h-[557px] lg:h-[557px] md:h-[545px] w-[518px]">
+		<ui5-busy-indicator
+			[active]="isLoading"
+			size="S"
+			class="w-100"
+			*ngIf="itemState">
+			<ui5-list
+				selectionMode="Multiple"
+				class="w-100"
+				(selectionChange)="machineChange($event)">
+				<ui5-li
+					class="w-100"
+					*ngFor="let machine of filteredMachines"
+					[selected]="machine.isSelected"
+					[id]="machine.id">
+					{{ machine.custom_id }} | {{ machine.name }}
+				</ui5-li>
+			</ui5-list>
+		</ui5-busy-indicator>
+	</div>
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			design="Emphasized"
+			id="saveButtonMachineState"
+			(click)="onMachineSave()"
+			[disabled]="disableButtonDuringRequest"
+			>{{ localization.save }}</ui5-button
+		>
+		<ui5-button
+			design="Transparent"
+			class="ml-8 border-none"
+			id="cancelButtonMachineState"
+			(click)="cancelDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>
+<app-associate-preview-dialog 
+	[isPreviewDialogOpen]="isPreviewDialogOpen" 
+	[title]="associateDialogTitle"
+	[columns]="machineColumns"
+	[data]="machines"
+	(closeAssociate)="closeAssociateDialog()">
+</app-associate-preview-dialog>
+<ui5-dialog
+		#deleteErrorDialogItemStates
+		id="deleteErrorDialogItemStates"
+		state="Negative"
+		header-text="Error">
+		<p>{{ localization.thisEntryIsBeingUsedElsewhere }}</p>
+		<div
+			slot="footer"
+			class="deleteErrorDialogFooter">
+			<ui5-button
+				class="dialogCloser"
+				design="Transparent"
+				(click)="closeDeleteErrorDialog()"
+				>{{ localization.close }}</ui5-button
+			>
+		</div>
+	</ui5-dialog>

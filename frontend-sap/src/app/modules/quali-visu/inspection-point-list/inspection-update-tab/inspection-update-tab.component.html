@@ -1,0 +1,529 @@
+<ui5-busy-indicator
+	[active]="isLoading"
+	size="M"
+	class="h-full w-full">
+	<div class="h-full w-full flex">
+		@if (fileSrc) {
+			<ui5-card class="h-[calc(100%-20px)] w-[45vw] p-[10px]">
+				<ui5-bar
+					slot="header"
+					class="h-[44px]"
+					design="Header">
+					<ui5-title
+						level="H5"
+						slot="startContent"
+						>{{ fileName }}</ui5-title
+					>
+				</ui5-bar>
+				<iframe class="h-[calc(90vh-200px)] w-full" [src]="fileSrc"> </iframe>
+			</ui5-card>
+		}
+
+		<div class="h-full w-full flex">
+			<form
+				#characteristicsForm="ngForm"
+				class="flex-grow grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] p-[10px] h-fit max-h-[calc(90vh-170px)] gap-[10px] overflow-auto">
+				<ui5-card class="h-[450px]">
+					<ui5-bar
+						slot="header"
+						class="h-[44px]"
+						design="Header">
+						<ui5-title
+							level="H5"
+							slot="startContent"
+							i18n
+							>Info</ui5-title
+						>
+					</ui5-bar>
+					<div class="flex flex-col !h-[360px] justify-between w-full gap-[10px] p-[10px]">
+						<div class="order-card justify-center mr-[20px]">
+							<ui5-title
+								level="H5"
+								id="operation"
+								>{{ inspectionOperationDetails?.pos }} -
+								{{ inspectionOperationDetails?.name }}</ui5-title
+							>
+							<span
+								class="label-style"
+								i18n
+								>Operation</span
+							>
+						</div>
+						<div class="order-card justify-center mr-[20px]">
+							<ui5-title
+								level="H5"
+								id="operation"
+								>{{ inspectionItem?.custom_id }} - {{ inspectionItem?.name }}</ui5-title
+							>
+							<span
+								class="label-style"
+								i18n
+								>Item</span
+							>
+						</div>
+
+						@if (selectedInspectionOperation?.frequency) {
+							<div class="order-card justify-center mr-[20px]">
+								<ui5-title
+									level="H5"
+									id="operation"
+									>{{ frequency }}</ui5-title
+								>
+								<span
+									class="label-style"
+									i18n
+									>Frequency</span
+								>
+							</div>
+						}
+
+						@if (availableResourceEquipmentType.length > 0) {
+							@for (resource of availableResource; track $index) {
+								<div class="order-card justify-center mr-[20px]">
+									<ui5-title
+										level="H5"
+										[id]="'resource_' + $index"
+										>{{ resource?.equipment?.custom_id }} - {{ resource?.equipment?.name }}</ui5-title
+									>
+									<span
+										class="label-style"
+										i18n
+										>Measuring Instrument</span
+									>
+								</div>
+							}
+						}
+
+						@if (selectedInspectionOperation?.pos) {
+							<div class="order-card justify-center mr-[20px]">
+								<ui5-title
+									level="H5"
+									id="operation"
+									>{{ selectedInspectionOperationPos }}</ui5-title
+								>
+								<span
+									class="label-style"
+									i18n
+									>Inspection Operation</span
+								>
+							</div>
+						}
+					</div>
+				</ui5-card>
+
+				@for (c of characteristics; track $index) {
+					<ui5-card class="h-[450px]">
+						<ui5-bar
+							slot="header"
+							class="h-[44px]"
+							design="Header">
+							<ui5-title
+								level="H5"
+								slot="startContent"
+								class="whitespace-nowrap overflow-hidden text-ellipsis"
+								[title]="c?.name ?? ''"
+								i18n
+								>{{ c?.name }}</ui5-title
+							>
+							<div
+								slot="endContent"
+								class="w-[10px]"></div>
+							<ui5-button
+								slot="endContent"
+								design="Transparent"
+								icon="sap-icon://hint"
+								(click)="openPointInfoModal(c)"
+								i18n></ui5-button>
+						</ui5-bar>
+						<div class="p-[10px] max-h-[395px] h-fit flex !flex-col gap-[10px]">
+							@if (c?.is_quantitative) {
+								<div class="w-full flex items-center gap-[10px]">
+									<ui5-input
+										class="text-right flex-grow"
+										type="Number"
+										#character="ngModel"
+										[decimalPlaces]="c.decimals"
+										[min]="c?.value_lower_limit_plausible"
+										[max]="c?.value_upper_limit_plausible"
+										numeric-input-validate
+										i18n
+										#characteristicInput
+										[name]="'character' + $index"
+										[placeholder]="c?.value_target ?? ''"
+										[valueState]="getValueState(c, character)"
+										[(ngModel)]="c.inserted_value"
+										(wheel)="$event.preventDefault()"
+										(input)="onInputChange()"
+										[disabled]="!isUserAuthorized(c?.user_group_id)"
+										(keydown)="disableArrowKeys($event)">
+										@if (character.hasError("decimalError")) {
+											<div slot="valueStateMessage">
+												{{
+													character.errors?.["decimalError"]?.["message"] +
+														": " +
+														character.errors?.["decimalError"]?.["expected"]
+												}}</div
+											>
+										} @else if (
+											isValueOutsideRange(
+												c.inserted_value,
+												c.value_lower_limit,
+												c.value_upper_limit,
+												c?.unit_of_measure?.name,
+												c?.value_upper_limit_plausible,
+												c?.value_lower_limit_plausible
+											)
+										) {
+											<div slot="valueStateMessage">
+												{{
+													isValueOutsideRange(
+														c.inserted_value,
+														c.value_lower_limit,
+														c.value_upper_limit,
+														c?.unit_of_measure?.name,
+														c?.value_upper_limit_plausible,
+														c?.value_lower_limit_plausible
+													)
+												}}</div
+											>
+										}
+									</ui5-input>
+									@if (c?.unit_of_measure?.name) {
+										<span>{{ c.unit_of_measure.name ?? "" }}</span>
+									}
+								</div>
+
+								<div class="flex !flex-col gap-[10px]">
+									@if (c.value_lower_limit == 0 || c.value_lower_limit) {
+										<div class="flex gap-1">
+											<ui5-icon
+												name="information"
+												design="Information"></ui5-icon>
+											<div class="text-[15px] text-[color:--infoColor]"
+                                                 i18n
+												>Lower Limit: {{ c.value_lower_limit }}
+												{{ c.unit_of_measure?.name ?? "" }}</div
+											>
+										</div>
+									}
+
+									@if (c.value_upper_limit == 0 || c.value_upper_limit) {
+										<div class="flex gap-1">
+											<ui5-icon
+												name="information"
+												design="Information"></ui5-icon>
+											<div class="text-[15px] text-[color:--infoColor]"
+                                                 i18n
+												>Upper Limit: {{ c.value_upper_limit }}
+												{{ c.unit_of_measure?.name ?? "" }}</div
+											>
+										</div>
+									}
+								</div>
+							} @else {
+								<div class="flex-grow overflow-auto mb-[10px]">
+									@for (
+										o of c?.inspection_operation_characteristic_options;
+										track $index
+									) {
+										<ui5-radio-button
+											[checked]="o.is_selected == true"
+											class="w-full"
+											[name]="'option_' + o.id"
+											(click)="setSelectedOption(c, o)"
+											[disabled]="!isUserAuthorized(c?.user_group_id)"
+											[text]="o.custom_id"></ui5-radio-button>
+									}
+								</div>
+							}
+
+							@if (
+								c?.user_group?.name || c?.inspection_specification_importance_code?.name
+							) {
+								<div class="pb-[10px] flex !flex-col gap-[10px]">
+									@if (c?.user_group?.name) {
+										<div class="flex gap-1">
+											<ui5-icon
+												name="information"
+												design="Information"></ui5-icon>
+											<div class="text-[15px] text-[color:--infoColor]"
+												><span i18n>User Group</span>:
+												{{ c.user_group.name }}</div
+											>
+										</div>
+									}
+
+									@if (c?.inspection_specification_importance_code?.name) {
+										<div class="flex gap-1 items-end">
+											<ui5-icon
+												name="information"
+												design="Information"></ui5-icon>
+											<div class="text-[15px] text-[color:--infoColor]">
+												<span i18n
+													>Importance Code</span>:
+												{{c.inspection_specification_importance_code.custom_id}} - {{c.inspection_specification_importance_code.name}}
+											</div
+											>
+										</div>
+
+										<img *ngIf="c.iconSrc" [src]="c.iconSrc" alt="{{ c.inspection_specification_importance_code.icon_type }} icon"
+											class="inline-block w-10 h-10 ml-2 mt-[10px]">
+									}
+								</div>
+							}
+
+							@if(inspectionOperationDetails?.cavity > 1) {
+								<div class="pb-[10px] w-full flex !flex-col gap-[10px]">
+									<ui5-label i18n show-colon required>Confirmation Number</ui5-label>
+									<ui5-input
+										class="text-right flex-grow w-full"
+										type="Number"
+										i18n
+										[name]="'confirmation_number' + $index"
+										(keypress)="preventDecimal($event)"
+										[disabled]="!isUserAuthorized(c?.user_group_id)"
+										[(ngModel)]="c.confirmation_number"
+										(wheel)="$event.preventDefault()"
+										(input)="onInputChange()"
+										(keydown)="disableArrowKeys($event)">
+									</ui5-input>
+								</div>
+							}
+
+							<div class="pb-[10px] w-full flex !flex-col gap-[10px]">
+								@if(c?.is_note_required) {
+									<ui5-label i18n show-colon required>Note</ui5-label>
+								} @else {
+									<ui5-label i18n show-colon>Note</ui5-label>
+								}
+
+								<ui5-input
+									class="text-left flex-grow w-full"
+									type="Text"
+									i18n
+									[name]="'field_note' + $index"
+									[disabled]="!isUserAuthorized(c?.user_group_id)"
+									[(ngModel)]="c.field_note"
+									(wheel)="$event.preventDefault()"
+									(input)="onInputChange()"
+									(keydown)="disableArrowKeys($event)">
+								</ui5-input>
+							</div>
+						</div>
+					</ui5-card>
+				}
+			</form>
+			@if(hasSingleCharacteristics) {
+				<div class="m-[10px] p-[10px] flex-grow shadow-[0px_2px_5px_rgba(0,0,0,0.15)] rounded-[1rem]" [ngClass]="{ 'w-[30%]': !fileSrc }">
+					<app-line-graphs
+						[chartData]="restructuredDataForGraph"
+						[dateLines]="qualiEvents"
+						[intervalChart]="chartTimeInterval"
+						[tooltipPattern]="'HH:mm:ss - MMM dd, YYYY'"
+						[designData]="{
+							lowerLimit: singleCharacteristicsDefinitions.lowerLimit,
+							upperLimit: singleCharacteristicsDefinitions.upperLimit,
+							unit: singleCharacteristicsDefinitions?.unit_of_measure?.name ?? '',
+							rangeColor: '#4bab50',
+							lowerRangeColor: '#ff0000',
+							dateLineColor: '#0070f2',
+						}"></app-line-graphs>
+				</div>
+			}
+		</div>
+	</div>
+</ui5-busy-indicator>
+
+<ui5-dialog
+	id="addGroupDialog"
+	[open]="isInfoDialogueOpen"
+	(beforeClose)="closeDialog()"
+	[headerText]="dialogTitle"
+	class="w-[calc(90vw-100px)] h-[calc(90vh-100px)]">
+	<div class="w-[calc(90vw-210px)] h-[calc(90vh-230px)] flex">
+		@if (fileSrc) {
+			<ui5-card class="h-full w-[40%] p-[10px]">
+				<ui5-bar
+					slot="header"
+					class="h-[44px]"
+					design="Header">
+					<ui5-title
+						level="H5"
+						slot="startContent"
+						>{{ fileName }}</ui5-title
+					>
+				</ui5-bar>
+				<iframe class="h-[calc(90vh-200px)] w-full" [src]="fileSrc"> </iframe>
+			</ui5-card>
+		}
+
+		<div
+			class="{{
+				fileSrc ? 'w-[60%] !flex-col' : 'h-[calc(90vh-210px)] w-full flex-row'
+			}} flex">
+			<ui5-card class="{{ fileSrc ? 'h-[calc(90vh-498px)] overflow-y-auto' : 'w-[30%]' }} p-[10px]">
+				<ui5-bar
+					slot="header"
+					class="h-[44px]"
+					design="Header">
+					<ui5-title
+						level="H5"
+						slot="startContent"
+						i18n
+						>Details</ui5-title
+					>
+				</ui5-bar>
+
+				@if (selectedCharacteristic) {
+					<div class="p-[10px] h-[calc(90vh-290px)] overflow-auto overflow-y-auto flex-grow">
+						@if (selectedCharacteristic.is_quantitative) {
+							<div class="w-full flex items-center gap-[10px]">
+								<ui5-input
+									class="text-right flex-grow"
+									type="Number"
+									[disabled]="true"
+									[(ngModel)]="selectedCharacteristic.inserted_value">
+								</ui5-input>
+
+								@if (selectedCharacteristic?.unit_of_measure?.name) {
+									<span>{{
+										selectedCharacteristic.unit_of_measure.name ?? ""
+									}}</span>
+								}
+							</div>
+
+							<div class="flex !flex-col gap-[10px] pt-[10px]">
+								@if (selectedCharacteristic.value_lower_limit == 0 || selectedCharacteristic.value_lower_limit) {
+									<div class="flex gap-1">
+										<ui5-icon
+											name="information"
+											design="Information"></ui5-icon>
+										<div class="text-[15px] text-[color:--infoColor]"
+											>Lower Limit: {{ selectedCharacteristic.value_lower_limit }}
+											{{ selectedCharacteristic.unit_of_measure?.name ?? "" }}</div
+										>
+									</div>
+								}
+
+								@if (selectedCharacteristic.value_upper_limit == 0 || selectedCharacteristic.value_upper_limit) {
+									<div class="flex gap-1">
+										<ui5-icon
+											name="information"
+											design="Information"></ui5-icon>
+										<div class="text-[15px] text-[color:--infoColor]"
+											>Upper Limit: {{ selectedCharacteristic.value_upper_limit }}
+											{{ selectedCharacteristic.unit_of_measure?.name ?? "" }}</div
+										>
+									</div>
+								}
+							</div>
+						} @else {
+							@for (
+								o of selectedCharacteristic.inspection_operation_characteristic_options;
+								track $index
+							) {
+								<ui5-radio-button
+									[checked]="o.is_selected"
+									class="w-full"
+									[name]="'option_' + o.id"
+									[text]="o.custom_id"
+									[disabled]="true"></ui5-radio-button>
+							}
+						}
+
+						@if (
+								selectedCharacteristic?.user_group?.name || selectedCharacteristic?.inspection_specification_importance_code?.name
+							) {
+								<div class="pt-[10px] flex !flex-col gap-[10px]">
+									@if (selectedCharacteristic?.user_group?.name) {
+										<div class="flex gap-1">
+											<ui5-icon
+												name="information"
+												design="Information"></ui5-icon>
+											<div class="text-[15px] text-[color:--infoColor]"
+												><span i18n>User Group</span>:
+												{{ selectedCharacteristic.user_group.name }}</div
+											>
+										</div>
+									}
+
+									@if (selectedCharacteristic?.inspection_specification_importance_code?.name) {
+										<div class="flex gap-1">
+											<ui5-icon
+												name="information"
+												design="Information"></ui5-icon>
+											<div class="text-[15px] text-[color:--infoColor]"
+												><span i18n
+													>Importance Code</span
+												>:
+												{{
+													selectedCharacteristic.inspection_specification_importance_code.name
+												}}</div
+											>
+										</div>
+
+										<img *ngIf="selectedCharacteristic.iconSrc" [src]="selectedCharacteristic.iconSrc" alt="{{ selectedCharacteristic.inspection_specification_importance_code.icon_type }} icon" class="inline-block w-10 h-10 ml-2 mt-[10px]">
+									}
+								</div>
+							}
+
+						@if(inspectionOperationDetails?.cavity > 1) {
+							<div class="mt-[10px] pb-[10px] w-full flex !flex-col gap-[10px]">
+								<ui5-label i18n show-colon>Confirmation Number</ui5-label>
+								<ui5-input
+									class="text-right flex-grow w-full"
+									type="Number"
+									i18n
+									[disabled]="true"
+									name="confirmation_number"
+									[(ngModel)]="selectedCharacteristic.confirmation_number"
+								>
+								</ui5-input>
+							</div>
+						}
+
+						<div class="mt-[10px] pb-[10px] w-full flex !flex-col gap-[10px]">
+							<ui5-label i18n show-colon>Note</ui5-label>
+							<ui5-input
+								class="text-left flex-grow w-full"
+								type="Text"
+								i18n
+								[disabled]="true"
+								name="field_note"
+								[(ngModel)]="selectedCharacteristic.field_note"
+							>
+							</ui5-input>
+						</div>
+					</div>
+				}
+			</ui5-card>
+			@if (selectedCharacteristic?.is_quantitative) {
+				<div class="m-[10px] p-[10px] flex-grow shadow-[0px_2px_5px_rgba(0,0,0,0.15)] rounded-[1rem]">
+					<app-line-graphs
+						[chartData]="restructuredDataForGraph"
+						[dateLines]="qualiEvents"
+						[intervalChart]="chartTimeInterval"
+						[tooltipPattern]="'HH:mm:ss - MMM dd, YYYY'"
+						[designData]="{
+							lowerLimit: selectedCharacteristic.value_lower_limit,
+							upperLimit: selectedCharacteristic.value_upper_limit,
+							unit: selectedCharacteristic?.unit_of_measure?.name ?? '',
+							rangeColor: '#4bab50',
+							lowerRangeColor: '#ff0000',
+							dateLineColor: '#0070f2',
+						}"></app-line-graphs>
+				</div>
+			}
+		</div>
+	</div>
+
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			design="Transparent"
+			(click)="closeDialog()"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

@@ -1,0 +1,28 @@
+{
+	"arrowParens": "avoid",
+	"bracketSameLine": true,
+	"bracketSpacing": true,
+	"printWidth": 100,
+	"quoteProps": "consistent",
+	"semi": true,
+	"singleAttributePerLine": false,
+	"singleQuote": false,
+	"tabWidth": 4,
+	"trailingComma": "es5",
+	"useTabs": true,
+	"htmlWhitespaceSensitivity": "strict",
+	"overrides": [
+		{
+			"files": ["**/*.html", "**/*.xml"],
+			"options": {
+				"singleAttributePerLine": true
+			}
+		},
+		{
+			"files": ["**/*.properties"],
+			"options": {
+				"keySeparator": "="
+			}
+		}
+	]
+}

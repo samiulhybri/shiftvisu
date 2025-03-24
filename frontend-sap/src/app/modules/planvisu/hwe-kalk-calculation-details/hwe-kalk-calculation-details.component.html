@@ -1,0 +1,17 @@
+
+<ui5-dialog [open]="openDialog" id="dialog"
+            headerText="Hwe Calculation Details"
+            i18n-headerText
+            class="w-[95vw] bg-gray-100 h-[93vh]" (ui5BeforeClose)="dialogClose()">
+	@if(calculationUrl){
+		<iframe [src]="this.calculationUrl"></iframe>
+	}
+
+        <div slot="footer" class="dialog-footer">
+          <ui5-button
+            class="ml-8"
+            (click)="dialogClose()"
+            >
+            {{ localization.close }}</ui5-button>
+        </div>
+</ui5-dialog>

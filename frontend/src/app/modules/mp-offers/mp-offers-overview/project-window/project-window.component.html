@@ -1,0 +1,46 @@
+<form novalidate class="k-form" [formGroup]="form" *ngIf="offer">
+    <kendo-gridlayout [align]="{ horizontal: 'start', vertical: 'middle' }" [gap]="{ rows: 10, cols: 10 }">
+
+        <kendo-gridlayout-item [row]="1" [col]="1" style="width: 100%;">
+            <kendo-label class="k-text-inverse modal-lbl-format" >
+                <span class="label-span" i18n>Offers</span>
+                <kendo-textbox #custom_id formControlName="custom_id" [(ngModel)]="offer.custom_id" i18n-placeholder
+                    placeholder="Offer" [readonly]="offer.custom_id != null" >
+                </kendo-textbox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="2" [col]="1"  style="width: 100%;">
+            <kendo-label class="k-text-inverse modal-lbl-format"  >
+                <span class="label-span" i18n>Project Number</span>
+                <kendo-numerictextbox #name formControlName="name" [(ngModel)]="project_nr" i18n-placeholder
+                    placeholder="Project Number" [spinners]="false" [format]="'#'" 
+                    [min]="1">
+                </kendo-numerictextbox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        <kendo-gridlayout-item [row]="3" [col]="1"  style="width: 100%;">
+            <kendo-label class="k-text-inverse" >
+                <span class="label-span" i18n>Project Handling</span>
+                <kendo-combobox formControlName="user" [(ngModel)]="offer.user"
+                    [data]="users"  textField="name" valueField="custom_id"
+                    [filterable]="true" (filterChange)="handleFilter($event)" 
+                    i18n-placeholder placeholder="Select an user"></kendo-combobox>
+            </kendo-label>
+        </kendo-gridlayout-item>
+        
+        <kendo-gridlayout-item *ngIf="errorMsg" [row]="4" [col]="1"  style="width: 100%; text-align: end;">
+            <div class="error-msg" [innerHTML]="errorMsg"></div>
+        </kendo-gridlayout-item>
+
+        <kendo-gridlayout-item [row]="5" [col]="1"  style="width: 100%; text-align: end;">
+            <button kendoButton primary class="k-button k-button-md k-rounded-md k-button-solid-primary k-button-solid"
+            (click)="saveProject()" >
+                <span class="k-icon icon-save"></span>
+                <text style="padding-left: 2px;" i18n>Save</text>
+            </button>
+        </kendo-gridlayout-item>
+    </kendo-gridlayout>
+</form>
+
+
+<app-loader *ngIf="isLoaderEnabled"></app-loader>

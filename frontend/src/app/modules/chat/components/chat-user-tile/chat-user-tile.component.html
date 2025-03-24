@@ -1,0 +1,22 @@
+<div
+  class="chat-tile"
+  [class.unread]="isChat(userOrChat) && userOrChat.unreadMessagesCount > 0"
+  [class.selected]="selected"
+  (click)="selectUserOrChat.emit()"
+>
+  <app-chat-avatar [chat]="userOrChat"></app-chat-avatar>
+  <div class="chat-right-items">
+    <div class="chat-top-line">
+      <div class="chat-name">{{ getChatName() }}</div>
+      <time class="chat-latest-msg-time" *ngIf="isChat(userOrChat)">{{
+        formatDate(userOrChat.latestMessage.timestamp)
+      }}</time>
+    </div>
+    <div class="chat-bottom-line" *ngIf="isChat(userOrChat)">
+      <div class="chat-latest-msg">{{ userOrChat.latestMessage.text }}</div>
+      <div class="unread-messages-count">
+        {{ userOrChat.unreadMessagesCount }}
+      </div>
+    </div>
+  </div>
+</div>

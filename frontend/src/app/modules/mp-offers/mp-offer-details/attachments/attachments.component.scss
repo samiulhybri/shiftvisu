@@ -1,0 +1,68 @@
+.attachment-container {
+    width: 99% !important;
+    height: 100% !important;
+} 
+
+.k-upload .k-upload-files .k-file-size {
+	align-self: flex-start;
+}
+
+.k-upload .k-upload-action {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.k-tabstrip-top>.k-content {
+	border-bottom-right-radius: 8px !important;
+	border-bottom-left-radius: 8px !important;
+	border-top-width: 0 !important;
+}
+
+.attachment_details_section {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.attachment_details {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.file_selection{
+	margin-right: 10px;
+}
+
+.files_details {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	margin-left: 10px;
+}
+.file_name {
+	font-size: 14px;
+	opacity: 1;
+}
+.file_size {
+	font-size: 10px;
+	opacity: 0.7;
+}
+.file-update-btn {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+.attachment-footer-section {
+	padding-block: 0px;
+    padding-inline: 0;
+    padding: 6px;
+    display: flex;
+    justify-content: flex-end;
+}

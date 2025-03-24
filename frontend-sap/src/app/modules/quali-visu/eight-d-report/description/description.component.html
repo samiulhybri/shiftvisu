@@ -1,0 +1,9 @@
+<ui5-busy-indicator [active]="isSaving" class="max-h-[calc(100vh-370px)] w-full">
+	<ckeditor class="w-full"
+		[(ngModel)]="description"
+		tagName="textarea"
+		[editor]="classicEditor"
+		[config]="config"
+		(ngModelChange)="valueChange()">
+	</ckeditor>
+</ui5-busy-indicator>

@@ -1,0 +1,84 @@
+.header-flex {
+	display: flex;
+	padding: 16px 16px;
+	height: 16px;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: var(--light-border);
+}
+
+:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+	height: 59vh !important;
+	overflow: auto;
+}
+
+.editor-div {
+	height: 90% !important;
+}
+
+@media (min-width: 1951px) and (max-width: 2100px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 56vh !important;
+	}
+
+	.editor-div {
+		height: 88% !important;
+	}
+}
+
+@media (min-width: 1601px) and (max-width: 1950px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 55vh !important;
+	}
+
+	.editor-div {
+		height: 86% !important;
+	}
+}
+
+@media (min-width: 1401px) and (max-width: 1600px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 40vh !important;
+	}
+
+	.editor-div {
+		height: 86% !important;
+	}
+}
+
+@media (min-width: 1300px) and (max-width: 1599px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 32vh !important;
+	}
+
+	.editor-div {
+		height: 90% !important;
+	}
+}
+
+@media (max-width: 1299px) {
+	:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+		height: 27vh !important;
+	}
+
+	.editor-div {
+		height: 80% !important;
+	}
+}
+
+.custom-grid {
+	display: grid;
+	grid-template-columns: repeat(40, 1fr);
+}
+
+.grid-child-narrow {
+	grid-column: span 1;
+}
+
+.grid-child-bigger {
+	grid-column: span 38;
+}
+
+.customBorder{
+	border-bottom: 1px solid #d6d6d6;
+}

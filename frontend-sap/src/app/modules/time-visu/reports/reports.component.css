@@ -1,0 +1,8 @@
+.report-content {
+    height: calc(100% - 70px);
+    margin: 10px 0 10px 10px;
+}
+
+.go-btn {
+    width: 80px !important;
+}

@@ -1,0 +1,217 @@
+<form novalidate class="k-form" *ngIf="hweCertificate">
+	<kendo-stacklayout orientation="horizontal" [gap]="12">
+		<kendo-card [style.flex]="6">
+			<kendo-card-header>
+				<span i18n> Hwe Certificates</span>
+				<kendo-grid-spacer></kendo-grid-spacer>
+				<button kendoButton type="button" *ngIf="hweCertificate.sample?.calculation_id" (click)="showCalculationDetails()" themeColor="primary"> Calculation Details</button>
+			</kendo-card-header>
+			<kendo-card-body class="pt-norm-details-body">
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="qsSample" i18n i18n-text text="Rev:"></kendo-label>
+						<kendo-numerictextbox #qsSample format="0" [(ngModel)]="hweCertificate.rev" name="rev">
+						</kendo-numerictextbox>
+					</kendo-stacklayout>
+
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="qsSample" i18n i18n-text text="Inspection no:"></kendo-label>
+						<kendo-textbox #qsSample [(ngModel)]="hweCertificate.inspection_no" name="inspection_no"
+						>
+						</kendo-textbox>
+					</kendo-stacklayout>
+
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="is_show_chemical_analysis" i18n i18n-text text="Is Show Chemical Analysis:"></kendo-label>
+						<div style="text-align: left">
+							<input type="checkbox" kendoCheckBox name="is_show_chemical_analysis" [(ngModel)]="hweCertificate.is_show_chemical_analysis" #is_show_chemical_analysis />
+						</div>
+
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="Product_Analysis" i18n i18n-text text="Product Analysis:"></kendo-label>
+						<div style="text-align: left">
+							<input type="checkbox" kendoCheckBox [checked]="hweCertificate?.sample?.product_analysis" disabled="disabled" #Product_Analysis />
+						</div>
+
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="is_show_grain_size_determination" i18n i18n-text text="Is Show Grain Size Determination:"></kendo-label>
+						<div style="text-align: left">
+							<input type="checkbox" kendoCheckBox name="is_show_grain_size_determination" [(ngModel)]="hweCertificate.is_show_grain_size_determination" #is_show_grain_size_determination />
+						</div>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="grainsize_of_the_component" i18n i18n-text text="Grainsize of the component:"></kendo-label>
+						<div style="text-align: left">
+							<input type="checkbox" kendoCheckBox [checked]="hweCertificate?.sample?.grainsize_of_the_component" disabled="disabled" #grainsize_of_the_component />
+						</div>
+
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="is_show_purity_determination" i18n i18n-text text="Is Show Purity Determination:"></kendo-label>
+						<div style="text-align: left">
+							<input type="checkbox" kendoCheckBox name="is_show_purity_determination" [(ngModel)]="hweCertificate.is_show_purity_determination" #is_show_purity_determination />
+						</div>
+
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="cleanliness_of_the_component" i18n i18n-text text="Cleanliness of the component:"></kendo-label>
+						<div style="text-align: left">
+							<input type="checkbox" kendoCheckBox [checked]="hweCertificate?.sample?.cleanliness_of_the_component" disabled="disabled" #cleanliness_of_the_component />
+						</div>
+
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="is_show_jominy_test" i18n i18n-text text="Is show Jominy Test:"></kendo-label>
+						<div style="text-align: left">
+							<input type="checkbox" kendoCheckBox name="is_show_jominy_test" [(ngModel)]="hweCertificate.is_show_jominy_test" #is_show_jominy_test />
+						</div>
+
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="jominy" i18n i18n-text text="Jominy:"></kendo-label>
+						<div style="text-align: left">
+							<input type="checkbox" kendoCheckBox [checked]="hweCertificate?.sample?.jominy" disabled="disabled" #jominy />
+						</div>
+
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="qsSample" i18n i18n-text text="Test Result:">
+							<span class="k-text-error k-pl-1">*</span></kendo-label>
+						<kendo-combobox #qsSample [(ngModel)]="hweCertificate.sample" name="qsSamples"
+										[data]="qsSamples" (valueChange)="qsSampleChange($event)" textField="custom_id" valueField="id" [style.width]="'50%'"
+										[filterable]="true" (filterChange)="handleFilter($event, 'qsSample')">
+						</kendo-combobox>
+					</kendo-stacklayout>
+
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="test_result_note" i18n i18n-text text="Test Result note:"></kendo-label>
+						<kendo-textarea name="test_result_note" [(ngModel)]="hweCertificate.test_result_note" #test_result_note></kendo-textarea>
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="hardness_note" i18n i18n-text text="Hardness note:"></kendo-label>
+						<kendo-textarea name="hardness_note" [(ngModel)]="hweCertificate.hardness_note" #hardness_note></kendo-textarea>
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="ultrasonic" i18n i18n-text text="Us Inspection:"> </kendo-label>
+						<kendo-combobox #ultrasonic [(ngModel)]="hweCertificate.ultrasonic" name="ultrasonics"
+										[data]="ultrasonics" textField="custom_id" valueField="id" [style.width]="'50%'"
+										[filterable]="true" (filterChange)="handleFilter($event, 'ultrasonic')">
+						</kendo-combobox>
+				    </kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="note_ultrasonic" i18n i18n-text text="Note Us Inspection:"></kendo-label>
+						<kendo-textarea name="note_ultrasonic" [(ngModel)]="hweCertificate.note_ultrasonic" #note_ultrasonic></kendo-textarea>
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="surface" i18n i18n-text text="Surface track inspection:"> </kendo-label>
+						<kendo-combobox #surface [(ngModel)]="hweCertificate.surface" name="surface"
+										[data]="surfaces" textField="custom_id" valueField="id" [style.width]="'50%'"
+										[filterable]="true" (filterChange)="handleFilter($event, 'surface')">
+						</kendo-combobox>
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="note_surface" i18n i18n-text text="Surface track inspection Note:"></kendo-label>
+						<kendo-textarea name="note_surface" [(ngModel)]="hweCertificate.note_surface" #note_surface></kendo-textarea>
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="heatTreatment" i18n i18n-text text="Heat-Treatment:"> </kendo-label>
+						<kendo-combobox #heatTreatment [(ngModel)]="hweCertificate.heatTreatment" name="heatTreatment"
+										[data]="heatTreatments" textField="custom_id" valueField="id" [style.width]="'50%'"
+										[filterable]="true" (filterChange)="handleFilter($event, 'heatTreatment')">
+						</kendo-combobox>
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="heat_treatment" i18n i18n-text text="Heat-Treatment Note:"></kendo-label>
+						<kendo-textarea name="heat_treatment" [(ngModel)]="hweCertificate.note_heat_treatment" #heat_treatment></kendo-textarea>
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="test_no" i18n i18n-text text="Notes:"></kendo-label>
+						<kendo-textarea name="test_no" [(ngModel)]="hweCertificate.test_no" #test_no></kendo-textarea>
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+					<kendo-stacklayout orientation="horizontal" [gap]="9">
+						<kendo-label [for]="note_attachment" i18n i18n-text text="Note Attachment:"></kendo-label>
+						<kendo-textarea name="note_attachment" [(ngModel)]="hweCertificate.note_attachment" #note_attachment></kendo-textarea>
+					</kendo-stacklayout>
+				</kendo-stacklayout>
+
+			</kendo-card-body>
+		</kendo-card>
+		<kendo-card [style.flex]="6">
+			<kendo-card-header i18n>
+				Hwe Certificate Qs Samples
+			</kendo-card-header>
+			<kendo-card-body class="pt-norm-details-body">
+				<span  *ngFor="let data of hweCertificate.hweCertificateHweQsSamples">
+				<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+						<kendo-stacklayout orientation="horizontal" [gap]="9">
+							<kendo-label [for]="ultrasonic" i18n i18n-text text="Qs samples:"> </kendo-label>
+							<kendo-combobox #ultrasonic [(ngModel)]="data.hweQsSample" [ngModelOptions]="{standalone: true}"
+											[data]="sampleNumbers"  textField="custom_id" valueField="id" [style.width]="'50%'"
+											[filterable]="true" (filterChange)="handleFilter($event, 'sampleNumbers')">
+							</kendo-combobox>
+						</kendo-stacklayout>
+					</kendo-stacklayout>
+					<kendo-stacklayout orientation="horizontal" [gap]="9" class="k-m-2">
+						<kendo-stacklayout orientation="horizontal" [gap]="9">
+							<kendo-label [for]="note_surface"  i18n i18n-text text="Note Qs Sample:"></kendo-label>
+							<kendo-textarea [ngModelOptions]="{standalone: true}"  #note_surface [(ngModel)]="data.note_qs_sample" ></kendo-textarea>
+						</kendo-stacklayout>
+					</kendo-stacklayout>
+				</span>
+			</kendo-card-body>
+			<kendo-card-footer>
+				<kendo-label [for]="" i18n i18n-text text="Notes Certificate:"> </kendo-label>
+				<kendo-textbox  disabled="true" value="{{zzv1}}">
+				</kendo-textbox>
+			</kendo-card-footer>
+		</kendo-card>
+	</kendo-stacklayout>
+</form>
+<app-loader *ngIf="isLoaderEnabled"></app-loader>
+
+
+
+<kendo-dialog
+	title="Please confirm"
+	*ngIf="calculationUrl"
+	(close)="calculationUrl=undefined"
+	[width]="'95vw'"
+	[height]="'90vh'"
+>
+	<iframe [src]="this.calculationUrl"></iframe>
+
+</kendo-dialog>

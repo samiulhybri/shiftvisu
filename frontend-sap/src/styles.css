@@ -1,0 +1,962 @@
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+@import 'ckeditor5/ckeditor5.css';
+@import 'ckeditor5-premium-features/ckeditor5-premium-features.css';
+
+html,
+body {
+    height: 99.8%;
+	background: color-mix(in srgb, black 4%, var(--sapBackgroundColor));
+	margin: 0px;
+	font-family: var(--sapFontFamily);
+}
+@import '@bryntum/core-thin/core.material.css';
+@import '@bryntum/grid-thin/grid.material.css';
+@import '@bryntum/scheduler-thin/scheduler.material.css';
+@import '@bryntum/schedulerpro-thin/schedulerpro.material.css';
+
+/* You can add global styles to this file, and also import other style files */
+:root {
+	--color-white: #FFFFFF;
+	--off-day-color-white: #F5F6F7;
+	--cardBorderRadius: 12px;
+	--card-background-color: #eff1f2;
+	--card-border-color: 1px solid #a8b3bd;
+	--machineBoardCardBorderRadius: 16px;
+	--production-color: #30914c;
+	--statnstill-color: #f53232;
+	--setup-color: #e76500bf;
+	--ready-color: #0057B8;
+	--greenHoverColor: #089931;
+	--redHoverColor: #f51a1a;
+	--yellowHoverColor: #e76400e1;
+	--customTextColor: #556b81;
+	--legendCardRadius: 20px;
+	--blackBorderColor: #1d2d3e;
+	--input-border-radius: 4px;
+	--input-text-font-size: 14px;
+	--input-line-height: 18px;
+	--input-padding-left: 4px;
+	--input-line-right: -6px;
+	--input-border-bottom: 1px solid var(--customTextColor);
+	--input-border-left: 1px solid lightgray;
+	--input-border-right: 1px solid lightgray;
+	--input-border-top: 1px solid lightgray;
+	--custom-shadow-color: #22364933;
+	--text-font-size: 14px;
+	--title-text-font-size: 16px;
+	--listHoverBorder: 1px solid #0064d9;
+	--goodPartColor: #0070f2;
+	--infoColor: #0070f2;
+	--reworkPartColor: #d27700;
+	--badPartColor: #788fa6;
+	--targetPartColor: #0032a5;
+	--listHoverBgColor: #edf6ff;
+	--list-border-radius: 8px;
+	--listTitleColor: #0064d9;
+	--customGridTableDateRangePickerWidth: 247px;
+	--clockInBackgroundColor: #F5F6F7;
+	--red-color-1-px-solid: #F53232;
+	--scrap-color: #ff5722;
+	--gray: #808080;
+	--clockInBackgroundColor: #f5f6f7;
+	--list-description-text-color: #556b82;
+	--production-lite-color: #ebf5cb;
+	--status-true-background-color: #ebf5cb;
+	--ready-lite-color: #E3F0FF;
+	--setup-lite-color: #fff8d6;
+	--standstill-lite-color: #ffd6e9;
+	--status-false-background-color: #ffd6e9;
+	--border-color: #a8b3bd;
+	--scrollbar-color: #999b9b;
+	--progressbar-information-bar-color: #0070F2;
+	--progressbar-information-remaining-bar-color: #CDEDFF;
+	--progressbar-machine-card-bar-color: #1D2D3E;
+	--progressbar-machine-card-remaining-bar-color: #556B81;
+	--file-icon-color: #758CA4;
+	--light-border: 1px solid #D9D9D9;
+	--setup-color-machine-card-view2: rgba(231, 101, 0, 0.75);
+	--color-red: rgba(255, 234, 244, 1);
+	--setup-color-machine-card-view2-hover: #EA893D;
+	--ready-color: #0070F2;
+	--ready-color-compact-hover: #0058BF;
+	--ready-class-hover: #E3F0FF;
+	--production-color-compact-hover: rgba(37, 111, 58, 1);
+	--statnstill-color-compact-hover: #AA0808;
+	--status-false-color: #AA0808;
+	--setup-color-compact-hover: rgba(180, 79, 0, 0.75);
+	--toaster-information: #1F7DA7;
+	--toaster-success: #039855;
+	--toaster-warning: #FDBF4B;
+	--toaster-error: #D92D20;
+	--div-border-color: #E5E5E5;
+	--status-true-text-color: #256F3A;
+	--status-false-text-color: #AA0808;
+	--status-border-color: #DBEDA1;
+	--status-true-border-color: #DBEDA1;
+	--bom-status-warning-bgcolor: #FFF3B7;
+	--bom-status-warning-color: #B95100;
+	--bom-status-warning-border-color: #FFEA84;
+	--bom-status-error-border-color: #FFC1DF;
+	--status-false-border-color: #FFC1DF;
+	--production-status-planned--bg: #E8F3FF;
+	--production-status-planned--color: #0064D8;
+	--production-status-planned-border--color: #B5D7FF;
+	--gap-for-main-content:12px;
+	--production-error-color: #f98585;
+	--default-bg-color: #E7E9EA;
+	--no-shift-time-color: #E90B0B;
+	--twenty-five-percent-shift-time-color: #F5F6F7;
+	--fifty-percent-shift-time-color: #E5F2BA;
+	--seventy-five-percent-shift-time-color: #4FAC6A;
+	--full-shift-time-color: #256F3A;
+  --card-margin: 11px
+}
+
+#company_logo {
+	margin: 0 0 0 36px;
+	height: 24.23px;
+}
+
+#company_logo:hover {
+	cursor: pointer;
+	background-color: rgba(128, 128, 128, 0.134);
+}
+
+.busy-indicator {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.legendColor {
+	height: 14px;
+	width: 14px;
+}
+
+ui5-toast {
+    z-index: 10000;
+}
+
+.success-toaster {
+	background-color: var(--toaster-success);
+	color: var(--color-white);
+	z-index: 99999;
+}
+
+.warning-toaster {
+	background-color: var(--toaster-warning);
+	color: var(--color-white);
+	z-index: 99999;
+}
+
+.information-toaster {
+	background-color: var(--toaster-information);
+	color: var(--color-white);
+	z-index: 99999;
+}
+
+.error-toaster {
+	background-color: var(--toaster-error);
+	color: var(--color-white);
+	z-index: 99999;
+}
+
+#content {
+	height: 100%;
+	overflow: hidden;
+}
+
+ui5-table ui5-table-column.table-header-text-alignment::part(column) {
+	text-align: end;
+}
+
+.ui5-table ui5-table-column.table-header-text-alignment::part(column) {
+	text-align: center;
+}
+
+#tableContainer {
+	border-radius: 10px;
+	height: 100%;
+	overflow: auto;
+}
+
+.columnChartPadding {
+	padding: 0px 16px 16px 16px;
+}
+
+.flex {
+	display: flex;
+}
+
+.flex-col {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.flex-end {
+	justify-content: end;
+}
+
+.flex-space-between {
+	justify-content: space-between;
+}
+
+.flex-begin {
+	justify-content: start;
+}
+
+.flex-col-item {
+	display: flex;
+	flex-direction: column;
+    gap: 5px;
+}
+
+.machine-dialog-body {
+	width: 27rem;
+	min-height: 28rem;
+	padding: 10px;
+}
+
+.hall-dialog-body {
+	width: 27rem;
+	height: 11rem;
+	padding: 10px;
+}
+
+.tool-dialog-body {
+	width: 418px;
+	height: 158px;
+}
+
+.machine-group-dialog-body {
+	width: 418px;
+	height: 218px;
+}
+
+.flex.center {
+	align-items: center;
+}
+
+.flex-column {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.gap-65 {
+	gap: 70px;
+}
+
+.gap-10 {
+	gap: 10px;
+}
+
+.gap-8 {
+	gap: 8px;
+}
+
+.gap-20 {
+	gap: 20px;
+}
+
+.p-10 {
+	padding: 10px;
+}
+
+.mb-10 {
+	margin-bottom: 10px;
+}
+
+.mb-20 {
+	margin-bottom: 20px;
+}
+
+.mb-12 {
+	margin-bottom: 12px;
+}
+
+.mb-16 {
+	margin-bottom: 16px;
+}
+
+.ml-8 {
+	margin-left: 8px;
+}
+
+.ml-5 {
+	margin-left: 5px;
+}
+
+.ml-6 {
+	margin-left: 6px;
+}
+
+.ml-15 {
+	margin-left: 15px;
+}
+
+.ml-16 {
+	margin-left: 16px;
+}
+
+.mr-4 {
+	margin-right: 4px;
+}
+
+.mr-5 {
+	margin-right: 5px;
+}
+
+.mr-8 {
+	margin-right: 8px;
+}
+
+.mr-10 {
+	margin-right: 10px;
+}
+
+.mr-15 {
+	margin-right: 20px;
+}
+
+.mr-16 {
+	margin-right: 16px;
+}
+
+.mt-8 {
+	margin-top: 8px;
+}
+
+.mt-9 {
+	margin-top: 9px;
+}
+
+.mt-10 {
+	margin-top: 10px;
+}
+
+.mt-35 {
+	margin-top: 35px;
+}
+
+.mt-20 {
+	margin-top: 20px;
+}
+
+.mt-28 {
+	margin-top: 28px;
+}
+
+.pd-10 {
+	padding: 10px;
+}
+
+.one-rem-width {
+	width: 1rem;
+}
+
+.w-22rm {
+	width: 22rem;
+}
+
+.w-33 {
+	width: 33%;
+}
+
+.w-40 {
+	width: 40%;
+}
+
+.w-33 {
+	width: 33%;
+}
+
+.w-50 {
+	width: 50%;
+}
+
+.w-60 {
+	width: 60%;
+}
+
+.w-70 {
+	width: 70%;
+}
+
+.w-80 {
+	width: 80%;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.w-98 {
+	width: 98%;
+}
+
+.w-100-22rm {
+	width: calc(100% - 22rem);
+	height: 100rem;
+}
+
+.h-45rem {
+	height: 48rem;
+}
+
+.h-130px {
+	height: 130px;
+}
+
+.h-90 {
+	height: 90%;
+}
+
+.h-100 {
+	height: 100%;
+}
+
+.dialog-footer {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+	align-items: center;
+}
+
+.bold-text {
+	color: var(--Text-sapTitleColor, #1d2d3e);
+	font-family: 72;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+}
+
+.tableStandard {
+	background: var(--sapBackgroundColor);
+	border-radius: 0.5rem 0.5rem 0 0;
+	height: 100%;
+	width: calc(99% + 10px);
+}
+
+.toolsDiv {
+	background: var(--sapBackgroundColor);
+	border-radius: 0.5rem 0.5rem 0 0;
+	height: 100%;
+	width: calc(99% + 20px);
+}
+
+.shiftModel {
+	background: var(--sapBackgroundColor);
+	border-radius: 0.5rem 0.5rem 0 0;
+	height: 100%;
+	width: calc(99% + 10px);
+	display: flex;
+	gap: 10px;
+}
+
+.suppliersDiv {
+	background: var(--sapBackgroundColor);
+	border-radius: 0.5rem 0.5rem 0 0;
+	height: 100%;
+	width: calc(99% + 10px);
+}
+
+.div-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.div-col {
+	display: flex;
+	flex-direction: column;
+}
+
+.AnalyticalTable-noDataContainer-0-2-30 {
+	height: 100%;
+}
+
+.footer-style {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+	align-items: center;
+}
+
+.singleElementSwitch {
+	display: flex;
+	margin-top: 0.5rem;
+	margin-left: 1rem;
+	flex-direction: column;
+}
+
+.singleElement {
+	display: flex;
+	margin-top: 0.5rem;
+	flex-direction: column;
+}
+
+.switchSection {
+	display: flex;
+	flex-direction: row;
+	margin-top: 1rem;
+}
+
+.cardMain {
+	display: flex;
+	flex-direction: column;
+	padding: 39px;
+}
+
+.formMainSection {
+	display: flex;
+	flex-direction: row;
+	height: 400px;
+}
+
+.applyBtn {
+	display: flex;
+	flex-direction: row;
+	justify-content: end;
+	margin-top: 10px;
+}
+
+.object-status-value {
+	padding-right: 0.125rem;
+}
+
+.green-color {
+	color: #2b7c2b;
+}
+
+.right-text-alignment {
+	text-align: right;
+}
+
+.search-field-width {
+	width: 220px;
+}
+
+.dialog-header {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding-top: 10px;
+}
+
+.dialog-footer {
+	display: flex;
+	align-items: center;
+	justify-content: end;
+	flex-direction: row;
+	width: 100%;
+}
+
+.setting-dialog-body {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.setting-dialog-list {
+	width: calc(100% + 30px);
+	margin: -15px;
+	height: 70vh;
+	overflow-y: auto;
+}
+
+.create-dialog-footer {
+	display: flex;
+	align-items: center;
+	justify-content: end;
+	flex-direction: row;
+	width: 100%;
+}
+
+.responsive-dialog-footer {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 5px 0px;
+}
+
+.login-footer {
+	display: flex;
+	align-items: flex-end;
+	justify-content: end;
+	background-color: #eff1f2;
+	height: 8%;
+	margin-left: -10px;
+	border-bottom-left-radius: 15px;
+	border-bottom-right-radius: 15px;
+	width: 100%;
+	position: absolute;
+	bottom: 0px;
+}
+
+.login-img {
+	margin-top: 20px;
+	margin-right: 15px;
+}
+
+.login-container {
+	height: 70%;
+	width: 23%;
+	border-radius: 15px;
+	padding: 40px, 0px, 0px, 0px;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	background-color: white;
+	margin: auto;
+	padding: 10px;
+}
+
+.settings-dialog-body {
+	width: 28rem;
+	height: 16rem;
+	padding: 10px;
+}
+
+.field-gap {
+	display: flex;
+	gap: 5px;
+}
+
+.ui5-card-design {
+	cursor: pointer;
+}
+
+.ui5-card-header {
+	padding-top: 1rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
+
+.card-div {
+	height: 176px;
+	width: 176px;
+}
+
+.card-div-center {
+	height: 168px;
+}
+
+.card-div-center:hover {
+	border: 1px solid var(--sapBrandColor);
+	border-radius: 15px;
+}
+
+.card-header-text {
+	font-weight: bold !important;
+}
+
+.default-div {
+	height: 170px;
+	background-color: var(--sapHoverColor);
+}
+
+.default-div:hover {
+	height: 168px;
+	border: 1px solid var(--sapBrandColor);
+	border-radius: 15px;
+}
+
+.ui5-card-design:hover {
+	display: inline-block;
+	background-position: 0px;
+	border-radius: 1rem;
+	outline: 0.5px solid var(--sapTile_Interactive_BorderColor);
+	box-shadow: 0px 4px 8px 0px var(--custom-shadow-color),
+		0px 2px 4px 0px var(--custom-shadow-color) !important;
+}
+
+.card-div:hover {
+	background-color: var(--sapHoverColor);
+}
+
+.clock-in-out-dialog {
+	width: 78.125rem;
+	height: 41.25rem;
+	border-radius: 12px 0px 0px 0px;
+}
+
+.grid-table-date-picker-width {
+	width: var(--customGridTableDateRangePickerWidth);
+}
+
+.left-component {
+	width: 320px;
+	height: 540px;
+}
+
+.keypad {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 12px;
+	padding: 12px;
+}
+
+.key {
+	width: 88px;
+	height: 36px;
+}
+
+.input-class {
+	width: 288px;
+	height: 36px;
+	margin-top: 12px;
+}
+
+.input-class-right-component {
+	width: 419px;
+	height: 36px;
+}
+
+.custom-hr {
+	border: none;
+	height: 1px;
+	background-color: #a8b3bd;
+	width: 100%;
+	margin-bottom: 3px;
+}
+
+.left-component-body {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	height: 452px;
+}
+
+.clock-in-confirm-button {
+	height: 36px;
+	margin-right: 16px;
+}
+
+.left-component-footer {
+	display: flex;
+	align-items: center;
+	justify-content: end;
+	flex-direction: row;
+	width: 100%;
+}
+
+.custom-header-hr {
+	border: none;
+	height: 1px;
+	background-color: #a8b3bd;
+	width: 100%;
+	margin-top: 10px;
+}
+
+.clock-button {
+	color: var(--sapHighlightColor);
+	margin: 6px;
+}
+
+.right-component-div {
+	margin-left: 16px;
+}
+
+.right-component {
+	width: 886px;
+	height: 540px;
+}
+
+.root-div-clock-in {
+	display: flex;
+	flex-direction: row;
+}
+
+.user-name-id-div {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: start;
+	width: 854px;
+}
+
+.user-name-div {
+	display: flex;
+	flex-direction: column;
+	padding: 16px;
+}
+
+.user-id-div {
+	display: flex;
+	flex-direction: column;
+}
+
+.user-table-div {
+	width: 854px;
+	height: 386px;
+}
+
+.no-user-logged-in-text {
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 24px;
+	margin-top: 12px;
+	color: var(--customTextColor);
+}
+
+.card-avatar {
+	width: 300px;
+	color: var(--sapHighlightColor);
+}
+
+.divider {
+	width: 100%;
+	height: 1px;
+	background-color: var(--sapGroup_TitleBorderColor);
+}
+
+.workplace-avatar {
+	color: var(--sapTextColor);
+	background-color: transparent;
+	border-color: var(--sapNeutralColor);
+	margin-top: 20px;
+}
+
+.workplace-card {
+	cursor: pointer;
+	width: 205px;
+	height: 170px;
+	text-align: center;
+	margin: 6px;
+}
+
+.header-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}
+
+.deselect-button {
+	border: none;
+	margin-left: auto;
+}
+
+.clock-button:hover {
+	background-color: var(--sapButton_Selected_Background);
+	border: 1px solid var(--sapButton_Lite_Active_BorderColor);
+}
+
+.flex-col {
+	display: flex;
+	flex-direction: column;
+}
+
+.h-208 {
+	height: 208px;
+}
+
+.pb-10 {
+	padding-bottom: 10px;
+}
+
+.h-322 {
+	height: 322px;
+}
+
+.w-320 {
+	width: 320px;
+}
+
+.h-540 {
+	height: 540px;
+}
+
+.confirm-dialog {
+	height: 540px;
+	width: 905px;
+}
+
+.gap-12 {
+	gap: 12px;
+}
+
+.margin-top--10 {
+	margin-top: -10px;
+}
+
+.gap-8 {
+	gap: 8px;
+}
+
+.margin-top--10 {
+	margin-top: -10px;
+}
+
+.hrStyle {
+	width: 100%;
+	border-top: var(--card-border-color);
+}
+
+#progressIndicator::part(bar) {
+	background-color: #0070F2;
+	z-index: 5;
+}
+
+#progressIndicator::part(remaining-bar) {
+	background-color: #CDEDFF;
+}
+
+.w-66-percent {
+	width: 66.67%;
+}
+
+.w-33-percent {
+	width: 33.33%;
+}
+
+.font-size-32 {
+	font-size: 32px;
+}
+
+.font-size-64 {
+	font-size: 64px;
+}
+
+.centered-loader {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.deleteErrorDialogFooter {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+	align-items: center
+}
+
+[class*="selectAllCheckBoxContainer"]>span {
+	text-align: center !important;
+}
+
+:global(.ui5-bar-startcontent-container){
+	padding-left: 48px !important;
+}
+
+.scanner-overlay {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 50%;
+	height: 50%;
+	border: 2px dashed #ff0000;
+	background-color: rgba(0, 0, 0, 0.1);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}

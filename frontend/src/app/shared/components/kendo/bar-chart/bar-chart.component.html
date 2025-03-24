@@ -1,0 +1,78 @@
+<kendo-chart
+	[seriesColors]="colors"
+	[legend]="legend"
+	[valueAxis]="valueAxis"
+	[style.height]="myHeight"
+	(seriesClick)="onSeriesClick($event)"
+	(plotAreaClick)="onPlotAreaClick($event)"
+	(selectEnd)="onSelectEnd($event)"
+	[subtitle]="subtitle"
+	[hidden]="isHidden"
+	[transitions]="transitions"
+>
+	<kendo-chart-axis-defaults [majorGridLines]="majorGridLines">
+	</kendo-chart-axis-defaults>
+	<kendo-chart-title
+		[text]="title"
+		[visible]="titleIsVisible"
+	></kendo-chart-title>
+	<kendo-chart-category-axis>
+		<kendo-chart-category-axis-item
+			[categories]="categories"
+			[select]="selection"
+		>
+			<kendo-chart-category-axis-item-labels
+				[content]="categoryAxisLabelContent"
+				[rotation]="categorieLabelRotation"
+			>
+			</kendo-chart-category-axis-item-labels>
+		</kendo-chart-category-axis-item>
+	</kendo-chart-category-axis>
+	<kendo-chart-value-axis>
+        <kendo-chart-value-axis-item 
+			[max]="maxValue"
+		>
+          <kendo-chart-value-axis-item-labels
+		  	[content]="valueAxisLabelContent"
+			[rotation]="valueAxisLabelRotation"
+		>
+          </kendo-chart-value-axis-item-labels>
+        </kendo-chart-value-axis-item>
+      </kendo-chart-value-axis>
+	<kendo-chart-series>
+		<kendo-chart-series-item
+			*ngFor="let series of seriesData"
+			[type]="barType"
+			[data]="series?.data"
+			[name]="series?.name"
+			[gap]="gap"
+			[field]="value"
+			[categoryField]="category"
+			[colorField]="color"
+			[border]="seriesBorderOption"
+			[spacing]="spacing"
+		>
+			<kendo-chart-series-item-labels 
+				[visible]="true"
+				[content]="seriesLabelContent"
+				format="{0}"
+			>
+			</kendo-chart-series-item-labels>
+			<kendo-chart-series-item-tooltip
+
+			>
+			</kendo-chart-series-item-tooltip>
+		</kendo-chart-series-item>
+	</kendo-chart-series>
+	<kendo-chart-tooltip [shared]="true">
+        <ng-template
+			kendoChartSharedTooltipTemplate
+			let-category="category"
+			let-points="points"
+        >
+        <div *ngFor="let point of points">
+            {{ category }} : <b>{{ point.value.toLocaleString() }}</b>
+        </div>
+        </ng-template>
+      </kendo-chart-tooltip>
+</kendo-chart>

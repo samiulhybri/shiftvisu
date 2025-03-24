@@ -1,0 +1,21 @@
+.main-div {
+    margin-left: -14px;
+    margin-right: -14px;
+    height: 100%;
+}
+
+.input-selection-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.label-flex-end {
+    flex: 1;
+    text-align: end;
+}
+
+.busy-indicator-flex {
+    flex: 2;
+}
