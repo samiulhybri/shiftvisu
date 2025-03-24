@@ -125,6 +125,7 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 
 	isLoadingCustomId: boolean = false;
 	customId: any;
+	isSaveFailureLoading: boolean = false;
 
 	constructor(
 		public authService: AuthService,
@@ -138,6 +139,8 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 	}
 
 	saveFailureSettings() {
+		this.isSaveFailureLoading = true;
+		const url = "shift-visu/component-issue-type";
 		if (this.modelComponent && this.modelComponent.selectedOriginalData) {
 		  this.selectedModelComponents = this.modelComponent.selectedOriginalData.map(
 			(data: any) => {
@@ -164,6 +167,22 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 		  shiftVisuGeneralComponents: this.seletedGeneralComponents,//array
 		};
 		console.log('payload',payload);
+		console.log('payload',payload);
+
+		this.shiftVisuService["post"](url, payload, false).subscribe({
+			next: async response => {
+				this.updateIssueTypes();
+				const { recordSavedSuccessfully } = Localization;
+				this.toast.showToast(recordSavedSuccessfully, "success");
+				await this.getCustomId();
+			},
+			error: async () => {
+				const { failedToSaveData } = Localization;
+				this.toast.showToast(failedToSaveData, "error");
+				this.isSaveFailureLoading = false;
+				await this.getCustomId();
+			},
+		});
 	  }
 	  
 	  
