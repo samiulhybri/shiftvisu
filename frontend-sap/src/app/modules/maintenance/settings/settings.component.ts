@@ -243,13 +243,10 @@ export class SettingsComponent {
 		if(this.maintenanceTypeId != event.id){
 			this.checkSelectedDataId(event.id);
 		}
-
 		this.selectedMaintenanceType = new OperationPlan().deserialize(event);
-
 		this.operationPlanCustomId = event.custom_id;
 		this.maintenanceTypeId = event.id;
 		this.isMaintenanceTypeDialog = true;
-		
 		this.maintenanceDialogTitle = Localization.edit;
 	}
 

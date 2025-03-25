@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild } from "@angular/core";
 import { NgForm, NgModel } from "@angular/forms";
 
 import { MultiComboBoxSelectionChangeEventDetail } from "@ui5/webcomponents/dist/MultiComboBox";
@@ -47,6 +47,7 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 	@ViewChild("archiveIssueTypeDialog") archiveIssueTypeDialog: Dialog | undefined;
 	@ViewChild("retrieveIssueTypeDialog") retrieveIssueTypeDialog: Dialog | undefined;
 
+	@Output() selectedIssue = new EventEmitter<any>();
 	are_active_errors_displaying = true;
 
 	odataUrl = "/ShiftVisuIssueTypes";
@@ -126,6 +127,7 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 	isLoadingCustomId: boolean = false;
 	customId: any;
 	isSaveFailureLoading: boolean = false;
+	selectedIssueTypeId: number | undefined;
 
 	constructor(
 		public authService: AuthService,
@@ -142,32 +144,31 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 		this.isSaveFailureLoading = true;
 		const url = "shift-visu/component-issue-type";
 		if (this.modelComponent && this.modelComponent.selectedOriginalData) {
-		  this.selectedModelComponents = this.modelComponent.selectedOriginalData.map(
-			(data: any) => {
-			  const model = new ShiftVisuComponentModel(); 
-			  model.deserialize(data); 
-			  return model; 
-			}
-		  );
-		//   console.log('model component',this.selectedModelComponents);
+			this.selectedModelComponents = this.modelComponent.selectedOriginalData.map(
+				(data: any) => {
+					const model = new ShiftVisuComponentModel();
+					model.deserialize(data);
+					return model;
+				}
+			);
 		}
 		if (this.generalComponent && this.generalComponent.selectedOriginalData) {
-		  this.seletedGeneralComponents = this.generalComponent.selectedOriginalData.map(
-			(data: any) => {
-			  const model = new ShiftVisuComponentModel();	
-			  model.deserialize(data);
-			  return model;
-			}
-		  );
-		//   console.log('general component',this.seletedGeneralComponents);
+			this.seletedGeneralComponents = this.generalComponent.selectedOriginalData.map(
+				(data: any) => {
+					const model = new ShiftVisuComponentModel();
+					model.deserialize(data);
+					return model;
+				}
+			);
 		}
 		const payload = {
-		  shiftVisuIssueType: this.selectedIssueType, // object
-		  shiftVisuModelComponents: this.selectedModelComponents,// array
-		  shiftVisuGeneralComponents: this.seletedGeneralComponents,//array
+			shiftVisuIssueType: this.selectedIssueType, 
+			shiftVisuModelComponents: this.selectedModelComponents, 
+			shiftVisuGeneralComponents: this.seletedGeneralComponents, 
 		};
-		console.log('payload',payload);
-		console.log('payload',payload);
+		console.log("payload", payload);
+		console.log("payload", payload);
+		this.selectedIssueTypeId = this.selectedIssueType.id;
 
 		this.shiftVisuService["post"](url, payload, false).subscribe({
 			next: async response => {
@@ -183,26 +184,36 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 				await this.getCustomId();
 			},
 		});
-	  }
-	  
-	  
+	}
 
 	processData(data: any, recentData: any) {
 		if (this.failureSettingsGrid) this.failureSettingsGrid.isBusy = false;
 		this.are_active_errors_displaying = this.filterQuery == "is_active eq true" ? true : false;
-
 		if (
 			this.failureSettingsGrid &&
 			data?.length > 0 &&
 			recentData?.length > 0 &&
 			data.length == recentData.length
 		) {
-			this.selectedRowsId[0] = true;
-			this.failureSettingsGrid.selectedRowsId = structuredClone(this.selectedRowsId);
-			this.selectedIssueType = data[0];
-			console.log("failer selected", data);
-		}
+			if (this.selectedIssueTypeId) {
+				const id = this.selectedIssueTypeId;
+				const index: number = this.failureSettingsGrid?.data.findIndex((item: any) => item.id === id);
 
+				if (this.failureSettingsGrid && this.failureSettingsGrid?.data.length && index !== undefined && index >= 0) {
+					this.selectedIssueType = this.failureSettingsGrid?.data[index];
+					this.selectedRowsId = {};
+					this.selectedRowsId[index] = true;
+					this.failureSettingsGrid.selectedRowsId = structuredClone(this.selectedRowsId);
+					this.selectedIssue.emit(this.selectedIssueType);
+				}
+			}else if (data?.length > 0) {
+				this.selectedRowsId[0] = true;
+				this.failureSettingsGrid.selectedRowsId = structuredClone(this.selectedRowsId);
+				this.selectedIssueType = data[0];
+				this.selectedIssue.emit(this.selectedIssueType);
+				console.log("failer selected", data);
+			}
+		}
 		this.cdr.detectChanges();
 	}
 
@@ -243,8 +254,12 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 				event.detail.selectedRowIds[key] = undefined;
 			}
 		} else {
+			if (this.failureSettingsGrid)
+				this.failureSettingsGrid.selectedRowsId = { [event?.detail?.row?.index]: true };
 			this.selectedIssueType = event.detail.row.original;
-			console.log("selected issue type", event.detail.row.original);
+			this.selectedIssueTypeId = this.selectedIssueType.id;
+			this.selectedIssue.emit(this.selectedIssueType);
+			// console.log("selected issue type", event.detail.row.original);
 		}
 	}
 

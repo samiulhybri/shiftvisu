@@ -18,6 +18,7 @@
 			[editPermission]="authService.isPermissionValid(shiftVisuAdminPermission)"
 			[isBaseVisu]="false"
 			[enableServerSideFiltering]="false"
+			(processData)="processData($event[0], $event[1])"
 			keyForCacheCustomDataTableColumns="modelComponent"
 			(rowClick)="rowClick($event)"
 			#modelComponentRef></app-grid-table>

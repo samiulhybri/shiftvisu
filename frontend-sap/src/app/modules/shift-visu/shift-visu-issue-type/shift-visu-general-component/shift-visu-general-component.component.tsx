@@ -1,4 +1,13 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild } from "@angular/core";
+import {
+	ChangeDetectorRef,
+	Component,
+	EventEmitter,
+	Input,
+	OnChanges,
+	OnInit,
+	SimpleChanges,
+	ViewChild,
+} from "@angular/core";
 
 import { CheckBox, Text } from "@ui5/webcomponents-react";
 import React from "react";
@@ -13,16 +22,18 @@ import { objectsDeepEqual } from "@app/shared/utils/compare-objects-deep";
 import { ShiftVisuComponentOptionTypeClass } from "@app/shared/enums/ShiftVisuComponentTypeEnum";
 
 import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
+import { ShiftVisuComponentModel } from "@app/shared/models/shift-visu-component.model";
 
 @Component({
 	selector: "app-shift-visu-general-component",
 	templateUrl: "./shift-visu-general-component.component.html",
 	styleUrl: "./shift-visu-general-component.component.css",
 })
-export class ShiftVisuGeneralComponentComponent implements OnChanges {
+export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 	@Input() issueType: any = null;
+	@Input() selectedIssue = new EventEmitter<any>();
 
-	@ViewChild("generalComponentRef", { static: false }) generalComponentGrid:
+	@ViewChild("generalComponentRef", { static: false }) gridTable:
 		| CustomReactGridTable
 		| undefined;
 
@@ -31,9 +42,9 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges {
 	selectedRowsId: Record<any, any> = {};
 	initialSelectedRowsId: {} = {};
 	idToIndex: any = {};
-
+	selectedRowIds: any = {};
 	isOpenDataUnsaved: boolean = false;
-
+	generalComponents: ShiftVisuComponentModel[] = [];
 	filterQuery = `model_type eq null or model_type eq ''`;
 
 	columns: any = [
@@ -61,15 +72,14 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges {
 						<CheckBox
 							checked={!row.isSelected ? false : true}
 							indeterminate={false}
-
 							disabled={row.isSelected ? false : true}
-							onClick={(event) => {
-								this.onCheckMandatory(event,row);
+							onClick={event => {
+								this.onCheckMandatory(event, row);
 							}}
 						/>
 					</React.StrictMode>
 				);
-			}
+			},
 		},
 
 		{
@@ -97,14 +107,52 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges {
 
 	constructor(
 		public authService: AuthService,
-		private shiftVisuService: ShiftVisuService
+		private shiftVisuService: ShiftVisuService,
+		private cdr: ChangeDetectorRef
 	) {}
+	ngOnInit(): void {
+		this.selectedIssue.subscribe((issue: any) => {
+			this.generalComponents =
+			this.generalComponents = issue.components?.filter((component: any) => component.model_type === null) || [];
+
+			if (this.gridTable?.data?.length) {
+				this.selectedRowIds = {}; // Reset selection
+				const modelComponentIds = this.generalComponents.map((comp: any) => comp.id);
+				// Loop through gridTable data and check for matching IDs
+				this.gridTable.data.forEach((item: any, index: number) => {
+					if (modelComponentIds.includes(item.id)) {
+						this.selectedRowIds[index] = true;
+					}
+				});
+
+				this.gridTable.selectedRowsId = structuredClone(this.selectedRowIds);
+				this.gridTable.render();
+				console.log("Selected Row IDs:", this.selectedRowIds);
+				console.log("Grid Table Data:", this.gridTable.selectedRowsId);
+				this.cdr.detectChanges();
+			}
+		});
+	}
 
 	processData(data: any[], recentData?: any[]) {
-		this.data = data;
+		if (this.gridTable?.data?.length) {
+			this.selectedRowIds = {}; // Reset selection
 
-		if (this.generalComponentGrid) {
-			this.generalComponentGrid.selectedRowsId = structuredClone(this.selectedRowsId);
+			// Get all model component IDs
+			const modelComponentIds = this.generalComponents.map((comp: any) => comp.id);
+
+			// Loop through gridTable data and check for matching IDs
+			this.gridTable.data.forEach((item: any, index: number) => {
+				if (modelComponentIds.includes(item.id)) {
+					this.selectedRowIds[index] = true;
+				}
+			});
+
+			this.gridTable.selectedRowsId = { ...this.selectedRowIds };
+			this.gridTable.render();
+			console.log("Selected Row IDs:", this.selectedRowIds);
+			console.log("Grid Table Data:", this.gridTable.selectedRowsId);
+			this.cdr.detectChanges();
 		}
 	}
 	onCheckMandatory(event: any, selectRow: any) {

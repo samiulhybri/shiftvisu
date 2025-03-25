@@ -1,9 +1,21 @@
-import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import {
+	ChangeDetectorRef,
+	Component,
+	EventEmitter,
+	Input,
+	OnChanges,
+	OnInit,
+	SimpleChanges,
+	ViewChild,
+} from "@angular/core";
 
 import React from "react";
 import { Text, CheckBox } from "@ui5/webcomponents-react";
 
-import { GridTableColumnDataType } from "@app/shared/components/CustomGridTable";
+import {
+	CustomReactGridTable,
+	GridTableColumnDataType,
+} from "@app/shared/components/CustomGridTable";
 import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
 import { ShiftVisuComponentOptionTypeClass } from "@app/shared/enums/ShiftVisuComponentTypeEnum";
 import { AuthService } from "@app/shared/services/auth.service";
@@ -11,21 +23,26 @@ import { objectsDeepEqual } from "@app/shared/utils/compare-objects-deep";
 import { BackendModelTypeClass } from "@app/shared/enums/BackendModelType";
 
 import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
+import { Model } from "ckeditor5";
+import { ShiftVisuComponentModel } from "@app/shared/models/shift-visu-component.model";
 
 @Component({
 	selector: "app-shift-visu-model-component",
 	templateUrl: "./shift-visu-model-component.component.html",
 	styleUrl: "./shift-visu-model-component.component.css",
 })
-export class ShiftVisuModelComponentComponent implements OnChanges {
+export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
+	@ViewChild("modelComponentRef") gridTable: CustomReactGridTable | undefined;
 	@Input() issueType: any = null;
+	@Input() selectedIssue = new EventEmitter<any>();
 
+	modelComponents: ShiftVisuComponentModel[] = [];
 	shiftVisuAdminPermission = PermissionEnum.SHIFTVISU_ADMIN;
 	selectedOriginalData: any[] = [];
 	selectedRowsId: any = [];
 	initialSelectedRowsId: {} = [];
 	idToIndex: any = [];
-
+	selectedRowIds: any = {};
 	filterQuery = `model_type ne null and model_type ne ''`;
 	isOpenDataUnsaved: boolean = false;
 	isLoading: unknown;
@@ -105,16 +122,59 @@ export class ShiftVisuModelComponentComponent implements OnChanges {
 
 	constructor(
 		public authService: AuthService,
-		private shiftVisuService: ShiftVisuService
+		private shiftVisuService: ShiftVisuService,
+		private cdr: ChangeDetectorRef
 	) {}
+	ngOnInit(): void {
+		this.selectedIssue.subscribe((issue: any) => {
+			this.modelComponents =
+				issue.components?.filter((component: any) => component.model_type) || [];
+
+			if (this.gridTable?.data?.length) {
+				this.selectedRowIds = {}; // Reset selection
+
+				// Get all model component IDs
+				const modelComponentIds = this.modelComponents.map((comp: any) => comp.id);
+
+				// Loop through gridTable data and check for matching IDs
+				this.gridTable.data.forEach((item: any, index: number) => {
+					if (modelComponentIds.includes(item.id)) {
+						this.selectedRowIds[index] = true;
+					}
+				});
+
+				this.gridTable.selectedRowsId = { ...this.selectedRowIds };
+				this.gridTable.render();
+				console.log("Selected Row IDs:", this.selectedRowIds);
+				console.log("Grid Table Data:", this.gridTable.selectedRowsId);
+				this.cdr.detectChanges();
+			}
+		});
+	}
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes["failure"]?.currentValue) {
 			this.initializeDataOnChange(changes["failure"].currentValue);
 		}
 	}
+
+	processData(data: any, recentData: any) {
+		if (this.gridTable?.data?.length) {
+			this.selectedRowIds = {}; 
+
+			const modelComponentIds = this.modelComponents.map((comp: any) => comp.id);
+			this.gridTable.data.forEach((item: any, index: number) => {
+				if (modelComponentIds.includes(item.id)) {
+					this.selectedRowIds[index] = true;
+				}
+			});
+			this.gridTable.selectedRowsId = { ...this.selectedRowIds };
+			this.gridTable.render();
+			this.cdr.detectChanges();
+		}
+	}
 	onCheckMandatory(event: any, selectRow: any) {
-		event.stopPropagation(); // Prevents unwanted event bubbling
+		event.stopPropagation(); 
 
 		const isChecked = event.target.checked;
 		console.log(`Checkbox clicked. Checked: ${isChecked}`);
@@ -138,10 +198,6 @@ export class ShiftVisuModelComponentComponent implements OnChanges {
 	}
 
 	rowClick(event: any) {
-		// let index = event.detail.row.index;
-		// this.data[index].selected = event.detail.selectedRowIds[index];
-		// this.selectedRowsId = event.detail.selectedRowIds;
-
 		const selectedOriginalData = event.detail.selectedFlatRows.map(
 			(row: { original: any }) => row.original
 		);
