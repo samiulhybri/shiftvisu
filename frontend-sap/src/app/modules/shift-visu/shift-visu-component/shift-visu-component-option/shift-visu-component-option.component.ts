@@ -175,18 +175,9 @@ export class ShiftVisuComponentOptionComponent {
 		if (!this.component.id || !this.component.component_type) {
 			return false;
 		}
-
-		if (
-			this.component.component_type == ShiftVisuComponentTypeEnum.TEXTFIELD ||
-			this.component.component_type == ShiftVisuComponentTypeEnum.TEXTAREA ||
-			this.component.component_type == ShiftVisuComponentTypeEnum.SWITCH ||
-			this.component.component_type == ShiftVisuComponentTypeEnum.DATE ||
-			this.component.component_type == ShiftVisuComponentTypeEnum.DATETIME ||
-			this.component.component_type == ShiftVisuComponentTypeEnum.MEASURE
-		) {
+		if (this.component.model_type) {
 			return false;
 		}
-
 		return true;
 	}
 }

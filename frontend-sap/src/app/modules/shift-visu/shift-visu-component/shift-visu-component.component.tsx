@@ -62,6 +62,7 @@ export class ShiftVisuComponentComponent implements OnInit {
 	deleteId: number | null = null;
 	isLoadingCustomId: boolean = false;
 	customId?: string = "";
+	componentId: number | undefined;
 
 	get shiftVisuAdminPermission() {
 		return PermissionEnum.SHIFTVISU_ADMIN;
@@ -79,6 +80,23 @@ export class ShiftVisuComponentComponent implements OnInit {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+		},
+		{
+			Header: $localize`Model Type`,
+			accessor: "model_type",
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: false,
+			isSelected: true,
+			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+				const { row } = instance;
+				let model = BackendModelTypeClass.getStateTranslate(row.original.model_type);
+				return (
+					<React.StrictMode>
+						<Text>{model?.text}</Text>
+					</React.StrictMode>
+				);
+			},
 		},
 		{
 			Header: $localize`Component Type`,
@@ -132,12 +150,24 @@ export class ShiftVisuComponentComponent implements OnInit {
 
 	processData(data: any[], recentData: any[]) {
 		if (data.length > 0 && data.length == recentData.length) {
-			if (this.gridTable?.selectedRowsId) {
-				this.selectedRowIds[0] = true;
-				this.gridTable.selectedRowsId = structuredClone(this.selectedRowIds);
+			if (this.componentId) {
+				const id = this.componentId;
+				const index: number = this.gridTable?.data.findIndex((item: any) => item.id === id);
+
+				if (this.gridTable && this.gridTable?.data.length && index !== undefined && index >= 0) {
+					this.gridTable.selectedRowsId = { [index]: true };
+					this.selectedRowIds = { [index]: true };
+					this.selectedComponent = structuredClone(this.gridTable?.data[index]);
+					this.cdr.detectChanges();
+				}
+			} else {
+				if (this.gridTable?.selectedRowsId) {
+					this.selectedRowIds[0] = true;
+					this.gridTable.selectedRowsId = structuredClone(this.selectedRowIds);
+				}
+				this.selectedComponent = structuredClone(data[0]);
+				this.cdr.detectChanges();
 			}
-			this.selectedComponent = structuredClone(data[0]);
-			this.cdr.detectChanges();
 		} else {
 			this.selectedComponent = new ShiftVisuComponentModel().deserialize({
 				...this.componentDefaultValue,
@@ -199,6 +229,7 @@ export class ShiftVisuComponentComponent implements OnInit {
 		this.selectedModelType = this.modalComponent.model_type ?? "";
 		this.addOrEditComponentDialog.isDialogOpen = true;
 		this.saveMode = "patch";
+		this.componentId = undefined;
 	}
 
 	newButtonClick() {
@@ -212,7 +243,16 @@ export class ShiftVisuComponentComponent implements OnInit {
 	}
 
 	onRowClicked(event: any) {
+		if (this.gridTable) this.gridTable.selectedRowsId = { [event?.detail?.row?.index]: true };
+
+		const tempSelectedComponent = { ...this.selectedComponent };
 		this.selectedComponent = event.detail.row.original;
+		this.componentId = this.selectedComponent.id;
+		console.log("Selected Component:", this.selectedComponent);
+
+		// if (tempSelectedComponent?.id !== this.selectedComponent?.id) {
+		// 	this.updateComponents(this.selectedComponent);
+		// }
 	}
 
 	onComponentSave(form: NgForm) {
@@ -222,7 +262,8 @@ export class ShiftVisuComponentComponent implements OnInit {
 		let url = this.baseUrl + (this.saveMode == "post" ? "" : `/${this.modalComponent.id}`);
 		if (this.saveMode) {
 			this.shiftVisuService[this.saveMode](url, payload).subscribe({
-				next: async response => {
+				next: async (response: any) => {
+					this.componentId = response.id;
 					this.updateComponents();
 					this.handleComponentPopupClose();
 					const { recordSavedSuccessfully } = Localization;

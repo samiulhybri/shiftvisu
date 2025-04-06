@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Providers;
-
 use App\Models\Area;
 use App\Models\CalculationDeformation;
 use App\Models\CalculationDocumentation;

@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# shiftvisu
-=======
 # Installation
 
 - Clone the repository
@@ -271,4 +268,3 @@ sudo ln -s /etc/nginx/sites-available/v11-backend /etc/nginx/sites-enabled/v11-b
 sudo ln -s /etc/nginx/sites-available/v11-frontend /etc/nginx/sites-enabled/v11-frontend
 sudo ln -s /etc/nginx/sites-available/v12-frontend /etc/nginx/sites-enabled/v12-frontend
 ```
->>>>>>> ab23840 (initial commit)
