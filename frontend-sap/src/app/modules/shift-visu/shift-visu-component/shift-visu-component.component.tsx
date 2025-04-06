@@ -17,7 +17,7 @@ import { AuthService } from "@app/shared/services/auth.service";
 import { Localization } from "@app/shared/utils/common-localize";
 import { ToastService } from "@app/shared/services/toaster.service";
 import { BackendModelTypeClass } from "@app/shared/enums/BackendModelType";
-
+import { MultiComboBoxSelectionChangeEventDetail } from "@ui5/webcomponents/dist/MultiComboBox";
 import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
 
 @Component({
@@ -148,6 +148,10 @@ export class ShiftVisuComponentComponent implements OnInit {
 		this.isLoadingCustomId = false;
 	}
 
+	translate(modelType: any): any {
+		return BackendModelTypeClass.getStateTranslate(modelType)?.text || '';
+	  }
+
 	processData(data: any[], recentData: any[]) {
 		if (data.length > 0 && data.length == recentData.length) {
 			if (this.componentId) {
@@ -173,7 +177,6 @@ export class ShiftVisuComponentComponent implements OnInit {
 				...this.componentDefaultValue,
 			});
 		}
-
 		this.modalComponent = new ShiftVisuComponentModel().deserialize({
 			...this.componentDefaultValue,
 		});
@@ -246,15 +249,9 @@ export class ShiftVisuComponentComponent implements OnInit {
 
 	onRowClicked(event: any) {
 		if (this.gridTable) this.gridTable.selectedRowsId = { [event?.detail?.row?.index]: true };
-
 		const tempSelectedComponent = { ...this.selectedComponent };
 		this.selectedComponent = event.detail.row.original;
 		this.componentId = this.selectedComponent.id;
-		console.log("Selected Component:", this.selectedComponent);
-
-		// if (tempSelectedComponent?.id !== this.selectedComponent?.id) {
-		// 	this.updateComponents(this.selectedComponent);
-		// }
 	}
 
 	onComponentSave(form: NgForm) {

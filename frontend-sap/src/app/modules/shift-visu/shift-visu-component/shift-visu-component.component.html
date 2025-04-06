@@ -1,4 +1,4 @@
-<span class="h-[calc(100vh-72px)] grid grid-cols-2 ">
+<span class="h-[calc(100vh-72px)] grid grid-cols-2">
 	<div class="w-auto mr-2">
 		<ui5-card>
 			<div class="h-[calc(100vh-72px)]">
@@ -7,7 +7,7 @@
 					i18n-headerTitle
 					[url]="baseUrl"
 					expandQuery="$expand=shiftVisuComponentOptions"
-					[filterQuery]="filterQuery"
+				
 					[columns]="columns"
 					[showAction]="true"
 					[showSearch]="true"
@@ -74,6 +74,26 @@
 					>
 				</ui5-input>
 			</div>
+
+			<div
+				class="w-[450px]"
+				[hidden]="saveMode == 'post'">
+				<ui5-label
+					i18n
+					show-colon
+					required
+					[hidden]="modalComponent.model_type == ''">
+					Model Type</ui5-label
+				>
+				<ui5-input
+					i18n-placeholder
+					class="w-full"
+					sanitize-input
+					value="{{ this.translate(modalComponent.model_type) }}"
+					readonly="true">
+				</ui5-input>
+			</div>
+
 			<div
 				class="w-[450px]"
 				[hidden]="saveMode == 'patch'">
@@ -110,7 +130,7 @@
 					@for (type of componentOptionTypeArray; track $index) {
 						<ui5-radio-button
 							[hidden]="
-								!(type.value | isComponentTypeVisible: modalComponent.model_type)
+								!(type.value | isComponentTypeVisible: modalComponent.model_type) || type.value == componentOptionTypes.MEASURE
 							"
 							name="component_type"
 							[text]="type.text"
@@ -120,6 +140,32 @@
 							[checked]="modalComponent.component_type == type.value"
 							(click)="modalComponent.component_type = type.value"></ui5-radio-button>
 					}
+
+					<div class="mesasure flex justify-between" [hidden]="modalComponent.model_type != '' ">
+						<ui5-radio-button
+						class="mr-2"
+							name="component_type"
+							[disabled]="saveMode == 'patch'"
+							[text]="componentOptionTypes.MEASURE"
+							[hidden]="modalComponent.model_type != '' "
+							[checked]="true"></ui5-radio-button>
+
+						<ui5-multi-combobox
+						class="w-[300px]"
+							i18n-placeholder
+							placeholder="Choose Mesasure Option"
+							value=""
+							[disabled]="saveMode == 'patch'"
+							[hidden]="modalComponent.model_type != '' "
+							ngModel
+							>
+							@for (component of componentOptionTypeArray; track $index) {
+								<ui5-mcb-item
+									[text]="component.text"
+									[id]="component.id"></ui5-mcb-item>
+							}
+						</ui5-multi-combobox>
+					</div>
 				</div>
 			</div>
 		</form>
