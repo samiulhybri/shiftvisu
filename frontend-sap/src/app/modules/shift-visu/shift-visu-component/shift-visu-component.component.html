@@ -74,27 +74,27 @@
 					>
 				</ui5-input>
 			</div>
-			<div class="w-[450px]">
+			<div
+				class="w-[450px]"
+				[hidden]="saveMode == 'patch'">
 				<ui5-label
 					show-colon
 					i18n
 					>Model Type</ui5-label
 				>
-
 				<ui5-combobox
 					id="modelTypeCombobox"
 					class="w-full"
-					[ngModel]="getModelName(selectedModelType)"
+					[(ngModel)]="selectedModelType"
 					name="model_type"
-					(selection-change)="updateModelTypeValues($event)"
-					(blur)="onModelTypeBlur()"
+					i18n-placeholder
 					placeholder="Select model"
 					show-clear-icon
-					[disabled]="isDisabled">
-					>
+					(selection-change)="updateModelTypeValues($event)"
+					(blur)="onModelTypeBlur()">
 					@for (item of modelTypeItems; track $index) {
 						<ui5-cb-item
-							[text]="getModelName(item.modelType)"
+							[text]="item.value"
 							[id]="item.modelType">
 						</ui5-cb-item>
 					}
