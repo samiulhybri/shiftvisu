@@ -114,4 +114,23 @@ class ShiftVisuController extends Controller
             ], 500);
         }
     }
+
+    public function getShiftVisuIssueTypesData()
+    {
+        $issueTypes = ShiftVisuIssueType::with([
+            'components' => function ($q) {
+                $q->select('shift_visu_components.*');
+            },
+            'halls'
+        ])->get();
+
+        $issueTypes->each(function ($issueType) {
+            $issueType->components->each(function ($component) {
+                $component->is_mandatory = $component->pivot->is_mandatory ?? null;
+                unset($component->pivot);
+            });
+        });
+
+        return response()->json($issueTypes);
+    }
 }
