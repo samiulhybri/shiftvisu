@@ -7,7 +7,7 @@ import { ShiftVisuComponentTypeEnum } from "@app/shared/enums/ShiftVisuComponent
 })
 export class IsComponentTypeVisiblePipe implements PipeTransform {
 	transform(value: string | null = null, model_type: any): unknown {
-		if (model_type == "" || model_type == null || model_type == undefined) {
+		if (model_type == "" || model_type == null || model_type == undefined ) {
 			return true;
 		}
 

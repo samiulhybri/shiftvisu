@@ -7,7 +7,6 @@
 					i18n-headerTitle
 					[url]="baseUrl"
 					expandQuery="$expand=shiftVisuComponentOptions"
-				
 					[columns]="columns"
 					[showAction]="true"
 					[showSearch]="true"
@@ -44,7 +43,9 @@
 	#addOrEditComponentDialog
 	[title]="saveMode == 'post' ? 'Add' : 'Edit'"
 	title-i18n>
-	<ui5-busy-indicator [active]="isSavingOrDeletingComponent">
+	<ui5-busy-indicator
+		[active]="isSavingOrDeletingComponent"
+		loading-delay="0">
 		<form
 			#addOrEditComponentForm="ngForm"
 			class="w-[450px] min-h-[500px] flex flex-col gap-2">
@@ -77,7 +78,33 @@
 
 			<div
 				class="w-[450px]"
-				[hidden]="saveMode == 'post'">
+				[hidden]="
+					saveMode == 'post' ||
+					modalComponent.component_type === componentOptionTypes.MEASURE
+				">
+				<ui5-label
+					i18n
+					show-colon
+					required
+					>
+					View In</ui5-label
+				>
+				<ui5-input
+					i18n-placeholder
+					class="w-full"
+					sanitize-input
+					value="{{ modalComponent.component_type }}"
+					readonly="true">
+				</ui5-input>
+			</div>
+
+			<div
+				class="w-[450px]"
+				[hidden]="
+					saveMode == 'post' ||
+					modalComponent.model_type == null ||
+					modalComponent.model_type == ''
+				">
 				<ui5-label
 					i18n
 					show-colon
@@ -100,6 +127,32 @@
 				<ui5-label
 					show-colon
 					i18n
+					>View In</ui5-label
+				>
+				<ui5-combobox
+					id="viewTypeCombobox"
+					class="w-full"
+					name="view_type"
+					i18n-placeholder
+					placeholder="Select view"
+					[value]="viewTypeValue"
+					[disabled]="modalComponent.component_type === componentOptionTypes.MEASURE"
+					(selection-change)="updateComponentViewInValues($event)">
+					@for (viewType of componentViewTypeArray; track $index) {
+						<ui5-cb-item
+							[text]="viewType.value"
+							[id]="viewType.value">
+						</ui5-cb-item>
+					}
+				</ui5-combobox>
+			</div>
+
+			<div
+				class="w-[450px]"
+				[hidden]="saveMode == 'patch'">
+				<ui5-label
+					show-colon
+					i18n
 					>Model Type</ui5-label
 				>
 				<ui5-combobox
@@ -111,7 +164,7 @@
 					placeholder="Select model"
 					show-clear-icon
 					(selection-change)="updateModelTypeValues($event)"
-					(blur)="onModelTypeBlur()">
+					(input)="onModelTypeInput($event)">
 					@for (item of modelTypeItems; track $index) {
 						<ui5-cb-item
 							[text]="item.value"
@@ -126,46 +179,61 @@
 					show-colon
 					>Choose Type</ui5-label
 				>
+
 				<div class="flex flex-col justify-between">
 					@for (type of componentOptionTypeArray; track $index) {
-						<ui5-radio-button
-							[hidden]="
-								!(type.value | isComponentTypeVisible: modalComponent.model_type) || type.value == componentOptionTypes.MEASURE
-							"
-							name="component_type"
-							[text]="type.text"
-							[disabled]="
-								type.value == componentOptionTypes.MEASURE || saveMode == 'patch'
-							"
-							[checked]="modalComponent.component_type == type.value"
-							(click)="modalComponent.component_type = type.value"></ui5-radio-button>
-					}
+						<div
+							class="mesasure flex justify-between"
+							[hidden]="modalComponent.model_type !== ''">
+							<ui5-radio-button
+								class="d-n"
+								[hidden]="
+									!(
+										type.value
+										| isComponentTypeVisible: modalComponent.model_type
+									)
+								"
+								name="component_type"
+								[text]="type.text"
+								[disabled]="saveMode === 'patch'"
+								[checked]="modalComponent.component_type === type.value"
+								(click)="onComponentTypeSelect(type)">
+							</ui5-radio-button>
 
-					<div class="mesasure flex justify-between" [hidden]="modalComponent.model_type != '' ">
-						<ui5-radio-button
-						class="mr-2"
-							name="component_type"
-							[disabled]="saveMode == 'patch'"
-							[text]="componentOptionTypes.MEASURE"
-							[hidden]="modalComponent.model_type != '' "
-							[checked]="true"></ui5-radio-button>
-
-						<ui5-multi-combobox
-						class="w-[300px]"
-							i18n-placeholder
-							placeholder="Choose Mesasure Option"
-							value=""
-							[disabled]="saveMode == 'patch'"
-							[hidden]="modalComponent.model_type != '' "
-							ngModel
-							>
-							@for (component of componentOptionTypeArray; track $index) {
-								<ui5-mcb-item
-									[text]="component.text"
-									[id]="component.id"></ui5-mcb-item>
+							@if (type.value === componentOptionTypes.MEASURE) {
+								<ui5-multi-combobox
+									#measureComboBox
+									class="w-[300px]"
+									i18n-placeholder
+									placeholder="Choose Measure Option"
+									name="measure_options"
+									[(ngModel)]="selectedMeasureOption"
+									[class.hidden]="
+										modalComponent.component_type !==
+										componentOptionTypes.MEASURE
+									"
+									[hidden]="
+										!(
+											type.value
+											| isComponentTypeVisible: modalComponent.model_type
+										)
+									"
+									(selection-change)="updateMeasureTypeValues($event)"
+									[disabled]="
+										saveMode === 'patch' ||
+										modalComponent.component_type !==
+											componentOptionTypes.MEASURE
+									">
+									@for (component of componentMeasureTypeArray; track $index) {
+										<ui5-mcb-item
+											[text]="component.text"
+											[id]="component.value">
+										</ui5-mcb-item>
+									}
+								</ui5-multi-combobox>
 							}
-						</ui5-multi-combobox>
-					</div>
+						</div>
+					}
 				</div>
 			</div>
 		</form>
