@@ -1,0 +1,13 @@
+:host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+	height: 29vh !important;
+	overflow: auto;
+}
+
+:host ::ng-deep .editor-container {
+   padding: 0 !important;
+   border: none !important;
+   border-radius: 0 !important;
+}
+:host ::ng-deep .ui5-tc-root > .ui5-tc__content {
+    padding: 0 !important;
+ }

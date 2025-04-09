@@ -27,6 +27,13 @@ export class ShiftVisuComponent implements OnInit {
 			permission: PermissionEnum.SHIFTVISU_VIEW,
 		},
 		{
+			label: $localize`Halls`,
+			id: "shift-visu-issue-halls",
+			routerLink: "/shift-visu/hall/2",
+			icon: "factory",
+			permission: PermissionEnum.SHIFTVISU_VIEW,
+		},
+		{
 			label: $localize`Settings`,
 			id: "shift-visu-settings",
 			icon: "settings",
@@ -48,6 +55,7 @@ export class ShiftVisuComponent implements OnInit {
 				},
 			],
 		},
+
 	];
 
 	constructor(
@@ -77,7 +85,6 @@ export class ShiftVisuComponent implements OnInit {
 
 		if (item.children.length > 0) {
 			item.expanded = true;
-
 			timer(1).subscribe(() => {
 				item.removeAttribute("selected");
 				item.children[0].selected = true;
