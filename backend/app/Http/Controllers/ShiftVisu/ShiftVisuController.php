@@ -133,4 +133,16 @@ class ShiftVisuController extends Controller
 
         return response()->json($issueTypes);
     }
+
+    public function getShiftVisuHallList()
+    {
+        $halls = DB::table('halls')
+                ->join('hall_shift_visu_issue_type', 'halls.id', '=', 'hall_shift_visu_issue_type.hall_id')
+                ->select('halls.id', 'halls.name')
+                ->distinct()
+                ->get();
+
+        return response()->json($halls);
+    }
+
 }

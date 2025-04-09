@@ -723,6 +723,7 @@ Route::prefix('shift-visu')->controller(ShiftVisuController::class)->group(funct
     Route::patch('/issue-type/{id}', 'updateIssueType');
     Route::post('/component-issue-type', 'updateComponentIssueType');
     Route::get('/issue-types-data', 'getShiftVisuIssueTypesData');
+    Route::get('/hall-list', 'getShiftVisuHallList');
 
 });
 
