@@ -145,8 +145,6 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 
 				this.gridTable.selectedRowsId = { ...this.selectedRowIds };
 				this.gridTable.render();
-				console.log("Selected Row IDs:", this.selectedRowIds);
-				console.log("Grid Table Data:", this.gridTable.selectedRowsId);
 				this.cdr.detectChanges();
 			}
 		});

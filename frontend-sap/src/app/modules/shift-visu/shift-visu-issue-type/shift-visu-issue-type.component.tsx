@@ -259,7 +259,7 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 			this.selectedIssueType = event.detail.row.original;
 			this.selectedIssueTypeId = this.selectedIssueType.id;
 			this.selectedIssue.emit(this.selectedIssueType);
-			// console.log("selected issue type", event.detail.row.original);
+			console.log("failer selected", this.selectedIssueType);
 		}
 	}
 
