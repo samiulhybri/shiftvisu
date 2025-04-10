@@ -8,6 +8,7 @@ import { arrayMove } from "@app/shared/utils/array-move";
 import { ProductionPlanningPageName } from "@app/shared/enums/ProductionPlanningPageName";
 import { ProdOrder } from "@app/shared/models/prod-order.model";
 import { Machine } from "@app/shared/models/machine.model";
+import { ShiftVisuIssueTypeModel } from "@app/shared/models/shift-visu-issue-type.model";
 
 export class Hall implements Deserializable {
 	id?: number;
@@ -27,6 +28,7 @@ export class Hall implements Deserializable {
 	frozen_zone_after_weeks?: number | undefined;
 	capacities: Capacity[] = [];
 	machines: Machine[] = [];
+	shiftVisuIssueTypes: ShiftVisuIssueTypeModel[] = [];
 	public dates: string[] = [];
 	isSelected = true; //internal use only
 	private isForge = false;

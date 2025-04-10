@@ -93,30 +93,7 @@
 					i18n-placeholder
 					class="w-full"
 					sanitize-input
-					value="{{ modalComponent.component_type }}"
-					readonly="true">
-				</ui5-input>
-			</div>
-
-			<div
-				class="w-[450px]"
-				[hidden]="
-					saveMode == 'post' ||
-					modalComponent.model_type == null ||
-					modalComponent.model_type == ''
-				">
-				<ui5-label
-					i18n
-					show-colon
-					required
-					[hidden]="modalComponent.model_type == ''">
-					Model Type</ui5-label
-				>
-				<ui5-input
-					i18n-placeholder
-					class="w-full"
-					sanitize-input
-					value="{{ this.translate(modalComponent.model_type) }}"
+					value="{{ modalComponent.view_in }}"
 					readonly="true">
 				</ui5-input>
 			</div>
@@ -145,6 +122,29 @@
 						</ui5-cb-item>
 					}
 				</ui5-combobox>
+			</div>
+
+			<div
+				class="w-[450px]"
+				[hidden]="
+					saveMode == 'post' ||
+					modalComponent.model_type == null ||
+					modalComponent.model_type == ''
+				">
+				<ui5-label
+					i18n
+					show-colon
+					required
+					[hidden]="modalComponent.model_type == ''">
+					Model Type</ui5-label
+				>
+				<ui5-input
+					i18n-placeholder
+					class="w-full"
+					sanitize-input
+					value="{{ this.translate(modalComponent.model_type) }}"
+					readonly="true">
+				</ui5-input>
 			</div>
 
 			<div
