@@ -7,6 +7,8 @@ import { environment } from "@app/environments/environment";
 import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
 import { AuthService } from "@app/shared/services/auth.service";
 import { ISideNavItem } from "@app/shared/interfaces/side-nav-item.interface";
+import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
+import { Hall } from "@app/shared/models/hall.model";
 
 @Component({
 	selector: "app-shift-visu",
@@ -17,57 +19,62 @@ export class ShiftVisuComponent implements OnInit {
 	public dynamicHomeRouteLink = environment.homeLink;
 	public isLogOutDialogOpen: boolean = false;
 	public isSideNavCollapsed = false;
+	navItems: ISideNavItem[] = [];
+	halls: Hall[] = [];
 
-	public navItems: ISideNavItem[] = [
-		{
-			label: $localize`Overview`,
-			id: "shift-visu-overview",
-			routerLink: "/shift-visu",
-			icon: "BusinessSuiteInAppSymbols/icon-overview",
-			permission: PermissionEnum.SHIFTVISU_VIEW,
-		},
-		{
-			label: $localize`Halls`,
-			id: "shift-visu-issue-halls",
-			routerLink: "/shift-visu/hall/2",
-			icon: "factory",
-			permission: PermissionEnum.SHIFTVISU_VIEW,
-		},
-		{
-			label: $localize`Settings`,
-			id: "shift-visu-settings",
-			icon: "settings",
-			permission: PermissionEnum.SHIFTVISU_ADMIN,
-			children: [
-				{
-					label: $localize`Failure Settings`,
-					id: "shift-visu-failure-settings",
-					routerLink: "/shift-visu/settings/failure",
-					icon: "settings",
-					permission: PermissionEnum.SHIFTVISU_ADMIN,
-				},
-				{
-					label: $localize`Component Option`,
-					id: "shift-visu-component-option",
-					routerLink: "/shift-visu/settings/component",
-					icon: "settings",
-					permission: PermissionEnum.SHIFTVISU_ADMIN,
-				},
-				{
-					label: $localize`General Settings`,
-					id: "shift-visu-general-option",
-					routerLink: "/shift-visu/settings/general",
-					icon: "settings",
-					permission: PermissionEnum.SHIFTVISU_ADMIN,
-				},
-			],
-		},
-
-	];
+	buildNavItems() {
+		this.navItems = [
+			{
+				label: $localize`Overview`,
+				id: "shift-visu-overview",
+				routerLink: "/shift-visu",
+				icon: "BusinessSuiteInAppSymbols/icon-overview",
+				permission: PermissionEnum.SHIFTVISU_VIEW,
+			},
+			...this.halls.map(hall => ({
+				label: $localize`${hall.name}`,
+				id: `shift-visu-issue-halls-${hall.id}`,
+				routerLink: `/shift-visu/hall/${hall.id}`,
+				icon: "factory",
+				permission: PermissionEnum.SHIFTVISU_VIEW,
+			})),
+			{
+				label: $localize`Settings`,
+				id: "shift-visu-settings",
+				icon: "settings",
+				slot: "fixedItems",
+				permission: PermissionEnum.SHIFTVISU_ADMIN,
+				children: [
+					{
+						label: $localize`Failure Settings`,
+						id: "shift-visu-failure-settings",
+						routerLink: "/shift-visu/settings/failure",
+						icon: "settings",
+						permission: PermissionEnum.SHIFTVISU_ADMIN,
+					},
+					{
+						label: $localize`Component Option`,
+						id: "shift-visu-component-option",
+						routerLink: "/shift-visu/settings/component",
+						icon: "settings",
+						permission: PermissionEnum.SHIFTVISU_ADMIN,
+					},
+					{
+						label: $localize`General Settings`,
+						id: "shift-visu-general-option",
+						routerLink: "/shift-visu/settings/general",
+						icon: "settings",
+						permission: PermissionEnum.SHIFTVISU_ADMIN,
+					},
+				],
+			},
+		];
+	}
 
 	constructor(
 		public router: Router,
 		private route: ActivatedRoute,
+		private shiftVisuService: ShiftVisuService,
 		public authService: AuthService
 	) {}
 
@@ -84,6 +91,27 @@ export class ShiftVisuComponent implements OnInit {
 
 		this.navItems.map(i => {
 			i.expanded = i.children?.some(c => c.routerLink == this.router.url) ? true : false;
+		});
+
+		this.shiftVisuService.getRefreshHallsObservable().subscribe(shouldRefresh => {
+			if (shouldRefresh) {
+			  this.getIsuueHalls();
+			}
+		  });		
+
+		this.getIsuueHalls();
+	}
+
+	getIsuueHalls() {
+		this.shiftVisuService["get"]("shift-visu/hall-list", false).subscribe({
+			next: async (response: any) => {
+				this.halls = response.map((item: any) => new Hall().deserialize(item));
+				console.log("get shift visu halls", this.halls);
+				this.buildNavItems();
+			},
+			error: async (error: any) => {
+				console.log(error);
+			},
 		});
 	}
 

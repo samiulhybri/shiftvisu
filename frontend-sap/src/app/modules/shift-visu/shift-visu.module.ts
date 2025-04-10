@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
 import { SharedModule } from "@app/shared/shared.module";
@@ -27,5 +27,6 @@ import { GeneralSettingsComponent } from './shift-visu-issue-type/general-settin
   GeneralSettingsComponent,
 	],
 	imports: [CommonModule, ShiftVisuRoutingModule, SharedModule],
+	schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ShiftVisuModule {}

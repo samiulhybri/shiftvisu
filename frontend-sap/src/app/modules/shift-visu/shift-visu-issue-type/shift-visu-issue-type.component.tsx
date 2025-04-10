@@ -357,6 +357,7 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 					this.handleIssueTypePopupClose(form);
 					const { recordSavedSuccessfully } = Localization;
 					this.toast.showToast(recordSavedSuccessfully, "success");
+					this.shiftVisuService.triggerHallRefresh();
 
 					await this.getCustomId();
 				},

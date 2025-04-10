@@ -10,7 +10,15 @@ import { Hall } from "@app/shared/models/hall.model";
 })
 export class ShiftVisuService extends CommonService {
 	private hallWithDept: BehaviorSubject<Hall | {}> = new BehaviorSubject({});
+	private refreshHallsSubject = new BehaviorSubject<boolean>(false);
 
+	getRefreshHallsObservable() {
+		return this.refreshHallsSubject.asObservable();
+	  }
+	  
+	  triggerHallRefresh() {
+		this.refreshHallsSubject.next(true);
+	  }
 	getHallWithDeptObservable() {
 		return of(this.hallWithDept.value);
 	}
