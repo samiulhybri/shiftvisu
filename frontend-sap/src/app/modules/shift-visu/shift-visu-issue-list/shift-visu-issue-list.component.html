@@ -160,11 +160,10 @@
 								required
 								>Creator</ui5-label
 							>
-							<ui5-select class="w-full">
-								<ui5-option>Abram Elias</ui5-option>
-								<ui5-option>Tablet</ui5-option>
-								<ui5-option>Phone</ui5-option>
-							</ui5-select>
+							<ui5-input
+								readonly="true"
+								value="{{this.creator}}"
+								class="w-full"></ui5-input>
 						</div>
 						<div class="flex-col flex">
 							<ui5-label
@@ -172,14 +171,31 @@
 								required
 								>Error</ui5-label
 							>
-							<ui5-select class="w-full">
-								<ui5-option>Server Issue</ui5-option>
-								<ui5-option>Client Issue</ui5-option>
-								<ui5-option>Qa Issue</ui5-option>
-							</ui5-select>
+
+							<ui5-combobox
+							id="viewTypeCombobox"
+							class="w-full"
+							name="view_type"
+							i18n-placeholder
+							placeholder="Select Error"
+							(selection-change)="onFailureValues($event)">
+							@for (item of failureList; track $index) {
+								<ui5-cb-item
+									[text]="item.name"
+									[id]="item.id">
+								</ui5-cb-item>
+							}
+						</ui5-combobox>
+
+							<!-- <ui5-select class="w-full">
+								@for (item of failureList; track $index) {
+									<ui5-option>{{item.name}}</ui5-option>
+								}
+							</ui5-select> -->
 						</div>
 					</div>
-
+                      
+			
 					<div>
 						<app-text-editor
 							[notes]="failureDescriptionNote"

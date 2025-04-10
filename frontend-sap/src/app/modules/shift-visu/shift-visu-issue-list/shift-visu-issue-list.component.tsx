@@ -2,6 +2,9 @@ import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Hall } from "@app/shared/models/hall.model";
+import { ShiftVisuComponentModel } from "@app/shared/models/shift-visu-component.model";
+import { ShiftVisuIssueTypeModel } from "@app/shared/models/shift-visu-issue-type.model";
+import { AuthService } from "@app/shared/services/auth.service";
 import { Localization } from "@app/shared/utils/common-localize";
 import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
 @Component({
@@ -13,35 +16,49 @@ export class ShiftVisuIssueListComponent implements OnInit {
 	failureDescriptionNote: string = "";
 	isIssueListCollapsed: boolean = false;
 	isIssueTabCollapsed: boolean = false;
-  isIssueTabLoading: boolean = false;
+	isIssueTabLoading: boolean = false;
 	localization = Localization;
+	creator: string = "";
 	hallId: number = 0;
 	hall = new Hall();
+	failureList: ShiftVisuIssueTypeModel[] = [];
+	failureComponent: ShiftVisuComponentModel[] = [];
 
-	constructor(private route: ActivatedRoute, private shiftVisuService: ShiftVisuService) {}
+
+	constructor(
+		private route: ActivatedRoute,
+		private shiftVisuService: ShiftVisuService,
+		public authService: AuthService
+	) {}
 
 	ngOnInit() {
 		this.route.paramMap.subscribe(params => {
-			const id = params.get("id"); // assuming your route is defined with ':id'
+			const id = params.get("id");
 			if (id) {
 				this.hallId = +id; // convert to number
 				console.log("hallId from route:", this.hallId);
-        this.getHallInfo();
+				this.getHallInfo();
+				this.creator = this.authService.getUser()?.name || "";
+				console.log("this.creator", this.creator);
 			}
 		});
 	}
 
-  getHallInfo() {
-    this.isIssueTabLoading = true;
-		this.shiftVisuService["get"](`Halls(${this.hallId})?$expand=shiftVisuIssueTypes`, true).subscribe({
+	getHallInfo() {
+		this.isIssueTabLoading = true;
+		this.shiftVisuService["get"](
+			`Halls(${this.hallId})?$expand=shiftVisuIssueTypes`,
+			true
+		).subscribe({
 			next: async (response: any) => {
 				this.hall = new Hall().deserialize(response);
 				console.log("get shift visu hallInfo", this.hall);
-        this.isIssueTabLoading = false;
+				this.failureList = structuredClone(this.hall.shiftVisuIssueTypes);
+				this.isIssueTabLoading = false;
 			},
 			error: async (error: any) => {
 				console.log(error);
-        this.isIssueTabLoading = false;
+				this.isIssueTabLoading = false;
 			},
 		});
 	}
@@ -95,5 +112,32 @@ export class ShiftVisuIssueListComponent implements OnInit {
 
 	onCLickIssueListCollapsed() {
 		this.isIssueListCollapsed = !this.isIssueListCollapsed;
+	}
+
+	onFailureValues(data: any) 
+	{
+		const failureName = data.detail.item.text;
+		const failurId= data.detail.item.id;
+		console.log("failurId", failurId);
+		this.getFailureComponent(failurId);
+	}
+
+	getFailureComponent(id: number) {
+		this.isIssueTabLoading = true;
+		this.shiftVisuService["get"](
+			`ShiftVisuIssueTypes(${id})?$expand=components`,
+			true
+		).subscribe({
+			next: async (response: any) => {
+				
+				this.failureComponent = structuredClone(response.components);
+				this.isIssueTabLoading = false;
+				console.log("ShiftVisuIssueTypes component", this.failureComponent);
+			},
+			error: async (error: any) => {
+				console.log(error);
+				this.isIssueTabLoading = false;
+			},
+		});
 	}
 }
