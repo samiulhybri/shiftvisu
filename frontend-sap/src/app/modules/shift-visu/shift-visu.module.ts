@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
 import { SharedModule } from "@app/shared/shared.module";
@@ -25,5 +25,6 @@ import { ShiftVisuIssueListComponent } from "@shift-visu/shift-visu-issue-list/s
 		ShiftVisuIssueListComponent,
 	],
 	imports: [CommonModule, ShiftVisuRoutingModule, SharedModule],
+	schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ShiftVisuModule {}
