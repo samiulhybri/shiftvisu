@@ -8,6 +8,7 @@ import { ShiftVisuIssueTypeComponent } from "@shift-visu/shift-visu-issue-type/s
 import { ShiftVisuComponentComponent } from "@shift-visu/shift-visu-component/shift-visu-component.component";
 import { ShiftVisuGeneralComponentComponent } from "@shift-visu/shift-visu-issue-type/shift-visu-general-component/shift-visu-general-component.component";
 import { ShiftVisuIssueListComponent } from "@shift-visu/shift-visu-issue-list/shift-visu-issue-list.component";
+import { ShiftVisuOverviewComponent } from "./shift-visu-overview/shift-visu-overview.component";
 
 const routes: Routes = [
 	{
@@ -16,6 +17,13 @@ const routes: Routes = [
 		component: ShiftVisuComponent,
 		canActivate: [premissionGuard],
 		children: [
+			{
+				path: "",
+				pathMatch: "full",
+				component: ShiftVisuOverviewComponent,
+				canActivate: [premissionGuard],
+			},
+
 			{
 				path: "settings/failure",
 				component: ShiftVisuIssueTypeComponent,
