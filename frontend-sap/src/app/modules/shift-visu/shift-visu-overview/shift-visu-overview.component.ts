@@ -60,8 +60,6 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			centerY: 0,
 		});
 
-		
-
 		series.data.setAll([
 			{ value: 22, category: "Issues" },
 			{ value: 12, category: "Issues" },

@@ -14,7 +14,7 @@
 				<div class="grid grid-cols-3 w-full text-center mt-2">
 					<div class="flex flex-col">
 						<span>Total Issues</span>
-						<span class="text-sky-400 text-3xl">234</span>
+						<span class="text-sky-600 text-3xl">234</span>
 					</div>
 
 					<div class="flex flex-col">
@@ -135,11 +135,16 @@
 				[showTableSettingBtn]="true"
 				i18n-addButtonText
 				i18n-extraButtonText
+				[showDatePicker]="true"
+				datePickerFormat="YYYY-MM-dd"
 				[showDownload]="true"
+				button1Text="All"
+				button2Text="Open"
+				button3Text="Close"
 				[showNewButton]="false"
 				[addButtonDisable]="false"
 				[showExtraButton]="false"
-				[isBaseVisu]="true"
+				[isBaseVisu]="false"
 				[showDeleteButton]="false"
 				[enableServerSideFiltering]="true"
 				selectionMode="Single"></app-grid-table>
