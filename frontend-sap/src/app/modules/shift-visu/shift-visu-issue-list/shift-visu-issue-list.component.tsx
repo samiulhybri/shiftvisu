@@ -33,7 +33,7 @@ export class ShiftVisuIssueListComponent implements OnInit {
 
   getHallInfo() {
     this.isIssueTabLoading = true;
-		this.shiftVisuService["get"](`Halls(${this.hallId})`, true).subscribe({
+		this.shiftVisuService["get"](`Halls(${this.hallId})?$expand=shiftVisuIssueTypes`, true).subscribe({
 			next: async (response: any) => {
 				this.hall = new Hall().deserialize(response);
 				console.log("get shift visu hallInfo", this.hall);
