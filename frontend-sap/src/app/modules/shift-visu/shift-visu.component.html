@@ -18,6 +18,7 @@
 					[selected]="item.routerLink ? router.url === item.routerLink : false"
 					[icon]="item.icon"
 					[expanded]="item.expanded"
+					[slot]="item?.slot ?? ''"
 					(click)="onSideNavItemClick($event, item)">
 					@for (child of item.children; track $index) {
 						@if (authService.isPermissionValid(child.permission)) {

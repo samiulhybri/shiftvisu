@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
 import { SharedModule } from "@app/shared/shared.module";
@@ -12,7 +12,8 @@ import { ShiftVisuComponentComponent } from "@shift-visu/shift-visu-component/sh
 import { ShiftVisuComponentOptionComponent } from "@shift-visu/shift-visu-component/shift-visu-component-option/shift-visu-component-option.component";
 import { IsComponentTypeVisiblePipe } from "@shift-visu/pipes/is-component-type-visible.pipe";
 import { ShiftVisuIssueListComponent } from "@shift-visu/shift-visu-issue-list/shift-visu-issue-list.component";
-import { ShiftVisuOverviewComponent } from './shift-visu-overview/shift-visu-overview.component';
+import { ShiftVisuOverviewComponent } from "./shift-visu-overview/shift-visu-overview.component";
+import { GeneralSettingsComponent } from "./shift-visu-issue-type/general-settings/general-settings.component";
 
 @NgModule({
 	declarations: [
@@ -24,8 +25,10 @@ import { ShiftVisuOverviewComponent } from './shift-visu-overview/shift-visu-ove
 		ShiftVisuComponentOptionComponent,
 		IsComponentTypeVisiblePipe,
 		ShiftVisuIssueListComponent,
-  ShiftVisuOverviewComponent,
+		ShiftVisuOverviewComponent,
+		GeneralSettingsComponent,
 	],
 	imports: [CommonModule, ShiftVisuRoutingModule, SharedModule],
+	schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ShiftVisuModule {}

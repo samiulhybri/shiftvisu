@@ -5,6 +5,7 @@ export interface ISideNavItem {
     id: string;
     routerLink?: string;
     icon: string;
+    slot?: string;
     permission: PermissionEnum;
     children?: undefined | ISideNavItem[];
     expanded?: boolean;

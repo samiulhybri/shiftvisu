@@ -7,7 +7,7 @@
 			level="H5"
 			slot="startContent"
 			i18n
-			>Sct Issues</ui5-title
+			>{{this.hall.name}} Issues</ui5-title
 		>
 
 		<ui5-input
@@ -93,12 +93,13 @@
 					interactive
 					size="XS"
 					color-scheme="Placeholder"
-					(click)="onCLickIssueTabCollapsed()"
-				></ui5-avatar>
+					(click)="onCLickIssueTabCollapsed()"></ui5-avatar>
 			</div>
 		</ui5-card>
 
-		<ui5-card [class.hidden]="isIssueTabCollapsed === true">
+		<ui5-card
+			[class.hidden]="isIssueTabCollapsed === true"
+			loading>
 			<div
 				class="flex flex-col absolute top-1/2 -translate-x-1/2 -translate-y-1/2 z-50"
 				[ngClass]="{
@@ -130,6 +131,7 @@
 					>AI Assists</ui5-button
 				>
 			</ui5-card-header>
+			<ui5-busy-indicator [active]="isIssueTabLoading" [delay]="0">
 			<ui5-tabcontainer
 				contentBackgroundDesign="Transparent"
 				class="ml-[-16px] mr-[-16px] w-[calc(100%+32px)]">
@@ -149,7 +151,7 @@
 							<ui5-label showColon>Hall</ui5-label>
 							<ui5-input
 								readonly="true"
-								value="Sct"
+								value="{{this.hall.name}}"
 								class="w-full"></ui5-input>
 						</div>
 						<div class="flex-col flex">
@@ -158,11 +160,10 @@
 								required
 								>Creator</ui5-label
 							>
-							<ui5-select class="w-full">
-								<ui5-option>Abram Elias</ui5-option>
-								<ui5-option>Tablet</ui5-option>
-								<ui5-option>Phone</ui5-option>
-							</ui5-select>
+							<ui5-input
+								readonly="true"
+								value="{{this.creator}}"
+								class="w-full"></ui5-input>
 						</div>
 						<div class="flex-col flex">
 							<ui5-label
@@ -170,14 +171,31 @@
 								required
 								>Error</ui5-label
 							>
-							<ui5-select class="w-full">
-								<ui5-option>Server Issue</ui5-option>
-								<ui5-option>Client Issue</ui5-option>
-								<ui5-option>Qa Issue</ui5-option>
-							</ui5-select>
+
+							<ui5-combobox
+							id="viewTypeCombobox"
+							class="w-full"
+							name="view_type"
+							i18n-placeholder
+							placeholder="Select Error"
+							(selection-change)="onFailureValues($event)">
+							@for (item of failureList; track $index) {
+								<ui5-cb-item
+									[text]="item.name"
+									[id]="item.id">
+								</ui5-cb-item>
+							}
+						</ui5-combobox>
+
+							<!-- <ui5-select class="w-full">
+								@for (item of failureList; track $index) {
+									<ui5-option>{{item.name}}</ui5-option>
+								}
+							</ui5-select> -->
 						</div>
 					</div>
-
+                      
+			
 					<div>
 						<app-text-editor
 							[notes]="failureDescriptionNote"
@@ -299,14 +317,12 @@
 					i18n-text
 					class="h-[calc(100vh-304px)]"
 					text="Emergency Measures">
-
-                    <div class="flex items-center">
+					<div class="flex items-center">
 						<ui5-label>Machine Status</ui5-label>
 						<ui5-switch
 							checked
 							class="ml-2"></ui5-switch>
 					</div>
-
 
 					<div>
 						<app-text-editor
@@ -349,15 +365,12 @@
 								class="w-full"></ui5-input>
 						</div>
 					</div>
-
-
 				</ui5-tab>
 				<ui5-tab
 					i18n-text
 					class="h-[calc(100vh-304px)]"
 					text="Corrective Measures">
-
-                    <div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 						<div class="flex-col flex">
 							<ui5-label showColon>Machine No</ui5-label>
 							<ui5-combobox
@@ -466,14 +479,12 @@
 								class="w-full"></ui5-input>
 						</div>
 					</div>
-
 				</ui5-tab>
 				<ui5-tab
 					i18n-text
 					class="h-[calc(100vh-304px)]"
 					text="Details">
-
-                    <div class="flex items-center">
+					<div class="flex items-center">
 						<ui5-label>Machine Status</ui5-label>
 						<ui5-switch
 							checked
@@ -637,7 +648,7 @@
 					text="Attachments">
 				</ui5-tab>
 			</ui5-tabcontainer>
-
+		</ui5-busy-indicator>
 			<ui5-bar>
 				<ui5-button
 					design="Emphasized"
@@ -647,6 +658,7 @@
 				<ui5-button
 					design="Emphasized"
 					slot="endContent"
+					[disabled]="isIssueTabLoading"
 					>save</ui5-button
 				>
 				<ui5-button slot="endContent">cancel</ui5-button>

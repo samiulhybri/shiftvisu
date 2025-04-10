@@ -6,9 +6,9 @@ import { premissionGuard } from "@app/shared/guard/premission.guard";
 import { ShiftVisuComponent } from "@shift-visu/shift-visu.component";
 import { ShiftVisuIssueTypeComponent } from "@shift-visu/shift-visu-issue-type/shift-visu-issue-type.component";
 import { ShiftVisuComponentComponent } from "@shift-visu/shift-visu-component/shift-visu-component.component";
-import { ShiftVisuGeneralComponentComponent } from "@shift-visu/shift-visu-issue-type/shift-visu-general-component/shift-visu-general-component.component";
 import { ShiftVisuIssueListComponent } from "@shift-visu/shift-visu-issue-list/shift-visu-issue-list.component";
 import { ShiftVisuOverviewComponent } from "./shift-visu-overview/shift-visu-overview.component";
+import { GeneralSettingsComponent } from "./shift-visu-issue-type/general-settings/general-settings.component";
 
 const routes: Routes = [
 	{
@@ -36,7 +36,7 @@ const routes: Routes = [
 			},
 			{
 				path: "settings/general",
-				component: ShiftVisuGeneralComponentComponent,
+				component: GeneralSettingsComponent,
 				canActivate: [premissionGuard],
 			},
 			{
