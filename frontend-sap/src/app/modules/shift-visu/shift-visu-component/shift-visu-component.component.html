@@ -6,6 +6,7 @@
 					headerTitle="Component Name"
 					i18n-headerTitle
 					[url]="baseUrl"
+					[showRowDataCount]="true"
 					expandQuery="$expand=shiftVisuComponentOptions"
 					[columns]="columns"
 					[showAction]="true"
@@ -206,7 +207,6 @@
 									i18n-placeholder
 									placeholder="Choose Measure Option"
 									name="measure_options"
-									[(ngModel)]="selectedMeasureOption"
 									[class.hidden]="
 										modalComponent.component_type !==
 										componentOptionTypes.MEASURE

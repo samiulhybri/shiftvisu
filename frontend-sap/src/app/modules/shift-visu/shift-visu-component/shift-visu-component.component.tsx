@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
+import {
+	AfterViewInit,
+	ChangeDetectorRef,
+	Component,
+	ElementRef,
+	OnInit,
+	ViewChild,
+} from "@angular/core";
 import { NgForm } from "@angular/forms";
 
 import Dialog from "@ui5/webcomponents/dist/Dialog";
@@ -34,11 +41,11 @@ import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
 	templateUrl: "./shift-visu-component.component.html",
 	styleUrl: "./shift-visu-component.component.css",
 })
-export class ShiftVisuComponentComponent implements OnInit {
+export class ShiftVisuComponentComponent implements OnInit, AfterViewInit {
 	@ViewChild("componentsRef") gridTable: CustomReactGridTable | undefined;
 	@ViewChild("addOrEditComponentDialog") addOrEditComponentDialog!: DialogComponent;
 	@ViewChild("deleteComponentDialog") deleteComponentDialog!: Dialog;
-	@ViewChild('measureComboBox') measureComboBox!: ElementRef<any>;
+	@ViewChild("measureComboBox") measureComboBox!: any;
 
 	localization = Localization;
 	modelTypeItems: { modelType: string; value: string }[] = [];
@@ -72,7 +79,7 @@ export class ShiftVisuComponentComponent implements OnInit {
 	});
 
 	selectedModelType = "";
-	selectedMeasureOption = "";
+	selectedMeasureOption: any[] = [];
 	selectedViewComponent = "";
 
 	deleteId: number | null = null;
@@ -154,6 +161,15 @@ export class ShiftVisuComponentComponent implements OnInit {
 			...this.componentDefaultValue,
 		});
 	}
+	ngAfterViewInit(): void {
+		// const comboBox = this.measureComboBox.nativeElement;
+		// setTimeout(() => {
+		// 	comboBox.items.forEach((item: any) => {
+		// 	  item.selected = this.selectedValues.includes(item.text);
+		// 	});
+
+		console.log(this.modalComponent.measure_options);
+	}
 
 	async ngOnInit() {
 		this.getModelTypes();
@@ -219,6 +235,15 @@ export class ShiftVisuComponentComponent implements OnInit {
 		}));
 	}
 
+	onMeasureOptionSelectReset() {
+		this.selectedMeasureOption = [];
+		// this.measureComboBox.elementRef.nativeElement.selectedValues = [];
+		// this.measureComboBox.value = "";
+		this.measureComboBox.elementRef.nativeElement.items.forEach(
+			(item: any) => (item.selected = false)
+		);
+	}
+
 	updateModelTypeValues(data: any) {
 		this.modalComponent.model_type = data.detail.item.id;
 		this.modalComponent.component_type = ShiftVisuComponentTypeEnum.DROPDOWN_SINGLE;
@@ -229,36 +254,23 @@ export class ShiftVisuComponentComponent implements OnInit {
 		const customEvent = event as CustomEvent;
 		const selectedValues = customEvent.detail.items.map((item: any) => item.id);
 		this.modalComponent.measure_options = selectedValues;
-		console.log("this.modalComponent.model_type", this.modalComponent);
 	}
 	updateComponentViewInValues(data: any) {
 		this.modalComponent.view_in = data.detail.item.text;
 		console.log("this.modalComponent.view_in", this.modalComponent);
-		
 	}
 	onModelTypeInput(event: Event): void {
 		const customEvent = event as CustomEvent;
 		const comboBox = customEvent.target as any;
-	
+
 		const filterValue = comboBox.filterValue;
-		if(filterValue == '') {
+		if (filterValue == "") {
 			this.selectedModelType = "";
 			this.modalComponent.model_type = "";
 		}
 		console.log("Filter value:", filterValue);
 	}
-	
-	// onModelTypeBlur() {
-	// 	let selectedType = this.modelTypeItems.find(t => t.value == this.selectedModelType);
-	// 	if (!selectedType) {
-	// 		this.selectedModelType = "";
-	// 		this.modalComponent.model_type = "";
-	// 	} else {
-	// 		this.modalComponent.model_type = selectedType.modelType;
-	// 	}
 
-	// 	console.log("claear model_type", selectedType);
-	// }
 	get viewTypeValue(): string {
 		const value =
 			this.modalComponent.component_type === this.componentOptionTypes.MEASURE
@@ -298,6 +310,14 @@ export class ShiftVisuComponentComponent implements OnInit {
 		this.addOrEditComponentDialog.isDialogOpen = true;
 		this.saveMode = "patch";
 		this.componentId = undefined;
+		if (this.modalComponent.measure_options) {
+			this.selectedMeasureOption = JSON.parse(this.modalComponent.measure_options);
+
+			const selectedItems = this.measureComboBox.elementRef.nativeElement.items.filter(
+				(item: any) => this.selectedMeasureOption.includes(item.id)
+			);
+			selectedItems.forEach((item: any) => (item.selected = true));
+		}
 	}
 
 	newButtonClick() {
@@ -319,26 +339,28 @@ export class ShiftVisuComponentComponent implements OnInit {
 
 	onComponentSave(form: NgForm): void {
 		this.isSavingOrDeletingComponent = true;
-	
+
 		if (this.modalComponent.component_type === ShiftVisuComponentTypeEnum.MEASURE) {
 			this.modalComponent.view_in = "";
-			this.modalComponent.measure_options = JSON.stringify(this.modalComponent.measure_options);
+			this.modalComponent.measure_options = JSON.stringify(
+				this.modalComponent.measure_options
+			);
 		} else {
-			this.modalComponent.measure_options = '';
+			delete this.modalComponent.measure_options;
 		}
-	
+
 		const payload = this.modalComponent.toOdata();
 		console.log("Submitting payload:", payload);
-	
+
 		const isPost = this.saveMode === "post";
 		const url = `${this.baseUrl}${isPost ? "" : `/${this.modalComponent.id}`}`;
-	
+
 		if (!this.saveMode || !payload) {
 			this.toast.showToast(Localization.failedToSaveData, "error");
 			this.isSavingOrDeletingComponent = false;
 			return;
 		}
-	
+
 		this.shiftVisuService[this.saveMode](url, payload).subscribe({
 			next: async (response: any) => {
 				this.componentId = response?.id;
@@ -353,14 +375,13 @@ export class ShiftVisuComponentComponent implements OnInit {
 				console.error("Failed to save component:", error);
 				this.handleComponentPopupClose();
 				this.toast.showToast(Localization.failedToSaveData, "error");
-	
+
 				form.resetForm();
 				await this.getCustomId();
 				this.isSavingOrDeletingComponent = false;
 			},
 		});
 	}
-	
 
 	updateComponents() {
 		this.modalComponent = new ShiftVisuComponentModel().deserialize({
@@ -380,10 +401,10 @@ export class ShiftVisuComponentComponent implements OnInit {
 		this.saveMode = null;
 		this.selectedModelType = "";
 		this.selectedViewComponent = "";
-
 		if (form) {
 			form.resetForm();
 		}
+		this.onMeasureOptionSelectReset();
 	}
 
 	searchClick() {
