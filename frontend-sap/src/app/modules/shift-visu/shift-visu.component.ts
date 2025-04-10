@@ -46,6 +46,13 @@ export class ShiftVisuComponent implements OnInit {
 					icon: "settings",
 					permission: PermissionEnum.SHIFTVISU_ADMIN,
 				},
+				{
+					label: $localize`General Settings`,
+					id: "shift-visu-general-option",
+					routerLink: "/shift-visu/settings/general",
+					icon: "settings",
+					permission: PermissionEnum.SHIFTVISU_ADMIN,
+				},
 			],
 		},
 	];
@@ -115,6 +122,6 @@ export class ShiftVisuComponent implements OnInit {
 
 	toggleSideNavCollpaseState(expandOnly: boolean = false) {
 		if (expandOnly) this.isSideNavCollapsed = false;
-        else this.isSideNavCollapsed = !this.isSideNavCollapsed;
+		else this.isSideNavCollapsed = !this.isSideNavCollapsed;
 	}
 }
