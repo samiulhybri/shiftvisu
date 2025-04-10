@@ -8,18 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class ShiftVisuComponent extends Model
 {
-    protected $fillable = ['custom_id'];
+    protected $fillable = [
+        'custom_id',
+        'view_in',
+        'measure_options',
+    ];
 
     use HasFactory;
-    
+
     #[LodataRelationship]
     public function shiftVisuComponentOptions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ShiftVisuComponentOption::class);
-    }
-
-    public function modelInstance()
-    {
-        return $this->morphTo();
     }
 }

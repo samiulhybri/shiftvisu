@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 
 import Dialog from "@ui5/webcomponents/dist/Dialog";
@@ -12,12 +12,21 @@ import {
 	ShiftVisuComponentOptionTypeClass,
 	ShiftVisuComponentTypeEnum,
 } from "@app/shared/enums/ShiftVisuComponentTypeEnum";
+import {
+	ShiftVisuComponentMeasureTypeEnum,
+	ShiftVisuComponentMeasureTypeClass,
+} from "@shift-visu/enums/shiftVisuComponentMeasureTypeEnum";
+import {
+	shiftVisuComponentViewTypeEnum,
+	ShiftVisuComponentViewTypeClass,
+} from "@shift-visu/enums/shiftVisuComponentViewTypeEnum";
+
 import { ShiftVisuComponentModel } from "@app/shared/models/shift-visu-component.model";
 import { AuthService } from "@app/shared/services/auth.service";
 import { Localization } from "@app/shared/utils/common-localize";
 import { ToastService } from "@app/shared/services/toaster.service";
 import { BackendModelTypeClass } from "@app/shared/enums/BackendModelType";
-
+import { MultiComboBoxSelectionChangeEventDetail } from "@ui5/webcomponents/dist/MultiComboBox";
 import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
 
 @Component({
@@ -29,10 +38,13 @@ export class ShiftVisuComponentComponent implements OnInit {
 	@ViewChild("componentsRef") gridTable: CustomReactGridTable | undefined;
 	@ViewChild("addOrEditComponentDialog") addOrEditComponentDialog!: DialogComponent;
 	@ViewChild("deleteComponentDialog") deleteComponentDialog!: Dialog;
+	@ViewChild('measureComboBox') measureComboBox!: ElementRef<any>;
 
 	localization = Localization;
 	modelTypeItems: { modelType: string; value: string }[] = [];
 	componentOptionTypeArray = ShiftVisuComponentOptionTypeClass.getEnumArray();
+	componentMeasureTypeArray = ShiftVisuComponentMeasureTypeClass.getEnumArray();
+	componentViewTypeArray = ShiftVisuComponentViewTypeClass.getEnumArray();
 	baseUrl = "/ShiftVisuComponents";
 
 	filterQuery = `startsWith(custom_id,'SVC-')`;
@@ -43,6 +55,8 @@ export class ShiftVisuComponentComponent implements OnInit {
 		name: "",
 		is_required: false,
 		model_type: "",
+		view_in: shiftVisuComponentViewTypeEnum.OVERVIEW,
+		measure_options: [],
 		component_type: ShiftVisuComponentTypeEnum.CHECKBOX,
 	});
 
@@ -58,17 +72,25 @@ export class ShiftVisuComponentComponent implements OnInit {
 	});
 
 	selectedModelType = "";
+	selectedMeasureOption = "";
+	selectedViewComponent = "";
 
 	deleteId: number | null = null;
 	isLoadingCustomId: boolean = false;
 	customId?: string = "";
+	componentId: number | undefined;
 
 	get shiftVisuAdminPermission() {
 		return PermissionEnum.SHIFTVISU_ADMIN;
 	}
-
+	get componentViewTypes() {
+		return shiftVisuComponentViewTypeEnum;
+	}
 	get componentOptionTypes() {
 		return ShiftVisuComponentTypeEnum;
+	}
+	get componentMeasureTypes() {
+		return ShiftVisuComponentMeasureTypeEnum;
 	}
 
 	columns: any = [
@@ -79,6 +101,23 @@ export class ShiftVisuComponentComponent implements OnInit {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+		},
+		{
+			Header: $localize`Model Type`,
+			accessor: "model_type",
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: false,
+			isSelected: true,
+			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+				const { row } = instance;
+				let model = BackendModelTypeClass.getStateTranslate(row.original.model_type);
+				return (
+					<React.StrictMode>
+						<Text>{model?.text}</Text>
+					</React.StrictMode>
+				);
+			},
 		},
 		{
 			Header: $localize`Component Type`,
@@ -130,20 +169,44 @@ export class ShiftVisuComponentComponent implements OnInit {
 		this.isLoadingCustomId = false;
 	}
 
+	onComponentTypeSelect(type: any): void {
+		this.modalComponent.component_type = type.value;
+	}
+
+	translate(modelType: any): any {
+		return BackendModelTypeClass.getStateTranslate(modelType)?.text || "";
+	}
+
 	processData(data: any[], recentData: any[]) {
 		if (data.length > 0 && data.length == recentData.length) {
-			if (this.gridTable?.selectedRowsId) {
-				this.selectedRowIds[0] = true;
-				this.gridTable.selectedRowsId = structuredClone(this.selectedRowIds);
+			if (this.componentId) {
+				const id = this.componentId;
+				const index: number = this.gridTable?.data.findIndex((item: any) => item.id === id);
+
+				if (
+					this.gridTable &&
+					this.gridTable?.data.length &&
+					index !== undefined &&
+					index >= 0
+				) {
+					this.gridTable.selectedRowsId = { [index]: true };
+					this.selectedRowIds = { [index]: true };
+					this.selectedComponent = structuredClone(this.gridTable?.data[index]);
+					this.cdr.detectChanges();
+				}
+			} else {
+				if (this.gridTable?.selectedRowsId) {
+					this.selectedRowIds[0] = true;
+					this.gridTable.selectedRowsId = structuredClone(this.selectedRowIds);
+				}
+				this.selectedComponent = structuredClone(data[0]);
+				this.cdr.detectChanges();
 			}
-			this.selectedComponent = structuredClone(data[0]);
-			this.cdr.detectChanges();
 		} else {
 			this.selectedComponent = new ShiftVisuComponentModel().deserialize({
 				...this.componentDefaultValue,
 			});
 		}
-
 		this.modalComponent = new ShiftVisuComponentModel().deserialize({
 			...this.componentDefaultValue,
 		});
@@ -159,15 +222,50 @@ export class ShiftVisuComponentComponent implements OnInit {
 	updateModelTypeValues(data: any) {
 		this.modalComponent.model_type = data.detail.item.id;
 		this.modalComponent.component_type = ShiftVisuComponentTypeEnum.DROPDOWN_SINGLE;
+		console.log("model_type", data);
 	}
 
-	onModelTypeBlur() {
-		let selectedType = this.modelTypeItems.find(t => t.value == this.selectedModelType);
-
-		if (!selectedType) {
+	updateMeasureTypeValues(event: Event): void {
+		const customEvent = event as CustomEvent;
+		const selectedValues = customEvent.detail.items.map((item: any) => item.id);
+		this.modalComponent.measure_options = selectedValues;
+		console.log("this.modalComponent.model_type", this.modalComponent);
+	}
+	updateComponentViewInValues(data: any) {
+		this.modalComponent.view_in = data.detail.item.text;
+		console.log("this.modalComponent.view_in", this.modalComponent);
+		
+	}
+	onModelTypeInput(event: Event): void {
+		const customEvent = event as CustomEvent;
+		const comboBox = customEvent.target as any;
+	
+		const filterValue = comboBox.filterValue;
+		if(filterValue == '') {
 			this.selectedModelType = "";
 			this.modalComponent.model_type = "";
 		}
+		console.log("Filter value:", filterValue);
+	}
+	
+	// onModelTypeBlur() {
+	// 	let selectedType = this.modelTypeItems.find(t => t.value == this.selectedModelType);
+	// 	if (!selectedType) {
+	// 		this.selectedModelType = "";
+	// 		this.modalComponent.model_type = "";
+	// 	} else {
+	// 		this.modalComponent.model_type = selectedType.modelType;
+	// 	}
+
+	// 	console.log("claear model_type", selectedType);
+	// }
+	get viewTypeValue(): string {
+		const value =
+			this.modalComponent.component_type === this.componentOptionTypes.MEASURE
+				? "Disabled"
+				: this.componentViewTypes.OVERVIEW;
+		this.selectedViewComponent = value;
+		return value;
 	}
 
 	deleteClick(event: any) {
@@ -199,6 +297,7 @@ export class ShiftVisuComponentComponent implements OnInit {
 		this.selectedModelType = this.modalComponent.model_type ?? "";
 		this.addOrEditComponentDialog.isDialogOpen = true;
 		this.saveMode = "patch";
+		this.componentId = undefined;
 	}
 
 	newButtonClick() {
@@ -212,34 +311,56 @@ export class ShiftVisuComponentComponent implements OnInit {
 	}
 
 	onRowClicked(event: any) {
+		if (this.gridTable) this.gridTable.selectedRowsId = { [event?.detail?.row?.index]: true };
+		const tempSelectedComponent = { ...this.selectedComponent };
 		this.selectedComponent = event.detail.row.original;
+		this.componentId = this.selectedComponent.id;
 	}
 
-	onComponentSave(form: NgForm) {
+	onComponentSave(form: NgForm): void {
 		this.isSavingOrDeletingComponent = true;
-		let payload: any = this.modalComponent.toOdata();
-
-		let url = this.baseUrl + (this.saveMode == "post" ? "" : `/${this.modalComponent.id}`);
-		if (this.saveMode) {
-			this.shiftVisuService[this.saveMode](url, payload).subscribe({
-				next: async response => {
-					this.updateComponents();
-					this.handleComponentPopupClose();
-					const { recordSavedSuccessfully } = Localization;
-					this.toast.showToast(recordSavedSuccessfully, "success");
-					form.resetForm();
-					await this.getCustomId();
-				},
-				error: async () => {
-					this.handleComponentPopupClose();
-					const { failedToSaveData } = Localization;
-					this.toast.showToast(failedToSaveData, "error");
-					form.resetForm();
-					await this.getCustomId();
-				},
-			});
+	
+		if (this.modalComponent.component_type === ShiftVisuComponentTypeEnum.MEASURE) {
+			this.modalComponent.view_in = "";
+			this.modalComponent.measure_options = JSON.stringify(this.modalComponent.measure_options);
+		} else {
+			this.modalComponent.measure_options = '';
 		}
+	
+		const payload = this.modalComponent.toOdata();
+		console.log("Submitting payload:", payload);
+	
+		const isPost = this.saveMode === "post";
+		const url = `${this.baseUrl}${isPost ? "" : `/${this.modalComponent.id}`}`;
+	
+		if (!this.saveMode || !payload) {
+			this.toast.showToast(Localization.failedToSaveData, "error");
+			this.isSavingOrDeletingComponent = false;
+			return;
+		}
+	
+		this.shiftVisuService[this.saveMode](url, payload).subscribe({
+			next: async (response: any) => {
+				this.componentId = response?.id;
+				this.updateComponents();
+				this.handleComponentPopupClose();
+				this.toast.showToast(Localization.recordSavedSuccessfully, "success");
+				form.resetForm();
+				await this.getCustomId();
+				this.isSavingOrDeletingComponent = false;
+			},
+			error: async (error: any) => {
+				console.error("Failed to save component:", error);
+				this.handleComponentPopupClose();
+				this.toast.showToast(Localization.failedToSaveData, "error");
+	
+				form.resetForm();
+				await this.getCustomId();
+				this.isSavingOrDeletingComponent = false;
+			},
+		});
 	}
+	
 
 	updateComponents() {
 		this.modalComponent = new ShiftVisuComponentModel().deserialize({
@@ -258,6 +379,7 @@ export class ShiftVisuComponentComponent implements OnInit {
 		this.deleteComponentDialog.open = false;
 		this.saveMode = null;
 		this.selectedModelType = "";
+		this.selectedViewComponent = "";
 
 		if (form) {
 			form.resetForm();

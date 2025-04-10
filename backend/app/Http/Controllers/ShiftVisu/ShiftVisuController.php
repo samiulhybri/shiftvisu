@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ShiftVisu\ShiftVisuIssueType;
 use Exception;
 use Illuminate\Http\Request;
+use DB;
 
 class ShiftVisuController extends Controller
 {
@@ -73,4 +74,75 @@ class ShiftVisuController extends Controller
             ]);
         }
     }
+
+    function updateComponentIssueType(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+    
+            if (!$request->input('shiftVisuIssueType.id')) {
+                return response()->json(['message' => 'Shift visu issue Type id is required.'], 400);
+            }
+    
+            $shiftVisuIssueTypeId = $request->input('shiftVisuIssueType.id');
+    
+            $shiftVisuIssueType = ShiftVisuIssueType::findOrFail($shiftVisuIssueTypeId);
+    
+            $components = array_merge(
+                $request->input('shiftVisuModelComponents', []),
+                $request->input('shiftVisuGeneralComponents', [])
+            );
+    
+            $syncData = [];
+            foreach ($components as $component) {
+                if (isset($component['id'], $component['is_mandatory'])) {
+                    $syncData[$component['id']] = ['is_mandatory' => $component['is_mandatory']];
+                }
+            }
+    
+            $shiftVisuIssueType->components()->sync($syncData);
+    
+            DB::commit();
+    
+            return response()->json(['message' => 'Data saved successfully.'], 201);
+    
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'An error occurred while saving data.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getShiftVisuIssueTypesData()
+    {
+        $issueTypes = ShiftVisuIssueType::with([
+            'components' => function ($q) {
+                $q->select('shift_visu_components.*');
+            },
+            'halls'
+        ])->get();
+
+        $issueTypes->each(function ($issueType) {
+            $issueType->components->each(function ($component) {
+                $component->is_mandatory = $component->pivot->is_mandatory ?? null;
+                unset($component->pivot);
+            });
+        });
+
+        return response()->json($issueTypes);
+    }
+
+    public function getShiftVisuHallList()
+    {
+        $halls = DB::table('halls')
+                ->join('hall_shift_visu_issue_type', 'halls.id', '=', 'hall_shift_visu_issue_type.hall_id')
+                ->select('halls.id', 'halls.name')
+                ->distinct()
+                ->get();
+
+        return response()->json($halls);
+    }
+
 }

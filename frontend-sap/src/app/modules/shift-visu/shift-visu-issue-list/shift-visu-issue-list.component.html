@@ -1,0 +1,656 @@
+<ui5-card class="h-full">
+	<ui5-bar
+		slot="header"
+		class="h-[44px]"
+		design="Header">
+		<ui5-title
+			level="H5"
+			slot="startContent"
+			i18n
+			>Sct Issues</ui5-title
+		>
+
+		<ui5-input
+			id="valueHelpInput"
+			placeholder="Search"
+			i18n-placeholder
+			slot="endContent">
+			<ui5-icon
+				id="valueHelpIcon"
+				slot="icon"
+				name="search"></ui5-icon>
+		</ui5-input>
+
+		<div
+			class="daterange-picker-width"
+			slot="endContent">
+			<ui5-daterange-picker
+				id="mydaterange-picker12"
+				format-pattern="dd.MM.yyyy"></ui5-daterange-picker>
+		</div>
+		<ui5-button
+			design="Emphasized"
+			slot="endContent"
+			i18n
+			>Go</ui5-button
+		>
+		<ui5-button
+			slot="endContent"
+			i18n
+			>Reset</ui5-button
+		>
+
+		<ui5-segmented-button
+			accessible-name="Map style"
+			slot="endContent">
+			<ui5-segmented-button-item selected>All</ui5-segmented-button-item>
+			<ui5-segmented-button-item>Open</ui5-segmented-button-item>
+			<ui5-segmented-button-item>Close</ui5-segmented-button-item>
+		</ui5-segmented-button>
+	</ui5-bar>
+	<div
+		class="p-10 h-[calc(100vh-150px)] grid gap-x-3 relative"
+		[ngClass]="{
+			'grid-cols-1': isIssueListCollapsed || isIssueTabCollapsed,
+			'grid-cols-2': !isIssueListCollapsed && !isIssueTabCollapsed,
+		}">
+		<ui5-card [class.hidden]="isIssueListCollapsed === true">
+			<div class="h-[calc(100vh-140px)]">
+				<app-grid-table
+					[headerTitle]="'All Issues'"
+					[url]="'s'"
+					[columns]="columns"
+					[showAction]="true"
+					[showSearch]="false"
+					[showActiveButton]="false"
+					[showTableSettingBtn]="true"
+					addButtonText="New"
+					i18n-addButtonText
+					i18n-extraButtonText
+					[showDownload]="true"
+					[showNewButton]="true"
+					[addButtonDisable]="false"
+					[showExtraButton]="false"
+					[isBaseVisu]="true"
+					[showDeleteButton]="true"
+					[enableServerSideFiltering]="true"
+					selectionMode="Single"
+					keyForCacheCustomDataTableColumns="failureSettings"
+					#failureSettingsRef></app-grid-table>
+			</div>
+
+			<div
+				class="flex flex-col absolute top-1/2 -translate-x-1/2 -translate-y-1/2 z-50"
+				[ngClass]="{
+					'left-[98%]': isIssueTabCollapsed,
+					'left-[49%]': !isIssueTabCollapsed,
+				}">
+				<ui5-avatar
+					class="relative top-[-40px] border border-slate-400 bg-white"
+					[icon]="
+						isIssueTabCollapsed ? 'navigation-left-arrow' : 'navigation-right-arrow'
+					"
+					interactive
+					size="XS"
+					color-scheme="Placeholder"
+					(click)="onCLickIssueTabCollapsed()"
+				></ui5-avatar>
+			</div>
+		</ui5-card>
+
+		<ui5-card [class.hidden]="isIssueTabCollapsed === true">
+			<div
+				class="flex flex-col absolute top-1/2 -translate-x-1/2 -translate-y-1/2 z-50"
+				[ngClass]="{
+					'left-[1%]': isIssueListCollapsed,
+					'left-[49%]': !isIssueListCollapsed,
+					'top-[45%]': isIssueListCollapsed,
+				}">
+				<ui5-avatar
+					class="border border-slate-400 bg-white"
+					[icon]="
+						isIssueListCollapsed ? 'navigation-right-arrow' : 'navigation-left-arrow'
+					"
+					interactive
+					size="XS"
+					color-scheme="Placeholder"
+					(click)="onCLickIssueListCollapsed()"></ui5-avatar>
+			</div>
+
+			<ui5-card-header [titleText]="'Server Issue'">
+				<ui5-button
+					design="Emphasized"
+					slot="action"
+					>KVP</ui5-button
+				>
+				<ui5-button
+					slot="action"
+					icon="ai"
+					class="ml-2"
+					>AI Assists</ui5-button
+				>
+			</ui5-card-header>
+			<ui5-tabcontainer
+				contentBackgroundDesign="Transparent"
+				class="ml-[-16px] mr-[-16px] w-[calc(100%+32px)]">
+				<ui5-tab
+					i18n-text
+					text="Overview"
+					class="h-[calc(100vh-304px)]">
+					<div class="flex items-center">
+						<ui5-label>Machine Status</ui5-label>
+						<ui5-switch
+							checked
+							class="ml-2"></ui5-switch>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Hall</ui5-label>
+							<ui5-input
+								readonly="true"
+								value="Sct"
+								class="w-full"></ui5-input>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label
+								showColon
+								required
+								>Creator</ui5-label
+							>
+							<ui5-select class="w-full">
+								<ui5-option>Abram Elias</ui5-option>
+								<ui5-option>Tablet</ui5-option>
+								<ui5-option>Phone</ui5-option>
+							</ui5-select>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label
+								showColon
+								required
+								>Error</ui5-label
+							>
+							<ui5-select class="w-full">
+								<ui5-option>Server Issue</ui5-option>
+								<ui5-option>Client Issue</ui5-option>
+								<ui5-option>Qa Issue</ui5-option>
+							</ui5-select>
+						</div>
+					</div>
+
+					<div>
+						<app-text-editor
+							[notes]="failureDescriptionNote"
+							[isReadOnly]="false">
+						</app-text-editor>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Machine No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Machine"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Serial No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Serial Number"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon>NCR NO</ui5-label>
+							<ui5-input
+								readonly="true"
+								value="5"
+								class="w-full"></ui5-input>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Part No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Part"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Plan Part </ui5-label>
+							<ui5-combobox
+								placeholder="Select Plan Part"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon> Tool No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Tool"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Machine No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Machine"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Serial No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Serial Number"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon>NCR NO</ui5-label>
+							<ui5-input
+								readonly="true"
+								value="5"
+								class="w-full"></ui5-input>
+						</div>
+					</div>
+				</ui5-tab>
+				<ui5-tab
+					i18n-text
+					class="h-[calc(100vh-304px)]"
+					text="Emergency Measures">
+
+                    <div class="flex items-center">
+						<ui5-label>Machine Status</ui5-label>
+						<ui5-switch
+							checked
+							class="ml-2"></ui5-switch>
+					</div>
+
+
+					<div>
+						<app-text-editor
+							[notes]="failureDescriptionNote"
+							[isReadOnly]="false">
+						</app-text-editor>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Machine No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Machine"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Serial No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Serial Number"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon>NCR NO</ui5-label>
+							<ui5-input
+								readonly="true"
+								value="5"
+								class="w-full"></ui5-input>
+						</div>
+					</div>
+
+
+				</ui5-tab>
+				<ui5-tab
+					i18n-text
+					class="h-[calc(100vh-304px)]"
+					text="Corrective Measures">
+
+                    <div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Machine No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Machine"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Serial No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Serial Number"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon>NCR NO</ui5-label>
+							<ui5-input
+								readonly="true"
+								value="5"
+								class="w-full"></ui5-input>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Part No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Part"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Plan Part </ui5-label>
+							<ui5-combobox
+								placeholder="Select Plan Part"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon> Tool No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Tool"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Machine No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Machine"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Serial No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Serial Number"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon>NCR NO</ui5-label>
+							<ui5-input
+								readonly="true"
+								value="5"
+								class="w-full"></ui5-input>
+						</div>
+					</div>
+
+				</ui5-tab>
+				<ui5-tab
+					i18n-text
+					class="h-[calc(100vh-304px)]"
+					text="Details">
+
+                    <div class="flex items-center">
+						<ui5-label>Machine Status</ui5-label>
+						<ui5-switch
+							checked
+							class="ml-2"></ui5-switch>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Hall</ui5-label>
+							<ui5-input
+								readonly="true"
+								value="Sct"
+								class="w-full"></ui5-input>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label
+								showColon
+								required
+								>Creator</ui5-label
+							>
+							<ui5-select class="w-full">
+								<ui5-option>Abram Elias</ui5-option>
+								<ui5-option>Tablet</ui5-option>
+								<ui5-option>Phone</ui5-option>
+							</ui5-select>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label
+								showColon
+								required
+								>Error</ui5-label
+							>
+							<ui5-select class="w-full">
+								<ui5-option>Server Issue</ui5-option>
+								<ui5-option>Client Issue</ui5-option>
+								<ui5-option>Qa Issue</ui5-option>
+							</ui5-select>
+						</div>
+					</div>
+
+					<div>
+						<app-text-editor
+							[notes]="failureDescriptionNote"
+							[isReadOnly]="false">
+						</app-text-editor>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Machine No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Machine"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Serial No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Serial Number"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon>NCR NO</ui5-label>
+							<ui5-input
+								readonly="true"
+								value="5"
+								class="w-full"></ui5-input>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Part No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Part"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Plan Part </ui5-label>
+							<ui5-combobox
+								placeholder="Select Plan Part"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon> Tool No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Tool"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
+						<div class="flex-col flex">
+							<ui5-label showColon>Machine No</ui5-label>
+							<ui5-combobox
+								placeholder="Select Machine"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+						<div class="flex-col flex">
+							<ui5-label showColon> Serial No </ui5-label>
+							<ui5-combobox
+								placeholder="Choose Serial Number"
+								class="w-full">
+								<ui5-cb-item text="Austria"></ui5-cb-item>
+								<ui5-cb-item text="Bulgaria"></ui5-cb-item>
+								<ui5-cb-item text="Germany"></ui5-cb-item>
+								<ui5-cb-item text="Italy"></ui5-cb-item>
+								<ui5-cb-item text="Spain"></ui5-cb-item>
+							</ui5-combobox>
+						</div>
+
+						<div class="flex-col flex">
+							<ui5-label showColon>NCR NO</ui5-label>
+							<ui5-input
+								readonly="true"
+								value="5"
+								class="w-full"></ui5-input>
+						</div>
+					</div>
+				</ui5-tab>
+				<ui5-tab
+					i18n-text
+					class="h-[calc(100vh-304px)]"
+					text="Attachments">
+				</ui5-tab>
+			</ui5-tabcontainer>
+
+			<ui5-bar>
+				<ui5-button
+					design="Emphasized"
+					slot="startContent"
+					>Chat</ui5-button
+				>
+				<ui5-button
+					design="Emphasized"
+					slot="endContent"
+					>save</ui5-button
+				>
+				<ui5-button slot="endContent">cancel</ui5-button>
+			</ui5-bar>
+		</ui5-card>
+	</div>
+</ui5-card>

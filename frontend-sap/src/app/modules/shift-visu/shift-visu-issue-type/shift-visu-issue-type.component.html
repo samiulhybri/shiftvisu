@@ -10,14 +10,14 @@
 			>Failure Settings</ui5-title
 		>
 	</ui5-bar>
-	<div class="p-10 h-[calc(100vh-150px)] grid grid-cols-2 gap-x-5">
+	<div class="p-10 h-[calc(100vh-150px)] grid grid-cols-2 gap-x-3">
 		<ui5-card>
-			<div class="h-[calc(100vh-140px)]">
+			<div class="h-[calc(100vh-140px)] ">
 				<app-grid-table
 					[headerTitle]="settingsListName"
 					[url]="odataUrl"
 					[filterQuery]="filterQuery"
-					expandQuery="$expand=halls"
+					expandQuery="$expand=halls,components"
 					[columns]="columns"
 					[showAction]="true"
 					[showSearch]="true"
@@ -63,12 +63,14 @@
 					i18n-text
 					text="Model Component">
 					<app-shift-visu-model-component
+					    [selectedIssue]="selectedIssue"
 						[issueType]="selectedIssueType"></app-shift-visu-model-component>
 				</ui5-tab>
 				<ui5-tab
 					i18n-text
 					text="Component">
 					<app-shift-visu-general-component
+					[selectedIssue]="selectedIssue"
 						[issueType]="selectedIssueType"></app-shift-visu-general-component>
 				</ui5-tab>
 			</ui5-tabcontainer>
@@ -76,6 +78,7 @@
 				<ui5-button
 					design="Emphasized"
 					slot="endContent"
+					(ui5Click)="saveFailureSettings()"
 					>{{ localization.save }}</ui5-button
 				>
 				<ui5-button slot="endContent">{{ localization.cancel }}</ui5-button>

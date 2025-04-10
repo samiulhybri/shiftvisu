@@ -27,6 +27,13 @@ export class ShiftVisuComponent implements OnInit {
 			permission: PermissionEnum.SHIFTVISU_VIEW,
 		},
 		{
+			label: $localize`Halls`,
+			id: "shift-visu-issue-halls",
+			routerLink: "/shift-visu/hall/2",
+			icon: "factory",
+			permission: PermissionEnum.SHIFTVISU_VIEW,
+		},
+		{
 			label: $localize`Settings`,
 			id: "shift-visu-settings",
 			icon: "settings",
@@ -46,8 +53,16 @@ export class ShiftVisuComponent implements OnInit {
 					icon: "settings",
 					permission: PermissionEnum.SHIFTVISU_ADMIN,
 				},
+				{
+					label: $localize`General Settings`,
+					id: "shift-visu-general-option",
+					routerLink: "/shift-visu/settings/general",
+					icon: "settings",
+					permission: PermissionEnum.SHIFTVISU_ADMIN,
+				},
 			],
 		},
+
 	];
 
 	constructor(
@@ -77,7 +92,6 @@ export class ShiftVisuComponent implements OnInit {
 
 		if (item.children.length > 0) {
 			item.expanded = true;
-
 			timer(1).subscribe(() => {
 				item.removeAttribute("selected");
 				item.children[0].selected = true;
@@ -115,6 +129,6 @@ export class ShiftVisuComponent implements OnInit {
 
 	toggleSideNavCollpaseState(expandOnly: boolean = false) {
 		if (expandOnly) this.isSideNavCollapsed = false;
-        else this.isSideNavCollapsed = !this.isSideNavCollapsed;
+		else this.isSideNavCollapsed = !this.isSideNavCollapsed;
 	}
 }

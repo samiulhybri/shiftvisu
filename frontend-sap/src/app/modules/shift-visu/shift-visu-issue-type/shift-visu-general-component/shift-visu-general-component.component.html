@@ -1,54 +1,32 @@
-<ui5-card>
-	<div class="h-[calc(100vh-304px)]">
-		<app-grid-table
-			headerTitle="Details"
-			i18n-headerTitle
-			url="/ShiftVisuComponents"
-			[filterQuery]="filterQuery"
-			[data]="data"
-			[columns]="columns"
-			[showAction]="false"
-			[showSearch]="false"
-			[showActiveButton]="false"
-			[showTableSettingBtn]="false"
-			addButtonText="New"
-			i18n-addButtonText
-			[showNewButton]="false"
-			[showDownload]="false"
-			[editPermission]="authService.isPermissionValid(shiftVisuAdminPermission)"
-			[isBaseVisu]="false"
-			selectionMode="Multiple"
-			keyForCacheCustomDataTableColumns="generalComponent"
-			#generalComponentRef
-			(rowClick)="rowClick($event)"
-			(processData)="processData($event[0], $event[1])"></app-grid-table>
-	</div>
-</ui5-card>
+<ui5-card class="card-half-width">
+	<ui5-bar
+		slot="header"
+		design="Header">
+		<ui5-title
+			level="H5"
+			slot="startContent"
+			>General Settings</ui5-title
+		>
+	</ui5-bar>
 
-<ui5-dialog
-	id="dialog"
-	state="Critical"
-	[open]="isOpenDataUnsaved"
-	header-text="Warning"
-	i18n-header-text>
-	<p i18n>You have unsaved changes. Do you want to save?</p>
-	<div
-		slot="footer"
-		class="flex justify-end w-full items-end">
-		<div class="flex flex-row-reverse">
-			<ui5-button
-				class="mr-1 mb-1"
-				(click)="closeDataUnSavedDialog()"
-				i18n
-				>No</ui5-button
+	<div class="settings-section">
+		<p class="settings-title">Permission</p>
+
+		<div class="setting-row">
+			<span>Creating entries in ShiftHandover via TPM/Visa.</span>
+			<ui5-switch checked></ui5-switch>
+		</div>
+
+		<div class="setting-row">
+			<span
+				>Create entries in ShiftHandover when entering the reason for standby of the
+				machine.</span
 			>
-			<ui5-button
-				class="mr-1 mb-1"
-				design="Emphasized"
-				(click)="saveUnSavedData()"
-				i18n
-				>Yes</ui5-button
-			>
+			<ui5-switch checked></ui5-switch>
+		</div>
+
+		<div style="margin-top: 1rem; text-align: right">
+			<ui5-button design="Emphasized">Save</ui5-button>
 		</div>
 	</div>
-</ui5-dialog>
+</ui5-card>
