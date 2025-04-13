@@ -4,6 +4,8 @@ import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5plugins_exporting from "@amcharts/amcharts5/plugins/exporting";
+import React from "react";
+import { Button, FlexBox, Icon } from "@ui5/webcomponents-react";
 
 @Component({
 	selector: "app-shift-visu-overview",
@@ -37,16 +39,17 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 
 	private initPieChart(): void {
 		this.pieRoot = am5.Root.new(this.chartDiv.nativeElement);
+
 		this.pieRoot.setThemes([am5themes_Animated.new(this.pieRoot)]);
 
-		let chart = this.pieRoot.container.children.push(
+		const chart = this.pieRoot.container.children.push(
 			am5percent.PieChart.new(this.pieRoot, {
 				layout: this.pieRoot.verticalLayout,
 				innerRadius: am5.percent(50),
 			})
 		);
 
-		let series = chart.series.push(
+		const series = chart.series.push(
 			am5percent.PieSeries.new(this.pieRoot, {
 				valueField: "value",
 				categoryField: "category",
@@ -54,28 +57,43 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			})
 		);
 
-		series.labels.template.setAll({
-			textType: "circular",
-			centerX: 0,
-			centerY: 0,
+		series.labels.template.adapters.add("text", (text, target) => {
+			const dataItem = target.dataItem;
+			if (!dataItem) return text;
+
+			const context = dataItem.dataContext as { category: string; value: number };
+			const evenValue = context.value % 2 === 0 ? context.value : context.value + 1;
+			return `${context.category}: ${evenValue}`;
+		});
+
+		series.slices.template.adapters.add("fill", (fill, target) => {
+			const data = target.dataItem?.dataContext as { color?: am5.Color };
+			return data?.color ?? fill;
+		});
+
+		series.slices.template.adapters.add("stroke", (stroke, target) => {
+			const data = target.dataItem?.dataContext as { color?: am5.Color };
+			return data?.color ?? stroke;
 		});
 
 		series.data.setAll([
-			{ value: 22, category: "Issues" },
-			{ value: 12, category: "Issues" },
-			{ value: 20, category: "Issues" },
+			{ value: 22, category: "Total", color: am5.color(0xff0000) },
+			{ value: 12, category: "Urgent", color: am5.color(0x0000ff) },
+			{ value: 20, category: "Not Urgent", color: am5.color(0x07b00d) },
 		]);
 
-		let legend = chart.children.push(
+		const legend = chart.children.push(
 			am5.Legend.new(this.pieRoot, {
 				centerX: am5.percent(50),
 				x: am5.percent(50),
-				marginTop: 15,
-				marginBottom: 15,
+				marginTop: 20,
+				layout: am5.GridLayout.new(this.pieRoot, {
+					maxColumns: 3,
+					fixedWidthGrid: true,
+				}),
 			})
 		);
 
-		legend.data.setAll(series.dataItems);
 		series.appear(1000, 100);
 		chart.appear(1000, 100);
 	}
@@ -95,31 +113,31 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		);
 
 		let data = [
-			{ country: "SSC", visits: 665, columnSettings: { fill: chart.get("colors")?.next() } },
-			{ country: "Test", visits: 600, columnSettings: { fill: chart.get("colors")?.next() } },
-			{ country: "TDAQ", visits: 441, columnSettings: { fill: chart.get("colors")?.next() } },
+			{ country: "SSC", visits: 665, columnSettings: { fill: am5.color(0x0000ff) } },
+			{ country: "Test", visits: 600, columnSettings: { fill: am5.color(0x0000ff) } },
+			{ country: "TDAQ", visits: 441, columnSettings: { fill: am5.color(0x0000ff) } },
 			{
 				country: "Test2",
 				visits: 395,
-				columnSettings: { fill: chart.get("colors")?.next() },
+				columnSettings: { fill: am5.color(0x0000ff) },
 			},
-			{ country: "HWK", visits: 386, columnSettings: { fill: chart.get("colors")?.next() } },
+			{ country: "HWK", visits: 386, columnSettings: { fill: am5.color(0x0000ff) } },
 			{
 				country: "Test4",
 				visits: 384,
-				columnSettings: { fill: chart.get("colors")?.next() },
+				columnSettings: { fill: am5.color(0x0000ff) },
 			},
-			{ country: "ADK", visits: 700, columnSettings: { fill: chart.get("colors")?.next() } },
+			{ country: "ADK", visits: 700, columnSettings: { fill: am5.color(0x0000ff) } },
 			{
 				country: "Test7",
 				visits: 328,
-				columnSettings: { fill: chart.get("colors")?.next() },
+				columnSettings: { fill: am5.color(0x0000ff) },
 			},
-			{ country: "SB", visits: 328, columnSettings: { fill: chart.get("colors")?.next() } },
+			{ country: "SB", visits: 328, columnSettings: { fill: am5.color(0x0000ff) } },
 			{
 				country: "Test3",
 				visits: 328,
-				columnSettings: { fill: chart.get("colors")?.next() },
+				columnSettings: { fill: am5.color(0x0000ff) },
 			},
 		];
 
@@ -174,7 +192,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 
 		series.data.setAll(data);
 
-		let exporting = am5plugins_exporting.Exporting.new(this.xyRoot, {
+		am5plugins_exporting.Exporting.new(this.xyRoot, {
 			menu: am5plugins_exporting.ExportingMenu.new(this.xyRoot, {}),
 		});
 
@@ -182,39 +200,99 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		chart.appear(1000, 100);
 	}
 
-	columns: any = [
+	columns = [
+		{
+			Header: $localize`Id`,
+			accessor: "prodOrderPos.prodOrder.custom_id",
+			disableFilters: true,
+			disableGroupBy: true,
+			disableSortBy: true,
+			isSelected: true,
+			hAlign: "Start",
+		},
 		{
 			Header: $localize`Error`,
-			accessor: "name",
-			disableFilters: false,
+			accessor: "machine.hall.name",
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
+			hAlign: "Start",
 		},
 		{
 			Header: $localize`Creator`,
-			accessor: "model_type",
-			disableFilters: false,
+			accessor: "machine.name",
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
+			hAlign: "Start",
 		},
-
 		{
 			Header: $localize`Start Date`,
-			accessor: "start_date",
-			disableFilters: false,
+			accessor: "prodOrderPos.quantity",
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
+			hAlign: "End",
+		},
+		{
+			Header: $localize`Descreption`,
+			accessor: "quantityDelivered",
+			disableFilters: true,
+			disableGroupBy: true,
+			disableSortBy: true,
+			isSelected: true,
+			hAlign: "Center",
+			Cell: (instance: any) => {
+				return (
+					<React.StrictMode>
+						<Button design="Transparent">
+							{" "}
+							<Icon name="message-information" />
+						</Button>
+					</React.StrictMode>
+				);
+			},
 		},
 		{
 			Header: $localize`Attachment`,
-			accessor: "attachment",
-			disableFilters: false,
+			accessor: "prodOrderPos.calculation.offerPos.product_type",
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
+			hAlign: "Center",
+			Cell: (instance: any) => {
+				return (
+					<React.StrictMode>
+						<Button design="Transparent">
+							{" "}
+							<Icon name="attachment" />
+						</Button>
+					</React.StrictMode>
+				);
+			},
+		},
+		{
+			Header: $localize`Action`,
+			accessor: "prodOrderPos.calculation.offerPos.offerPosRawDimensions[0].gross_weight",
+			disableFilters: true,
+			disableGroupBy: true,
+			disableSortBy: true,
+			isSelected: true,
+			hAlign: "Center",
+			Cell: (instance: any) => {
+				return (
+					<React.StrictMode>
+						<Button design="Transparent">
+							{" "}
+							<Icon name="attachment" />
+						</Button>
+					</React.StrictMode>
+				);
+			},
 		},
 	];
 
