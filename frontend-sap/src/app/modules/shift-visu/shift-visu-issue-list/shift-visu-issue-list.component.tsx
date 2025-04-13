@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Hall } from "@app/shared/models/hall.model";
 import { ShiftVisuComponentModel } from "@app/shared/models/shift-visu-component.model";
@@ -7,20 +7,24 @@ import { ShiftVisuIssueTypeModel } from "@app/shared/models/shift-visu-issue-typ
 import { AuthService } from "@app/shared/services/auth.service";
 import { Localization } from "@app/shared/utils/common-localize";
 import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
+import { DialogComponent } from "@app/shared/components/dialog/dialog.component";
 @Component({
 	selector: "app-shift-visu-issue-list",
 	templateUrl: "./shift-visu-issue-list.component.html",
 	styleUrl: "./shift-visu-issue-list.component.css",
 })
 export class ShiftVisuIssueListComponent implements OnInit {
+		@ViewChild("addOrEditMeasurementDialog") addOrEditMeasurementDialog!: DialogComponent;
 	failureDescriptionNote: string = "";
 	isIssueListCollapsed: boolean = false;
 	isIssueTabCollapsed: boolean = false;
 	isIssueTabLoading: boolean = false;
+	customIdValueStateText: string = Localization.invalidEntry;
 	localization = Localization;
 	creator: string = "";
 	hallId: number = 0;
 	hall = new Hall();
+	saveMode: "post" | "patch" | null = null;
 	failureList: ShiftVisuIssueTypeModel[] = [];
 	failureComponent: ShiftVisuComponentModel[] = [];
 
@@ -35,11 +39,9 @@ export class ShiftVisuIssueListComponent implements OnInit {
 		this.route.paramMap.subscribe(params => {
 			const id = params.get("id");
 			if (id) {
-				this.hallId = +id; // convert to number
-				console.log("hallId from route:", this.hallId);
+				this.hallId = +id; 
 				this.getHallInfo();
 				this.creator = this.authService.getUser()?.name || "";
-				console.log("this.creator", this.creator);
 			}
 		});
 	}
@@ -52,7 +54,6 @@ export class ShiftVisuIssueListComponent implements OnInit {
 		).subscribe({
 			next: async (response: any) => {
 				this.hall = new Hall().deserialize(response);
-				console.log("get shift visu hallInfo", this.hall);
 				this.failureList = structuredClone(this.hall.shiftVisuIssueTypes);
 				this.isIssueTabLoading = false;
 			},
@@ -106,6 +107,13 @@ export class ShiftVisuIssueListComponent implements OnInit {
 		},
 	];
 
+	newMeasureButtonClick() {
+		this.addOrEditMeasurementDialog.isDialogOpen = true;
+	}
+	closeMeasurementDialog() {
+		this.addOrEditMeasurementDialog.isDialogOpen = false;
+	}
+
 	onCLickIssueTabCollapsed() {
 		this.isIssueTabCollapsed = !this.isIssueTabCollapsed;
 	}
@@ -118,7 +126,6 @@ export class ShiftVisuIssueListComponent implements OnInit {
 	{
 		const failureName = data.detail.item.text;
 		const failurId= data.detail.item.id;
-		console.log("failurId", failurId);
 		this.getFailureComponent(failurId);
 	}
 
@@ -132,7 +139,6 @@ export class ShiftVisuIssueListComponent implements OnInit {
 				
 				this.failureComponent = structuredClone(response.components);
 				this.isIssueTabLoading = false;
-				console.log("ShiftVisuIssueTypes component", this.failureComponent);
 			},
 			error: async (error: any) => {
 				console.log(error);

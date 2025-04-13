@@ -2,7 +2,9 @@
 	height: 29vh !important;
 	overflow: auto;
 }
-
+#restartDate :host ::ng-deep .ui5-date-picker-root > .ui5-date-picker-input {
+   width: auto !important;
+}
 :host ::ng-deep .editor-container {
    padding: 0 !important;
    border: none !important;
@@ -11,3 +13,5 @@
 :host ::ng-deep .ui5-tc-root > .ui5-tc__content {
     padding: 0 !important;
  }
+
+ 

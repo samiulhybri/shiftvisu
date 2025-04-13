@@ -162,13 +162,6 @@ export class ShiftVisuComponentComponent implements OnInit, AfterViewInit {
 		});
 	}
 	ngAfterViewInit(): void {
-		// const comboBox = this.measureComboBox.nativeElement;
-		// setTimeout(() => {
-		// 	comboBox.items.forEach((item: any) => {
-		// 	  item.selected = this.selectedValues.includes(item.text);
-		// 	});
-
-		console.log(this.modalComponent.measure_options);
 	}
 
 	async ngOnInit() {
@@ -237,8 +230,6 @@ export class ShiftVisuComponentComponent implements OnInit, AfterViewInit {
 
 	onMeasureOptionSelectReset() {
 		this.selectedMeasureOption = [];
-		// this.measureComboBox.elementRef.nativeElement.selectedValues = [];
-		// this.measureComboBox.value = "";
 		this.measureComboBox.elementRef.nativeElement.items.forEach(
 			(item: any) => (item.selected = false)
 		);
@@ -247,7 +238,6 @@ export class ShiftVisuComponentComponent implements OnInit, AfterViewInit {
 	updateModelTypeValues(data: any) {
 		this.modalComponent.model_type = data.detail.item.id;
 		this.modalComponent.component_type = ShiftVisuComponentTypeEnum.DROPDOWN_SINGLE;
-		console.log("model_type", data);
 	}
 
 	updateMeasureTypeValues(event: Event): void {
@@ -257,7 +247,6 @@ export class ShiftVisuComponentComponent implements OnInit, AfterViewInit {
 	}
 	updateComponentViewInValues(data: any) {
 		this.modalComponent.view_in = data.detail.item.text;
-		console.log("this.modalComponent.view_in", this.modalComponent);
 	}
 	onModelTypeInput(event: Event): void {
 		const customEvent = event as CustomEvent;
@@ -268,7 +257,6 @@ export class ShiftVisuComponentComponent implements OnInit, AfterViewInit {
 			this.selectedModelType = "";
 			this.modalComponent.model_type = "";
 		}
-		console.log("Filter value:", filterValue);
 	}
 
 	get viewTypeValue(): string {
@@ -339,7 +327,6 @@ export class ShiftVisuComponentComponent implements OnInit, AfterViewInit {
 
 	onComponentSave(form: NgForm): void {
 		this.isSavingOrDeletingComponent = true;
-
 		if (this.modalComponent.component_type === ShiftVisuComponentTypeEnum.MEASURE) {
 			this.modalComponent.view_in = "";
 			this.modalComponent.measure_options = JSON.stringify(
@@ -348,10 +335,7 @@ export class ShiftVisuComponentComponent implements OnInit, AfterViewInit {
 		} else {
 			delete this.modalComponent.measure_options;
 		}
-
 		const payload = this.modalComponent.toOdata();
-		console.log("Submitting payload:", payload);
-
 		const isPost = this.saveMode === "post";
 		const url = `${this.baseUrl}${isPost ? "" : `/${this.modalComponent.id}`}`;
 

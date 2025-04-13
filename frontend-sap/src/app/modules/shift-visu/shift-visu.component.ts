@@ -106,7 +106,6 @@ export class ShiftVisuComponent implements OnInit {
 		this.shiftVisuService["get"]("shift-visu/hall-list", false).subscribe({
 			next: async (response: any) => {
 				this.halls = response.map((item: any) => new Hall().deserialize(item));
-				console.log("get shift visu halls", this.halls);
 				this.buildNavItems();
 			},
 			error: async (error: any) => {
