@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ShiftVisu;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShiftVisu\ShiftVisuIssueType;
+use App\Models\ShiftVisu\ShiftVisuIssueTypeShiftVisuComponent;
 use Exception;
 use Illuminate\Http\Request;
 use DB;
@@ -145,4 +146,64 @@ class ShiftVisuController extends Controller
         return response()->json($halls);
     }
 
+
+    public function getComponents(Request $request)
+    {
+        $issueTypeId = $request->input('shift_visu_issue_type_id');
+
+        $components = ShiftVisuIssueTypeShiftVisuComponent::with(['component.options'])
+            ->where('shift_visu_issue_type_id', $issueTypeId)
+            ->get()
+            ->pluck('component');
+            // ->filter(function ($component) {
+            // return strtoupper($component->component_type) !== 'MEASURE';
+        //     });
+
+        $grouped = [];
+
+        foreach ($components as $component) {
+            $viewIn = strtoupper($component->view_in);
+            $componentType = strtoupper($component->component_type);
+
+            $componentData = [
+                'name' => $component->name,
+                'is_required' => $component->is_required,
+                'model_type' => $component->model_type,
+                'component_type' => $component->component_type,
+                'view_in' => $component->view_in,
+                'measure_options' => \json_decode($component->measure_options),
+                'option' => $component->options->map(function ($option) {
+                return [
+                    'shift_visu_component_id' => $option->shift_visu_component_id,
+                    'option' => $option->option
+                   ];
+                })->toArray()
+            ];
+
+        if (!isset($grouped[$viewIn])) {
+            $grouped[$viewIn] = [
+                'view_in' => $viewIn,
+                'component_type' => []
+            ];
+        }
+
+        $found = false;
+        foreach ($grouped[$viewIn]['component_type'] as &$typeGroup) {
+            if ($typeGroup['type'] === $componentType) {
+                $typeGroup['components'][] = $componentData;
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            $grouped[$viewIn]['component_type'][] = [
+                'type' => $componentType,
+                'components' => [$componentData],
+              ];
+            }
+        }
+
+        return response()->json(array_values($grouped));
+    }
 }

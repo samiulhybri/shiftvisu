@@ -724,7 +724,7 @@ Route::prefix('shift-visu')->controller(ShiftVisuController::class)->group(funct
     Route::post('/component-issue-type', 'updateComponentIssueType');
     Route::get('/issue-types-data', 'getShiftVisuIssueTypesData');
     Route::get('/hall-list', 'getShiftVisuHallList');
-
+    Route::get('/get-components', 'getComponents');
 });
 
 Route::prefix('quali-visu')->controller(QualiVisuController::class)->group(function () {

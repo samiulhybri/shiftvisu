@@ -21,4 +21,9 @@ class ShiftVisuComponent extends Model
     {
         return $this->hasMany(ShiftVisuComponentOption::class);
     }
+
+    public function options()
+    {
+        return $this->hasMany(ShiftVisuComponentOption::class, 'shift_visu_component_id');
+    }
 }
