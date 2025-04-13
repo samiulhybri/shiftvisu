@@ -1,6 +1,12 @@
 :host([description]) .ui5-li-content {
-    height: 3rem !important;
-  }
-  
+	height: 3rem !important;
+}
 
- 
+:host([description]) .ui5-li-text-wrapper {
+	height: 0px !important;
+  padding: 0 !important;
+}
+
+:host([description]) .ui5-li-content {
+  height: 0rem !important;
+}
