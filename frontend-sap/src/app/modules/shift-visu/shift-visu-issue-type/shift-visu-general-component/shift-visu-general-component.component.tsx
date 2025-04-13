@@ -116,7 +116,7 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 			this.generalComponents = issue.components?.filter((component: any) => component.model_type === null) || [];
 
 			if (this.gridTable?.data?.length) {
-				this.selectedRowIds = {}; // Reset selection
+				this.selectedRowIds = {}; 
 				const modelComponentIds = this.generalComponents.map((comp: any) => comp.id);
 				// Loop through gridTable data and check for matching IDs
 				this.gridTable.data.forEach((item: any, index: number) => {
@@ -127,8 +127,6 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 
 				this.gridTable.selectedRowsId = structuredClone(this.selectedRowIds);
 				this.gridTable.render();
-				console.log("Selected Row IDs:", this.selectedRowIds);
-				console.log("Grid Table Data:", this.gridTable.selectedRowsId);
 				this.cdr.detectChanges();
 			}
 		});
@@ -136,12 +134,8 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 
 	processData(data: any[], recentData?: any[]) {
 		if (this.gridTable?.data?.length) {
-			this.selectedRowIds = {}; // Reset selection
-
-			// Get all model component IDs
+			this.selectedRowIds = {}; 
 			const modelComponentIds = this.generalComponents.map((comp: any) => comp.id);
-
-			// Loop through gridTable data and check for matching IDs
 			this.gridTable.data.forEach((item: any, index: number) => {
 				if (modelComponentIds.includes(item.id)) {
 					this.selectedRowIds[index] = true;
@@ -150,24 +144,18 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 
 			this.gridTable.selectedRowsId = { ...this.selectedRowIds };
 			this.gridTable.render();
-			console.log("Selected Row IDs:", this.selectedRowIds);
-			console.log("Grid Table Data:", this.gridTable.selectedRowsId);
 			this.cdr.detectChanges();
 		}
 	}
 	onCheckMandatory(event: any, selectRow: any) {
-		event.stopPropagation(); // Prevents unwanted event bubbling
-
+		event.stopPropagation(); 
 		const isChecked = event.target.checked;
-		console.log(`Checkbox clicked. Checked: ${isChecked}`);
-		console.log("onCheckMandatory called for row:", selectRow);
 		const row = selectRow.original;
 		const rowIndex = this.selectedOriginalData.findIndex(item => item.id === row.id);
 		if (rowIndex !== -1) {
 			this.selectedOriginalData[rowIndex].is_mandatory = isChecked;
-			console.log("Updated row with id_mandatory:", this.selectedOriginalData[rowIndex]);
 		} else {
-			console.log("Row not found in selectedOriginalData");
+			console.error("Row not found in selectedOriginalData");
 		}
 	}
 	ngOnChanges(changes: SimpleChanges): void {
@@ -178,10 +166,6 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 
 	initializeDataOnChange(currentFailure: any) {
 		let selectedFailure = currentFailure;
-
-		/**
-		 * ToDo: Call backend when required properties are added.
-		 */
 	}
 
 	returnIdForUnsavedFailure() {
@@ -197,9 +181,6 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 		this.isOpenDataUnsaved = false;
 	}
 
-	/**
-	 * ToDo: Add saving functionality
-	 * */
 	saveUnSavedData() {
 		this.isOpenDataUnsaved = false;
 	}
@@ -212,6 +193,5 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 			row.is_mandatory = row.is_mandatory = true;
 			return row;
 		});
-		console.log("Selected Original Data:", this.selectedOriginalData);
 	}
 }

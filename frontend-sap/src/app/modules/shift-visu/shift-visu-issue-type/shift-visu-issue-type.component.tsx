@@ -166,8 +166,6 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 			shiftVisuModelComponents: this.selectedModelComponents, 
 			shiftVisuGeneralComponents: this.seletedGeneralComponents, 
 		};
-		console.log("payload", payload);
-		console.log("payload", payload);
 		this.selectedIssueTypeId = this.selectedIssueType.id;
 
 		this.shiftVisuService["post"](url, payload, false).subscribe({
@@ -211,7 +209,6 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 				this.failureSettingsGrid.selectedRowsId = structuredClone(this.selectedRowsId);
 				this.selectedIssueType = data[0];
 				this.selectedIssue.emit(this.selectedIssueType);
-				console.log("failer selected", data);
 			}
 		}
 		this.cdr.detectChanges();
@@ -259,7 +256,6 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 			this.selectedIssueType = event.detail.row.original;
 			this.selectedIssueTypeId = this.selectedIssueType.id;
 			this.selectedIssue.emit(this.selectedIssueType);
-			console.log("failer selected", this.selectedIssueType);
 		}
 	}
 
@@ -358,14 +354,12 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 					const { recordSavedSuccessfully } = Localization;
 					this.toast.showToast(recordSavedSuccessfully, "success");
 					this.shiftVisuService.triggerHallRefresh();
-
 					await this.getCustomId();
 				},
 				error: async () => {
 					this.handleIssueTypePopupClose(form);
 					const { failedToSaveData } = Localization;
 					this.toast.showToast(failedToSaveData, "error");
-
 					await this.getCustomId();
 				},
 			});
@@ -374,7 +368,6 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 
 	deleteClick(event: any) {
 		this.deleteId = event.id;
-
 		if (this.deleteIssueTypeDialog) this.deleteIssueTypeDialog.open = true;
 	}
 

@@ -173,17 +173,13 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 	}
 	onCheckMandatory(event: any, selectRow: any) {
 		event.stopPropagation(); 
-
 		const isChecked = event.target.checked;
-		console.log(`Checkbox clicked. Checked: ${isChecked}`);
-		console.log("onCheckMandatory called for row:", selectRow);
 		const row = selectRow.original;
 		const rowIndex = this.selectedOriginalData.findIndex(item => item.id === row.id);
 		if (rowIndex !== -1) {
 			this.selectedOriginalData[rowIndex].is_mandatory = isChecked;
-			console.log("Updated row with id_mandatory:", this.selectedOriginalData[rowIndex]);
 		} else {
-			console.log("Row not found in selectedOriginalData");
+			console.error("Row not found in selectedOriginalData");
 		}
 	}
 
@@ -203,7 +199,6 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 			row.is_mandatory = row.is_mandatory = true;
 			return row;
 		});
-		console.log("Selected Original Data:", this.selectedOriginalData);
 	}
 
 	returnIdForUnsavedFailure() {
