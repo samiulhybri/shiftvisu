@@ -1,0 +1,206 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-1 lg:grid-cols-4 h-full shadow-lg rounded-lg">
+	<div class="relative grid gap-1">
+		<div class="h-[38vh]">
+			<ui5-card class="h-full">
+				<ui5-bar design="Header">
+					<ui5-title
+						slot="startContent"
+						level="H5"
+						size="H5">
+						Total Issues
+					</ui5-title>
+				</ui5-bar>
+
+				<div class="grid grid-cols-3 w-full text-center mt-2">
+					<div class="flex flex-col">
+						<span>Total Issues</span>
+						<span class="text-blue-600 text-3xl">234</span>
+					</div>
+
+					<div class="flex flex-col">
+						<span>Urgent</span>
+						<span class="text-red-600 text-3xl">234</span>
+					</div>
+
+					<div class="flex flex-col">
+						<span>Not Urgent</span>
+						<span class="text-green-600 text-3xl">234</span>
+					</div>
+				</div>
+
+				<div class="chart m-auto mt-2">
+					<div
+						#chartdiv
+						class="w-full xl:h-[200px] 2xl:h-[230px] m-auto">
+					</div>
+				</div>
+				<div class="grid px-3 pb-2 w-full grid-cols-3">
+					<div class="flex  items-center">
+						<ui5-color-palette>
+							<ui5-color-palette-item value="#071de6" />
+						</ui5-color-palette>
+						<ui5-label>Total</ui5-label>
+					</div>
+
+					<div class="flex items-center">
+						<ui5-color-palette>
+							<ui5-color-palette-item value="#e60712" />
+						</ui5-color-palette>
+						<ui5-label>Urgent</ui5-label>
+					</div>
+
+					<div class="flex  items-center">
+						<ui5-color-palette>
+							<ui5-color-palette-item value="#07b00d" />
+						</ui5-color-palette>
+						<ui5-label>Not Urgent</ui5-label>
+					</div>
+				</div>
+			</ui5-card>
+		</div>
+
+		<div class="h-[55vh]">
+			<ui5-card class="h-full">
+				<ui5-bar design="Header">
+					<ui5-title
+						slot="startContent"
+						level="H5"
+						size="H5"
+						>Issues responsible(29)
+					</ui5-title>
+
+					<ui5-button
+						design="Transparent"
+						slot="endContent"
+						>20 of 23</ui5-button
+					>
+				</ui5-bar>
+
+				<ui5-list>
+					<ui5-li-custom class="border-none mt-2">
+						<div class="flex items-center justify-between w-full">
+							<div class="flex items-center gap-2">
+								<ui5-avatar
+									initials="XS"
+									size="XS"></ui5-avatar>
+								<div class="flex flex-col">
+									<ui5-title
+										level="H5"
+										size="H5"
+										>Title</ui5-title
+									>
+									<ui5-label class="text-xs"> 3135435 </ui5-label>
+								</div>
+							</div>
+							<ui5-label>56 issue</ui5-label>
+						</div>
+					</ui5-li-custom>
+
+					<ui5-li-custom class="border-none mt-2">
+						<div class="flex items-center justify-between w-full">
+							<div class="flex items-center gap-2">
+								<ui5-avatar
+									initials="AH"
+									color-scheme="Accent1"
+									size="XS"></ui5-avatar>
+								<div class="flex flex-col">
+									<ui5-title
+										level="H5"
+										size="H5"
+										>Title</ui5-title
+									>
+									<ui5-label class="text-xs">56 issue</ui5-label>
+								</div>
+							</div>
+							<ui5-label>56 issue</ui5-label>
+						</div>
+					</ui5-li-custom>
+				</ui5-list>
+			</ui5-card>
+		</div>
+	</div>
+
+	<div class="card grid gap-1 col-span-3">
+		<div class="grid grid-cols-3 gap-1">
+			<div class="h-full">
+				<ui5-card class="h-full">
+					<ui5-bar design="Header">
+						<ui5-title
+							slot="startContent"
+							level="H5"
+							size="H5"
+							>All Issues</ui5-title
+						>
+						<ui5-label
+							design="Transparent"
+							slot="endContent"
+							>20.08.2024</ui5-label
+						>
+					</ui5-bar>
+
+					<div class="p-4 space-y-4 mt-5">
+						<div
+							class="flex items-center space-x-3"
+							*ngFor="let items of issues; let i = index">
+							<div class="w-28 text-sm font-medium">{{ items.label }}</div>
+							<div class="flex-1 bg-gray-200 rounded h-2 overflow-hidden">
+								<div
+									[ngClass]="items.bgcolor"
+									class="h-full"
+									[style]="'width:' + items.percentage + '%'"></div>
+							</div>
+							<div
+								[ngClass]="items.textcolor"
+								class="w-10 text-sm font-semibold text-right"
+								>{{ items.percentage }}%</div
+							>
+						</div>
+					</div>
+				</ui5-card>
+			</div>
+			<div class="col-span-2">
+				<ui5-card class="h-full">
+					<ui5-bar design="Header">
+						<ui5-title
+							slot="startContent"
+							level="H5"
+							size="H5"
+							>Overall Views</ui5-title
+						>
+					</ui5-bar>
+
+					<div
+						#stockchart
+						class="w-full h-[18vh]">
+					</div>
+				</ui5-card>
+			</div>
+		</div>
+
+		<div class="row-span-3 rounded-lg overflow-hidden">
+			<app-grid-table
+				[headerTitle]="'All List'"
+				[url]="'s'"
+				[columns]="columns"
+				[showAction]="true"
+				[showSearch]="true"
+				[showActiveButton]="true"
+				[showTableSettingBtn]="true"
+				i18n-addButtonText
+				i18n-extraButtonText
+				[showDatePicker]="true"
+				datePickerFormat="YYYY-MM-dd"
+				[showDownload]="true"
+				button1Text="All"
+				button2Text="Open"
+				button3Text="Close"
+				[showNewButton]="false"
+				[addButtonDisable]="false"
+				[showExtraButton]="false"
+				[isBaseVisu]="true"
+				[showDeleteButton]="false"
+				[enableServerSideFiltering]="true"
+				selectionMode="Single"></app-grid-table>
+		</div>
+	</div>
+</div>
