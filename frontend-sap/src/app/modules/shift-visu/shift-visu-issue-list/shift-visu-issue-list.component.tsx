@@ -8,13 +8,17 @@ import { AuthService } from "@app/shared/services/auth.service";
 import { Localization } from "@app/shared/utils/common-localize";
 import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
 import { DialogComponent } from "@app/shared/components/dialog/dialog.component";
+import "@ui5/webcomponents/dist/Button.js";
+import "@ui5/webcomponents-fiori/dist/IllustratedMessage.js";
+import "@ui5/webcomponents-fiori/dist/illustrations/NoData.js";
 @Component({
 	selector: "app-shift-visu-issue-list",
 	templateUrl: "./shift-visu-issue-list.component.html",
 	styleUrl: "./shift-visu-issue-list.component.css",
 })
 export class ShiftVisuIssueListComponent implements OnInit {
-		@ViewChild("addOrEditMeasurementDialog") addOrEditMeasurementDialog!: DialogComponent;
+	@ViewChild("addOrEditMeasurementDialog") addOrEditMeasurementDialog!: DialogComponent;
+	@ViewChild("aiAssistDialog") aiAssistDialog!: DialogComponent;
 	failureDescriptionNote: string = "";
 	isIssueListCollapsed: boolean = false;
 	isIssueTabCollapsed: boolean = false;
@@ -28,7 +32,6 @@ export class ShiftVisuIssueListComponent implements OnInit {
 	failureList: ShiftVisuIssueTypeModel[] = [];
 	failureComponent: ShiftVisuComponentModel[] = [];
 
-
 	constructor(
 		private route: ActivatedRoute,
 		private shiftVisuService: ShiftVisuService,
@@ -39,7 +42,7 @@ export class ShiftVisuIssueListComponent implements OnInit {
 		this.route.paramMap.subscribe(params => {
 			const id = params.get("id");
 			if (id) {
-				this.hallId = +id; 
+				this.hallId = +id;
 				this.getHallInfo();
 				this.creator = this.authService.getUser()?.name || "";
 			}
@@ -110,6 +113,13 @@ export class ShiftVisuIssueListComponent implements OnInit {
 	newMeasureButtonClick() {
 		this.addOrEditMeasurementDialog.isDialogOpen = true;
 	}
+	aiAssistClick(){
+		this.aiAssistDialog.isDialogOpen = true;
+	}
+
+	closeAiAssistDialog(){
+		this.aiAssistDialog.isDialogOpen = false;
+	}
 	closeMeasurementDialog() {
 		this.addOrEditMeasurementDialog.isDialogOpen = false;
 	}
@@ -122,10 +132,9 @@ export class ShiftVisuIssueListComponent implements OnInit {
 		this.isIssueListCollapsed = !this.isIssueListCollapsed;
 	}
 
-	onFailureValues(data: any) 
-	{
+	onFailureValues(data: any) {
 		const failureName = data.detail.item.text;
-		const failurId= data.detail.item.id;
+		const failurId = data.detail.item.id;
 		this.getFailureComponent(failurId);
 	}
 
@@ -136,7 +145,6 @@ export class ShiftVisuIssueListComponent implements OnInit {
 			true
 		).subscribe({
 			next: async (response: any) => {
-				
 				this.failureComponent = structuredClone(response.components);
 				this.isIssueTabLoading = false;
 			},

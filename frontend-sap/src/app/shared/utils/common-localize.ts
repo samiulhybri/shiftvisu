@@ -35,6 +35,7 @@ export const Localization = {
     go: $localize`Go`,
     reset: $localize`Reset`,
     upload: $localize`Upload`,
+    download: $localize`Download`,
     warning: $localize`Warning`,
     details: $localize`Details`,
     nameIsRequired: $localize`Name is required`,

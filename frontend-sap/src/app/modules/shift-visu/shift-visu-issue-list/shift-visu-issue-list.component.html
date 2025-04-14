@@ -127,7 +127,8 @@
 				<ui5-button
 					slot="action"
 					icon="ai"
-					class="ml-2">
+					class="ml-2"
+					(ui5Click)="aiAssistClick()">
 					{{ localization.aiAssists }}</ui5-button
 				>
 			</ui5-card-header>
@@ -564,11 +565,16 @@
 						i18n-text
 						class="h-[calc(100vh-304px)]"
 						text="Details">
-						<div class="flex items-center">
-							<ui5-label i18n>Machine Status</ui5-label>
-							<ui5-switch
-								checked
-								class="ml-2"></ui5-switch>
+						<div class="">
+							<ui5-label
+								i18n
+								showColon
+								>Reason</ui5-label
+							>
+							<ui5-textarea
+								placeholder="Write here."
+								i18n-placeholder
+								class="w-full h-[100px]"></ui5-textarea>
 						</div>
 
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
@@ -614,12 +620,16 @@
 								</ui5-select>
 							</div>
 						</div>
-
 						<div>
-							<app-text-editor
-								[notes]="failureDescriptionNote"
-								[isReadOnly]="false">
-							</app-text-editor>
+							<ui5-label
+								i18n
+								showColon
+								>Department(Originator)</ui5-label
+							>
+							<ui5-textarea
+								placeholder="Write here."
+								i18n-placeholder
+								class="w-full h-[100px]"></ui5-textarea>
 						</div>
 
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
@@ -627,151 +637,28 @@
 								<ui5-label
 									showColon
 									i18n
-									>Machine No</ui5-label
-								>
-								<ui5-combobox
-									placeholder="Select Machine"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Serial No
-								</ui5-label>
-								<ui5-combobox
-									placeholder="Choose Serial Number"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>NCR NO</ui5-label
+									>Cost</ui5-label
 								>
 								<ui5-input
 									readonly="true"
-									value="5"
+									value="Sct"
 									class="w-full"></ui5-input>
 							</div>
-						</div>
-
-						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
 								<ui5-label
 									showColon
-									i18n
-									>Part No</ui5-label
-								>
-								<ui5-combobox
-									placeholder="Select Part"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
+									i18n>
+									Network Cost Announced
+								</ui5-label>
+								<ui5-switch></ui5-switch>
 							</div>
 							<div class="flex-col flex">
 								<ui5-label
 									showColon
 									i18n>
-									Plan Part
+									Still Mill Error
 								</ui5-label>
-								<ui5-combobox
-									placeholder="Select Plan Part"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Tool No
-								</ui5-label>
-								<ui5-combobox
-									placeholder="Choose Tool"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-						</div>
-
-						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Machine No</ui5-label
-								>
-								<ui5-combobox
-									placeholder="Select Machine"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Serial No
-								</ui5-label>
-								<ui5-combobox
-									placeholder="Choose Serial Number"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>NCR NO</ui5-label
-								>
-								<ui5-input
-									readonly="true"
-									value="5"
-									class="w-full"></ui5-input>
+								<ui5-switch></ui5-switch>
 							</div>
 						</div>
 					</ui5-tab>
@@ -783,7 +670,6 @@
 						<ui5-card class="h-[calc(100vh-310px)]">
 							<ui5-bar
 								slot="header"
-						
 								design="Header">
 								<ui5-title
 									level="H5"
@@ -804,10 +690,26 @@
 									i18n
 									>{{ localization.upload }}
 								</ui5-button>
+								<ui5-button
+									slot="endContent"
+									design="Transparent"
+									i18n
+									>{{ localization.download }}
+								</ui5-button>
+
+								<ui5-input
+									id="valueHelpInput"
+									placeholder="Search by file name"
+									i18n-placeholder
+									slot="endContent">
+									<ui5-icon
+										id="valueHelpIcon"
+										slot="icon"
+										name="search"></ui5-icon>
+								</ui5-input>
 							</ui5-bar>
 
-							<ui5-illustrated-message name="UnableToUpload">
-							</ui5-illustrated-message>
+							<ui5-illustrated-message name="NoData"> </ui5-illustrated-message>
 						</ui5-card>
 					</ui5-tab>
 				</ui5-tabcontainer>
@@ -935,3 +837,193 @@
 	</div>
 </app-dialog>
 
+<app-dialog
+	#aiAssistDialog
+	[title]="'Ai Assist'"
+	title-i18n>
+	<ui5-input
+		id="valueHelpInput"
+		placeholder="Search"
+		i18n-placeholder
+		class="w-full mb-3">
+		<ui5-icon
+			id="valueHelpIcon"
+			slot="icon"
+			name="search"></ui5-icon>
+	</ui5-input>
+
+	<ui5-card class="mb-4 ">
+		<div class="flex items-center p-2 mt-3 pl-3">
+			<ui5-icon
+				name="ai"
+				design="Information"></ui5-icon>
+			<ui5-title
+				level="H5"
+				size="H5"
+				class="ml-2"
+				>DAQ
+			</ui5-title>
+		</div>
+
+		<ui5-list
+			separators="None"
+			class="pl-3"
+			style="margin-block-end: 0.75rem">
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					>
+				
+					Failure Description :
+				</ui5-title>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero tempora error quidem, quas omnis necessitatibus cum</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					>Error Measure :
+				</ui5-title>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero
+				</ui5-label>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					>Corrective Measure :
+				</ui5-title>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+		</ui5-list>
+	</ui5-card>
+	<ui5-card class="mb-4">
+		<div class="flex items-center p-2 mt-3 pl-3">
+			<ui5-icon
+				name="ai"
+				design="Information"></ui5-icon>
+			<ui5-title
+				level="H5"
+				size="H5"
+				class="ml-2"
+				>DAQ
+			</ui5-title>
+		</div>
+
+		<ui5-list
+			separators="None"
+			class="pl-3"
+			style="margin-block-end: 0.75rem">
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					>
+				
+					Failure Description :
+				</ui5-title>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero tempora error quidem, quas omnis necessitatibus cum</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					>Error Measure :
+				</ui5-title>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero
+				</ui5-label>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					>Corrective Measure :
+				</ui5-title>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+		</ui5-list>
+	</ui5-card>
+	<ui5-card class="mb-4">
+		<div class="flex items-center p-2 mt-3 pl-3">
+			<ui5-icon
+				name="ai"
+				design="Information"></ui5-icon>
+			<ui5-title
+				level="H5"
+				size="H5"
+				class="ml-2"
+				>DAQ
+			</ui5-title>
+		</div>
+
+		<ui5-list
+			separators="None"
+			class="pl-3"
+			style="margin-block-end: 0.75rem">
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					>
+				
+					Failure Description :
+				</ui5-title>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero tempora error quidem, quas omnis necessitatibus cum</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					>Error Measure :
+				</ui5-title>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero
+				</ui5-label>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					>Corrective Measure :
+				</ui5-title>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+		</ui5-list>
+	</ui5-card>
+
+
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			class="ml-8"
+			id="CancelButtonId"
+			type="Button"
+			[design]="'Transparent'"
+			(ui5Click)="closeAiAssistDialog()">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</app-dialog>
