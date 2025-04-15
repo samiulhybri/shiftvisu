@@ -1,4 +1,4 @@
-import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
@@ -15,7 +15,8 @@ import { Button, FlexBox, Icon } from "@ui5/webcomponents-react";
 export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 	@ViewChild("chartdiv", { static: true }) chartDiv!: ElementRef;
 	@ViewChild("stockchart", { static: true }) stockChart!: ElementRef;
-
+	@Output() openIssueViewer: EventEmitter<string> = new EventEmitter<string>();
+	SelectedTab : string = ''
 	private pieRoot!: am5.Root;
 	private xyRoot!: am5.Root;
 
@@ -256,7 +257,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			Cell: (instance: any) => {
 				return (
 					<React.StrictMode>
-						<Button icon="message-information" design="Transparent"></Button>
+						<Button icon="message-information" onClick={(e)=>{this.openIssueViewer.emit(instance.original); this.SelectedTab="details"}} design="Transparent"></Button>
 					</React.StrictMode>
 				);
 			},
@@ -272,7 +273,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			Cell: (instance: any) => {
 				return (
 					<React.StrictMode>
-						<Button icon="attachment" design="Transparent">
+						<Button onClick={(e)=>{this.openIssueViewer.emit(instance.original); this.SelectedTab="attachments"}} icon="attachment" design="Transparent">
 							2 Files
 						</Button>
 					</React.StrictMode>
@@ -290,7 +291,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			Cell: (instance: any) => {
 				return (
 					<React.StrictMode>
-						<Button icon="show" design="Transparent"></Button>
+						<Button icon="show" onClick={(e)=>{this.openIssueViewer.emit(instance.original); this.SelectedTab="overview"}} design="Transparent"></Button>
 					</React.StrictMode>
 				);
 			},

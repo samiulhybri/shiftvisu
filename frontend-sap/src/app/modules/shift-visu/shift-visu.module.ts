@@ -14,6 +14,7 @@ import { IsComponentTypeVisiblePipe } from "@shift-visu/pipes/is-component-type-
 import { ShiftVisuIssueListComponent } from "@shift-visu/shift-visu-issue-list/shift-visu-issue-list.component";
 import { ShiftVisuOverviewComponent } from "./shift-visu-overview/shift-visu-overview.component";
 import { GeneralSettingsComponent } from "./shift-visu-issue-type/general-settings/general-settings.component";
+import { ServerIssuesViewComponent } from '@shift-visu/shift-visu-overview/server-issues-view/server-issues-view.component';
 
 @NgModule({
 	declarations: [
@@ -27,6 +28,7 @@ import { GeneralSettingsComponent } from "./shift-visu-issue-type/general-settin
 		ShiftVisuIssueListComponent,
 		ShiftVisuOverviewComponent,
 		GeneralSettingsComponent,
+  ServerIssuesViewComponent,
 	],
 	imports: [CommonModule, ShiftVisuRoutingModule, SharedModule],
 	schemas: [CUSTOM_ELEMENTS_SCHEMA],
