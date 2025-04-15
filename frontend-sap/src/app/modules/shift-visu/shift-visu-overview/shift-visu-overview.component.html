@@ -35,7 +35,7 @@
 					</div>
 				</div>
 				<div class="grid px-3 pb-2 w-full grid-cols-3">
-					<div class="flex  items-center">
+					<div class="flex items-center">
 						<ui5-color-palette>
 							<ui5-color-palette-item value="#071de6" />
 						</ui5-color-palette>
@@ -49,7 +49,7 @@
 						<ui5-label>Urgent</ui5-label>
 					</div>
 
-					<div class="flex  items-center">
+					<div class="flex items-center">
 						<ui5-color-palette>
 							<ui5-color-palette-item value="#07b00d" />
 						</ui5-color-palette>
@@ -87,7 +87,7 @@
 									<ui5-title
 										level="H5"
 										size="H5"
-										>Title</ui5-title
+										>Alexander Holzer</ui5-title
 									>
 									<ui5-label class="text-xs"> 3135435 </ui5-label>
 								</div>
@@ -107,12 +107,92 @@
 									<ui5-title
 										level="H5"
 										size="H5"
-										>Title</ui5-title
+										>Elias abraham</ui5-title
 									>
 									<ui5-label class="text-xs">56 issue</ui5-label>
 								</div>
 							</div>
+							<ui5-label>22 issue</ui5-label>
+						</div>
+					</ui5-li-custom>
+
+					<ui5-li-custom class="border-none mt-2">
+						<div class="flex items-center justify-between w-full">
+							<div class="flex items-center gap-2">
+								<ui5-avatar
+									initials="AH"
+									color-scheme="Accent2"
+									size="XS"></ui5-avatar>
+								<div class="flex flex-col">
+									<ui5-title
+										level="H5"
+										size="H5"
+										>Ashraf chowdhury</ui5-title
+									>
+									<ui5-label class="text-xs">512546</ui5-label>
+								</div>
+							</div>
+							<ui5-label>58 issue</ui5-label>
+						</div>
+					</ui5-li-custom>
+
+					<ui5-li-custom class="border-none mt-2">
+						<div class="flex items-center justify-between w-full">
+							<div class="flex items-center gap-2">
+								<ui5-avatar
+									initials="AH"
+									color-scheme="Accent3"
+									size="XS"></ui5-avatar>
+								<div class="flex flex-col">
+									<ui5-title
+										level="H5"
+										size="H5"
+										>Title</ui5-title
+									>
+									<ui5-label class="text-xs">56254</ui5-label>
+								</div>
+							</div>
 							<ui5-label>56 issue</ui5-label>
+						</div>
+					</ui5-li-custom>
+
+					<ui5-li-custom class="border-none mt-2">
+						<div class="flex items-center justify-between w-full">
+							<div class="flex items-center gap-2">
+								<ui5-avatar
+									initials="AH"
+									color-scheme="Accent4"
+									size="XS"></ui5-avatar>
+								<div class="flex flex-col">
+									<ui5-title
+										level="H5"
+										size="H5"
+										>Biprojirt roy</ui5-title
+									>
+									<ui5-label class="text-xs">56214</ui5-label>
+								</div>
+							</div>
+							<ui5-label>57 issue</ui5-label>
+						</div>
+					</ui5-li-custom>
+
+					<ui5-li-custom class="border-none mt-2">
+						<div class="flex items-center justify-between w-full">
+							<div class="flex items-center gap-2">
+								<ui5-avatar
+									initials="AH"
+									color-scheme="Accent1"
+									size="XS"></ui5-avatar>
+								<div class="flex flex-col">
+									<ui5-title
+										level="H5"
+										size="H5"
+										>Theodor sherer</ui5-title
+									>
+									<ui5-label class="text-xs">56 issue</ui5-label>
+								</div>
+							</div>
+							<ui5-label>88 issue</ui5-label>
 						</div>
 					</ui5-li-custom>
 				</ui5-list>
@@ -182,13 +262,15 @@
 				[headerTitle]="'All List'"
 				[url]="'s'"
 				[columns]="columns"
-				[showAction]="true"
+				[showAction]="false"
+				[customData]="true"
+				[data]="customdata"
 				[showSearch]="true"
 				[showActiveButton]="true"
 				[showTableSettingBtn]="true"
 				i18n-addButtonText
 				i18n-extraButtonText
-				[showDatePicker]="true"
+				[showDateRangePicker]="true"
 				datePickerFormat="YYYY-MM-dd"
 				[showDownload]="true"
 				button1Text="All"

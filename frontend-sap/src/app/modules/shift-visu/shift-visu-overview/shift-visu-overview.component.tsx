@@ -21,6 +21,14 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 
 	constructor(private zone: NgZone) {}
 
+	customdata: any = [
+		{
+			id: 12,
+			error: "new error",
+			creator: "shihab",
+		},
+	];
+
 	ngOnInit(): void {
 		this.zone.runOutsideAngular(() => {
 			this.initPieChart();
@@ -203,7 +211,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 	columns = [
 		{
 			Header: $localize`Id`,
-			accessor: "prodOrderPos.prodOrder.custom_id",
+			accessor: "id",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
@@ -212,7 +220,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		},
 		{
 			Header: $localize`Error`,
-			accessor: "machine.hall.name",
+			accessor: "error",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
@@ -221,7 +229,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		},
 		{
 			Header: $localize`Creator`,
-			accessor: "machine.name",
+			accessor: "creator",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
@@ -248,17 +256,14 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			Cell: (instance: any) => {
 				return (
 					<React.StrictMode>
-						<Button design="Transparent">
-							{" "}
-							<Icon name="message-information" />
-						</Button>
+						<Button icon="message-information" design="Transparent"></Button>
 					</React.StrictMode>
 				);
 			},
 		},
 		{
 			Header: $localize`Attachment`,
-			accessor: "prodOrderPos.calculation.offerPos.product_type",
+			accessor: "attachment",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
@@ -267,9 +272,8 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			Cell: (instance: any) => {
 				return (
 					<React.StrictMode>
-						<Button design="Transparent">
-							{" "}
-							<Icon name="attachment" />
+						<Button icon="attachment" design="Transparent">
+							2 Files
 						</Button>
 					</React.StrictMode>
 				);
@@ -277,7 +281,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		},
 		{
 			Header: $localize`Action`,
-			accessor: "prodOrderPos.calculation.offerPos.offerPosRawDimensions[0].gross_weight",
+			accessor: "action",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
@@ -286,10 +290,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			Cell: (instance: any) => {
 				return (
 					<React.StrictMode>
-						<Button design="Transparent">
-							{" "}
-							<Icon name="attachment" />
-						</Button>
+						<Button icon="show" design="Transparent"></Button>
 					</React.StrictMode>
 				);
 			},
