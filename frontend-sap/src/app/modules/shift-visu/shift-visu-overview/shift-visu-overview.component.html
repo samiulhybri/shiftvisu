@@ -3,30 +3,30 @@
 		<div class="h-[38vh]">
 			<ui5-card class="h-full">
 				<ui5-bar design="Header">
-					<ui5-title slot="startContent" level="H5" size="H5">
+					<ui5-title i18n-title slot="startContent" level="H5" size="H5" i18n>
 						Total Issues
 					</ui5-title>
 				</ui5-bar>
 
 				<div class="grid grid-cols-3 w-full text-center mt-2">
 					<div class="flex flex-col">
-						<span>Total Issues</span>
-						<span class="text-blue-600 text-3xl">234</span>
+						<span i18n>Total Issues</span>
+						<span i18n class="text-blue-600 text-3xl">234</span>
 					</div>
 
 					<div class="flex flex-col">
-						<span>Urgent</span>
-						<span class="text-red-600 text-3xl">234</span>
+						<span i18n>Urgent</span>
+						<span i18n class="text-red-600 text-3xl">234</span>
 					</div>
 
 					<div class="flex flex-col">
-						<span>Not Urgent</span>
-						<span class="text-green-600 text-3xl">234</span>
+						<span i18n>Not Urgent</span>
+						<span i18n class="text-green-600 text-3xl">234</span>
 					</div>
 				</div>
 
 				<div class="chart m-auto mt-2">
-					<div #chartdiv class="w-full xl:h-[180px] 2xl:h-[20vh]  m-auto">
+					<div #chartdiv class="w-full xl:h-[180px] 2xl:h-[20vh] m-auto">
 					</div>
 				</div>
 				<div class="grid px-3 pb-2 w-full grid-cols-3">
@@ -34,21 +34,21 @@
 						<ui5-color-palette>
 							<ui5-color-palette-item value="#071de6" />
 						</ui5-color-palette>
-						<ui5-label>Total</ui5-label>
+						<ui5-label i18n>Total</ui5-label>
 					</div>
 
 					<div class="flex items-center">
 						<ui5-color-palette>
 							<ui5-color-palette-item value="#e60712" />
 						</ui5-color-palette>
-						<ui5-label>Urgent</ui5-label>
+						<ui5-label i18n>Urgent</ui5-label>
 					</div>
 
 					<div class="flex items-center">
 						<ui5-color-palette>
 							<ui5-color-palette-item value="#07b00d" />
 						</ui5-color-palette>
-						<ui5-label>Not Urgent</ui5-label>
+						<ui5-label i18n>Not Urgent</ui5-label>
 					</div>
 				</div>
 			</ui5-card>
@@ -57,10 +57,10 @@
 		<div class="h-[54vh]">
 			<ui5-card class="h-full">
 				<ui5-bar design="Header">
-					<ui5-title slot="startContent" level="H5" size="H5">Issues responsible(29)
+					<ui5-title slot="startContent" level="H5" size="H5" i18n i18n-title>Issues responsible(29)
 					</ui5-title>
 
-					<ui5-button design="Transparent" slot="endContent">20 of 23</ui5-button>
+					<ui5-button design="Transparent" slot="endContent" i18n i18n-title>20 of 23</ui5-button>
 				</ui5-bar>
 
 				<ui5-list>
@@ -69,11 +69,13 @@
 							<div class="flex items-center gap-2">
 								<ui5-avatar initials="XS" size="XS"></ui5-avatar>
 								<div class="flex flex-col">
-									<ui5-title level="H5" size="H5">Alexander Holzer</ui5-title>
-									<ui5-label class="text-xs"> 3135435 </ui5-label>
+									<ui5-title level="H5" size="H5" i18n i18n-title>Alexander Holzer</ui5-title>
+									<ui5-label class="text-xs" i18n>
+										3135435
+									</ui5-label>
 								</div>
 							</div>
-							<ui5-label>56 issue</ui5-label>
+							<ui5-label i18n>56 issue</ui5-label>
 						</div>
 					</ui5-li-custom>
 
@@ -82,11 +84,11 @@
 							<div class="flex items-center gap-2">
 								<ui5-avatar initials="AH" color-scheme="Accent1" size="XS"></ui5-avatar>
 								<div class="flex flex-col">
-									<ui5-title level="H5" size="H5">Elias abraham</ui5-title>
-									<ui5-label class="text-xs">56 issue</ui5-label>
+									<ui5-title level="H5" size="H5" i18n i18n-title>Elias abraham</ui5-title>
+									<ui5-label class="text-xs" i18n>56 issue</ui5-label>
 								</div>
 							</div>
-							<ui5-label>22 issue</ui5-label>
+							<ui5-label i18n>22 issue</ui5-label>
 						</div>
 					</ui5-li-custom>
 
@@ -95,11 +97,11 @@
 							<div class="flex items-center gap-2">
 								<ui5-avatar initials="AH" color-scheme="Accent2" size="XS"></ui5-avatar>
 								<div class="flex flex-col">
-									<ui5-title level="H5" size="H5">Ashraf chowdhury</ui5-title>
-									<ui5-label class="text-xs">512546</ui5-label>
+									<ui5-title level="H5" size="H5" i18n i18n-title>Ashraf chowdhury</ui5-title>
+									<ui5-label class="text-xs" i18n>512546</ui5-label>
 								</div>
 							</div>
-							<ui5-label>58 issue</ui5-label>
+							<ui5-label i18n>58 issue</ui5-label>
 						</div>
 					</ui5-li-custom>
 
@@ -108,11 +110,11 @@
 							<div class="flex items-center gap-2">
 								<ui5-avatar initials="AH" color-scheme="Accent3" size="XS"></ui5-avatar>
 								<div class="flex flex-col">
-									<ui5-title level="H5" size="H5">Title</ui5-title>
-									<ui5-label class="text-xs">56254</ui5-label>
+									<ui5-title level="H5" size="H5" i18n i18n-title>Title</ui5-title>
+									<ui5-label class="text-xs" i18n>56254</ui5-label>
 								</div>
 							</div>
-							<ui5-label>56 issue</ui5-label>
+							<ui5-label i18n>56 issue</ui5-label>
 						</div>
 					</ui5-li-custom>
 
@@ -121,11 +123,11 @@
 							<div class="flex items-center gap-2">
 								<ui5-avatar initials="AH" color-scheme="Accent4" size="XS"></ui5-avatar>
 								<div class="flex flex-col">
-									<ui5-title level="H5" size="H5">Biprojirt roy</ui5-title>
-									<ui5-label class="text-xs">56214</ui5-label>
+									<ui5-title level="H5" size="H5" i18n i18n-title>Biprojirt roy</ui5-title>
+									<ui5-label class="text-xs" i18n>56214</ui5-label>
 								</div>
 							</div>
-							<ui5-label>57 issue</ui5-label>
+							<ui5-label i18n>57 issue</ui5-label>
 						</div>
 					</ui5-li-custom>
 
@@ -134,11 +136,11 @@
 							<div class="flex items-center gap-2">
 								<ui5-avatar initials="AH" color-scheme="Accent1" size="XS"></ui5-avatar>
 								<div class="flex flex-col">
-									<ui5-title level="H5" size="H5">Theodor sherer</ui5-title>
-									<ui5-label class="text-xs">56 issue</ui5-label>
+									<ui5-title level="H5" size="H5" i18n i18n-title>Theodor sherer</ui5-title>
+									<ui5-label class="text-xs" i18n>56 issue</ui5-label>
 								</div>
 							</div>
-							<ui5-label>88 issue</ui5-label>
+							<ui5-label i18n>88 issue</ui5-label>
 						</div>
 					</ui5-li-custom>
 				</ui5-list>
@@ -151,18 +153,18 @@
 			<div class="h-full">
 				<ui5-card class="h-full">
 					<ui5-bar design="Header">
-						<ui5-title slot="startContent" level="H5" size="H5">All Issues</ui5-title>
-						<ui5-label design="Transparent" slot="endContent">20.08.2024</ui5-label>
+						<ui5-title slot="startContent" level="H5" size="H5" i18n i18n-title>All Issues</ui5-title>
+						<ui5-label design="Transparent" slot="endContent" i18n>20.08.2024</ui5-label>
 					</ui5-bar>
 
 					<div class="p-4 space-y-4 mt-5">
 						<div class="flex items-center space-x-3" *ngFor="let items of issues; let i = index">
-							<div class="w-28 text-sm font-medium">{{ items.label }}</div>
+							<div class="w-28 text-sm font-medium" i18n>{{ items.label }}</div>
 							<div class="flex-1 bg-gray-200 rounded h-2 overflow-hidden">
-								<div [ngClass]="items.bgcolor" class="h-full"
+								<div i18n [ngClass]="items.bgcolor" class="h-full"
 									[style]="'width:' + items.percentage + '%'"></div>
 							</div>
-							<div [ngClass]="items.textcolor" class="w-10 text-sm font-semibold text-right">{{
+							<div [ngClass]="items.textcolor" class="w-10 text-sm font-semibold text-right" i18n>{{
 								items.percentage }}%</div>
 						</div>
 					</div>
@@ -171,7 +173,7 @@
 			<div class="col-span-2">
 				<ui5-card class="h-full">
 					<ui5-bar design="Header">
-						<ui5-title slot="startContent" level="H5" size="H5">Overall Views</ui5-title>
+						<ui5-title slot="startContent" level="H5" size="H5" i18n i18n-title>Overall Views</ui5-title>
 					</ui5-bar>
 
 					<div #stockchart class="w-full h-[18vh]">
@@ -191,6 +193,5 @@
 		</div>
 	</div>
 </div>
-
 
 <app-server-issues-view [isOpenView]="openIssueViewer" [TabType]="SelectedTab"></app-server-issues-view>
