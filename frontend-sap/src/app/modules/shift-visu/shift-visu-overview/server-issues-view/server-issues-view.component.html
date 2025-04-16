@@ -159,8 +159,26 @@
 							show-tooltip i18n-placeholder [labelInterval]="2" show-tickmarks></ui5-range-slider>
 					</div>
 				</div>
+
+				<div class="grid grid-cols-3">
+					<div>
+						<ui5-title level="H6" slot="startContent" size="H6">Emergency Measures</ui5-title>
+					</div>
+
+					<div class="flex items-center">
+						<ui5-radio-button text="No Emergency Measures Needed" readonly [checked]="true" i18n
+							name="critical1"></ui5-radio-button>
+					</div>
+
+					<div class="flex items-center justify-end">
+						<ui5-label showColon i18n>Finished</ui5-label>
+						<ui5-switch checked disabled class="ml-2"></ui5-switch>
+					</div>
+
+				</div>
+
 				<div class="mt-3">
-					<ui5-label showColon required class="mb-2" i18n>Failure Description</ui5-label>
+					<ui5-label showColon required class="mb-2" i18n>Emergency Measure Description</ui5-label>
 					<app-text-editor i18n-placeholder [isReadOnly]="false"> </app-text-editor>
 				</div>
 
@@ -278,82 +296,85 @@
 			</ui5-tab>
 			<ui5-tab [selected]="TabType=='attachments'? true :  false" class="h-[calc(100vh-304px)]"
 				text="Attachments">
-			<section class="h-full w-[99%] m-auto">
-				<ui5-card class="-m-1 h-full  ">
-					<ui5-bar design="Header">
-						<ui5-title level="H5" slot="startContent" size="H5" i18n-tittle>Attachments(5)</ui5-title>
+				<section class="h-full w-[99%] m-auto">
+					<ui5-card class="-m-1 h-full  ">
+						<ui5-bar design="Header">
+							<ui5-title level="H5" slot="startContent" size="H5" i18n-tittle>Attachments(5)</ui5-title>
 
-						<div slot="endContent" class="flex items-center gap-2">
-							<ui5-button i18n design="Transparent">Download</ui5-button>
-							<div class="flex-column samples-margin">
-								<ui5-input i18n-placeholder id="searchInput" placeholder="Search by file name"
-									style="width: 100%">
-									<ui5-icon id="searchIcon" slot="icon" name="search"></ui5-icon>
-								</ui5-input>
-							</div>
-						</div>
-					</ui5-bar>
-
-					<ui5-list class="h-full">
-						<ui5-li-custom class="mt-2 h-[90px]">
-							<div class="flex items-center justify-between w-full">
-								<div class="flex items-center gap-4">
-									<div class="w-[70px]">
-										<ui5-icon design="Neutral" class="h-full w-full"
-											name="doc-attachment"></ui5-icon>
-									</div>
-									<div class="flex flex-col">
-										<ui5-text i18n class="text-blue-500 text-[17px]">Overview.doc</ui5-text>
-
-										<ui5-label i18n class="text-xs text-gray-500">Uploaded By: Jane Burns - Uploaded
-											On:
-											09/06/2023</ui5-label>
-										<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
-									</div>
+							<div slot="endContent" class="flex items-center gap-2">
+								<ui5-button i18n design="Transparent">Download</ui5-button>
+								<div class="flex-column samples-margin">
+									<ui5-input i18n-placeholder id="searchInput" placeholder="Search by file name"
+										style="width: 100%">
+										<ui5-icon id="searchIcon" slot="icon" name="search"></ui5-icon>
+									</ui5-input>
 								</div>
 							</div>
-						</ui5-li-custom>
+						</ui5-bar>
 
-						<ui5-li-custom class="mt-2 h-[90px]">
-							<div class="flex items-center justify-between w-full">
-								<div class="flex items-center gap-4">
-									<div class="w-[70px]">
-										<img src="assets/images/derga_logo.png" slot="image" alt="Picture"
-											class="w-full h-full bg-cover rounded-md" />
-									</div>
+						<ui5-list class="h-full">
+							<ui5-li-custom class="mt-2 h-[90px]">
+								<div class="flex items-center justify-between w-full">
+									<div class="flex items-center gap-4">
+										<div class="w-[70px]">
+											<ui5-icon design="Neutral" class="h-full w-full"
+												name="doc-attachment"></ui5-icon>
+										</div>
+										<div class="flex flex-col">
+											<ui5-text i18n class="text-blue-500 text-[17px]">Overview.doc</ui5-text>
 
-									<div class="flex flex-col">
-										<ui5-text class="text-blue-500 text-[17px]" i18n>Picture.png</ui5-text>
-										<ui5-label i18n class="text-xs text-gray-500">Uploaded By: Jane Burns - Uploaded
-											On:
-											09/06/2023</ui5-label>
-										<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
-									</div>
-								</div>
-							</div>
-						</ui5-li-custom>
-
-						<ui5-li-custom class="mt-2 h-[90px]">
-							<div class="flex items-center justify-between w-full">
-								<div class="flex items-center gap-4">
-									<div class="w-[70px]">
-										<ui5-icon design="Neutral" class="h-full w-full"
-											name="pdf-attachment"></ui5-icon>
-									</div>
-
-									<div class="flex flex-col">
-										<ui5-text class="text-blue-500 text-[17px]" i18n>Picture.pdf</ui5-text>
-										<ui5-label i18n class="text-xs text-gray-500">Uploaded By: Jane Burns - Uploaded
-											On:
-											09/06/2023</ui5-label>
-										<ui5-label class="text-xs text-gray-500" i18n>File Size: 100 KB</ui5-label>
+											<ui5-label i18n class="text-xs text-gray-500">Uploaded By: Jane Burns -
+												Uploaded
+												On:
+												09/06/2023</ui5-label>
+											<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
+										</div>
 									</div>
 								</div>
-							</div>
-						</ui5-li-custom>
-					</ui5-list>
-				</ui5-card>
-			</section>
+							</ui5-li-custom>
+
+							<ui5-li-custom class="mt-2 h-[90px]">
+								<div class="flex items-center justify-between w-full">
+									<div class="flex items-center gap-4">
+										<div class="w-[70px]">
+											<img src="assets/images/derga_logo.png" slot="image" alt="Picture"
+												class="w-full h-full bg-cover rounded-md" />
+										</div>
+
+										<div class="flex flex-col">
+											<ui5-text class="text-blue-500 text-[17px]" i18n>Picture.png</ui5-text>
+											<ui5-label i18n class="text-xs text-gray-500">Uploaded By: Jane Burns -
+												Uploaded
+												On:
+												09/06/2023</ui5-label>
+											<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
+										</div>
+									</div>
+								</div>
+							</ui5-li-custom>
+
+							<ui5-li-custom class="mt-2 h-[90px]">
+								<div class="flex items-center justify-between w-full">
+									<div class="flex items-center gap-4">
+										<div class="w-[70px]">
+											<ui5-icon design="Neutral" class="h-full w-full"
+												name="pdf-attachment"></ui5-icon>
+										</div>
+
+										<div class="flex flex-col">
+											<ui5-text class="text-blue-500 text-[17px]" i18n>Picture.pdf</ui5-text>
+											<ui5-label i18n class="text-xs text-gray-500">Uploaded By: Jane Burns -
+												Uploaded
+												On:
+												09/06/2023</ui5-label>
+											<ui5-label class="text-xs text-gray-500" i18n>File Size: 100 KB</ui5-label>
+										</div>
+									</div>
+								</div>
+							</ui5-li-custom>
+						</ui5-list>
+					</ui5-card>
+				</section>
 			</ui5-tab>
 		</ui5-tabcontainer>
 	</ui5-card>
