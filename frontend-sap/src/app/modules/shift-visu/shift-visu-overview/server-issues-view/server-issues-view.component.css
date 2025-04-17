@@ -3,14 +3,22 @@
 	overflow: auto;
 }
 #restartDate :host ::ng-deep .ui5-date-picker-root > .ui5-date-picker-input {
-   width: auto !important;
+	width: auto !important;
 }
 :host ::ng-deep .editor-container {
-   padding: 0 !important;
-   border: none !important;
-   border-radius: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	border-radius: 0 !important;
 }
 :host ::ng-deep .ui5-tc-root > .ui5-tc__content {
-    padding: 0 !important;
- }
+	padding: 0 !important;
+}
 
+:host ::ng-deep .ui5-tc-root > .ui5-tc__content {
+	padding: 0 !important;
+}
+
+ui5-dialog::part(content) {
+   overflow: unset !important;
+   box-sizing: border-box;
+ }

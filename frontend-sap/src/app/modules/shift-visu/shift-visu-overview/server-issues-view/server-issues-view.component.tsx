@@ -10,11 +10,36 @@ export class ServerIssuesViewComponent implements OnInit {
 	@Input() isOpenView: EventEmitter<string> = new EventEmitter<string>();
 	OpenView: boolean = false;
 	@Input() TabType: string = "";
+	DataList :any[] = [];
 	ngOnInit(): void {
 		this.isOpenView.subscribe((items: any) => {
 			this.OpenView = !this.OpenView;
 		});
 	}
+	imgname: string = "shihab.jpg";
+
+	imageType(name: string) {
+		const imgtype = ["jpg", "jpeg", "png", "gif", "bmp", "tiff"];
+		const docType = ["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx"];
+		const extension = name.split(".").pop();
+		if (imgtype.includes(extension ?? "")) {
+			return "image";
+		}
+		if (docType.includes(extension ?? "")) {
+			return "document";
+		}
+
+		return name;
+	}
+
+	imageExtension(name: string) {
+		const extension = name.split(".").pop();
+		if (extension) {
+			return extension;
+		}
+		return "";
+	}
+
 	columns = [
 		{
 			Header: $localize`Details`,
@@ -118,6 +143,5 @@ export class ServerIssuesViewComponent implements OnInit {
 	CloseDialog() {
 		this.OpenView = false;
 		this.TabType = "";
-		
 	}
 }
