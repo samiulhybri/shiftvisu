@@ -6,8 +6,7 @@
 		<ui5-title
 			level="H5"
 			slot="startContent"
-			i18n-title
-			>{{ this.hall.name }} Issues</ui5-title
+			>{{ this.hall.name }} <span i18n>Issues</span> </ui5-title
 		>
 		<ui5-input
 			id="valueHelpInput"
@@ -127,7 +126,8 @@
 				<ui5-button
 					slot="action"
 					icon="ai"
-					class="ml-2">
+					class="ml-2"
+					(ui5Click)="aiAssistClick()">
 					{{ localization.aiAssists }}</ui5-button
 				>
 			</ui5-card-header>
@@ -149,11 +149,7 @@
 
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Hall</ui5-label
-								>
+								<ui5-label showColon i18n>Hall</ui5-label>
 								<ui5-input
 									readonly="true"
 									i18n-placeholder
@@ -161,25 +157,14 @@
 									class="w-full"></ui5-input>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									required
-									i18n
-									>Creator</ui5-label
-								>
+								<ui5-label showColon required i18n>Creator</ui5-label>
 								<ui5-input
 									readonly="true"
 									value="{{ this.creator }}"
 									class="w-full"></ui5-input>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									required
-									i18n
-									>Error</ui5-label
-								>
-
+								<ui5-label showColon required i18n>Error</ui5-label>
 								<ui5-combobox
 									id="viewTypeCombobox"
 									class="w-full"
@@ -202,8 +187,7 @@
 								showColon
 								required
 								class="mb-2"
-								i18n
-								>Failure Description</ui5-label
+								i18n>Failure Description</ui5-label
 							>
 							<app-text-editor
 								[notes]="failureDescriptionNote"
@@ -213,11 +197,7 @@
 
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Machine No</ui5-label
-								>
+								<ui5-label showColon i18n>Machine No</ui5-label>
 								<ui5-combobox
 									placeholder="Select Machine"
 									i18n-placeholder
@@ -230,11 +210,7 @@
 								</ui5-combobox>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Serial No
-								</ui5-label>
+								<ui5-label showColon i18n>Serial No</ui5-label>
 								<ui5-combobox
 									placeholder="Choose Serial Number"
 									i18n-placeholder
@@ -248,11 +224,7 @@
 							</div>
 
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>NCR NO</ui5-label
-								>
+								<ui5-label showColon i18n>NCR NO</ui5-label>
 								<ui5-input
 									readonly="true"
 									value="5"
@@ -262,11 +234,7 @@
 
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Part No</ui5-label
-								>
+								<ui5-label showColon i18n>Part No</ui5-label>
 								<ui5-combobox
 									placeholder="Select Part"
 									i18n-placeholder
@@ -279,11 +247,7 @@
 								</ui5-combobox>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Plan Part
-								</ui5-label>
+								<ui5-label showColon i18n>Plan Part</ui5-label>
 								<ui5-combobox
 									placeholder="Select Plan Part"
 									i18n-placeholder
@@ -297,11 +261,7 @@
 							</div>
 
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Tool No
-								</ui5-label>
+								<ui5-label showColon i18n>Tool No</ui5-label>
 								<ui5-combobox
 									placeholder="Choose Tool"
 									i18n-placeholder
@@ -317,11 +277,7 @@
 
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Machine No</ui5-label
-								>
+								<ui5-label showColon i18n>Machine No</ui5-label>
 								<ui5-combobox
 									placeholder="Select Machine"
 									i18n-placeholder
@@ -334,11 +290,7 @@
 								</ui5-combobox>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Serial No
-								</ui5-label>
+								<ui5-label showColon i18n>Serial No</ui5-label>
 								<ui5-combobox
 									placeholder="Choose Serial Number"
 									i18n-placeholder
@@ -352,11 +304,7 @@
 							</div>
 
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>NCR NO</ui5-label
-								>
+								<ui5-label showColon i18n>NCR NO</ui5-label>
 								<ui5-input
 									readonly="true"
 									value="5"
@@ -371,11 +319,7 @@
 						text="Emergency Measures">
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Emergency Measures</ui5-label
-								>
+								<ui5-label showColon i18n>Emergency Measures</ui5-label>
 								<ui5-combobox
 									placeholder="Select Emergency Measures"
 									i18n-placeholder
@@ -390,11 +334,7 @@
 								</ui5-combobox>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Final Measures
-								</ui5-label>
+								<ui5-label showColon i18n>Final Measures</ui5-label>
 								<ui5-combobox
 									placeholder="Choose Final Measures"
 									i18n-placeholder
@@ -411,11 +351,7 @@
 							</div>
 
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Further Use</ui5-label
-								>
+								<ui5-label showColon i18n>Further Use</ui5-label>
 								<ui5-combobox
 									placeholder="Choose Further Use"
 									i18n-placeholder
@@ -433,12 +369,7 @@
 						</div>
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex items-center">
-								<ui5-title
-									level="H5"
-									size="H5"
-									i18n
-									>Emergency Measure</ui5-title
-								>
+								<ui5-title level="H5" size="H5" i18n>Emergency Measure</ui5-title>
 							</div>
 							<div class="flex items-center">
 								<ui5-checkbox
@@ -446,23 +377,13 @@
 									i18n-text></ui5-checkbox>
 							</div>
 							<div class="flex items-center justify-end">
-								<ui5-label
-									showColon
-									i18n
-									>Finished</ui5-label
-								>
+								<ui5-label showColon i18n>Finished</ui5-label>
 								<ui5-switch class="ml-2"></ui5-switch>
 							</div>
 						</div>
 
 						<div>
-							<ui5-label
-								showColon
-								required
-								class="mb-2"
-								i18n
-								>Emergency Measure Description</ui5-label
-							>
+							<ui5-label showColon required class="mb-2" i18n>Emergency Measure Description</ui5-label>
 							<app-text-editor
 								[notes]="failureDescriptionNote"
 								[isReadOnly]="false">
@@ -471,31 +392,18 @@
 
 						<div class="grid grid-cols-2 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Restart</ui5-label
-								>
-
+								<ui5-label showColon i18n>Restart</ui5-label>
 								<ui5-datetime-picker
 									format-pattern="dd.MM.yyyy, hh:mm"></ui5-datetime-picker>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>End Date</ui5-label
-								>
+								<ui5-label showColon i18n>End Date</ui5-label>
 								<ui5-datetime-picker
 									format-pattern="dd.MM.yyyy, hh:mm"></ui5-datetime-picker>
 							</div>
 
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Responsible</ui5-label
-								>
+								<ui5-label showColon i18n>Responsible</ui5-label>
 								<ui5-combobox
 									placeholder="Select Machine"
 									i18n-placeholder>
@@ -511,11 +419,7 @@
 						</div>
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Status</ui5-label
-								>
+								<ui5-label showColon i18n>Status</ui5-label>
 								<ui5-range-slider
 									start-value="0"
 									end-value="25"
@@ -564,32 +468,24 @@
 						i18n-text
 						class="h-[calc(100vh-304px)]"
 						text="Details">
-						<div class="flex items-center">
-							<ui5-label i18n>Machine Status</ui5-label>
-							<ui5-switch
-								checked
-								class="ml-2"></ui5-switch>
+						<div class="">
+							<ui5-label showColon i18n>Reason</ui5-label>
+							<ui5-textarea
+								placeholder="Write here."
+								i18n-placeholder
+								class="w-full h-[100px]"></ui5-textarea>
 						</div>
 
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Hall</ui5-label
-								>
+								<ui5-label showColon i18n>Hall</ui5-label>
 								<ui5-input
 									readonly="true"
 									value="Sct"
 									class="w-full"></ui5-input>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									required
-									i18n
-									>Creator</ui5-label
-								>
+								<ui5-label showColon required i18n>Creator</ui5-label>
 								<ui5-select
 									class="w-full"
 									i18n-placeholder>
@@ -599,12 +495,7 @@
 								</ui5-select>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									required
-									i18n
-									>Error</ui5-label
-								>
+								<ui5-label showColon required i18n>Error</ui5-label>
 								<ui5-select
 									class="w-full"
 									i18n-placeholder>
@@ -614,164 +505,29 @@
 								</ui5-select>
 							</div>
 						</div>
-
 						<div>
-							<app-text-editor
-								[notes]="failureDescriptionNote"
-								[isReadOnly]="false">
-							</app-text-editor>
+							<ui5-label showColon i18n>Department(Originator)</ui5-label>
+							<ui5-textarea
+								placeholder="Write here."
+								i18n-placeholder
+								class="w-full h-[100px]"></ui5-textarea>
 						</div>
 
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Machine No</ui5-label
-								>
-								<ui5-combobox
-									placeholder="Select Machine"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Serial No
-								</ui5-label>
-								<ui5-combobox
-									placeholder="Choose Serial Number"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>NCR NO</ui5-label
-								>
+								<ui5-label showColon i18n>Cost</ui5-label>
 								<ui5-input
 									readonly="true"
-									value="5"
+									value="Sct"
 									class="w-full"></ui5-input>
 							</div>
-						</div>
-
-						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Part No</ui5-label
-								>
-								<ui5-combobox
-									placeholder="Select Part"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
+								<ui5-label showColon i18n>Network Cost Announced</ui5-label>
+								<ui5-switch></ui5-switch>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Plan Part
-								</ui5-label>
-								<ui5-combobox
-									placeholder="Select Plan Part"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Tool No
-								</ui5-label>
-								<ui5-combobox
-									placeholder="Choose Tool"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-						</div>
-
-						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>Machine No</ui5-label
-								>
-								<ui5-combobox
-									placeholder="Select Machine"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n>
-									Serial No
-								</ui5-label>
-								<ui5-combobox
-									placeholder="Choose Serial Number"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-
-							<div class="flex-col flex">
-								<ui5-label
-									showColon
-									i18n
-									>NCR NO</ui5-label
-								>
-								<ui5-input
-									readonly="true"
-									value="5"
-									class="w-full"></ui5-input>
+								<ui5-label showColon i18n>Still Mill Error</ui5-label>
+								<ui5-switch></ui5-switch>
 							</div>
 						</div>
 					</ui5-tab>
@@ -783,13 +539,11 @@
 						<ui5-card class="h-[calc(100vh-310px)]">
 							<ui5-bar
 								slot="header"
-						
 								design="Header">
 								<ui5-title
 									level="H5"
 									slot="startContent"
-									i18n-title
-									>Attachments</ui5-title
+									i18n-title>Attachments</ui5-title
 								>
 								<ui5-button
 									id="btnScan"
@@ -801,13 +555,27 @@
 								<ui5-button
 									slot="endContent"
 									design="Transparent"
-									i18n
 									>{{ localization.upload }}
 								</ui5-button>
+								<ui5-button
+									slot="endContent"
+									design="Transparent"
+									>{{ localization.download }}
+								</ui5-button>
+
+								<ui5-input
+									id="valueHelpInput"
+									placeholder="Search by file name"
+									i18n-placeholder
+									slot="endContent">
+									<ui5-icon
+										id="valueHelpIcon"
+										slot="icon"
+										name="search"></ui5-icon>
+								</ui5-input>
 							</ui5-bar>
 
-							<ui5-illustrated-message name="UnableToUpload">
-							</ui5-illustrated-message>
+							<ui5-illustrated-message name="NoData"> </ui5-illustrated-message>
 						</ui5-card>
 					</ui5-tab>
 				</ui5-tabcontainer>
@@ -844,32 +612,17 @@
 		<form action="">
 			<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 				<div class="flex items-center">
-					<ui5-title
-						level="H5"
-						size="H5"
-						i18n
-						>Corrective Measure</ui5-title
-					>
+					<ui5-title level="H5" size="H5" i18n>Corrective Measure</ui5-title>
 				</div>
 				<div class="flex items-center"> </div>
 				<div class="flex items-center justify-end">
-					<ui5-label
-						showColon
-						i18n
-						>Finished</ui5-label
-					>
+					<ui5-label showColon i18n>Finished</ui5-label>
 					<ui5-switch class="ml-2"></ui5-switch>
 				</div>
 			</div>
 
 			<div>
-				<ui5-label
-					showColon
-					required
-					class="mb-2"
-					i18n
-					>Corrective Measure Description</ui5-label
-				>
+				<ui5-label showColon required class="mb-2" i18n>Corrective Measure Description</ui5-label>
 				<app-text-editor
 					[notes]="failureDescriptionNote"
 					[isReadOnly]="false">
@@ -878,28 +631,17 @@
 
 			<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 				<div class="flex-col flex">
-					<ui5-label
-						showColon
-						i18n
-						>Restart</ui5-label
+					<ui5-label showColon i18n>Restart</ui5-label
 					>
 					<ui5-datetime-picker format-pattern="dd.MM.yyyy, hh:mm"></ui5-datetime-picker>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label
-						showColon
-						i18n
-						>End Date</ui5-label
-					>
+					<ui5-label showColon i18n>End Date</ui5-label>
 					<ui5-datetime-picker format-pattern="dd.MM.yyyy, hh:mm"></ui5-datetime-picker>
 				</div>
 
 				<div class="flex-col flex">
-					<ui5-label
-						showColon
-						i18n
-						>Responsible</ui5-label
-					>
+					<ui5-label showColon i18n>Responsible</ui5-label>
 					<ui5-combobox
 						placeholder="Select Machine"
 						class="w-full"
@@ -935,3 +677,176 @@
 	</div>
 </app-dialog>
 
+<app-dialog
+	#aiAssistDialog
+	[title]="'Ai Assist'"
+	title-i18n>
+	<ui5-input
+		id="valueHelpInput"
+		placeholder="Search"
+		i18n-placeholder
+		class="w-full mb-3">
+		<ui5-icon
+			id="valueHelpIcon"
+			slot="icon"
+			name="search"></ui5-icon>
+	</ui5-input>
+
+	<ui5-card class="mb-4">
+		<div class="flex items-center p-2 mt-3 pl-3">
+			<ui5-icon
+				name="ai"
+				design="Information"></ui5-icon>
+			<ui5-title level="H5" size="H5" class="ml-2" i18n-title>DAQ</ui5-title>
+		</div>
+
+		<ui5-list
+			separators="None"
+			class="pl-3"
+			style="margin-block-end: 0.75rem">
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					i18n-title>Failure Description :</ui5-title
+				>
+				<ui5-label class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero tempora error quidem, quas omnis necessitatibus cum</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					i18n-title>Error Measure :</ui5-title
+				>
+				<ui5-label class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero
+				</ui5-label>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					i18n-title>Corrective Measure :</ui5-title
+				>
+				<ui5-label class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+		</ui5-list>
+	</ui5-card>
+	<ui5-card class="mb-4">
+		<div class="flex items-center p-2 mt-3 pl-3">
+			<ui5-icon
+				name="ai"
+				design="Information"></ui5-icon>
+			<ui5-title
+				level="H5"
+				size="H5"
+				class="ml-2"
+				i18n-title>DAQ</ui5-title
+			>
+		</div>
+
+		<ui5-list
+			separators="None"
+			class="pl-3"
+			style="margin-block-end: 0.75rem">
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5" i18n-title>Failure Description :</ui5-title
+				>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero tempora error quidem, quas omnis necessitatibus cum</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5" i18n-title>Error Measure :</ui5-title
+				>
+				<ui5-label class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero
+				</ui5-label>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					i18n-title>Corrective Measure :</ui5-title
+				>
+				<ui5-label class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+		</ui5-list>
+	</ui5-card>
+	<ui5-card class="mb-4">
+		<div class="flex items-center p-2 mt-3 pl-3">
+			<ui5-icon
+				name="ai"
+				design="Information"></ui5-icon>
+			<ui5-title
+				level="H5"
+				size="H5"
+				class="ml-2"
+				i18n-title>DAQ</ui5-title
+			>
+		</div>
+
+		<ui5-list
+			separators="None"
+			class="pl-3"
+			style="margin-block-end: 0.75rem">
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5" i18n-title>Failure Description :</ui5-title
+				>
+				<ui5-label class="ml-1"
+					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero tempora error quidem, quas omnis necessitatibus cum</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5" i18n-title>Error Measure :</ui5-title
+				>
+				<ui5-label class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
+					libero
+				</ui5-label>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-title
+					level="H5"
+					size="H5"
+					i18n-title>Corrective Measure :</ui5-title
+				>
+				<ui5-label class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+		</ui5-list>
+	</ui5-card>
+
+	<div
+		slot="footer"
+		class="dialog-footer">
+		<ui5-button
+			class="ml-8"
+			id="CancelButtonId"
+			type="Button"
+			[design]="'Transparent'"
+			(ui5Click)="closeAiAssistDialog()">
+			{{ localization.close }}
+		</ui5-button>
+	</div>
+</app-dialog>

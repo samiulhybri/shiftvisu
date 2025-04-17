@@ -17,6 +17,7 @@ export const Localization = {
     active: $localize`Active`,
     add: $localize`Add`,
     edit: $localize`Edit`,
+    download: $localize`Download`,
     delete: $localize`Delete`,
     internalServerError: $localize`Internal Server Error`,
     recordExist: $localize`This record is already exists.`,

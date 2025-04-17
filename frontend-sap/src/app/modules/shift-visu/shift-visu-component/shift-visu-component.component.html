@@ -51,12 +51,7 @@
 			#addOrEditComponentForm="ngForm"
 			class="w-[450px] min-h-[500px] flex flex-col gap-2">
 			<div class="w-[450px]">
-				<ui5-label
-					i18n
-					show-colon
-					required
-					>Component</ui5-label
-				>
+				<ui5-label show-colon required i18n>Component</ui5-label>
 				<ui5-input
 					#componentName="ngModel"
 					i18n-placeholder
@@ -71,8 +66,7 @@
 					name="componentName">
 					<div
 						slot="valueStateMessage"
-						i18n
-						>Component name is required.</div
+						i18n>Component name is required.</div
 					>
 				</ui5-input>
 			</div>
@@ -83,12 +77,7 @@
 					saveMode == 'post' ||
 					modalComponent.component_type === componentOptionTypes.MEASURE
 				">
-				<ui5-label
-					i18n
-					show-colon
-					required>
-					View In</ui5-label
-				>
+				<ui5-label show-colon required i18n>View In</ui5-label>
 				<ui5-input
 					i18n-placeholder
 					class="w-full"
@@ -101,11 +90,7 @@
 			<div
 				class="w-[450px]"
 				[hidden]="saveMode == 'patch'">
-				<ui5-label
-					show-colon
-					i18n
-					>View In</ui5-label
-				>
+				<ui5-label show-colon i18n>View In</ui5-label>
 				<ui5-combobox
 					id="viewTypeCombobox"
 					class="w-full"
@@ -132,11 +117,10 @@
 					modalComponent.model_type == ''
 				">
 				<ui5-label
-					i18n
 					show-colon
 					required
-					[hidden]="modalComponent.model_type == ''">
-					Model Type</ui5-label
+					[hidden]="modalComponent.model_type == ''" 
+					i18n>Model Type</ui5-label
 				>
 				<ui5-input
 					i18n-placeholder
@@ -150,11 +134,7 @@
 			<div
 				class="w-[450px]"
 				[hidden]="saveMode == 'patch'">
-				<ui5-label
-					show-colon
-					i18n
-					>Model Type</ui5-label
-				>
+				<ui5-label show-colon i18n>Model Type</ui5-label>
 				<ui5-combobox
 					id="modelTypeCombobox"
 					class="w-full"
@@ -174,12 +154,7 @@
 				</ui5-combobox>
 			</div>
 			<div class="w-full">
-				<ui5-label
-					i18n
-					show-colon
-					>Choose Type</ui5-label
-				>
-
+				<ui5-label show-colon i18n>Choose Type</ui5-label>
 				<div class="flex flex-col justify-between">
 					@for (type of componentOptionTypeArray; track $index) {
 						<div

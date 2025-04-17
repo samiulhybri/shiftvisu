@@ -33,11 +33,7 @@
 			#addOrEditOptionForm="ngForm"
 			class="w-[450px] flex flex-col">
 			<div class="w-full">
-				<ui5-label
-					i18n
-					show-colon
-					>Component Name</ui5-label
-				>
+				<ui5-label show-colon i18n>Component Name</ui5-label>
 				<ui5-input
 					disabled
 					class="w-full"
@@ -45,10 +41,9 @@
 			</div>
 			<div class="w-full">
 				<ui5-label
-					i18n
 					show-colon
 					required
-					>Option</ui5-label
+					i18n>Option</ui5-label
 				>
 				<ui5-input
 					#optionName="ngModel"
@@ -62,8 +57,7 @@
 					name="optionName">
 					<div
 						slot="valueStateMessage"
-						i18n
-						>Option name is required.</div
+						i18n>Option name is required.</div
 					>
 				</ui5-input>
 			</div>

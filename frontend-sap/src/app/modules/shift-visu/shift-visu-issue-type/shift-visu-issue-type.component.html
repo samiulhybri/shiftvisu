@@ -6,8 +6,7 @@
 		<ui5-title
 			level="H5"
 			slot="startContent"
-			i18n
-			>Failure Settings</ui5-title
+			i18n>Failure Settings</ui5-title
 		>
 	</ui5-bar>
 	<div class="p-10 h-[calc(100vh-150px)] grid grid-cols-2 gap-x-3">
@@ -98,10 +97,9 @@
 			#repairForm="ngForm">
 			<div class="w-[450px]">
 				<ui5-label
-					i18n
 					show-colon
-					required
-					>Repair</ui5-label
+					required 
+					i18n>Repair</ui5-label
 				>
 				<ui5-input
 					#repairName="ngModel"
@@ -115,19 +113,13 @@
 					sanitize-input>
 					<div
 						slot="valueStateMessage"
-						i18n>
-						Repair name is required.
-					</div>
+						i18n>Repair name is required.</div
+					>
 				</ui5-input>
 			</div>
 
 			<div class="w-[450px]">
-				<ui5-label
-					i18n
-					show-colon
-					required
-					>Hall</ui5-label
-				>
+				<ui5-label show-colon required i18n>Hall</ui5-label>
 				<ui5-busy-indicator
 					[active]="isBatchCallRunning"
 					class="w-full">
@@ -220,8 +212,7 @@
 	i18n-header-text
 	header-text="Warning"
 	state="Critical">
-	<p i18n
-		>You can’t delete this item. This component already in use. Do you really want to Archive
+	<p i18n>You can’t delete this item. This component already in use. Do you really want to Archive
 		this item?</p
 	>
 	<div
