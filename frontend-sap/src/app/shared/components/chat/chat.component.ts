@@ -29,9 +29,11 @@ export class ChatComponent implements AfterViewInit, OnChanges {
 	@Input({ required: true }) public modelId: number = 0;
 	@Input({ required: true }) public modelName: string = "";
 	@Input({ required: true }) public chat: any;
+	@Input()  customClass:  any = "";
 
 	@Output() closeDialog = new EventEmitter<any>();
 	@Output() refreshGridTable = new EventEmitter<any>();
+	
 
 	private userNearBottom: boolean = true;
 	groupedNotes: NoteGroup[] = [];

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
 import { Button, CheckBox, Switch } from "@ui5/webcomponents-react";
 import React from "react";
 @Component({
@@ -8,15 +8,50 @@ import React from "react";
 })
 export class ServerIssuesViewComponent implements OnInit {
 	@Input() isOpenView: EventEmitter<string> = new EventEmitter<string>();
-	OpenView: boolean = false;
 	@Input() TabType: string = "";
-	DataList :any[] = [];
+	@ViewChild("overview", { static: false }) overview!: any;
+	@ViewChild("emergency", { static: false }) emergency!: any;
+	@ViewChild("corrective", { static: false }) corrective!: any;
+	@ViewChild("details", { static: false }) details!: any;
+	@ViewChild("attachment", { static: false }) attachment!: any;
+	@ViewChild("chat", { static: false }) chat!: any;
+	@ViewChild("chatcontent", { static: false }) chatcontent!: any;
+	OpenView: boolean = false;
+	tabRefs: Record<string, any> = {};
+	DataList: any[] = [];
+
 	ngOnInit(): void {
+		
 		this.isOpenView.subscribe((items: any) => {
 			this.OpenView = !this.OpenView;
 		});
 	}
 	imgname: string = "shihab.jpg";
+
+	ngAfterViewInit() {
+		this.tabRefs = {
+			overview: this.overview,
+			emergency: this.emergency,
+			corrective: this.corrective,
+			details: this.details,
+			attachment: this.attachment,
+			chat: this.chat,
+		};
+	}
+
+	openTab(tabType: string) {
+		this.TabType = tabType;
+		this.selectTab(tabType);
+	}
+
+	selectTab(tabType: string) {
+		for (const key in this.tabRefs) {
+			const tabElement = this.tabRefs[key]?.elementRef.nativeElement;
+			if (tabElement) {
+				tabElement.selected = key === tabType;
+			}
+		}
+	}
 
 	imageType(name: string) {
 		const imgtype = ["jpg", "jpeg", "png", "gif", "bmp", "tiff"];

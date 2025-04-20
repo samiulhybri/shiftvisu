@@ -1,5 +1,5 @@
 <ui5-busy-indicator [active]="isChatLoading">
-	<div class="h-[80vh] max-h-[700px] w-[80vw] max-w-[700px] flex flex-row gap-2">
+	<div [ngClass]="customClass? customClass : ' h-[80vh] max-h-[700px] w-[80vw] max-w-[700px] flex flex-row gap-2'">
 		<div class="bg-gray-100 rounded-lg shadow-lg flex flex-col chat-body w-full">
 			<div
 				class="px-[10px] bg-white border-t border-gray-300 rounded-t-lg h-[50px] w-[calc(100%-20px)] flex items-center justify-between">

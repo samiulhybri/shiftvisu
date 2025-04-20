@@ -22,3 +22,8 @@ ui5-dialog::part(content) {
    overflow: unset !important;
    box-sizing: border-box;
  }
+
+  .chat-data{
+	max-width: 100% !important;
+	
+  }
