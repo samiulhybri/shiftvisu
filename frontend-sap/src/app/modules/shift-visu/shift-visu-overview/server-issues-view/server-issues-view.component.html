@@ -1,51 +1,123 @@
-<ui5-dialog #dialog="ui5Dialog" style="
+<ui5-dialog
+	#dialog="ui5Dialog"
+	style="
 		--_ui5-v2-0-1_popup_content_padding_m_l: 0;
 		--_ui5-v2-0-1_popup_content_padding_xl: 0;
 		top: 0px;
 		left: 0px;
 		--_ui5-v2-0-1_popup_header_padding_m_l: 0;
-	" class="w-[90%]" [open]="OpenView">
+	"
+	class="w-[90%]"
+	[open]="OpenView">
 	<ui5-bar slot="header">
-		<ui5-title level="H6" slot="startContent" size="H6" i18n i18n-title>Server Issues</ui5-title>
-		<ui5-button slot="endContent" design="Emphasized" i18n>Chat</ui5-button>
+		<ui5-title
+			level="H6"
+			slot="startContent"
+			size="H6"
+			i18n
+			i18n-title
+			>Server Issues</ui5-title
+		>
+		<ui5-button
+			(click)="openChat()"
+			slot="endContent"
+			design="Emphasized"
+			i18n
+			>Chat</ui5-button
+		>
 	</ui5-bar>
 
-	<ui5-tabcontainer contentBackgroundDesign="Transparent" class="ml-[-16px] mr-[-16px] mt-[-16px] mb-[-16px] w-[calc(100%+32px)]">
-		<ui5-tab i18n-text design="Default" text="Overview"
-			[selected]="TabType == 'overview' ? true : TabType == '' ? true : false" class="h-[calc(100vh-250px)]">
+	<ui5-tabcontainer
+		contentBackgroundDesign="Transparent"
+		class="ml-[-16px] mr-[-16px] mt-[-16px] mb-[-16px] w-[calc(100%+32px)]">
+		<ui5-tab
+			i18n-text
+			design="Default"
+			text="Overview"
+			[selected]="TabType == 'overview' ? true : TabType == '' ? true : false"
+			class="h-[calc(100vh-250px)]">
 			<div class="grid grid-cols-3 gap-2 items-center w-full">
 				<div class="flex-col flex">
-					<ui5-label showColon i18n required>Department</ui5-label>
-					<ui5-input readonly="true" i18n-placeholder value="rakib" class="w-full"></ui5-input>
+					<ui5-label
+						showColon
+						i18n
+						required
+						>Department</ui5-label
+					>
+					<ui5-input
+						readonly="true"
+						i18n-placeholder
+						value="rakib"
+						class="w-full"></ui5-input>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label showColon required i18n>Creator</ui5-label>
-					<ui5-input readonly="true" value="shihab" i18n-placeholder class="w-full"></ui5-input>
+					<ui5-label
+						showColon
+						required
+						i18n
+						>Creator</ui5-label
+					>
+					<ui5-input
+						readonly="true"
+						value="shihab"
+						i18n-placeholder
+						class="w-full"></ui5-input>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label showColon required i18n>Error</ui5-label>
+					<ui5-label
+						showColon
+						required
+						i18n
+						>Error</ui5-label
+					>
 
-					<ui5-combobox id="viewTypeCombobox" readonly="true" class="w-full" name="view_type"
-						value="new error" i18n-placeholder placeholder="Select Error">
-						<ui5-cb-item [text]="'new error'" [id]="12">
+					<ui5-combobox
+						id="viewTypeCombobox"
+						readonly="true"
+						class="w-full"
+						name="view_type"
+						value="new error"
+						i18n-placeholder
+						placeholder="Select Error">
+						<ui5-cb-item
+							[text]="'new error'"
+							[id]="12">
 						</ui5-cb-item>
 					</ui5-combobox>
 				</div>
 			</div>
 			<div class="flex items-center">
 				<ui5-label i18n>Machine Status</ui5-label>
-				<ui5-switch checked class="ml-2"></ui5-switch>
+				<ui5-switch
+					checked
+					class="ml-2"></ui5-switch>
 			</div>
 			<div class="mt-3">
-				<ui5-label showColon required class="mb-2" i18n>Failure Description</ui5-label>
-				<app-text-editor i18n-placeholder [isReadOnly]="false">
+				<ui5-label
+					showColon
+					required
+					class="mb-2"
+					i18n
+					>Failure Description</ui5-label
+				>
+				<app-text-editor
+					i18n-placeholder
+					[isReadOnly]="false">
 				</app-text-editor>
 			</div>
 
 			<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>Machine No</ui5-label>
-					<ui5-combobox placeholder="Select Machine" i18n-placeholder readonly="true" class="w-full">
+					<ui5-label
+						showColon
+						i18n
+						>Machine No</ui5-label
+					>
+					<ui5-combobox
+						placeholder="Select Machine"
+						i18n-placeholder
+						readonly="true"
+						class="w-full">
 						<ui5-cb-item text="Austria"></ui5-cb-item>
 						<ui5-cb-item text="Bulgaria"></ui5-cb-item>
 						<ui5-cb-item text="Germany"></ui5-cb-item>
@@ -54,10 +126,16 @@
 					</ui5-combobox>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>
+					<ui5-label
+						showColon
+						i18n>
 						Serial No
 					</ui5-label>
-					<ui5-combobox placeholder="Choose Serial Number" i18n-placeholder readonly="true" class="w-full">
+					<ui5-combobox
+						placeholder="Choose Serial Number"
+						i18n-placeholder
+						readonly="true"
+						class="w-full">
 						<ui5-cb-item text="Austria"></ui5-cb-item>
 						<ui5-cb-item text="Bulgaria"></ui5-cb-item>
 						<ui5-cb-item text="Germany"></ui5-cb-item>
@@ -67,15 +145,31 @@
 				</div>
 
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>NCR NO</ui5-label>
-					<ui5-input readonly="true" value="5" i18n-placeholder class="w-full"></ui5-input>
+					<ui5-label
+						showColon
+						i18n
+						>NCR NO</ui5-label
+					>
+					<ui5-input
+						readonly="true"
+						value="5"
+						i18n-placeholder
+						class="w-full"></ui5-input>
 				</div>
 			</div>
 
 			<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>Part No</ui5-label>
-					<ui5-combobox placeholder="Select Part" i18n-placeholder readonly="true" class="w-full">
+					<ui5-label
+						showColon
+						i18n
+						>Part No</ui5-label
+					>
+					<ui5-combobox
+						placeholder="Select Part"
+						i18n-placeholder
+						readonly="true"
+						class="w-full">
 						<ui5-cb-item text="Austria"></ui5-cb-item>
 						<ui5-cb-item text="Bulgaria"></ui5-cb-item>
 						<ui5-cb-item text="Germany"></ui5-cb-item>
@@ -84,10 +178,16 @@
 					</ui5-combobox>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>
+					<ui5-label
+						showColon
+						i18n>
 						Plan Part
 					</ui5-label>
-					<ui5-combobox placeholder="Select Plan Part" i18n-placeholder readonly="true" class="w-full">
+					<ui5-combobox
+						placeholder="Select Plan Part"
+						i18n-placeholder
+						readonly="true"
+						class="w-full">
 						<ui5-cb-item text="Austria"></ui5-cb-item>
 						<ui5-cb-item text="Bulgaria"></ui5-cb-item>
 						<ui5-cb-item text="Germany"></ui5-cb-item>
@@ -97,10 +197,16 @@
 				</div>
 
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>
+					<ui5-label
+						showColon
+						i18n>
 						Tool No
 					</ui5-label>
-					<ui5-combobox placeholder="Choose Tool" readonly="true" i18n-placeholder class="w-full">
+					<ui5-combobox
+						placeholder="Choose Tool"
+						readonly="true"
+						i18n-placeholder
+						class="w-full">
 						<ui5-cb-item text="Austria"></ui5-cb-item>
 						<ui5-cb-item text="Bulgaria"></ui5-cb-item>
 						<ui5-cb-item text="Germany"></ui5-cb-item>
@@ -112,8 +218,16 @@
 
 			<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>Clinet No</ui5-label>
-					<ui5-combobox placeholder="Select Machine" i18n-placeholder readonly="true" class="w-full">
+					<ui5-label
+						showColon
+						i18n
+						>Clinet No</ui5-label
+					>
+					<ui5-combobox
+						placeholder="Select Machine"
+						i18n-placeholder
+						readonly="true"
+						class="w-full">
 						<ui5-cb-item text="Austria"></ui5-cb-item>
 						<ui5-cb-item text="Bulgaria"></ui5-cb-item>
 						<ui5-cb-item text="Germany"></ui5-cb-item>
@@ -122,10 +236,16 @@
 					</ui5-combobox>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>
+					<ui5-label
+						showColon
+						i18n>
 						Supplier No
 					</ui5-label>
-					<ui5-combobox placeholder="Choose Serial Number" i18n-placeholder readonly="true" class="w-full">
+					<ui5-combobox
+						placeholder="Choose Serial Number"
+						i18n-placeholder
+						readonly="true"
+						class="w-full">
 						<ui5-cb-item text="Austria"></ui5-cb-item>
 						<ui5-cb-item text="Bulgaria"></ui5-cb-item>
 						<ui5-cb-item text="Germany"></ui5-cb-item>
@@ -135,66 +255,152 @@
 				</div>
 
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>Error Description</ui5-label>
-					<ui5-input readonly="true" value="Hwk descreption" class="w-full"></ui5-input>
+					<ui5-label
+						showColon
+						i18n
+						>Error Description</ui5-label
+					>
+					<ui5-input
+						readonly="true"
+						value="Hwk descreption"
+						class="w-full"></ui5-input>
 				</div>
 			</div>
 		</ui5-tab>
 
-		<ui5-tab i18n-text design="Default" text="Emergency Measures" class="h-[calc(100vh-250px)]">
+		<ui5-tab
+			i18n-text
+			design="Default"
+			text="Emergency Measures"
+			class="h-[calc(100vh-250px)]">
 			<div class="grid grid-cols-3 gap-2 items-center w-full">
 				<div class="flex-col flex">
-					<ui5-label showColon i18n required>Department</ui5-label>
-					<ui5-input readonly="true" i18n-placeholder value="rakib" class="w-full"></ui5-input>
+					<ui5-label
+						showColon
+						i18n
+						required
+						>Department</ui5-label
+					>
+					<ui5-input
+						readonly="true"
+						i18n-placeholder
+						value="rakib"
+						class="w-full"></ui5-input>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label showColon required i18n>Creator</ui5-label>
-					<ui5-input readonly="true" value="shihab" i18n-placeholder class="w-full"></ui5-input>
+					<ui5-label
+						showColon
+						required
+						i18n
+						>Creator</ui5-label
+					>
+					<ui5-input
+						readonly="true"
+						value="shihab"
+						i18n-placeholder
+						class="w-full"></ui5-input>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label showColon required i18n>Error</ui5-label>
+					<ui5-label
+						showColon
+						required
+						i18n
+						>Error</ui5-label
+					>
 
-					<ui5-combobox id="viewTypeCombobox" readonly="true" class="w-full" name="view_type"
-						value="new error" i18n-placeholder placeholder="Select Error">
-						<ui5-cb-item [text]="'new error'" [id]="12">
+					<ui5-combobox
+						id="viewTypeCombobox"
+						readonly="true"
+						class="w-full"
+						name="view_type"
+						value="new error"
+						i18n-placeholder
+						placeholder="Select Error">
+						<ui5-cb-item
+							[text]="'new error'"
+							[id]="12">
 						</ui5-cb-item>
 					</ui5-combobox>
 				</div>
 			</div>
 			<div class="grid my-2 grid-cols-3">
 				<div>
-					<ui5-label showColon i18n>Status</ui5-label>
-					<ui5-range-slider [min]="0" [max]="100" [step]="25" [startValue]="0" [endValue]="25" show-tooltip
-						i18n-placeholder [labelInterval]="2" show-tickmarks></ui5-range-slider>
+					<ui5-label
+						showColon
+						i18n
+						>Status</ui5-label
+					>
+					<ui5-range-slider
+						[min]="0"
+						[max]="100"
+						[step]="25"
+						[startValue]="0"
+						[endValue]="25"
+						show-tooltip
+						i18n-placeholder
+						[labelInterval]="2"
+						show-tickmarks></ui5-range-slider>
 				</div>
 			</div>
 
 			<div class="grid grid-cols-3">
 				<div>
-					<ui5-title level="H6" slot="startContent" size="H6">Emergency Measures</ui5-title>
+					<ui5-title
+						level="H6"
+						slot="startContent"
+						size="H6"
+						>Emergency Measures</ui5-title
+					>
 				</div>
 
 				<div class="flex items-center">
-					<ui5-radio-button text="No Emergency Measures Needed" readonly [checked]="true" i18n
+					<ui5-radio-button
+						text="No Emergency Measures Needed"
+						readonly
+						[checked]="true"
+						i18n
 						name="critical1"></ui5-radio-button>
 				</div>
 
 				<div class="flex items-center justify-end">
-					<ui5-label showColon i18n>Finished</ui5-label>
-					<ui5-switch checked disabled class="ml-2"></ui5-switch>
+					<ui5-label
+						showColon
+						i18n
+						>Finished</ui5-label
+					>
+					<ui5-switch
+						checked
+						disabled
+						class="ml-2"></ui5-switch>
 				</div>
 			</div>
 
 			<div class="mt-3">
-				<ui5-label showColon required class="mb-2" i18n>Emergency Measure Description</ui5-label>
-				<app-text-editor i18n-placeholder [isReadOnly]="false">
+				<ui5-label
+					showColon
+					required
+					class="mb-2"
+					i18n
+					>Emergency Measure Description</ui5-label
+				>
+				<app-text-editor
+					i18n-placeholder
+					[isReadOnly]="false">
 				</app-text-editor>
 			</div>
 
 			<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>Responsible</ui5-label>
-					<ui5-combobox placeholder="Select Part" i18n-placeholder readonly="true" class="w-full">
+					<ui5-label
+						showColon
+						i18n
+						>Responsible</ui5-label
+					>
+					<ui5-combobox
+						placeholder="Select Part"
+						i18n-placeholder
+						readonly="true"
+						class="w-full">
 						<ui5-cb-item text="Austria"></ui5-cb-item>
 						<ui5-cb-item text="Bulgaria"></ui5-cb-item>
 						<ui5-cb-item text="Germany"></ui5-cb-item>
@@ -203,10 +409,16 @@
 					</ui5-combobox>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>
+					<ui5-label
+						showColon
+						i18n>
 						Restart
 					</ui5-label>
-					<ui5-combobox placeholder="Select Plan Part" i18n-placeholder readonly="true" class="w-full">
+					<ui5-combobox
+						placeholder="Select Plan Part"
+						i18n-placeholder
+						readonly="true"
+						class="w-full">
 						<ui5-cb-item text="Austria"></ui5-cb-item>
 						<ui5-cb-item text="Bulgaria"></ui5-cb-item>
 						<ui5-cb-item text="Germany"></ui5-cb-item>
@@ -216,30 +428,59 @@
 				</div>
 
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>
+					<ui5-label
+						showColon
+						i18n>
 						End Date
 					</ui5-label>
 					<ui5-datetime-picker readonly="true"></ui5-datetime-picker>
 				</div>
 			</div>
 		</ui5-tab>
-		<ui5-tab class="h-[calc(100vh-250px)]" text="Corrective  Measures">
-			<div class="w-[98%] rounded-lg shadow-lg overflow-hidden h-[98%]  m-auto">
-				<app-grid-table [headerTitle]="'Corrective Measures'" [url]="'s'" [columns]="columns"
-					[showAction]="false" [customData]="true" [showSearch]="false" [showActiveButton]="false"
-					[showTableSettingBtn]="false" i18n-addButtonText [showDownload]="false" [data]="customdata"
-					i18n-extraButtonText [showNewButton]="true" [addButtonDisable]="true" [showExtraButton]="false"
-					[showRowDataCount]="true" addButtonText="New" [isBaseVisu]="false"
-					[enableServerSideFiltering]="true" selectionMode="Single"></app-grid-table>
+		<ui5-tab
+			class="h-[calc(100vh-250px)]"
+			text="Corrective  Measures">
+			<div class="w-[98%] rounded-lg shadow-lg overflow-hidden h-[98%] m-auto">
+				<app-grid-table
+					[headerTitle]="'Corrective Measures'"
+					[url]="'s'"
+					[columns]="columns"
+					[showAction]="false"
+					[customData]="true"
+					[showSearch]="false"
+					[showActiveButton]="false"
+					[showTableSettingBtn]="false"
+					i18n-addButtonText
+					[showDownload]="false"
+					[data]="customdata"
+					i18n-extraButtonText
+					[showNewButton]="true"
+					[addButtonDisable]="true"
+					[showExtraButton]="false"
+					[showRowDataCount]="true"
+					addButtonText="New"
+					[isBaseVisu]="false"
+					[enableServerSideFiltering]="true"
+					selectionMode="Single"></app-grid-table>
 			</div>
 		</ui5-tab>
 
-		<ui5-tab class="h-[calc(100vh-250px)]" [selected]="TabType == 'details' ? true : false" text="Details">
+		<ui5-tab
+			class="h-[calc(100vh-250px)]"
+			[selected]="TabType == 'details' ? true : false"
+			text="Details">
 			<section class="grid h-full gap-2 grid-rows-[1fr_100px_1fr_1fr]">
 				<div>
 					<div class="flex flex-col">
-						<ui5-label i18n showColon>Reason</ui5-label>
-						<ui5-textarea readonly="true" class="h-full" i18n-placeholder
+						<ui5-label
+							i18n
+							showColon
+							>Reason</ui5-label
+						>
+						<ui5-textarea
+							readonly="true"
+							class="h-full"
+							i18n-placeholder
 							placeholder="Type as much text as you wish"></ui5-textarea>
 					</div>
 				</div>
@@ -247,32 +488,80 @@
 				<div>
 					<div class="grid gap-2 mt-3 grid-cols-3">
 						<div class="flex flex-col">
-							<ui5-label i18n showColon>Functional Test</ui5-label>
+							<ui5-label
+								i18n
+								showColon
+								>Functional Test</ui5-label
+							>
 							<div class="grid gap-2 grid-cols-2">
-								<ui5-radio-button text="Critical" readonly [checked]="true" i18n
+								<ui5-radio-button
+									text="Critical"
+									readonly
+									[checked]="true"
+									i18n
 									name="critical1"></ui5-radio-button>
-								<ui5-radio-button text="Major" readonly i18n name="major"></ui5-radio-button>
-								<ui5-radio-button text="Minor" readonly i18n name="minor"></ui5-radio-button>
+								<ui5-radio-button
+									text="Major"
+									readonly
+									i18n
+									name="major"></ui5-radio-button>
+								<ui5-radio-button
+									text="Minor"
+									readonly
+									i18n
+									name="minor"></ui5-radio-button>
 							</div>
 						</div>
 
 						<div class="flex flex-col">
-							<ui5-label i18n showColon>Consider For</ui5-label>
+							<ui5-label
+								i18n
+								showColon
+								>Consider For</ui5-label
+							>
 							<div class="grid gap-2 grid-cols-2">
-								<ui5-radio-button text="Werkzeug" readonly [checked]="true" i18n
+								<ui5-radio-button
+									text="Werkzeug"
+									readonly
+									[checked]="true"
+									i18n
 									name="werkzeug"></ui5-radio-button>
-								<ui5-radio-button text="Asset" readonly i18n name="asset"></ui5-radio-button>
-								<ui5-radio-button text="Test" readonly i18n name="test"></ui5-radio-button>
+								<ui5-radio-button
+									text="Asset"
+									readonly
+									i18n
+									name="asset"></ui5-radio-button>
+								<ui5-radio-button
+									text="Test"
+									readonly
+									i18n
+									name="test"></ui5-radio-button>
 							</div>
 						</div>
 
 						<div class="flex flex-col">
-							<ui5-label i18n showColon>Error Type</ui5-label>
+							<ui5-label
+								i18n
+								showColon
+								>Error Type</ui5-label
+							>
 							<div class="grid gap-2 grid-cols-2">
-								<ui5-radio-button text="Critical" readonly [checked]="true" i18n
+								<ui5-radio-button
+									text="Critical"
+									readonly
+									[checked]="true"
+									i18n
 									name="critical"></ui5-radio-button>
-								<ui5-radio-button text="Major" i18n readonly name="major"></ui5-radio-button>
-								<ui5-radio-button text="Minor" readonly i18n name="minor"></ui5-radio-button>
+								<ui5-radio-button
+									text="Major"
+									i18n
+									readonly
+									name="major"></ui5-radio-button>
+								<ui5-radio-button
+									text="Minor"
+									readonly
+									i18n
+									name="minor"></ui5-radio-button>
 							</div>
 						</div>
 					</div>
@@ -280,43 +569,94 @@
 
 				<div>
 					<div class="flex flex-col">
-						<ui5-label i18n showColon>Department(Originator)</ui5-label>
-						<ui5-textarea readonly="true" class="h-full" value="hello world"></ui5-textarea>
+						<ui5-label
+							i18n
+							showColon
+							>Department(Originator)</ui5-label
+						>
+						<ui5-textarea
+							readonly="true"
+							class="h-full"
+							value="hello world"></ui5-textarea>
 					</div>
 				</div>
 
 				<div>
 					<div class="grid gap-3 grid-cols-3">
 						<div class="flex flex-col">
-							<ui5-label i18n showColon>Cost</ui5-label>
-							<ui5-input class="w-full" readonly="true" type="Number"></ui5-input>
+							<ui5-label
+								i18n
+								showColon
+								>Cost</ui5-label
+							>
+							<ui5-input
+								class="w-full"
+								readonly="true"
+								type="Number"></ui5-input>
 						</div>
 
 						<div class="flex flex-col items-start">
-							<ui5-label class="ml-1" showColon i18n>Rework Cost Announced</ui5-label>
-							<ui5-switch accessible-name="graphical" disabled checked></ui5-switch>
+							<ui5-label
+								class="ml-1"
+								showColon
+								i18n
+								>Rework Cost Announced</ui5-label
+							>
+							<ui5-switch
+								accessible-name="graphical"
+								disabled
+								checked></ui5-switch>
 						</div>
 
 						<div class="flex flex-col items-start">
-							<ui5-label class="ml-1" showColon i18n>Still Mill Error</ui5-label>
-							<ui5-switch accessible-name="graphical" disabled checked></ui5-switch>
+							<ui5-label
+								class="ml-1"
+								showColon
+								i18n
+								>Still Mill Error</ui5-label
+							>
+							<ui5-switch
+								accessible-name="graphical"
+								disabled
+								checked></ui5-switch>
 						</div>
 					</div>
 				</div>
 			</section>
 		</ui5-tab>
-		<ui5-tab [selected]="TabType == 'attachments' ? true : false" class="h-[calc(100vh-250px)]" text="Attachments">
+		<ui5-tab
+			[selected]="TabType == 'attachments' ? true : false"
+			class="h-[calc(100vh-250px)]"
+			text="Attachments">
 			<section class="h-full w-[99%] m-auto">
 				<ui5-card class="-m-1 h-full">
 					<ui5-bar design="Header">
-						<ui5-title level="H5" slot="startContent" size="H5" i18n-tittle>Attachments({{DataList.length}})</ui5-title>
+						<ui5-title
+							level="H5"
+							slot="startContent"
+							size="H5"
+							i18n-tittle
+							>Attachments({{ DataList.length }})</ui5-title
+						>
 
-						<div slot="endContent" class="flex items-center gap-2">
-							<ui5-button i18n design="Transparent">Download</ui5-button>
+						<div
+							slot="endContent"
+							class="flex items-center gap-2">
+							<ui5-button
+								i18n
+								design="Transparent"
+								>Download</ui5-button
+							>
 							<div class="flex-column samples-margin">
-								<ui5-input i18n-placeholder id="searchInput" placeholder="Search by file name"
+								<ui5-input
+									i18n-placeholder
+									id="searchInput"
+									placeholder="Search by file name"
 									style="width: 100%">
-									<ui5-icon id="searchIcon" slot="icon" name="search"></ui5-icon>
+									<ui5-icon
+										id="searchIcon"
+										slot="icon"
+										name="search"></ui5-icon>
 								</ui5-input>
 							</div>
 						</div>
@@ -327,16 +667,29 @@
 							<div class="flex items-center justify-between w-full">
 								<div class="flex items-center gap-4">
 									<div class="w-[70px]">
-										<ui5-icon design="Neutral" class="h-full w-full"
+										<ui5-icon
+											design="Neutral"
+											class="h-full w-full"
 											name="doc-attachment"></ui5-icon>
 									</div>
 									<div class="flex flex-col">
-										<ui5-text i18n class="text-blue-500 text-[17px]">Overview.doc</ui5-text>
+										<ui5-text
+											i18n
+											class="text-blue-500 text-[17px]"
+											>Overview.doc</ui5-text
+										>
 
-										<ui5-label i18n class="text-xs text-gray-500">Uploaded By: Jane Burns - Uploaded
-											On:
-											09/06/2023</ui5-label>
-										<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
+										<ui5-label
+											i18n
+											class="text-xs text-gray-500"
+											>Uploaded By: Jane Burns - Uploaded On:
+											09/06/2023</ui5-label
+										>
+										<ui5-label
+											i18n
+											class="text-xs text-gray-500"
+											>File Size: 100 KB</ui5-label
+										>
 									</div>
 								</div>
 							</div>
@@ -347,18 +700,44 @@
 								<div class="flex items-center gap-4">
 									<div class="w-[70px]">
 										<!-- detectImageExtension -->
-										<ui5-icon *ngIf="imageType(imgname)==='document'" design="Neutral" class="h-full w-full"
-										[name]="imageExtension(imgname)==='pdf' ? 'pdf-attachment':imageExtension(imgname)==='doc' ? 'doc-attachment' :imageExtension(imgname)==='xls'? 'excel-attachment':'attachment-text-file'"></ui5-icon>
-										<img *ngIf="imageType(imgname)==='image'" src="assets/images/derga_logo.png" slot="image" alt="Picture"
+										<ui5-icon
+											*ngIf="imageType(imgname) === 'document'"
+											design="Neutral"
+											class="h-full w-full"
+											[name]="
+												imageExtension(imgname) === 'pdf'
+													? 'pdf-attachment'
+													: imageExtension(imgname) === 'doc'
+														? 'doc-attachment'
+														: imageExtension(imgname) === 'xls'
+															? 'excel-attachment'
+															: 'attachment-text-file'
+											"></ui5-icon>
+										<img
+											*ngIf="imageType(imgname) === 'image'"
+											src="assets/images/derga_logo.png"
+											slot="image"
+											alt="Picture"
 											class="w-full h-full bg-cover rounded-md" />
 									</div>
 
 									<div class="flex flex-col">
-										<ui5-text class="text-blue-500 text-[17px]" i18n>Picture.png</ui5-text>
-										<ui5-label i18n class="text-xs text-gray-500">Uploaded By: Jane Burns - Uploaded
-											On:
-											09/06/2023</ui5-label>
-										<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
+										<ui5-text
+											class="text-blue-500 text-[17px]"
+											i18n
+											>Picture.png</ui5-text
+										>
+										<ui5-label
+											i18n
+											class="text-xs text-gray-500"
+											>Uploaded By: Jane Burns - Uploaded On:
+											09/06/2023</ui5-label
+										>
+										<ui5-label
+											i18n
+											class="text-xs text-gray-500"
+											>File Size: 100 KB</ui5-label
+										>
 									</div>
 								</div>
 							</div>
@@ -368,16 +747,29 @@
 							<div class="flex items-center justify-between w-full">
 								<div class="flex items-center gap-4">
 									<div class="w-[70px]">
-										<ui5-icon design="Neutral" class="h-full w-full"
+										<ui5-icon
+											design="Neutral"
+											class="h-full w-full"
 											name="pdf-attachment"></ui5-icon>
 									</div>
 
 									<div class="flex flex-col">
-										<ui5-text class="text-blue-500 text-[17px]" i18n>Picture.pdf</ui5-text>
-										<ui5-label i18n class="text-xs text-gray-500">Uploaded By: Jane Burns - Uploaded
-											On:
-											09/06/2023</ui5-label>
-										<ui5-label class="text-xs text-gray-500" i18n>File Size: 100 KB</ui5-label>
+										<ui5-text
+											class="text-blue-500 text-[17px]"
+											i18n
+											>Picture.pdf</ui5-text
+										>
+										<ui5-label
+											i18n
+											class="text-xs text-gray-500"
+											>Uploaded By: Jane Burns - Uploaded On:
+											09/06/2023</ui5-label
+										>
+										<ui5-label
+											class="text-xs text-gray-500"
+											i18n
+											>File Size: 100 KB</ui5-label
+										>
 									</div>
 								</div>
 							</div>
@@ -388,6 +780,26 @@
 		</ui5-tab>
 	</ui5-tabcontainer>
 	<ui5-bar slot="footer">
-		<ui5-button slot="endContent" design="Transparent" (click)="CloseDialog()" i18n>Cancel</ui5-button>
+		<ui5-button
+			slot="endContent"
+			design="Transparent"
+			(click)="CloseDialog()"
+			i18n
+			>Cancel</ui5-button
+		>
 	</ui5-bar>
+</ui5-dialog>
+
+<ui5-dialog
+	id="chat"
+	*ngIf="isChat"
+	[open]="isChat"
+	(ui5BeforeClose)="closeChat()">
+	<div>
+		<app-chat
+			[modelId]="1"
+			[modelName]="'EightDReports'"
+			[chat]=""
+			(closeDialog)="closeChat()"></app-chat>
+	</div>
 </ui5-dialog>

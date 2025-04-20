@@ -22,3 +22,9 @@ ui5-dialog::part(content) {
    overflow: unset !important;
    box-sizing: border-box;
  }
+
+ #chat::part(content) {
+	padding-inline: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}

@@ -11,6 +11,7 @@ export class ServerIssuesViewComponent implements OnInit {
 	OpenView: boolean = false;
 	@Input() TabType: string = "";
 	DataList :any[] = [];
+	isChat : boolean = false;
 	ngOnInit(): void {
 		this.isOpenView.subscribe((items: any) => {
 			this.OpenView = !this.OpenView;
@@ -39,6 +40,13 @@ export class ServerIssuesViewComponent implements OnInit {
 		}
 		return "";
 	}
+
+	openChat(){
+		this.isChat = !this.isChat;
+	}
+closeChat(){
+	this.isChat = false;
+}
 
 	columns = [
 		{
