@@ -112,8 +112,7 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 	) {}
 	ngOnInit(): void {
 		this.selectedIssue.subscribe((issue: any) => {
-			this.generalComponents = issue.components?.filter((component: any) => component.model_type === null) || [];
-
+			this.generalComponents = issue.components?.filter((component: any) => component.model_type === null || component.model_type === '');
 			if (this.gridTable?.data?.length) {
 				this.selectedRowIds = {}; 
 				const modelComponentIds = this.generalComponents.map((comp: any) => comp.id);
