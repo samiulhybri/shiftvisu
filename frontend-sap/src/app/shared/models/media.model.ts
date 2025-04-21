@@ -17,6 +17,7 @@ export class Media implements Deserializable {
     generated_conversions?: string;
     responsive_images?: string;
     original_url?: string;
+    path?: string;
     order_column?: number;
     created_at?: Date;
     updated_at?: Date;

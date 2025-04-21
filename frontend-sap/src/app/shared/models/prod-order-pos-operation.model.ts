@@ -82,6 +82,7 @@ export class ProdOrderPosOperation implements Deserializable {
 	send_ahead_quantity?: number = 0;
 	user_id?: any = null;
 	constraint_type?: any = MachineConstraintType.MANUAL;
+	is_automatic_created_repair: boolean = false;
 
 	constructor() {}
 

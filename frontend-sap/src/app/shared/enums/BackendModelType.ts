@@ -166,7 +166,7 @@ export class BackendModelTypeClass {
 				};
 			case BackendModelType.Equipment:
 				return {
-					text: $localize`Equipement`,
+					text: $localize`Equipment`,
 					route: "/Equipements",
 					icon: "sap-icon://person-placeholder",
 					modelType: BackendModelType.Equipment,

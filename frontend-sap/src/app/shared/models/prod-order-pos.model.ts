@@ -41,6 +41,7 @@ export class ProdOrderPos implements Deserializable {
 	toolSupplier?: Suppliers;
 	is_sampling_required?:boolean;
 	is_sampling_done?:boolean;
+	is_prod_date_manual?: boolean;
 
 	constructor() {}
 

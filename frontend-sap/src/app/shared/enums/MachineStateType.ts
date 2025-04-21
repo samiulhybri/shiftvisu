@@ -1,5 +1,6 @@
 export enum MachineStateType {
 	MANUAL = "MANUAL",
+    BASED_ON_OPERATION = "BASED_ON_OPERATION",
 	IIOT = "IIOT",
 }
 
@@ -10,6 +11,8 @@ export class MachineStateTypeClass {
 		switch (state) {
 			case MachineStateType.MANUAL:
 				return $localize`Manual`;
+			case MachineStateType.BASED_ON_OPERATION:
+				return $localize`Based on operation state`;
 			case MachineStateType.IIOT:
 				return $localize`IIOT`;
 			default:
@@ -21,6 +24,8 @@ export class MachineStateTypeClass {
 		switch (value) {
 			case $localize`Manual`:
 				return MachineStateType.MANUAL;
+			case $localize`Based on operation state`:
+				return MachineStateType.BASED_ON_OPERATION;
 			case $localize`IIOT`:
 				return MachineStateType.IIOT;
 			default:

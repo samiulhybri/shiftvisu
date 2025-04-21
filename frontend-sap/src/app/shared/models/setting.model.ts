@@ -24,6 +24,18 @@ export class Setting implements Deserializable {
 		StatusBoardSidebarType.STANDARD_1
 	);
 	date_to_consider = DateToConsiderClass.getStateTranslate(DateToConsider.SHIFT_START);
+	show_filter_hall?: boolean = true;
+	show_filter_machine_group?: boolean = true;
+	show_filter_machine?: boolean = true;
+	show_filter_item?: boolean = true;
+	show_filter_prod_order?: boolean = true;
+	show_op_prod_order?: boolean = true;
+	show_op_item?: boolean = true;
+	show_op_due_date?: boolean = true;
+	show_op_release_date?: boolean = true;
+	show_op_constraint_type?: boolean = true;
+	show_op_alt_machine?: boolean = true;
+	show_op_customer?: boolean = true;
 
 	constructor() {}
 

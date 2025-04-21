@@ -83,6 +83,7 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 	@Input() public showDatePicker: any = false;
 	@Input() public showDateRangePicker: any = false;
 	@Input() public datePickerFormat: string = "";
+	@Input() public datePickerValue: string = "";
 	@Input() public showTableSettingBtn: any = true;
 	@Input() public editPermission: any = true;
 	@Input() public showActiveButton: any = false;
@@ -104,6 +105,7 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 	@Input() customData = false;
 	@Input() isTreeTable = false;
 	@Input() isTreeTableHookEnable = true;
+	@Input() isServerSideSorting:boolean | undefined;
 	@Input() data: any = [];
 	@Input() limit = 40;
 	@Input() selectedRowsId = {};
@@ -142,7 +144,7 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 	@Input() multiSelectTwoData?: { textAccessor: string; idAccessor: string; data: any[] };
 	@Input() multiSelectThreeData?: { textAccessor: string; idAccessor: string; data: any[] };
 	@Input() multiSelectFourData?: { textAccessor: string; idAccessor: string; data: any[] };
-	@Input() segmentButtonItems: { id: string; name: string }[] = [];
+	@Input() segmentButtonItems: { id: string; name: string; defaultSelect?: boolean }[] = [];
 	@Input() showEditButton = true;
 	@Input() showDeleteButton = true;
 	@Input() showDeleteButtonInHeader = false;
@@ -334,15 +336,38 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 
 	public onFilterAndSortingForEdit = (originalItem: any, value: any) => {
 		if (value) {
-			const index = this.data?.findIndex((data: any) => data.id === value.id);
-			this.data[index] = value;
+			this.updateRow(value);
 		} else {
-			const dataIndex = this.data?.findIndex((data: any) => data.id === originalItem.id);
+			const dataIndex = this.data?.findIndex((data: any) => data.id === originalItem);
 
-			for (let i = dataIndex; i < this.data.length - 2; i++) {
-				this.data[i] = this.data[i + 1];
+			if (dataIndex > -1) {
+				for (let i = dataIndex; i < this.data.length - 1; i++) {
+					this.data[i] = this.data[i + 1];
+				}
+				this.data.length -= 1;
+
+				if (this.showRowDataCount) {
+					this.filteredDataCount -= 1; 
+				}
 			}
+
 		}
+		this.render();
+	};
+
+	public updateRow = (value: any) => {
+		this.data = this.data.map((data: any) => (data.id === value.id ? value : data));
+
+		if (this.buttonEnabled === "ACTIVE") {
+			this.data = this.data.filter(
+				(data: any) => data.is_active === true || data.is_active === undefined
+			);
+		} else if (this.buttonEnabled === "INACTIVE") {
+			this.data = this.data.filter(
+				(data: any) => data.is_active === false || data.is_active === undefined
+			);
+		}
+
 		this.render();
 	};
 
@@ -466,8 +491,10 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 								break;
 
 							case GridTableColumnDataType.NestedString:
+								if(!value) break;
+
 								if (!Array.isArray(value)) value = [value];
-			
+
 								let arrayValueQuery = value?.map((val: string) => {
 									if (column.accessorArray?.length == 2) {
 										const [first, second] = column.accessorArray;
@@ -866,14 +893,27 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 			const localStorageColumns = localStorage.getItem(
 				this.keyForCacheCustomDataTableColumns || this.url
 			);
-			let lengthOfCachedColumns;
+			let cacheColumnHash: string = '';
+			let columnHash: string = '';
 
-			if (localStorageColumns) lengthOfCachedColumns = JSON.parse(localStorageColumns).length;
+			if (localStorageColumns) {
+				const parsedStorageColumn = JSON.parse(localStorageColumns) as any[];
+
+				for (let i = 0; i < parsedStorageColumn.length; i++) {
+					const column = parsedStorageColumn[i];
+					cacheColumnHash = `${cacheColumnHash}.${column.accessor}`
+				}
+			}
+			
+			for (let i = 0; i < this.columns.length; ++i) {
+				const column = this.columns[i];
+				columnHash = `${columnHash}.${column.accessor}`
+			}
 
 			// Remove Cache for specific column if new column is added
 			if (
 				!localStorageColumns ||
-				(localStorageColumns && lengthOfCachedColumns !== this.columns.length)
+				(localStorageColumns && cacheColumnHash !== columnHash)
 			) {
 				this.cachedColumn = JSON.parse(JSON.stringify(this.columns));
 				this.mergeColumns();
@@ -1131,17 +1171,17 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 							(c: any) => c["accessor"] == column["accessor"]
 						).comboBoxValues;
 
-						let value = column["comboBoxValues"]?.find(
-							(d: { value: any; text: any }) =>
-								d.value == rowData[column["accessor"]]
-						)?.text ?? "";
+						let value =
+							column["comboBoxValues"]?.find(
+								(d: { value: any; text: any }) =>
+									d.value == rowData[column["accessor"]]
+							)?.text ?? "";
 
 						let placeholder = "";
 
 						if (typeof column["placeholder"] == "string") {
 							placeholder = column["placeholder"];
-						}
-						else if (column["placeholder"] instanceof Function) {
+						} else if (column["placeholder"] instanceof Function) {
 							placeholder = column["placeholder"](row);
 						}
 
@@ -2143,9 +2183,10 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 								{showDatePicker ? (
 									<DatePicker
 										id="datePicker"
+										value={this.datePickerValue ?? ""}
 										placeholder={this.datePickerPlaceholder || this.datePickerFormat || ""}
 										onChange={e => onChangeDatePicker(e)}
-										formatPattern= {this.datePickerFormat ?? "YYYY-MM-dd"}
+										formatPattern={this.datePickerFormat ?? "YYYY-MM-dd"}
 										valueState="None"
 									/>
 								) : (
@@ -2362,7 +2403,11 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 										selectionMode="Single"
 										onSelectionChange={e => this.segmentButtonChange.emit(e)}>
 										<React.Fragment>
-											{this.segmentButtonItems.map(value => (
+											{this.segmentButtonItems.map(value => value?.defaultSelect ? (
+												<SegmentedButtonItem id={value.id} selected>
+													{value.name}
+												</SegmentedButtonItem>
+											) : (
 												<SegmentedButtonItem id={value.id}>
 													{value.name}
 												</SegmentedButtonItem>
@@ -2419,7 +2464,7 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 										handleRowClick(e);
 									}}
 									onSort={(e: any) =>
-										this.enableServerSideFiltering && onSorting(e)
+										this.enableServerSideFiltering && this.isServerSideSorting !== false && onSorting(e)
 									}
 									onTableScroll={function _a() {}}
 									visibleRowCountMode="AutoWithEmptyRows"
@@ -2430,7 +2475,7 @@ export class CustomReactGridTable implements OnChanges, OnDestroy, AfterViewInit
 									selectionMode={selectionMode}
 									selectedRowIds={selectedRowsId}
 									reactTableOptions={{
-										manualSortBy: this.enableServerSideFiltering,
+										manualSortBy: this.isServerSideSorting ?? this.enableServerSideFiltering,
 										manualFilters: this.enableServerSideFiltering,
 										manualGroupBy: this.enableServerSideFiltering,
 										selectSubRows:

@@ -8,9 +8,11 @@ export class QualificationUser implements Deserializable {
 	qualification?: Qualification;
 	is_prequalified: boolean = false;
 	is_suspended: boolean = false;
-	total_hours?:number;
-	total_operations?: number;
-	note?: string;
+	total_hours?:number = 0;
+	total_operations?: number = 0;
+	operations_imported?: number = 0;
+	hours_imported?: number = 0;
+	note?: string = '';
 
 	deserialize(input: any): this {
 		Object.assign(this, input);

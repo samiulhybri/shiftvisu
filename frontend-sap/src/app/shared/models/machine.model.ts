@@ -29,7 +29,10 @@ import { StandardValueKey } from "@app/shared/models/standardValueKey.model";
 import { ShiftModel } from "@app/shared/models/shift-model.model";
 import { StandardValueKeyActivityType } from "@app/shared/models/StandardValueKeyActivityType.model";
 import { SectionActivatable } from "@app/shared/models/sectionActivatable.model";
-import { MachineBoardStateTypeClass, MachineBoardStateType } from "@app/shared/enums/MachineBoardStateType";
+import {
+	MachineBoardStateTypeClass,
+	MachineBoardStateType,
+} from "@app/shared/enums/MachineBoardStateType";
 import { Plant } from "@app/shared/models/plant.model";
 import MachineComponentSerialNumberProfiles from "@app/shared/models/machine-last-serial-number-profile.model";
 import MachineLastSerialNumberProfiles from "@app/shared/models/machine-last-serial-number-profile.model";
@@ -38,6 +41,7 @@ import { QuantityType, QuantityTypeClass } from "@app/shared/enums/QuantityType"
 import { OrderDetails } from "@app/shared/interfaces/OrderDetails";
 import { ProdOrderPosOperationStatus } from "@app/shared/enums/ProdOrderPosOperationStatus";
 import { MachineConstraintType, MachineConstraintTypeClass } from "../enums/MachineConstraintType";
+import { MachineQualificationImportType, MachineQualificationImportTypeClass } from "@app/shared/enums/MachineQualificationImportType";
 
 export class Machine implements Deserializable {
 	id?: number;
@@ -104,6 +108,8 @@ export class Machine implements Deserializable {
 	shiftModel?: ShiftModel;
 	machineStateProduction?: MachineState;
 	machineStateOff?: MachineState;
+	machineStateSetup?: MachineState;
+	machineStateAvailable?: MachineState;
 	private _oee?: number;
 	private _machineUsage?: number;
 	private _machinePerformance?: number;
@@ -113,6 +119,11 @@ export class Machine implements Deserializable {
 	operationDetails?: OrderDetails;
 	limit_quantity_to_packaging_target: boolean = false;
 	auto_close_operation: boolean = false;
+	save_operator_id: boolean = false;
+	save_operator_id_qualivisu: boolean = false;
+	qualification_import_type:string = MachineQualificationImportType.NONE;
+	default_qualification_hours = 0;
+	default_qualification_operations = 0;
 
 	scap_quantity = 0;
 	total_quantity = 0;
@@ -169,7 +180,7 @@ export class Machine implements Deserializable {
 			);
 		}
 
-		if (input.current_operation_times) {
+		if (input.current_operation_times && input.current_operation_times.prod_order_pos_operation) {
 			this.current_operation = new ProdOrderPosOperation().deserialize(
 				input.current_operation_times.prod_order_pos_operation
 			);
@@ -177,6 +188,10 @@ export class Machine implements Deserializable {
 
 		this.quantity_type = QuantityTypeClass.getStateTranslate(
 			input.quantity_type ?? QuantityType.TYPE_1
+		);
+		
+		this.qualification_import_type = MachineQualificationImportTypeClass.getStateTranslate(
+			input.qualification_import_type ?? MachineQualificationImportType.NONE
 		);
 
 		if (input.topQualification) {
@@ -209,11 +224,10 @@ export class Machine implements Deserializable {
 			this.shiftModel = new ShiftModel().deserialize(input.shift_model);
 		}
 
-		this.machineStateProduction = new MachineState().deserialize(
-			input.machineStateProduction ?? {}
-		);
-
+		this.machineStateProduction = new MachineState().deserialize(input.machineStateProduction ?? {});
 		this.machineStateOff = new MachineState().deserialize(input.machineStateOff ?? {});
+		this.machineStateSetup = new MachineState().deserialize(input.machineStateSetup ?? {});
+		this.machineStateAvailable = new MachineState().deserialize(input.machineStateAvailable ?? {});
 
 		this.standardValueKey = new StandardValueKey().deserialize(input.standardValueKey ?? {});
 		this.plant = new Plant().deserialize(input.plant ?? {});
@@ -455,10 +469,14 @@ export class Machine implements Deserializable {
 			quantity_type: QuantityTypeClass.getStateValue(this.quantity_type),
 			isUsed: undefined,
 			prodOrderPosOperationTimes: undefined,
-			machine_state_id_default_production: this.machineStateProduction?.id ?? null,
+            machine_state_id_default_production: this.machineStateProduction?.id ?? null,
 			machineStateProduction: undefined,
 			machine_state_id_default_off: this.machineStateOff?.id ?? null,
 			machineStateOff: undefined,
+			machine_state_id_default_setup: this.machineStateSetup?.id ?? null,
+			machineStateSetup: undefined,
+			machine_state_id_default_available: this.machineStateAvailable?.id ?? null,
+            machineStateAvailable: undefined,
 			/**
 			 * due to some issues with backend there is machineStates and machineState
 			 */

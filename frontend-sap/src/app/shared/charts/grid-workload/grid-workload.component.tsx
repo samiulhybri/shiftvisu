@@ -39,6 +39,8 @@ export class GridWorkloadComponent implements OnInit {
 	weekListWidth: number = 104;
 
 	@Output() totalMachineEvent: EventEmitter<number> = new EventEmitter();
+	@Output() staffWorkloadEvent: EventEmitter<{ counter: number; type: string }> =
+		new EventEmitter();
 
 	@ViewChild("gridTable", { static: false }) gridTable: CustomReactGridTable | undefined;
 
@@ -70,6 +72,7 @@ export class GridWorkloadComponent implements OnInit {
 		private planVisuService: PlanVisuService
 	) {
 		this.title = this.gridTitle;
+		this.setTitle();
 	}
 
 	initializeColumns() {
@@ -80,7 +83,7 @@ export class GridWorkloadComponent implements OnInit {
 						direction={FlexBoxDirection.Column}
 						className="cursor-pointer h-full w-full"
 						onClick={() => this.handleHeaderClick()}>
-						<Text className="font-bold">{this.gridTitle}</Text>
+						<Text className="font-bold">{this.title}</Text>
 					</FlexBox>
 				),
 				accessor: "name",
@@ -190,16 +193,38 @@ export class GridWorkloadComponent implements OnInit {
 	ngOnInit() {
 		this.selectedMachine = "";
 		this.weekListWidth = this.getValueBasedOnWidth(window.innerWidth);
+		this.setTitle();
+	}
+
+	setTitle() {
+		const reportTypes = [
+			ReportType.WORK_LOAD,
+			ReportType.STAFF_NEEDED,
+			ReportType.STAFF_WORKLOAD,
+		];
+
+		this.title = reportTypes.includes(this.reportType as ReportType)
+			? this.gridTitle.split(" ")[0]
+			: this.gridTitle;
 	}
 
 	getValueBasedOnWidth(width: number): number {
+		const reportTypes = [
+			ReportType.WORK_LOAD,
+			ReportType.STAFF_NEEDED,
+			ReportType.STAFF_WORKLOAD,
+		];
+
+		const subtractValue = reportTypes.includes(this.reportType as ReportType) ? 4 : 0;
+
 		if (width >= 2560) {
-			return 158;
+			return 158 - subtractValue;
 		} else if (width >= 1920) {
-			return 104;
+			return 104 - subtractValue;
 		} else if (width >= 1536) {
 			return 71;
 		}
+
 		return 50; // Default value if the width is smaller than 1536
 	}
 
@@ -218,6 +243,15 @@ export class GridWorkloadComponent implements OnInit {
 	}
 
 	handleFirstColumnClick(filterKey: string, index: number) {
+		const bullterColumnChartData = this.planVisuService.generateCombineBulletChartData(
+			this.demandsData || [],
+			this.capacityData || [],
+			this.selectedMachine,
+			this.weeksList
+		);
+
+		this.planVisuService.updateCombineBulletChartData(bullterColumnChartData);
+
 		let data = this.prepareGridData();
 		this.gridData = data;
 
@@ -405,6 +439,10 @@ export class GridWorkloadComponent implements OnInit {
 		let data = this.prepareGridData();
 		this.gridData = data;
 		this.totalMachineEvent.emit(this.gridData?.length);
+		this.staffWorkloadEvent.emit({
+			counter: this.gridData?.length ?? 0,
+			type: this.reportType as string,
+		});
 		this.initializeColumns();
 	}
 

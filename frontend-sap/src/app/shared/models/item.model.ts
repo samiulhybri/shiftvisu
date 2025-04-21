@@ -43,6 +43,7 @@ export class Item implements Deserializable {
 	total_weight?: string = '';
 	is_production_item?: boolean = false;
 	is_purchased_item?: boolean = false;
+	repair_req_percentage: string = '';
 	name3?: string = '';
 	name2?: string = '';
 	customers: Customer[] = [];

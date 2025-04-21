@@ -1,5 +1,5 @@
 <ui5-busy-indicator [active]="isChatLoading">
-	<div [ngClass]="customClass? customClass : ' h-[80vh] max-h-[700px] w-[80vw] max-w-[700px] flex flex-row gap-2'">
+	<div class="h-[80vh] max-h-[700px] w-[80vw] max-w-[700px] flex flex-row gap-2">
 		<div class="bg-gray-100 rounded-lg shadow-lg flex flex-col chat-body w-full">
 			<div
 				class="px-[10px] bg-white border-t border-gray-300 rounded-t-lg h-[50px] w-[calc(100%-20px)] flex items-center justify-between">
@@ -62,11 +62,11 @@
 									class="mt-2 text-sm text-gray-800"
 									*ngIf="note.media">
 									<img
-										src="{{ note.media.original_url }}"
+										src="{{ note.media.path }}"
 										width="200px"
 										height="200px"
 										class="cursor-pointer"
-										(click)="openInNewTab(note?.media?.original_url)" />
+										(click)="openInNewTab(note?.media?.path)" />
 								</p>
 								@if (note?.id) {
 									<ui5-button
@@ -87,23 +87,23 @@
 				</div>
 			</div>
 
-			<div
-				*ngIf="previewImagesData.length"
-				class="image-preview-container">
-				<div
-					class="preview-wrapper"
-					*ngFor="let previewImage of previewImagesData; let i = index">
-					<img
-						[src]="previewImage"
-						alt="Pasted Image"
-						class="preview-image" />
-					<ui5-button
-						icon="delete"
-						class="remove-button"
-						design="Default"
-						tooltip="Remove Image"
-						i18n-tooltip
-						(click)="removeImagePreview(i)"></ui5-button>
+			<div *ngIf="previewImagesData.length">
+				<div class="image-preview-container">
+					<div
+						class="preview-wrapper"
+						*ngFor="let previewImage of previewImagesData; let i = index">
+						<img
+							[src]="previewImage"
+							alt="Pasted Image"
+							class="preview-image" />
+						<ui5-button
+							icon="delete"
+							class="remove-button"
+							design="Default"
+							tooltip="Remove Image"
+							i18n-tooltip
+							(click)="removeImagePreview(i)"></ui5-button>
+					</div>
 				</div>
 			</div>
 			<!-- Input Area -->

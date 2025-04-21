@@ -5,7 +5,6 @@ import {
 	EventEmitter,
 	Input,
 	OnChanges,
-	OnInit,
 	Output,
 	SimpleChanges,
 	ViewChild,
@@ -13,7 +12,6 @@ import {
 import { Message } from "@app/shared/models/message.model";
 import { AuthService } from "@app/shared/services/auth.service";
 import { CommonService } from "@app/shared/services/common.service";
-import { Customer } from "@app/shared/models/customer.model";
 import { Chat } from "@app/shared/models/chat.model";
 import { Localization } from "@app/shared/utils/common-localize";
 
@@ -23,17 +21,15 @@ import { Localization } from "@app/shared/utils/common-localize";
 	styleUrl: "./chat.component.css",
 })
 export class ChatComponent implements AfterViewInit, OnChanges {
-	@ViewChild("messageContainer") private messageContainer!: ElementRef;
+	@ViewChild("messageContainerRef") private messageContainer!: ElementRef;
 	@ViewChild("messageTextarea", { static: false }) messageTextareaRef!: ElementRef;
 
 	@Input({ required: true }) public modelId: number = 0;
 	@Input({ required: true }) public modelName: string = "";
 	@Input({ required: true }) public chat: any;
-	@Input()  customClass:  any = "";
 
 	@Output() closeDialog = new EventEmitter<any>();
 	@Output() refreshGridTable = new EventEmitter<any>();
-	
 
 	private userNearBottom: boolean = true;
 	groupedNotes: NoteGroup[] = [];
@@ -67,7 +63,7 @@ export class ChatComponent implements AfterViewInit, OnChanges {
 	) {}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if (changes["modelId"] && changes["chat"]) {
+		if (changes["modelId"]?.currentValue && changes["chat"]) {
 			this.isChatLoading = true;
 			this.commonService.get("get-customer-data/" + this.chat.id, false).subscribe({
 				next: (response: any) => {
@@ -243,14 +239,12 @@ export class ChatComponent implements AfterViewInit, OnChanges {
 
 	// Function to scroll to the bottom
 	scrollToBottom(): void {
-		try {
+		setTimeout(() => {
 			if (this.messageContainer) {
 				this.messageContainer.nativeElement.scrollTop =
 					this.messageContainer.nativeElement.scrollHeight;
 			}
-		} catch (err) {
-			console.error("Error while scrolling:", err);
-		}
+		}, 0);
 	}
 
 	addNote() {

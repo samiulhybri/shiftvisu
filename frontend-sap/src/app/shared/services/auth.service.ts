@@ -9,10 +9,11 @@ import { User } from '@app/shared/models/user.model';
 export class AuthService {
   private token?:string|null;
   private isAlreadyLoggedIn?:boolean = false;
+  public hasQualifiedUsers: boolean = false;
+  public totalClockedInUsers: number = 0;
   public loggedInUser: User = new User();
 
   constructor(private http: HttpClient,) { }
-
 
   login(userName:string, password:string) {
     const user = {
@@ -191,6 +192,11 @@ export class AuthService {
     }
 
     return false;
+  }
+
+  isQualified(): boolean {
+    if (this.hasQualifiedUsers && this.totalClockedInUsers) return true;
+    else return false;
   }
 
   public getAllMachines(machineId:any): Promise<any> {

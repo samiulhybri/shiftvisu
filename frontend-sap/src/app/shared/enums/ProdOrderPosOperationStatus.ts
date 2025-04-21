@@ -9,8 +9,11 @@ export enum ProdOrderPosOperationStatus {
 	IN_SETUP = "IN_SETUP",
     IN_TEARDOWN  = "IN_TEARDOWN",
 	IN_PRODUCTION = "IN_PRODUCTION",
+	RELEASED = "RELEASED",
+	RESTRICTRED = "RESTRICTRED",
 	CLOSED = "CLOSED",
 	DELETED = "DELETED",
+	CANCELLED = "CANCELLED",
 }
 
 export class ProdOrderPosOperationStatusClass {
@@ -38,11 +41,16 @@ export class ProdOrderPosOperationStatusClass {
 				return $localize`Teardown`;
 			case ProdOrderPosOperationStatus.IN_PRODUCTION:
 				return $localize`In Production`;
+			case ProdOrderPosOperationStatus.RELEASED:
+				return $localize`Released`;
+			case ProdOrderPosOperationStatus.RESTRICTRED:
+				return $localize`Restricted`;
 			case ProdOrderPosOperationStatus.CLOSED:
 				return $localize`Closed`;
 			case ProdOrderPosOperationStatus.DELETED:
 				return $localize`Deleted`;
-
+			case ProdOrderPosOperationStatus.CANCELLED:
+					return $localize`Cancelled`;
 			default:
 				return "";
 		}
@@ -68,10 +76,16 @@ export class ProdOrderPosOperationStatusClass {
 				return ProdOrderPosOperationStatus.IN_SETUP;
 			case $localize`In Production`:
 				return ProdOrderPosOperationStatus.IN_PRODUCTION;
+			case $localize`Released`:
+				return ProdOrderPosOperationStatus.RELEASED;
+			case $localize`Restricted`:
+				return ProdOrderPosOperationStatus.RESTRICTRED;
 			case $localize`Closed`:
 				return ProdOrderPosOperationStatus.CLOSED;
 			case $localize`Deleted`:
 				return ProdOrderPosOperationStatus.DELETED;
+			case $localize`Cancelled`:
+				return ProdOrderPosOperationStatus.CANCELLED;
 			default:
 				return "";
 		}

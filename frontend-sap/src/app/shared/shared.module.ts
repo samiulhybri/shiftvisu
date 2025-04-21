@@ -38,6 +38,7 @@ import { SidebarComponent } from "@app/shared/components/sidebar/sidebar.compone
 import { CrmActionGridComponent } from "./charts/crm-action-grid/crm-action-grid.component";
 import { VerticalBarChartComponent } from "./charts/vertical-bar-chart/vertical-bar-chart.component";
 import { ChatComponent } from "@app/shared/components/chat/chat.component";
+import { CombinedBulletColumnLineChartComponent } from "./charts/combined-bullet-column-line-chart/combined-bullet-column-line-chart.component";
 
 @NgModule({
 	imports: [
@@ -89,6 +90,7 @@ import { ChatComponent } from "@app/shared/components/chat/chat.component";
 		CrmActionGridComponent,
 		VerticalBarChartComponent,
 		ChatComponent,
+		CombinedBulletColumnLineChartComponent,
 	],
 	declarations: [
 		DialogComponent,
@@ -117,6 +119,7 @@ import { ChatComponent } from "@app/shared/components/chat/chat.component";
 		CrmActionGridComponent,
 		VerticalBarChartComponent,
 		ChatComponent,
+		CombinedBulletColumnLineChartComponent,
 	],
 	providers: [DateFormatPipe, DatePipe],
 })

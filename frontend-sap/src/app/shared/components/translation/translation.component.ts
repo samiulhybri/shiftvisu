@@ -79,6 +79,7 @@ export class TranslationComponent {
 	}
 
 	onMenuItemSelect(event: any): void {
+		this.url = window.location.href;
 		this.selectedLanguageName = event.detail.item.getAttribute("text");
 		const selectedLanguage = this.selectedLanguage.find(
 			(lang: any) => lang.name === this.selectedLanguageName

@@ -6,7 +6,7 @@ import { Contact } from "@app/shared/models/contact.model";
 export class CustomerCrmActionLog implements Deserializable {
     id?: number;
     crm_action_id ?: number;
-    log_date ?: Date = new Date();
+    log_date ?: Date | string = new Date();
     user_id ?: number;
     customer_id ?: number;
     note?: string = "";
@@ -17,6 +17,18 @@ export class CustomerCrmActionLog implements Deserializable {
     user?: User = new User().deserialize({});
 
     constructor() {}
+     convertToUTC(dateStr: any): any {
+        // Extract date and time parts
+        const [datePart, timePart] = dateStr.split(', ');
+        const [day, month, year] = datePart.split('.').map(Number);
+        const [hour, minute] = timePart.split(':').map(Number);
+      
+        // Create a Date object in local time
+        const localDate = new Date(year, month - 1, day, hour, minute);
+      
+        // Convert to UTC and return ISO format
+        return localDate.toISOString();
+      }
 
     deserialize(input: any): this {
         Object.assign(this, input);
@@ -29,6 +41,7 @@ export class CustomerCrmActionLog implements Deserializable {
     toOdata(): Object {
         return {
             ...this,
+            log_date: this.convertToUTC(this.log_date),
             crm_action_id: this.crmAction?.id,
             contact_id: this.contact?.id,
             contact:undefined,

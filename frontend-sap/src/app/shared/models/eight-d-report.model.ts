@@ -10,7 +10,7 @@ export interface EightDReport {
     description?: string,
     supplier?: Suppliers,
     supplier_id?: number | null;
-    complaint_opening_date?: Date | string | null,
+    complaint_opening_date?:  string | null,
     revision?: number,
     revision_date?: Date | string | null,
     production_site?: string,

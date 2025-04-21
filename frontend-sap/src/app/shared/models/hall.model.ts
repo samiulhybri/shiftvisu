@@ -360,7 +360,7 @@ export class Hall implements Deserializable {
 			prodOrderOperation.plan_start = lastTime;
 			prodOrderOperation.start = lastTime;
 			prodOrderOperation.plan_end = moment(lastTime)
-				.add((prodOrderOperation.te!*prodOrderOperation.prodOrderPos?.quantity!), "seconds")
+				.add(prodOrderOperation.te! * prodOrderOperation.prodOrderPos?.quantity!, "seconds")
 				.format("YYYY-MM-DD HH:mm:ss");
 			prodOrderOperation.end = prodOrderOperation.plan_end;
 			lastTime = prodOrderOperation.plan_end!;

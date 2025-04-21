@@ -1,239 +1,258 @@
-import { Injectable } from "@angular/core";
+import {Injectable} from "@angular/core";
 import {
-	HttpClient,
-	HttpErrorResponse,
-	HttpEvent,
-	HttpHandler,
-	HttpInterceptor,
-	HttpRequest,
+    HttpClient,
+    HttpErrorResponse,
+    HttpEvent,
+    HttpHandler,
+    HttpInterceptor,
+    HttpRequest,
 } from "@angular/common/http";
-import { environment } from "@app/environments/environment";
-import { Observable, lastValueFrom, throwError } from "rxjs";
-import { map } from "rxjs/operators";
-import { catchError } from "rxjs/operators";
-import { ActivatedRoute, Router } from "@angular/router";
-import { LogicalOperator } from "@app/shared/enums/LogicalOperator";
-import { Localization } from "@app/shared/utils/common-localize";
+import {environment} from "@app/environments/environment";
+import {Observable, lastValueFrom, throwError} from "rxjs";
+import {catchError, map} from "rxjs/operators";
+import {ActivatedRoute, Router} from "@angular/router";
+import {LogicalOperator} from "@app/shared/enums/LogicalOperator";
+import {Localization} from "@app/shared/utils/common-localize";
+import {isNaN} from "@amcharts/amcharts5/.internal/core/util/Type";
 
 @Injectable({
-	providedIn: "root",
+    providedIn: "root",
 })
 export class CommonService implements HttpInterceptor {
-	private apiUrl = environment.apiURL;
-	private apiPrefixForRest = environment.apiPrefixForRest;
-	private lodataPrefix: string = environment.apiURL;
-	private apiPrefix: string = environment.apiPrefixForRest;
-
-	constructor(
-		private http: HttpClient,
-		private router: Router,
-		private activatedRoute: ActivatedRoute,
-	) {}
-
-	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-		const token = localStorage.getItem("LaravelToken");
-		if (token && (req.url.includes('odata') || req.url.includes('api'))) {
-			req = req.clone({
-				setHeaders: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
-		}
-
-		return next.handle(req).pipe(
-			catchError((err: HttpErrorResponse) => {
-				if (err.status === 401) {
-					localStorage.removeItem("LaravelToken");
-					this.router.navigate(["/login"], { replaceUrl: true });
-				}
-				return throwError(() => err);
-			})
-		);
-	}
-
-	get(url: string, isLodata: boolean = true, addPrefix:boolean = true) {
-		let urlPrefix = isLodata ? this.lodataPrefix : this.apiPrefix;
-		const header:any = {
-			"Cache-Control": "no-cache",
-		};
-		let modifiedUrl = addPrefix ? `${urlPrefix}/${url}` : url;
-		return this.http.get(`${modifiedUrl}`, {
-			headers: header,
-		});
-	}
-
-	getAutoIncrementId(url: string, isLodata: boolean = true) {
-		let urlPrefix = isLodata ? this.lodataPrefix : this.apiPrefix;
-		return this.http.get<any>(`${urlPrefix}/${url}?$orderby=id desc&$top=1`);
-	}
-
-	put(url: string, data: any, isLodata: boolean = true) {
-		let urlPrefix = isLodata ? this.lodataPrefix : this.apiPrefix;
-		return this.http.put(`${urlPrefix}/${url}`, data);
-	}
-
-	patch(url: string, data: any, isLodata: boolean = true) {
-		let urlPrefix = isLodata ? this.lodataPrefix : this.apiPrefix;
-		return this.http.patch(`${urlPrefix}/${url}`, data);
-	}
-
-	post(url: string, data: any, isLodata: boolean = true,config: any=undefined) {
-		let urlPrefix = isLodata ? this.lodataPrefix : this.apiPrefix;
-		return this.http.post(`${urlPrefix}/${url}`, data, config);
-	}
-
-	getFile(url: string, isLodata: boolean = true) {
-		let urlPrefix = isLodata ? this.lodataPrefix : this.apiPrefix;
-		return this.http
-			.get(`${urlPrefix}/${url}`, { responseType: 'arraybuffer' });
-	}
-
-	postFile(url: string, data: any, isLodata: boolean = true) {
-		let urlPrefix = isLodata ? this.lodataPrefix : this.apiPrefix;
-		return this.http.post(`${urlPrefix}/${url}`, data, { responseType: "arraybuffer" });
-	}
-
-	delete(url: string, isLodata: boolean = true) {
-		let urlPrefix = isLodata ? this.lodataPrefix : this.apiPrefix;
-		return this.http.delete(`${urlPrefix}/${url}`);
-	}
-
-	generateCustomQueryForMultipleEntry(queryString: string, propery: string) {
-		let ids = queryString.split(",").map(String);
-		ids = ids.filter(id => id !== "");
-		return ids.map((id: string) => `${propery} eq ${id}`).join(" or ");
-	}
-
-	getValidIdsFromQueryParams(queryString: string) {
-		return queryString.split(",").map(Number).filter(el=> !isNaN(el));
-	}
-
-	// Function to add or update query parameters
-	updateQueryParams(params: { [key: string]: any }) {
-		const currentParams = this.activatedRoute.snapshot.queryParams;
-		const newParams = { ...currentParams, ...params };
-		for (const key in newParams) {
-			if (newParams[key] === '' || newParams[key] === null || newParams[key] === undefined) {
-			  	delete newParams[key];
-			}
-		}
-		this.router.navigate([], {
-			relativeTo: this.activatedRoute,
-			queryParams: newParams
-		});
-	}
-
-	getEntity(entity: string) {
-		return lastValueFrom(this.getGeneratedId(entity)).catch(() => {
-			return false;
-		});
-	}
-
-	getGeneratedId(entity: string) {
-		return this.http.get(`${this.apiPrefix}/generateId?entity=${entity}`).pipe(
-			map((res: any) => {
-				return res.entity;
-			})
-		);
-	}
-
-	getImageUrlForExternalImage(itemCustomId: string) {
-		return `${environment.apiPrefixForRest}/import-image-from-btp/${itemCustomId}`;
+    get apiPrefix(): string {
+        return this._apiPrefix;
     }
 
-	paginateCustomTableData(
-		top: number,
-		skip: number,
-		sortBy: string = "id",
-		sortType: string = "asc",
-		fieldName: string,
-		searchText: string,
-		url: string,
-		expandQuery?: string,
-		filterOperator: string = "Contain",
-		isCustomQuery: boolean = false,
-		useOdataStyles = true,
-		filterQuery:string="",
-		showCount: boolean = false,
-	): Observable<any> {
-		url = (isCustomQuery ? this.apiPrefixForRest : this.apiUrl) + url;
-		const containsQuery = url.includes("?");
+    private apiUrl = environment.apiURL;
+    private apiPrefixForRest = environment.apiPrefixForRest;
+    private lodataPrefix: string = environment.apiURL;
+    private _apiPrefix: string = environment.apiPrefixForRest;
 
-		// Check for search text
-		if (
-			searchText != null &&
-			searchText != undefined &&
-			searchText != "" &&
-			(!isCustomQuery || url.includes("api/users"))
-		) {
-			switch (filterOperator) {
-				case LogicalOperator.CONTAINS:
-					url += `${containsQuery ? "&" : "?"}$filter=${
-						LogicalOperator.CONTAINS
-					}(${fieldName},'${searchText}')`;
-					break;
-				case LogicalOperator.EQ:
-					url += `${containsQuery ? "&" : "?"}$filter=${fieldName} ${
-						LogicalOperator.EQ
-					} ${searchText}`;
-					break;
-				case LogicalOperator.NE:
-					url += `${containsQuery ? "&" : "?"}$filter=${fieldName} ${
-						LogicalOperator.NE
-					} ${searchText}`;
-					break;
-			}
-		}
+    constructor(
+        private http: HttpClient,
+        private router: Router,
+        private activatedRoute: ActivatedRoute,
+    ) {
+    }
 
-		if(filterQuery) {
-			url+=`${searchText?' and':'?$filter='} ${filterQuery}`
-		}
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        const token = localStorage.getItem("LaravelToken");
+        if (token && (req.url.includes('odata') || req.url.includes('api'))) {
+            req = req.clone({
+                setHeaders: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        }
 
-		// Check for sort by
-		if (sortBy && !isCustomQuery && useOdataStyles) {
-			let sort = sortBy.split(".").join("/");
-			url += searchText || containsQuery ||filterQuery ? "&" : "?";
-			url += `$orderby=${sort} ${sortType || "asc"}`;
-		}
+        return next.handle(req).pipe(
+            catchError((err: HttpErrorResponse) => {
+                if (err.status === 401) {
+                    localStorage.removeItem("LaravelToken");
+                    this.router.navigate(["/login"], {replaceUrl: true});
+                }
+                return throwError(() => err);
+            })
+        );
+    }
 
-		// Check for top
-		if (top > -1 && useOdataStyles) {
-			url += searchText || sortBy || containsQuery ||filterQuery ? "&" : "?";
-			url += `$top=${top}&$skip=${skip}`;
-		}
+    get(url: string, isLodata: boolean = true, addPrefix: boolean = true) {
+        let urlPrefix = isLodata ? this.lodataPrefix : this._apiPrefix;
+        const header: any = {
+            "Cache-Control": "no-cache",
+        };
+        let modifiedUrl = addPrefix ? `${urlPrefix}/${url}` : url;
+        return this.http.get(`${modifiedUrl}`, {
+            headers: header,
+        });
+    }
 
-		if (expandQuery && useOdataStyles) {
-			url += `& ${expandQuery}`;
-		}
+    getOption(url: string, isLodata: boolean = true, addPrefix: boolean = true) {
+        let urlPrefix = isLodata ? this.lodataPrefix : this._apiPrefix;
+        let modifiedUrl = addPrefix ? `${urlPrefix}/${url}` : url;
+        return this.http.get(`${modifiedUrl}`, { responseType: 'blob', headers: {"Cache-Control": "no-cache"} });
+    }
 
-		// Check for count
-		if (showCount && useOdataStyles){
-			url += `&$count=true`;
-		}
-		return this.http.get<any>(url);
-	}
+    getAutoIncrementId(url: string, isLodata: boolean = true) {
+        let urlPrefix = isLodata ? this.lodataPrefix : this._apiPrefix;
+        return this.http.get<any>(`${urlPrefix}/${url}?$orderby=id desc&$top=1`);
+    }
 
-	openNewTab(url: string) {
-		window.open(url, '_blank');
-	}
+    put(url: string, data: any, isLodata: boolean = true) {
+        let urlPrefix = isLodata ? this.lodataPrefix : this._apiPrefix;
+        return this.http.put(`${urlPrefix}/${url}`, data);
+    }
 
-	customIdValidation(generatedId: string, userGivenId: string) {
-		const customId = userGivenId;
-		const customIdParts = generatedId?.split("-") || [];
-		const prefix = customIdParts[0] || "";
-		let result = {
-			success: true,
-			msg: ''
-		}
-		switch (true) {
-			case !customId:
-				result.success = false;
-				result.msg = Localization.idIsRequired;
-				break;
-			case !customId?.startsWith(prefix):
-				result.success = true;
-				break;
-		}
-		return result;
-	}
+    patch(url: string, data: any, isLodata: boolean = true) {
+        let urlPrefix = isLodata ? this.lodataPrefix : this._apiPrefix;
+        return this.http.patch(`${urlPrefix}/${url}`, data);
+    }
+
+    post(url: string, data: any, isLodata: boolean = true, config: any = undefined) {
+        let urlPrefix = isLodata ? this.lodataPrefix : this._apiPrefix;
+        return this.http.post(`${urlPrefix}/${url}`, data, config);
+    }
+
+    getFile(url: string, isLodata: boolean = true) {
+        let urlPrefix = isLodata ? this.lodataPrefix : this._apiPrefix;
+        return this.http
+            .get(`${urlPrefix}/${url}`, {responseType: 'arraybuffer'});
+    }
+
+    postFile(url: string, data: any, isLodata: boolean = true) {
+        let urlPrefix = isLodata ? this.lodataPrefix : this._apiPrefix;
+        return this.http.post(`${urlPrefix}/${url}`, data, {responseType: "arraybuffer"});
+    }
+
+    delete(url: string, isLodata: boolean = true) {
+        let urlPrefix = isLodata ? this.lodataPrefix : this._apiPrefix;
+        return this.http.delete(`${urlPrefix}/${url}`);
+    }
+
+    generateCustomQueryForMultipleEntry(queryString: string, propery: string) {
+        let ids = queryString.split(",").map(String);
+        ids = ids.filter(id => id !== "");
+        return ids.map((id: string) => `${propery} eq ${id}`).join(" or ");
+    }
+
+    getValidIdsFromQueryParams(queryString: string) {
+        return queryString.split(",").map(Number).filter(el => !isNaN(el));
+    }
+
+    // Function to add or update query parameters
+    updateQueryParams(params: { [key: string]: any }) {
+        const currentParams = this.activatedRoute.snapshot.queryParams;
+        const newParams = {...currentParams, ...params};
+        for (const key in newParams) {
+            if (newParams[key] === '' || newParams[key] === null || newParams[key] === undefined) {
+                delete newParams[key];
+            }
+        }
+        this.router.navigate([], {
+            relativeTo: this.activatedRoute,
+            queryParams: newParams
+        });
+    }
+
+    getEntity(entity: string) {
+        return lastValueFrom(this.getGeneratedId(entity)).catch(() => {
+            return false;
+        });
+    }
+
+    getGeneratedId(entity: string) {
+        return this.http.get(`${this._apiPrefix}/generateId?entity=${entity}`).pipe(
+            map((res: any) => {
+                return res.entity;
+            })
+        );
+    }
+
+    paginateCustomTableData(
+        top: number,
+        skip: number,
+        sortBy: string = "id",
+        sortType: string = "asc",
+        fieldName: string,
+        searchText: string,
+        url: string,
+        expandQuery?: string,
+        filterOperator: string = "Contain",
+        isCustomQuery: boolean = false,
+        useOdataStyles = true,
+        filterQuery: string = "",
+        showCount: boolean = false,
+    ): Observable<any> {
+        url = (isCustomQuery ? this.apiPrefixForRest : this.apiUrl) + url;
+        const containsQuery = url.includes("?");
+
+        // Check for search text
+        if (
+            searchText != null &&
+            searchText != undefined &&
+            searchText != "" &&
+            (!isCustomQuery || url.includes("api/users"))
+        ) {
+            switch (filterOperator) {
+                case LogicalOperator.CONTAINS:
+                    url += `${containsQuery ? "&" : "?"}$filter=${
+                        LogicalOperator.CONTAINS
+                    }(${fieldName},'${searchText}')`;
+                    break;
+                case LogicalOperator.EQ:
+                    url += `${containsQuery ? "&" : "?"}$filter=${fieldName} ${
+                        LogicalOperator.EQ
+                    } ${searchText}`;
+                    break;
+                case LogicalOperator.NE:
+                    url += `${containsQuery ? "&" : "?"}$filter=${fieldName} ${
+                        LogicalOperator.NE
+                    } ${searchText}`;
+                    break;
+            }
+        }
+
+        if (filterQuery) {
+            url += `${searchText ? ' and' : '?$filter='} ${filterQuery}`
+        }
+
+        // Check for sort by
+        if (sortBy && !isCustomQuery && useOdataStyles) {
+            let sort = sortBy.split(".").join("/");
+            url += searchText || containsQuery || filterQuery ? "&" : "?";
+            url += `$orderby=${sort} ${sortType || "asc"}`;
+        }
+
+        // Check for top
+        if (top > -1 && useOdataStyles) {
+            url += searchText || sortBy || containsQuery || filterQuery ? "&" : "?";
+            url += `$top=${top}&$skip=${skip}`;
+        }
+
+        if (expandQuery && useOdataStyles) {
+            url += `& ${expandQuery}`;
+        }
+
+        // Check for count
+        if (showCount && useOdataStyles) {
+            url += `&$count=true`;
+        }
+        return this.http.get<any>(url);
+    }
+
+    openNewTab(url: string) {
+        window.open(url, '_blank');
+    }
+
+    customIdValidation(generatedId: string, userGivenId: string) {
+        const customId = userGivenId;
+        const customIdParts = generatedId?.split("-") || [];
+        const prefix = customIdParts[0] || "";
+        let result = {
+            success: true,
+            msg: ''
+        }
+        switch (true) {
+            case !customId:
+                result.success = false;
+                result.msg = Localization.idIsRequired;
+                break;
+            case !customId?.startsWith(prefix):
+                result.success = true;
+                break;
+        }
+        return result;
+    }
+
+    getDataFromV10(url: string) {
+        const token = localStorage.getItem("token") ?? "";
+        const header: any = {
+            "Cache-Control": "no-cache",
+            "Authorization": `Bearer ${token}`
+        };
+        let modifiedUrl: string = environment.homeLink + url;
+        return this.http.get(`${modifiedUrl}`, {
+            headers: header,
+        });
+    }
 }

@@ -10,6 +10,8 @@ export class ColorSchemeSorting implements Deserializable {
 	value_string?: string = "";
 	color?: string = "";
 	colorScheme?: ColorScheme;
+	has_border: boolean = false;
+	border_color: string = 'none';
 
 	constructor() {}
 
