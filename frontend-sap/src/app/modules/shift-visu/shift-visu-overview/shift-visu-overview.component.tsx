@@ -334,17 +334,17 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 
 	issues = [
 		{
-			label: "Issues Solve",
+			label: "Production",
 			percentage: 70,
 			bgcolor: "bg-green-600",
 			textcolor: "text-green-600",
 		},
 		{
-			label: "Issues Open",
+			label: "Setup",
 			percentage: 19,
 			bgcolor: "bg-orange-500",
 			textcolor: "text-orange-500",
 		},
-		{ label: "Issues Close", percentage: 11, bgcolor: "bg-red-500", textcolor: "text-red-500" },
+		{ label: "Machine Off", percentage: 11, bgcolor: "bg-red-500", textcolor: "text-red-500" },
 	];
 }
