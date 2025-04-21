@@ -102,8 +102,8 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		});
 
 		series.data.setAll([
-			{ value: 22, category: "Total", color: am5.color(0xff0000) },
-			{ value: 12, category: "Urgent", color: am5.color(0x0000ff) },
+			{ value: 22, category: "Urgent", color: am5.color(0xff0000) },
+			{ value: 12, category: "Total", color: am5.color(0x0000ff) },
 			{ value: 20, category: "Not Urgent", color: am5.color(0x07b00d) },
 		]);
 
