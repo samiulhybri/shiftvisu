@@ -36,6 +36,13 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			id: 12,
 			error: "new error",
 			creator: "shihab",
+			status: "Negative",
+		},
+		{
+			id: 13,
+			error: "new error",
+			creator: "shihab",
+			status: "Positive",
 		},
 	];
 

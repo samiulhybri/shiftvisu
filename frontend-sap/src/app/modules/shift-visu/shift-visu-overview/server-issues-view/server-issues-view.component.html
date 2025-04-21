@@ -142,7 +142,8 @@
 			</div>
 		</ui5-tab>
 
-		<ui5-tab #emergency [selected]="TabType == 'emergency'" i18n-text design="Default" text="Emergency Measures" class="h-[calc(100vh-250px)]">
+		<ui5-tab #emergency [selected]="TabType == 'emergency'" i18n-text design="Default" text="Emergency Measures"
+			class="h-[calc(100vh-250px)]">
 			<div class="grid grid-cols-3 gap-2 items-center w-full">
 				<div class="flex-col flex">
 					<ui5-label showColon i18n required>Department</ui5-label>
@@ -224,7 +225,8 @@
 				</div>
 			</div>
 		</ui5-tab>
-		<ui5-tab #corrective [selected]="TabType == 'corrective'" class="h-[calc(100vh-250px)]" text="Corrective  Measures">
+		<ui5-tab #corrective [selected]="TabType == 'corrective'" class="h-[calc(100vh-250px)]"
+			text="Corrective  Measures">
 			<div class="w-[98%] rounded-lg shadow-lg overflow-hidden h-[98%] m-auto">
 				<app-grid-table [headerTitle]="'Corrective Measures'" [url]="'s'" [columns]="columns"
 					[showAction]="false" [customData]="true" [showSearch]="false" [showActiveButton]="false"
@@ -235,7 +237,7 @@
 			</div>
 		</ui5-tab>
 
-		<ui5-tab #details  class="h-[calc(100vh-250px)]" [selected]="TabType == 'details'" text="Details">
+		<ui5-tab #details class="h-[calc(100vh-250px)]" [selected]="TabType == 'details'" text="Details">
 			<section class="grid h-full gap-2 grid-rows-[1fr_100px_1fr_1fr]">
 				<div>
 					<div class="flex flex-col">
@@ -306,7 +308,8 @@
 				</div>
 			</section>
 		</ui5-tab>
-		<ui5-tab #attachment [selected]="TabType == 'attachment'" class="h-[calc(100vh-250px)]" text="Attachments">
+		<ui5-tab #attachment [selected]="TabType == 'attachment'" class="h-[calc(100vh-250px)]"
+			[text]="'Attachment (' + 3 + ')'">
 			<section class="h-full w-[99%] m-auto">
 				<ui5-card class="-m-1 h-full">
 					<ui5-bar design="Header">
@@ -325,7 +328,7 @@
 					</ui5-bar>
 
 					<ui5-list class="h-full">
-						<ui5-li-custom class="mt-2 h-[90px]">
+						<ui5-li-custom class="mt-2 attachment-list h-[90px]">
 							<div class="flex items-center justify-between w-full">
 								<div class="flex items-center gap-4">
 									<div class="w-[70px]">
@@ -341,6 +344,11 @@
 										<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
 									</div>
 								</div>
+
+								<div class="flex items-center gap-2">
+									<ui5-button design="Transparent" class="text-3xl hidden attachment-close-btn"
+										icon="download" i18n></ui5-button>
+								</div>
 							</div>
 						</ui5-li-custom>
 
@@ -348,7 +356,7 @@
 							<div class="flex items-center justify-between w-full">
 								<div class="flex items-center gap-4">
 									<div class="w-[70px]">
-										<!-- detectImageExtension -->
+
 										<ui5-icon *ngIf="imageType(imgname) === 'document'" design="Neutral"
 											class="h-full w-full" [name]="
 												imageExtension(imgname) === 'pdf'
@@ -397,9 +405,11 @@
 			</section>
 		</ui5-tab>
 
-		<ui5-tab  #chat class="h-[calc(100vh-250px)]" [selected]="TabType == 'chat'">
+		<ui5-tab #chat class="h-[calc(100vh-250px)]" [selected]="TabType == 'chat'">
 			<section class="w-full h-ful text-center">
-				<app-chat  [customClass]="'h-[calc(100vh-260px)]  w-[80vw] max-w-[100%] flex flex-row gap-2'" #chatcontent class="chat-data" [modelId]="23" [modelName]="'EightDReports'" [chat]="">
+				<app-chat [customClass]="
+						'h-[calc(100vh-260px)]  w-[85vw] max-w-[100%] flex flex-row gap-2'
+					" #chatcontent class="chat-data" [modelId]="2" [modelName]="'EightDReports'" [chat]="">
 				</app-chat>
 			</section>
 		</ui5-tab>

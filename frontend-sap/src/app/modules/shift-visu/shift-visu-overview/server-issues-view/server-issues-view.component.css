@@ -27,3 +27,8 @@ ui5-dialog::part(content) {
 	max-width: 100% !important;
 	
   }
+
+
+  .attachment-list:hover .attachment-close-btn{
+	display: block !important;
+  }
