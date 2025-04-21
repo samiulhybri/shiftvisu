@@ -1,29 +1,39 @@
 <div class="toolsDiv">
 	<app-grid-table
 		headerTitle="Inspection Points"
-		url="/InspectionPoints"
+		[customUrl]="inspectionPointCustomUrl"
+		[isCustomApiCall]="true"
 		i18n-headerTitle
 		[columns]="columns"
 		[showAction]="false"
 		[showSearch]="true"
 		[showDownload]="false"
+		[useOdataStyles]="false"
 		button1Text="All"
 		button2Text="Inactive"
 		button3Text="Active"
 		addButtonText="New"
+		[isMultiSelectOneActive]="true"
+		multiSelectOneLabelText="User Groups"
+		[multiSelectOneData]="userGroupFilterItems"
+		i18n-multiSelectOneLabelText
 		i18n-addButtonText
 		i18n-button1Text
 		i18n-button2Text
 		i18n-button3Text
 		[showNewButton]="false"
-		[limit]="200"
-		[enableServerSideFiltering]="false"
+		[enableServerSideFiltering]="true"
+		[isServerSideSorting]="false"
+		keyForCacheCustomDataTableColumns="inspectionPointQualivisuModule"
+		(processData)="processData($event[0], $event[1])"
 		[editPermission]="authService.isPermissionValid('QUALIVISU_INSPECTION_POINT_EDIT')"
+		(multiSelectOneSelectionChanged)="multiSelectOneSelectionChange($event)"
+		(onSearchForCustomAPI)="onSearchForCustomAPI($event)"
+		(onLoadMoreForCustomAPI)="onLoadMoreForCustomAPI()"
+		[segmentButtonItems]="segmentButtonItems"
+		(segmentButtonChange)="segmentButtonChange($event)"
 		[isBaseVisu]="false"
-		filterQuery="date_completed eq null"
-		expandQuery="$expand=machine,prodOrderPosOperation($expand=prodOrderPos($expand=prodOrder($select=custom_id),item($select=id,name,custom_id);$select=id);$select=id,name,pos)"
 		selectionMode="None"
-		sortBy="date_opened"
 		#childComponentRef>
 	</app-grid-table>
 </div>

@@ -28,7 +28,7 @@
 		[enableServerSideFiltering]="true"
 		[showSearch]="true"
 		sortBy="custom_id"
-		selectionMode="Single"		
+		selectionMode="Single"
 		#childComponentRef>
 	</app-grid-table>
 
@@ -79,7 +79,7 @@
 		</div>
 	</ui5-dialog>
 </div>
-<ui5-dialog 
+<ui5-dialog
     class="w-[1632px]"
 	id="machineDialog"
 	[open]="isDialogOpen"
@@ -96,7 +96,7 @@
 		</div>
 		<div class="flex justify-start">
 			<ui5-tabcontainer
-				class="ml-[-46px]"
+				[ngStyle]="{ 'margin-left': getTabContainerMargin() }"
 				(tab-select)="tabNavChanged($event)"
 				fixed
 				collapsed>
@@ -127,12 +127,12 @@
 			</ui5-tabcontainer>
 		</div>
 	</div>
-	<div class="2xl:h-[710px] xl:h-[510px] lg:h-[325px] h-[250px] w-full max-w-[1632px]">
+	<div class="xxl:h-[700px] 2xl:h-[620px] xl:h-[510px] lg:h-[325px] h-[250px] w-full max-w-[1632px]">
 		<div [ngStyle]="{ display: selectedTab != 'core_data' ? 'none' : '' }">
 			<form (ngSubmit)="onSubmit(createOrUpdateForm)" *ngIf="isDialogOpen" #createOrUpdateForm="ngForm">
 				<ui5-busy-indicator [active]="isLoading" class="ml-[-10px]" size="L">
 					<div class="flex flex-col mb-3">
-						<div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 xxl:grid-cols-7 gap-2 max-h-[305px]">
+						<div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 xxl:grid-cols-7 gap-2 max-h-[305px] md:mb-2 xl:mb-2 xxl:mb-2 custom-margin">
 							<div class="flex flex-col">
 								<ui5-label show-colon>{{ localization.active }}</ui5-label>
 								<ui5-switch id="activeSwitch" name="is_active" [checked]="selectedMachine.is_active"
@@ -230,9 +230,23 @@
 									[(ngModel)]="selectedMachine.needs_operator_for_production"
 									[disabled]="shouldBeDisabled('needs_operator_for_production')"></ui5-switch>
 							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>Save Operator Id</ui5-label>
+								<ui5-switch #save_operator_id id="saveOperatorId" name="save_operator_id"
+									[checked]="selectedMachine.save_operator_id"
+									[(ngModel)]="selectedMachine.save_operator_id"
+									[disabled]="shouldBeDisabled('save_operator_id')"></ui5-switch>
+							</div>
+							<div class="flex flex-col">
+								<ui5-label show-colon i18n>QualiVisu Save Operator Id</ui5-label>
+								<ui5-switch #save_operator_id_qualivisu id="saveOperatorIdQualiVisu" name="save_operator_id_qualivisu"
+									[checked]="selectedMachine.save_operator_id_qualivisu"
+									[(ngModel)]="selectedMachine.save_operator_id_qualivisu"
+									[disabled]="shouldBeDisabled('save_operator_id_qualivisu')"></ui5-switch>
+							</div>
 						</div>
 
-						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 xxl:grid-cols-5 gap-2 mt-3 sm:mt-[6rem] md:mt-3 xl:mt-3 xxl:mt-3">
+						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 xxl:grid-cols-5 gap-2">
 							<div class="flex-column">
 								<ui5-label show-colon required>{{ localization.id }}</ui5-label>
 								<ui5-busy-indicator [active]="isLoadingCustomId" size="S">
@@ -269,7 +283,7 @@
 										</ng-container>
 									</ui5-combobox>
 								</ui5-busy-indicator>
-							</div>												
+							</div>
 							<div class="flex-column">
 								<ui5-label i18n show-colon>Hall</ui5-label>
 								<ui5-combobox #hallComboBox id="hallComboBox" class="w-100"
@@ -314,7 +328,7 @@
 									(change)="onChangePrice($event)" [disabled]="shouldBeDisabled('price')" name="price"
 									class="w-100" id="priceInput">
 								</ui5-input>
-							</div>						
+							</div>
 							<div class="flex-column">
 								<ui5-label i18n show-colon>Default Shift Model</ui5-label>
 								<ui5-combobox #shiftModelComboBox class="w-100"
@@ -347,6 +361,34 @@
 									(input)="onMachineStateDefaultOffInputChange($event)"
 									(selection-change)="onChangeMachineStateDefaultOff($event)"
 									[disabled]="shouldBeDisabled('machine_state_id_default_off')">
+									<ng-container *ngFor="let machineState of machineStates">
+										<ui5-cb-item *ngIf="machineState.is_active" id="{{ machineState.id }}"
+											[additionalText]="machineState.custom_id"
+											text="{{ machineState.name }}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Machines State Id Default Setup</ui5-label>
+								<ui5-combobox #machineStateDefaultSetupComboBox class="w-100"
+									[value]="selectedMachine.machineStateSetup?.name || ''"
+									(input)="onMachineStateDefaultSetupInputChange($event)"
+									(selection-change)="onChangeMachineStateDefaultSetup($event)"
+									[disabled]="shouldBeDisabled('machine_state_id_default_setup')">
+									<ng-container *ngFor="let machineState of machineStates">
+										<ui5-cb-item *ngIf="machineState.is_active" id="{{ machineState.id }}"
+											[additionalText]="machineState.custom_id"
+											text="{{ machineState.name }}"></ui5-cb-item>
+									</ng-container>
+								</ui5-combobox>
+							</div>
+							<div class="flex-column">
+								<ui5-label i18n show-colon>Machines State Id Default Available</ui5-label>
+								<ui5-combobox #machineStateDefaultAvailableComboBox class="w-100"
+									[value]="selectedMachine.machineStateAvailable?.name || ''"
+									(input)="onMachineStateDefaultAvailableInputChange($event)"
+									(selection-change)="onChangeMachineStateDefaultAvailable($event)"
+									[disabled]="shouldBeDisabled('machine_state_id_default_available')">
 									<ng-container *ngFor="let machineState of machineStates">
 										<ui5-cb-item *ngIf="machineState.is_active" id="{{ machineState.id }}"
 											[additionalText]="machineState.custom_id"
@@ -504,7 +546,7 @@
 										selectedLastSerialNumberProfile.includes(serialNumberProfile.id)
 									" text="{{ serialNumberProfile.custom_id }}"></ui5-mcb-item>
 								</ui5-multi-combobox>
-							</div>						
+							</div>
 							<div class="flex-column">
 								<ui5-label i18n show-colon required>Constraint Type</ui5-label>
 								<ui5-combobox #constraint_type id="constraintTypeCombobox" class="w-100"
@@ -537,6 +579,82 @@
 										text="{{ item.text }}"></ui5-cb-item>
 								</ui5-combobox>
 							</div>
+
+							<div class="flex-column">
+								<ui5-label
+									i18n
+									show-colon
+									required
+									>Machine Qualification Import Type</ui5-label
+								>
+								<ui5-combobox
+									#qualification_import_type
+									id="machineBoardStateTypeCombobox"
+									class="w-100"
+									[value]="selectedMachine.qualification_import_type"
+									[disabled]="shouldBeDisabled('qualification_import_type')"
+									(change)="
+										inputValueRestrict(
+											$event,
+											selectedMachine.qualification_import_type
+										)
+									"
+									(selection-change)="onChangeQualificationImportType($event)">
+									<ui5-cb-item
+										*ngFor="let item of machineQualificationImportTypeClass"
+										text="{{ item.text }}"></ui5-cb-item>
+								</ui5-combobox>
+							</div>
+
+							<div class="flex-column">
+								<ui5-label
+									i18n
+									show-colon
+									required
+									>Default Qualification Hours</ui5-label
+								>
+								<ui5-input
+									[(ngModel)]="selectedMachine.default_qualification_hours"
+									#defaultQualificationHoursInput="ngModel"
+									[disabled]="shouldBeDisabled('default_qualification_hours')"
+									[required]="true"
+									pattern="^\d+(\.\d+)?$"
+									[valueState]="
+										defaultQualificationHoursInput.valid == false &&
+										defaultQualificationHoursInput.touched
+											? 'Negative'
+											: 'None'
+									"
+									id="default_qualification_hours"
+									name="defaultQualificationHoursInput"
+									class="w-full">
+								</ui5-input>
+							</div>
+							
+							<div class="flex-column">
+								<ui5-label
+									i18n
+									show-colon
+									required
+									>Default Qualification Operations</ui5-label
+								>
+								<ui5-input
+									[(ngModel)]="selectedMachine.default_qualification_operations"
+									#defaultQualificationOperationsInput="ngModel"
+									[disabled]="shouldBeDisabled('default_qualification_operations')"
+									[required]="true"
+									pattern="^\d+(\.\d+)?$"
+									[valueState]="
+										defaultQualificationOperationsInput.valid == false &&
+										defaultQualificationOperationsInput.touched
+											? 'Negative'
+											: 'None'
+									"
+									id="default_qualification_operations"
+									name="defaultQualificationOperationsInput"
+									class="w-full">
+								</ui5-input>
+							</div>
 					</div>
 					</div>
 				</ui5-busy-indicator>
@@ -565,7 +683,7 @@
 			</ui5-card>
 		</div>
 		<div class="" [ngStyle]="{ display: selectedTab != 'modules' ? 'none' : '' }">
-			<div class="flex flex-row 2xl:h-[652px] lg:h-[325px] h-[250px]">
+			<div class="flex flex-row">
 				<div>
 					<ui5-label show-colon i18n>Statusboard</ui5-label>
 					<ui5-switch [checked]="showStatusBoard" id="statusBoardSwitch"

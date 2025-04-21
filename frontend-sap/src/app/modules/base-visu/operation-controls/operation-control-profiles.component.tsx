@@ -188,7 +188,7 @@ export class OperationControlProfilesComponent {
 	}
 
 	refreshEditData() {
-		const url = `OperationControlProfiles?$filter=is_active eq true and id eq ${this.selectedItem?.id}&$orderby=custom_id asc`;
+		const url = `OperationControlProfiles?$filter=id eq ${this.selectedItem?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -205,7 +205,7 @@ export class OperationControlProfilesComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedItem, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedItem.id, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

@@ -112,7 +112,6 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 	) {}
 	ngOnInit(): void {
 		this.selectedIssue.subscribe((issue: any) => {
-			this.generalComponents =
 			this.generalComponents = issue.components?.filter((component: any) => component.model_type === null) || [];
 
 			if (this.gridTable?.data?.length) {

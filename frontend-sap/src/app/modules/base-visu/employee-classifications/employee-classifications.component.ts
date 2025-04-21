@@ -136,7 +136,7 @@ export class EmployeeClassificationsComponent implements OnInit {
 	}
 
 	refreshEditData() {
-		const url = `EmployeeClassifications?$filter=is_active eq true and id eq ${this.selectedEmployeeClassifications?.id}`;
+		const url = `EmployeeClassifications?$filter=id eq ${this.selectedEmployeeClassifications?.id}`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);

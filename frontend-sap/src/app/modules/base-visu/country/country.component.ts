@@ -172,7 +172,7 @@ export class CountryComponent {
 	}
 
 	refreshEditData() {
-		const url = `Countries?$filter=is_active eq true and id eq ${this.selectedRowValue?.id}`;
+		const url = `Countries?$filter=id eq ${this.selectedRowValue?.id}`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -190,7 +190,7 @@ export class CountryComponent {
 				this.disableButtonDuringRequest = false;
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue.id, null);
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},
 			error: err => {

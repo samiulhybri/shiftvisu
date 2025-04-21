@@ -207,7 +207,7 @@ export class SalesStatusComponent implements OnInit {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedSalesStatus, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

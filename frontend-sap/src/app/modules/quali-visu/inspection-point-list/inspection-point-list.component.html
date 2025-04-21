@@ -1,95 +1,116 @@
 <div class="h-[calc(90vh-100px)] w-[calc(90vw-40px)] flex gap-[20px]">
-	<ui5-busy-indicator
-		class="h-full"
-		[active]="isNavBarLoading || inspectionPointTab?.childComponent?.isBusy">
-		<ui5-card>
-			<div class="h-[calc(90vh-120px)] p-[10px] flex !flex-col gap-[10px]">
-				<ui5-segmented-button
-					(selection-change)="updateInspectionOperationFilterType($event)">
-					<ui5-segmented-button-item
-						[id]="inspectionOperationFilterEnum.ALL"
-						i18n-tooltip
-						tooltip="All Inspections"
-						i18n
-						>All</ui5-segmented-button-item
-					>
-					<ui5-segmented-button-item
-						[id]="inspectionOperationFilterEnum.OPEN"
-						i18n-tooltip
-						tooltip="Open Inspections"
-						i18n
-						selected
-						>Open</ui5-segmented-button-item
-					>
-				</ui5-segmented-button>
-				@if (inspectionOperationList.length) {
-					<ui5-side-navigation class="rounded-lg w-[calc(20vw)]">
-						@for (inspectionOperation of inspectionOperationList; track $index) {
-							<ui5-side-navigation-item
-								[text]="inspectionOperation.name"
-								[selected]="
-									inspectionOperation.id == selectedInspectionOperation?.id
-								"
-								(ui5Click)="
-									selectInspectionOperation(inspectionOperation)
-								"></ui5-side-navigation-item>
-						}
-					</ui5-side-navigation>
-				} @else {
-					<div class="w-[256px] h-[calc(90vh-100px)] flex justify-center items-center">
-						@if (!isNavBarLoading) {
-							<div i18n>No Data</div>
-						}
-					</div>
-				}
-			</div>
-		</ui5-card>
-	</ui5-busy-indicator>
+    <ui5-busy-indicator
+        class="h-full"
+        [active]="isNavBarLoading || inspectionPointTab?.childComponent?.isBusy">
+        <ui5-card>
+            <div class="h-[calc(90vh-120px)] p-[10px] flex !flex-col gap-[10px]">
+                @if(availableOperations.length > 1) {
+                    <span
+                    class="label-style"
+                    i18n
+                    >Order:</span>
 
-	@if (!selectedInspectionOperation && !isNavBarLoading) {
-		<div
-			class="h-[calc(90vh-100px)] w-[calc(90vw-360px)] flex items-center justify-center flex-grow">
-			<div i18n>No Data</div>
-		</div>
-	} @else {
-		<div class="h-[calc(90vh-100px)] w-[calc(90vw-360px)] mr-[20px]">
-			<ui5-card clas="h-[calc(90vh-100px)]">
-				<ui5-tabcontainer
-					class="h-[calc(90vh-100px)] w-full"
-					(tab-select)="selectTab($event)">
-					@if (
-						authService.isPermissionValid(
-							permissionEnums.QUALIVISU_INSPECTION_POINT_VIEW
-						) || authService.isPermissionValid(permissionEnums.MACHINEBOARD_QUALIVISU_EDIT) || authService.isPermissionValid(permissionEnums.MACHINEBOARD_QUALIVISU_EDIT_IF_QUALIFIED)
-					) {
-						<ui5-tab
-							[id]="inspectionOperationTabType.INSPECTION_POINT"
-							text="Inspection Points"
-							i18n-text
-							[selected]="selectedTab == inspectionOperationTabType.INSPECTION_POINT">
-							<app-inspection-point-tab
-								#inspectionPointTab
-								[selectedFilter]="inspectionOperationFilterType"
-								[inspectionPoint]="selectedInspectionOperation"
-								(onDataUpdate)="
+                    <div class="w-[calc(20vw)]">
+                        <ui5-multi-combobox
+                            slot="endContent"
+                            #operationFilterRef
+                            (selectionChange)="operationSelection($event)"
+                            id="operationFilterMultiSelect"
+                            placeholder="Select Order"
+                            i18n-placeholder
+                            class="multi-combobox w-full">
+                            <ui5-mcb-item
+                                *ngFor="let operation of availableOperations"
+                                text="{{operation.prodOrderCustomId}} - {{operation.itemId}}"
+                                [id]="operation.id">
+                            </ui5-mcb-item>
+                        </ui5-multi-combobox>
+                    </div>
+                }
+               
+                <ui5-segmented-button
+                    (selection-change)="updateInspectionOperationFilterType($event)">
+                    <ui5-segmented-button-item
+                        [id]="inspectionOperationFilterEnum.ALL"
+                        i18n-tooltip
+                        tooltip="All Inspections"
+                        i18n
+                    >All
+                    </ui5-segmented-button-item
+                    >
+                    <ui5-segmented-button-item
+                        [id]="inspectionOperationFilterEnum.OPEN"
+                        i18n-tooltip
+                        tooltip="Open Inspections"
+                        i18n
+                        selected
+                    >Open
+                    </ui5-segmented-button-item
+                    >
+                </ui5-segmented-button>
+                @if (filteredInspectionOperations.length) {
+                    <div class="mb-10" [ngClass]="{'h-[94%]' : availableOperations.length == 1, 'h-[83%]': availableOperations.length > 1}">
+                        <ui5-side-navigation class="rounded-lg w-[calc(20vw)]">
+                            <ui5-side-navigation-item
+                                *ngFor="let inspectionOperation of filteredInspectionOperations"
+                                [text]="inspectionOperation.pos + ' - ' + ProdInspectionOperationFrequencyClass.getTypeTranslateShortCode(inspectionOperation.frequency) + ' - ' + inspectionOperation.name"
+                                [selected]="inspectionOperation.id == selectedInspectionOperation?.id"
+                                (ui5Click)="selectInspectionOperation(inspectionOperation)"></ui5-side-navigation-item>
+                        </ui5-side-navigation>
+                    </div>
+                } @else {
+                    <div class="w-[calc(20vw)] h-[calc(90vh-100px)] flex justify-center items-center">
+                        @if (!isNavBarLoading) {
+                            <div i18n>No Data</div>
+                        }
+                    </div>
+                }
+            </div>
+        </ui5-card>
+    </ui5-busy-indicator>
+
+    @if (!selectedInspectionOperation && !isNavBarLoading) {
+        <div
+            class="h-[calc(90vh-100px)] w-[calc(90vw-360px)] flex items-center justify-center flex-grow">
+            <div i18n>No Data</div>
+        </div>
+    } @else if (selectedInspectionOperation) {
+        <div class="h-[calc(90vh-100px)] w-[calc(90vw-360px)] mr-[20px]">
+            <ui5-card class="h-[calc(90vh-100px)]">
+                <ui5-tabcontainer
+                    class="h-[calc(90vh-100px)] w-full"
+                    (tab-select)="selectTab($event)">
+                    @if (authService.isPermissionValid(
+                        permissionEnums.QUALIVISU_INSPECTION_POINT_VIEW
+                    ) || authService.isPermissionValid(permissionEnums.MACHINEBOARD_QUALIVISU_EDIT) || authService.isPermissionValid(permissionEnums.MACHINEBOARD_QUALIVISU_EDIT_IF_QUALIFIED)) {
+                        <ui5-tab
+                            [id]="inspectionOperationTabType.INSPECTION_POINT"
+                            text="Inspection Points"
+                            i18n-text
+                            [selected]="selectedTab == inspectionOperationTabType.INSPECTION_POINT">
+                            <app-inspection-point-tab
+                                #inspectionPointTab
+                                [selectedFilter]="inspectionOperationFilterType"
+                                [selectedInspectionOperation]="selectedInspectionOperation"
+                                (onDataUpdate)="
 									updateInspectionOperationList()
-								"></app-inspection-point-tab
-						></ui5-tab>
-					}
-					<ui5-tab
-						[id]="inspectionOperationTabType.ATTACHMENT"
-						text="Attachment"
-						i18n-text
-						[selected]="selectedTab == inspectionOperationTabType.ATTACHMENT">
-						<div class="w-full h-full flex items-center justify-center">
-							<div class="w-[95%] h-[95%]">
-								<app-attachment-upload
-									class="w-full h-full"></app-attachment-upload>
-							</div>
-						</div>
-					</ui5-tab>
-				</ui5-tabcontainer>
-			</ui5-card>
-		</div>
-	}
+								"></app-inspection-point-tab>
+                        </ui5-tab>
+                    }
+                    <ui5-tab
+                        [id]="inspectionOperationTabType.ATTACHMENT"
+                        text="Attachment"
+                        i18n-text
+                        [selected]="selectedTab == inspectionOperationTabType.ATTACHMENT">
+                        <div class="w-full h-full flex items-center justify-center">
+                            <div class="w-[95%] h-[95%]">
+                                <app-attachment-upload
+                                    class="w-full h-full"></app-attachment-upload>
+                            </div>
+                        </div>
+                    </ui5-tab>
+                </ui5-tabcontainer>
+            </ui5-card>
+        </div>
+    }
 </div>

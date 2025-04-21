@@ -263,7 +263,7 @@ export class PrintersComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedValue, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 
 				this._toasterSrv.showToast(recordDeleted, "success");

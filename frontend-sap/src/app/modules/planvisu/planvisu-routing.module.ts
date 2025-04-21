@@ -139,7 +139,7 @@ const routes: Routes = [
 				canActivate: [premissionGuard],
 			},
 			{
-				path: "user-plan",
+				path: "user-planning-overview",
 				component: UserPlanComponent,
 				canActivate: [premissionGuard],
 			},

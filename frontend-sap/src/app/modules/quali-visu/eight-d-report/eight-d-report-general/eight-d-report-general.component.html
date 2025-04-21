@@ -182,15 +182,30 @@
 				<ui5-label
 					i18n
 					show-colon
+					required
 					>Complaint Opening Date</ui5-label
 				>
 				<ui5-date-picker
 					class="w-full"
-					#complaintOpeningDate="ngModel"
+					#openingDate="ngModel"
 					formatPattern="dd.MM.yyyy"
 					name="complaint_opening_date"
+					required
 					[(ngModel)]="eightDReport.complaint_opening_date"
-					[ngModelOptions]="{ standalone: true }">
+					[valueState]="
+						openingDate.touched &&
+						openingDate.invalid &&
+						!moment(eightDReport.complaint_opening_date, 'dd.MM.yyyy').isValid()
+							? 'Negative'
+							: 'None'
+					">
+					@if (openingDate.invalid) {
+						<div
+							slot="valueStateMessage"
+							i18n
+							>Complaint Opening Date is required.</div
+						>
+					}
 				</ui5-date-picker>
 			</div>
 

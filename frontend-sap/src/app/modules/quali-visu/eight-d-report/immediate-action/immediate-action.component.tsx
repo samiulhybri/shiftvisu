@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, Input, SimpleChanges, ViewChild } from "@
 import { FlexBox, Button } from "@ui5/webcomponents-react";
 import React from "react";
 import moment from "moment";
+import { ToastComponent } from "@ui5/webcomponents-ngx";
 
 import {
 	CustomReactGridTable,
@@ -24,6 +25,8 @@ export class ImmediateActionComponent {
 		| CustomReactGridTable
 		| undefined;
 
+	@ViewChild("toast") toast?: ToastComponent;
+
 	localization = Localization;
 
 	@Input() eightDReportId: number = 0;
@@ -37,6 +40,7 @@ export class ImmediateActionComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Responsible Person`,
@@ -45,6 +49,8 @@ export class ImmediateActionComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
+			dataType: GridTableColumnDataType.NestedString,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -65,6 +71,7 @@ export class ImmediateActionComponent {
 			disableFilters: false,
 			disableGroupBy: true,
 			disableSortBy: false,
+			autoResizable: true,
 			dataType: GridTableColumnDataType.Date,
 			hAlign: "End",
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
@@ -75,7 +82,9 @@ export class ImmediateActionComponent {
 				return (
 					<React.StrictMode>
 						<FlexBox>
-							{formattedDate.isValid() ? formattedDate.format("DD.MM.YYYY") : ""}
+							{formattedDate.isValid()
+								? moment.utc(formattedDate).local().format("DD.MM.YYYY")
+								: ""}
 						</FlexBox>
 					</React.StrictMode>
 				);
@@ -83,13 +92,15 @@ export class ImmediateActionComponent {
 		},
 		{
 			Header: $localize`Progress`,
-			accessor: "status",
+			accessor: "progress",
 			disableFilters: false,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 			hAlign: "Right",
 			width: 100,
+			dataType: GridTableColumnDataType.Number,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -105,10 +116,11 @@ export class ImmediateActionComponent {
 		{
 			Header: $localize`Description`,
 			accessor: "description",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
+			autoResizable: true,
 			width: 120,
 			hAlign: "Center",
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
@@ -160,6 +172,7 @@ export class ImmediateActionComponent {
 	};
 
 	selectedTask: any = { ...this.emptyTask };
+	toastMessage: string = "";
 
 	constructor(
 		private qualiVisuService: QualiVisuService,
@@ -210,9 +223,10 @@ export class ImmediateActionComponent {
 			payload = { ...returnChanges(this.initialTask, data) };
 		}
 
-		if (Object.keys(payload).length === 0) {
-			this.isTaskSaveDialogOpen = false;
-			return;
+		if (payload.end_date) {
+			payload.end_date = moment(payload.end_date, "DD.MM.YYYY", true)
+				.endOf("day")
+				.toISOString();
 		}
 
 		this.isSavingTask = true;
@@ -223,12 +237,16 @@ export class ImmediateActionComponent {
 				this.saveMode = "patch";
 				this.isSavingTask = false;
 				this.isTaskSaveDialogOpen = false;
+				this.toastMessage = this.localization.recordSavedSuccessfully;
+				this.toast!.open = true;
 			},
 			error => {
 				this.immediateActionGrid?.onFilterAndSorting();
 				this.saveMode = "patch";
 				this.isSavingTask = false;
 				this.isTaskSaveDialogOpen = false;
+				this.toastMessage = this.localization.failedToSaveData;
+				this.toast!.open = true;
 			}
 		);
 	}
@@ -248,7 +266,7 @@ export class ImmediateActionComponent {
 
 		let data = { ...event };
 
-		data.end_date = data.end_date ? moment(data.end_date).format("DD.MM.YYYY") : "";
+		data.end_date = data.end_date ? moment.utc(data.end_date).local().format("DD.MM.YYYY") : "";
 
 		this.initialTask = { ...data };
 		this.selectedTask = { ...data };

@@ -24,6 +24,7 @@
 			i18n-button2Text
 			i18n-button3Text
 			[enableServerSideFiltering]="true"
+			[editPermission]="authService.isPermissionValid('DOCVISU_PROCESS_EDIT')"
 			[plantId]="usePlantId ? this.plantId : undefined"
 			[customActionButtons]="actionButtons"
 			(newButtonClick)="newButtonClick()"

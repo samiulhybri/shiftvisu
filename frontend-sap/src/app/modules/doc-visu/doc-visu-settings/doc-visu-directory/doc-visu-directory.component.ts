@@ -9,6 +9,7 @@ import { Localization } from "@app/shared/utils/common-localize";
 import { DocVisuService } from "@doc-visu/doc-visu.service";
 import { IDirectory } from "@app/shared/interfaces/directory.interface.";
 import { DocVisuDirectoryViewComponent } from "@doc-visu/doc-visu-directory-view/doc-visu-directory-view.component";
+import { AuthService } from "@app/shared/services/auth.service";
 
 @Component({
 	selector: "app-doc-visu-directory",
@@ -41,78 +42,102 @@ export class DocVisuDirectoryComponent implements OnInit, OnDestroy {
 	public folderName: string = "";
 	public isUpdate: boolean = false;
 	public actionButtons = [
-		{
-			id: "add",
-			name: "add",
-			icon: "add-folder",
-			onClick: (rowData: any) => {
-				this.headerTitle = $localize`New Folder`;
-				this.selectedRow = rowData;
-				this.selectedId = rowData.id;
-				this.selectedFolderId = rowData.id;
-				this.addFolderDialog.elementRef.nativeElement.open = true;
-			},
-		},
-		{
-			id: "edit",
-			name: "edit",
-			icon: "edit",
-			onClick: (rowData: any) => {
-				this.headerTitle = $localize`Edit Folder`;
-				this.isUpdate = true;
-				this.selectedRow = rowData;
-				this.selectedId = rowData.id;
-				this.selectedFolderId = rowData.id;
-				this.folderName = rowData.name;
-				this.addFolderDialog.elementRef.nativeElement.open = true;
-			},
-		},
-		{
-			id: "delete",
-			icon: "delete",
-			name: "delete",
-			onClick: (rowData: any) => {
-				this.selectedRow = rowData;
-				this.selectedId = rowData.id;
-				this.folderName = rowData.name;
-				this.selectedFolderId = rowData.id;
-				this.addFolderDialog.elementRef.nativeElement.open = false;
-				this.deleteFolderDialog.elementRef.nativeElement.open = true;
-			},
-		},
+		...(this.authService.isPermissionValid("DOCVISU_FOLDER_ADD")
+			? [
+					{
+						id: "add",
+						name: "add",
+						icon: "add-folder",
+						onClick: (rowData: any) => {
+							this.headerTitle = $localize`New Folder`;
+							this.selectedRow = rowData;
+							this.selectedId = rowData.id;
+							this.selectedFolderId = rowData.id;
+							this.addFolderDialog.elementRef.nativeElement.open = true;
+						},
+					},
+				]
+			: []),
+		...(this.authService.isPermissionValid("DOCVISU_FOLDER_EDIT")
+			? [
+					{
+						id: "edit",
+						name: "edit",
+						icon: "edit",
+						onClick: (rowData: any) => {
+							this.headerTitle = $localize`Edit Folder`;
+							this.isUpdate = true;
+							this.selectedRow = rowData;
+							this.selectedId = rowData.id;
+							this.selectedFolderId = rowData.id;
+							this.folderName = rowData.name;
+							this.addFolderDialog.elementRef.nativeElement.open = true;
+						},
+					},
+				]
+			: []),
+		...(this.authService.isPermissionValid("DOCVISU_FOLDER_DELETE")
+			? [
+					{
+						id: "delete",
+						icon: "delete",
+						name: "delete",
+						onClick: (rowData: any) => {
+							this.selectedRow = rowData;
+							this.selectedId = rowData.id;
+							this.folderName = rowData.name;
+							this.selectedFolderId = rowData.id;
+							this.addFolderDialog.elementRef.nativeElement.open = false;
+							this.deleteFolderDialog.elementRef.nativeElement.open = true;
+						},
+					},
+				]
+			: []),
 	];
 
 	public processActionButtons = [
-		{
-			id: "add",
-			name: $localize`Add`,
-			icon: "add-folder",
-			onClick: (rowData: any) => {
-				this.headerTitle = $localize`New Folder`;
-				this.selectedRow = rowData;
-				this.selectedId = rowData.id;
-				this.selectedFolderId = rowData.id;
-				this.addFolderDialog.elementRef.nativeElement.open = true;
-			},
-		},
-		{
-			id: "edit",
-			name: $localize`Edit`,
-			icon: "edit",
-			disable: () => {
-				return true;
-			},
-			onClick: (rowData: any) => {},
-		},
-		{
-			id: "delete",
-			icon: "delete",
-			name: $localize`Delete`,
-			disable: () => {
-				return true;
-			},
-			onClick: (rowData: any) => {},
-		},
+		...(this.authService.isPermissionValid("DOCVISU_FOLDER_ADD")
+			? [
+					{
+						id: "add",
+						name: $localize`Add`,
+						icon: "add-folder",
+						onClick: (rowData: any) => {
+							this.headerTitle = $localize`New Folder`;
+							this.selectedRow = rowData;
+							this.selectedId = rowData.id;
+							this.selectedFolderId = rowData.id;
+							this.addFolderDialog.elementRef.nativeElement.open = true;
+						},
+					},
+				]
+			: []),
+		...(this.authService.isPermissionValid("DOCVISU_FOLDER_EDIT")
+			? [
+					{
+						id: "edit",
+						name: $localize`Edit`,
+						icon: "edit",
+						disable: () => {
+							return true;
+						},
+						onClick: (rowData: any) => {},
+					},
+				]
+			: []),
+		...(this.authService.isPermissionValid("DOCVISU_FOLDER_DELETE")
+			? [
+					{
+						id: "delete",
+						icon: "delete",
+						name: $localize`Delete`,
+						disable: () => {
+							return true;
+						},
+						onClick: (rowData: any) => {},
+					},
+				]
+			: []),
 	];
 
 	@ViewChild("addFolderDialog", { static: false }) addFolderDialog: any;
@@ -121,6 +146,7 @@ export class DocVisuDirectoryComponent implements OnInit, OnDestroy {
 	public directory?: IDirectory;
 
 	constructor(
+		public authService: AuthService,
 		private toasterSrv: ToastService,
 		private docVisuService: DocVisuService
 	) {}

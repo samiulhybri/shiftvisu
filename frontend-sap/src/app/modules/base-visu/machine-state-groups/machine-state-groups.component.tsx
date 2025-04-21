@@ -82,7 +82,7 @@ export class MachineStateGroupsComponent {
 		this.getCustomId();
 	}
 	refreshEditData() {
-		const url = `MachineStateGroups?$filter=is_active eq true and id eq ${this.selectedMachineStateGroup?.id}&$orderby=custom_id asc`;
+		const url = `MachineStateGroups?$filter=id eq ${this.selectedMachineStateGroup?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -222,7 +222,7 @@ export class MachineStateGroupsComponent {
 		this.commonService.delete(`/MachineStateGroups(${this.deleteItemId})`).subscribe({
 			next: () => {
 				this.closeDialogDelete();
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedMachineStateGroup, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deleteItemId, null);
 				this.isLoading = false;
 				this.disableButtonDuringRequest = false;
 

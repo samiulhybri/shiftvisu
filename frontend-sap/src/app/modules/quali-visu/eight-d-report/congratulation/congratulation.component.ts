@@ -120,7 +120,6 @@ export class CongratulationComponent {
 			if (!file?.id) {
 				const formData = new FormData();
 				formData.append("reportId", this.eightDReport.id + "");
-				formData.append("model", "Message");
 				formData.append("media", file);
 
 				this.qualiVisuService
@@ -155,14 +154,14 @@ export class CongratulationComponent {
 	}
 
 	fileShow(file: any) {
-		if (file.original_url) {
+		if (file.path) {
 			var width = 800;
 			var height = 600;
 			var left = window.innerWidth / 2 - width / 2;
 			var top = window.innerHeight / 2 - height / 2;
 			
 			window.open(
-				file.original_url,
+				file.path,
 				"newWindow",
 				`width=${width},height=${height},left=${left},top=${top}`
 			);

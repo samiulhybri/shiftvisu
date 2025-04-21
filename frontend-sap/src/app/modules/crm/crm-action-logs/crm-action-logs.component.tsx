@@ -17,6 +17,7 @@ import React from "react";
 import { FlexBox, Text } from "@ui5/webcomponents-react";
 import moment from "moment";
 import { ComboBoxComponent } from "@ui5/webcomponents-ngx";
+import DatePicker from "@ui5/webcomponents/dist/DatePicker";
 
 
 @Component({
@@ -54,9 +55,11 @@ export class CrmActionLogsComponent {
     cachedCustomId?: string = "";
     selectedId = "";
     customId?: string;
+    action_log_date?: string;
     @ViewChild("errorDialogCrmAction", { static: false }) errorDialogCrmAction: any;
     crmActions: CrmAction[] = [];
   	@ViewChild("crmActionsCombobox") crmActionsCombobox!: ComboBoxComponent;
+  	@ViewChild("startInput") startInput!: DatePicker;
     @Output() onActionLogCreated: EventEmitter<any> = new EventEmitter();
 
     columns: any = [
@@ -122,7 +125,7 @@ export class CrmActionLogsComponent {
           return (
             <React.StrictMode>
               <FlexBox>
-                <Text>{rowData?.log_date ? moment(rowData.log_date).format("DD.MM.YYYY , HH:mm") : null}</Text>
+                <Text>{rowData?.log_date.includes(',') ? rowData?.log_date : rowData?.log_date ? moment(rowData.log_date).format("DD.MM.YYYY, HH:mm") : null}</Text>
               </FlexBox>
             </React.StrictMode>
           );
@@ -170,27 +173,27 @@ export class CrmActionLogsComponent {
       this.isUpdate = false;
       this.customIdState = "None";
       this.disableButtonDuringRequest = false;
-      this.selectedCCActionLog = new CustomerCrmActionLog().deserialize({});
+      this.selectedCCActionLog = new CustomerCrmActionLog().deserialize({'log_date':moment(new Date()).format("DD.MM.YYYY, HH:mm")});
     }
   
-    editClick(value: object): void {
+    editClick(value: any): void {
+      console.log(value.log_date);
+      
       this.isDialogOpen = true;
       this.isUpdate = true;
       this.dialogTitle = this.localization.edit;
       this.customIdState = "None";
-      
+      value.log_date = value?.log_date.includes(',') ? value?.log_date : moment(value.log_date).format("DD.MM.YYYY, HH:mm");
       this.selectedCCActionLog = this.selectedCCActionLog?.deserialize(value);
-
       this.disableButtonDuringRequest = false;
     }
   
     onSubmit(form: NgForm) {
-      if (!form.valid || !this.checkAllRequiredComboboxes()) {
+      if (!form.valid || !this.checkAllRequiredComboboxes() || !this.checkDatepickerValidity()) {
         this.disableButtonDuringRequest = false;
         return;
       }
 
-      this.selectedCCActionLog.log_date = new Date();
       this.selectedCCActionLog.user_id = this._authService.getUser().id;
       this.selectedCCActionLog.customer_id = this.customer.id;
 
@@ -298,6 +301,8 @@ export class CrmActionLogsComponent {
 	}
 
 	checkAllRequiredComboboxes(): boolean {
+    console.log(this.startInput);
+    
 		if (!this.crmActionsCombobox.element.value) {
 			this.crmActionsCombobox.element.valueState = "Negative";
 			return false;
@@ -306,7 +311,35 @@ export class CrmActionLogsComponent {
 		}
 		return true;
 	}
-
+  checkDatepickerValidity(): boolean {
+    const datepicker = this.startInput as any; // Reference to DatePicker
+    const dateValue = datepicker.value;
+  
+    if (!dateValue) {
+      datepicker.valueState = "Negative";
+      datepicker.valueStateMessage = "Date is required.";
+      return false;
+    }
+  
+    // Validate Date Format (dd.MM.yyyy , HH:mm)
+    const dateFormatRegex = /^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/;
+    if (!dateFormatRegex.test(dateValue)) {
+      datepicker.valueState = "Negative";
+      datepicker.valueStateMessage = "Invalid date format. Use dd.MM.yyyy, HH:mm.";
+      return false;
+    }
+  
+    // Reset value state if valid
+    datepicker.valueState = "None";
+    return true;
+  }
+  
+  preventKeys(event: KeyboardEvent) {
+    const isNumberKey = (event.key >= "0" && event.key <= "9");
+    if(event.key === 'Backspace' || !isNumberKey || event.key === 'Delete') {
+      event.preventDefault();
+    }
+  }
 	inputInvalidEntryRestrict(event: any, value: any) {
 		if (!event.target.value) {
 			value = "";

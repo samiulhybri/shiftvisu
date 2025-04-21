@@ -57,6 +57,7 @@ export class IshikawaComponent implements AfterViewInit {
 			disableGroupBy: true,
 			disableSortBy: true,
 			isSelected: true,
+			autoResizable: true,
 			width: 50,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
@@ -77,6 +78,7 @@ export class IshikawaComponent implements AfterViewInit {
 			disableGroupBy: true,
 			disableSortBy: true,
 			isSelected: true,
+			autoResizable: true,
 			dataType: GridTableColumnDataType.InputField,
 		},
 	];

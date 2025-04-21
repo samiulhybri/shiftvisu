@@ -247,7 +247,7 @@ export class TpmSubGroupComponent {
 		this.commonService.delete(`/TpmSubGroups(${this.deleteItemId})`).subscribe({
 			next: () => {
 				this.closeDialogDelete();
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedTpmSubGroup, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deleteItemId, null);
 				this.isLoading = false;
 				this.disableButtonDuringRequest = false;
 

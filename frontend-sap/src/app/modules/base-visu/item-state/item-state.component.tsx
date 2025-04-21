@@ -483,7 +483,7 @@ export class ItemStateComponent {
 		this.commonService.delete(`/ItemStates(${this.deletItemId})`).subscribe({
 			next: () => {
 				this.disableButtonDuringRequest = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.itemState, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.isLoading = false;
 				this.closeDialogDelete();
 
@@ -526,7 +526,7 @@ export class ItemStateComponent {
 	}
 
 	refreshEditData() {
-		const url = `ItemStates?$filter=is_active eq true and id eq ${this.itemState?.id}&$orderby=custom_id asc&$expand=itemStateGroup,machines`;
+		const url = `ItemStates?$filter=id eq ${this.itemState?.id}&$orderby=custom_id asc&$expand=itemStateGroup,machines`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);

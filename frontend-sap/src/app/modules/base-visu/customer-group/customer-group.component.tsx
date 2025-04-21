@@ -124,7 +124,7 @@ export class CustomerGroupComponent {
 		this.getCustomId();
 	}
 	refreshEditData() {
-		const url = `CustomerGroups?$filter=is_active eq true and id eq ${this.selectedCustomerGroup?.id}&$orderby=sort_order asc`;
+		const url = `CustomerGroups?$filter=id eq ${this.selectedCustomerGroup?.id}&$orderby=sort_order asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -250,7 +250,7 @@ export class CustomerGroupComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedCustomerGroup, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 
 				this._toasterSrv.showToast(recordDeleted, "success");

@@ -93,6 +93,8 @@ export class ClockInComponent implements OnInit, OnDestroy {
 	isEnabledForClockin: boolean = false;
 	showClockOutErrorDialog = false;
 	clockOutErrorMachines: any[] = [];
+	clockInText = $localize`Clock In`;
+	clockedInText = $localize`Clocked In`;
 
 	localization = Localization;
 
@@ -304,11 +306,9 @@ export class ClockInComponent implements OnInit, OnDestroy {
 
 	setSelectedMachineIds() {
 		const clockedInMachineIds = this.machineUserTimes.map(el => el.machine?.id!);
-		this.selectedMachineIds = this.userMachineList
-			.filter(el => clockedInMachineIds.includes(el.id!))
-			.map(m => m.id!);
 
 		this.clockedInMachineIds = [...clockedInMachineIds];
+		this.selectedMachineIds = [...clockedInMachineIds];
 
 		if (this.machineUserTimes.length) {
 			this.machineUserTimes.forEach(mt => {

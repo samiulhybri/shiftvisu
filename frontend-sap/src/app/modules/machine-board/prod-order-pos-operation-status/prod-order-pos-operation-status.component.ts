@@ -30,8 +30,6 @@ export class ProdOrderPosOperationStatusComponent {
 
 	currentOperation?: OrderDetails | undefined;
 	isBusy = false;
-	machineStateStateType = MachineStateStateType;
-	machineBoardStateType = MachineBoardStateType;
 	prodOrderPosOperationStatusClass = ProdOrderPosOperationStatusClass;
 	prodOrderPosOperationStatus = ProdOrderPosOperationStatus;
 

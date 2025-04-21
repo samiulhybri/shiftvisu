@@ -224,7 +224,7 @@ export class MachineGroupComponent {
 	}
 
 	refreshEditData() {
-		const url = `MachineGroups?$filter=is_active eq true and id eq ${this.selectedMachineGroup?.id}&$orderby=custom_id asc&$expand=hall&$count=true`;
+		const url = `MachineGroups?$filter=id eq ${this.selectedMachineGroup?.id}&$orderby=custom_id asc&$expand=hall&$count=true`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -258,7 +258,7 @@ export class MachineGroupComponent {
 				this.closeDialogDelete();
 
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedMachineGroup, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				(this.form as any).onReset();
 
 				this.disableButtonDuringRequest = false;

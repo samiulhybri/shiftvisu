@@ -91,8 +91,11 @@ export class ProductionPlanComponent {
     airTankText = $localize`Air Tank`;
     groupText = $localize`Group`;
 
-    private machineBoardProductionPlanEdit: boolean = this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_EDIT) 
-                                                    || this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_EDIT_IF_QUALIFIED);
+    private machineBoardProductionPlanEdit: boolean = this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_EDIT)
+                                                    || (
+                                                        this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_EDIT_IF_QUALIFIED)
+                                                        && this.authService.isQualified()
+                                                    );
 
     multipleButtons:ButtonConfig[] =[
         {
@@ -161,7 +164,10 @@ export class ProductionPlanComponent {
 
     ngOnInit(): void {
         this.machineBoardProductionPlanEdit = this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_EDIT)
-                                             || this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_EDIT_IF_QUALIFIED);
+                                            || (
+                                                this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_EDIT_IF_QUALIFIED)
+                                                && this.authService.isQualified()
+                                            );
         this.isButtonDisabled = !this.machineBoardProductionPlanEdit;
         const MachineId = this.activeRoute.parent?.snapshot.params["id"];
         this.getMachine(MachineId);
@@ -381,6 +387,7 @@ export class ProductionPlanComponent {
             disableSortBy: false,
             isSelected: true,
             hAlign: "Left",
+            width: 100,
         },
         {
             Header: $localize`Operation`,
@@ -390,6 +397,7 @@ export class ProductionPlanComponent {
             disableSortBy: false,
             isSelected: true,
             hAlign: "Center",
+            width: 100,
         },
         {
             Header: $localize`Item Id`,
@@ -399,6 +407,7 @@ export class ProductionPlanComponent {
             disableSortBy: false,
             isSelected: true,
             hAlign: "Left",
+            width: 180,
         },
         {
             Header: $localize`Item Name`,
@@ -408,6 +417,7 @@ export class ProductionPlanComponent {
             disableSortBy: false,
             isSelected: true,
             hAlign: "Left",
+            width: 260,
         },
         {
             Header: $localize`Start`,
@@ -440,6 +450,7 @@ export class ProductionPlanComponent {
 				const quantity = formatNumber(row.original.remain_quantity);
 				return quantity;
 			},
+            width: 180,
         }, {
             Header: $localize`Confirmed Quantity`,
             accessor: "confirm_quantity",
@@ -453,6 +464,7 @@ export class ProductionPlanComponent {
 				const quantity = formatNumber(row.original.confirm_quantity);
 				return quantity;
 			},
+            width: 180,
         },
         {
             Header: $localize`Order Link`,
@@ -470,7 +482,7 @@ export class ProductionPlanComponent {
             disableSortBy: false,
             isSelected: true,
             hAlign: "Left",
-            width: 180,
+            width: 120,
             Cell: (instance: any) => {
                 const {row, webComponentsReactProperties} = instance;
                 const data = row?.original;
@@ -501,7 +513,7 @@ export class ProductionPlanComponent {
             disableSortBy: false,
             isSelected: true,
             hAlign: "Left",
-            width: 200,
+            width: 120,
             Cell: (instance: any) => {
                 const {row, webComponentsReactProperties} = instance;
                 const data = row?.original;
@@ -527,52 +539,51 @@ export class ProductionPlanComponent {
             disableSortBy: false,
             isSelected: true,
             hAlign: "Center",
-            width: 150,
+            width: 180,
             Cell: (instance: any) => {
-                const {row, webComponentsReactProperties} = instance;
+                const { row } = instance;
                 const data = row?.original;
                 const styles = this.getTransportButtonDesign(data.component_availability);
                 return (
                     <React.StrictMode>
-						<FlexBox>
-                            <Button
-                                onClick={() => this.showOderInfo(data)}
-                                design="Transparent"
-                                icon="message-information">
-							</Button>
-						</FlexBox>
-                        <FlexBox>
-                            {(
-                                <Button 
-                                onClick={() => this.bomInfo(data)}  
-                                design="Transparent"
-                                disabled={!this.machineBoardProductionPlanEdit} 
-                                icon="survey">
-                                </Button>
-                            )}
-                        </FlexBox>
-                        <FlexBox>
-                             {(
-                                <Button onClick={() => this.transportInfo(data)}
+                        <FlexBox className="gap-2">
+                            <FlexBox>
+                                <Button
+                                    onClick={() => this.showOderInfo(data)}
                                     design="Transparent"
-                                    disabled={!this.machineBoardProductionPlanEdit || this.isEwmEnabled ? data.is_prepared ? false : true : false}
-                                    icon="shipping-status"
-                                    style={styles}
-                                >
-                                </Button>
-                             )}
-                        </FlexBox>
-                        {this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_PRINT) ? (
-                            <FlexBox >
-                                {(
-                                    <Button 
-                                        onClick={() => this.printProductionPlan(data)} 
-                                        design="Transparent"
-                                        icon="print">
+                                    icon="message-information">
+					    		</Button>
+					    	</FlexBox>
+                            <FlexBox>
+                                    <Button
+                                    onClick={() => this.bomInfo(data)}
+                                    design="Transparent"
+                                    disabled={!this.machineBoardProductionPlanEdit}
+                                    tooltip={$localize`Bill of Material`}
+                                    icon="survey">
                                     </Button>
-                                )}
                             </FlexBox>
-                        ) : null}
+                            <FlexBox>
+                                    <Button onClick={() => this.transportInfo(data)}
+                                        design="Transparent"
+                                        disabled={!this.machineBoardProductionPlanEdit || this.isEwmEnabled ? data.is_prepared ? false : true : false}
+                                        icon="shipping-status"
+                                        tooltip={$localize`Transport Order`}
+                                        style={styles}
+                                    >
+                                    </Button>
+                            </FlexBox>
+                            {this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_PRINT) ? (
+                                <FlexBox >
+                                        <Button
+                                            onClick={() => this.printProductionPlan(data)}
+                                            design="Transparent"
+                                            tooltip={$localize`Print Operation`}
+                                            icon="print">
+                                        </Button>
+                                </FlexBox>
+                            ) : null}
+                        </FlexBox>
 					</React.StrictMode>
                 );
             },
@@ -1218,7 +1229,7 @@ export class ProductionPlanComponent {
 
     closedOrder(){
         this.setUpButtonClick(true, false)
-      
+
       const dialog = document.getElementById('closed-warning-modal') as Dialog;
         dialog.open = false;
     }

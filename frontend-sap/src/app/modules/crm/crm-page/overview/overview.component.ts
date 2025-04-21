@@ -586,7 +586,7 @@ export class OverviewComponent implements AfterViewChecked {
 	}
 
 	onActionLogCreated(event: any) {
-		const createdAt = this._datePipe.transform(new Date(event.created_at), "dd.MM.yyyy, HH:mm");
+		const createdAt = this._datePipe.transform(new Date(event.log_date), "dd.MM.yyyy, HH:mm");
 		const actionName = event.crmAction?.name || "Unknown Action";
 		const note = event.note ? `\n \n${event.note}` : "";
 

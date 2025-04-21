@@ -203,7 +203,7 @@ export class ItemStateGroupComponent {
 	}
 
 	refreshEditData() {
-		const url = `ItemStateGroups?$filter=is_active eq true and id eq ${this.selectedItemStateGroup?.id}&$orderby=custom_id asc`;
+		const url = `ItemStateGroups?$filter=id eq ${this.selectedItemStateGroup?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -236,7 +236,7 @@ export class ItemStateGroupComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				(this.form as any).onReset();
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");

@@ -36,6 +36,7 @@ export class PrintHandlingUnitComponent {
 	selectedOperationId: number = 0;
 	disableButtonDuringRequest: boolean = false;
 	selectableHUCustomIds: string[] = [];
+	cachedSelectableHUCustomIds: string[] = [];
 	private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 	selectedOrderDetails: OrderDetails | null = null;
 
@@ -65,7 +66,8 @@ export class PrintHandlingUnitComponent {
 			})
 		).subscribe((res: any)=>{
 			if (res) {
-				this.selectableHUCustomIds = res.selectableHU as string[];				
+				this.cachedSelectableHUCustomIds = res.selectableHU as string[];				
+				this.selectableHUCustomIds = res.selectableHU?.map((customId: string)=> customId.split('-')[0]);	
 				this.loadData(this.dynamicSearch ?? "", this.skip, this.top);
 			}
 		});
@@ -85,6 +87,17 @@ export class PrintHandlingUnitComponent {
 		this.commonService.get(url).subscribe({
 			next: (res: any) => {
 				this.isLoading = false;
+
+				res.value = res.value?.map((handlingUnit: HandlingUnit)=>{
+					const isExistInCache =  this.cachedSelectableHUCustomIds.includes(handlingUnit.custom_id+'-p');
+
+					if(isExistInCache){
+						handlingUnit.custom_id = handlingUnit.custom_id+' '+$localize`HU+`
+					}
+
+					return handlingUnit;
+				})
+
 				this.allHU = skip === 0 ? res.value : [...this.allHU, ...res.value];
 				this.skip += top;
 			},

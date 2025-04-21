@@ -204,7 +204,7 @@ export class StorageSectionComponent {
 	}
 
 	refreshEditData() {
-		const url = `StorageSections?$filter=is_active eq true and id eq ${this.selectedStorageSection?.id}&$orderby=custom_id asc`;
+		const url = `StorageSections?$filter=id eq ${this.selectedStorageSection?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -227,7 +227,7 @@ export class StorageSectionComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedStorageSection, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 
 				this._toasterSrv.showToast(recordDeleted, "success");

@@ -196,10 +196,10 @@
 	id="stocksDialogId"
 	header-text="Stocks"
 	[open]="isShowStockDialogOpen"
-	(beforeClose)="closeAndRemoveBomPos()"
+	(beforeClose)="closeStocksForItem()"
 	class="w-[95vw]"
 	i18n-header-text>
-	<div class="flex h-[65vh]">
+	<div class="flex h-[65vh]" *ngIf="isShowStockDialogOpen">
 		<ui5-card class="h-[65vh] max-h-[850px] md:max-lg:col-span-7 col-span-4">
 			<div class="h-[calc(60vh)] max-h-[800px]">
 				<ui5-bar
@@ -221,7 +221,7 @@
 					[showSearch]="false"
 					[showDownload]="false"
 					[showActiveButton]="false"
-					selectionMode="Multiple"
+					selectionMode="None"
 					keyForCacheCustomDataTableColumns="BOM-stocks"
 					[showNewButton]="false"
 					[enableServerSideFiltering]="false"
@@ -240,7 +240,7 @@
 		<ui5-button
 			design="Transparent"
 			i18n
-			(click)="isShowStockDialogOpen = false"
+			(click)="closeStocksForItem()"
 			>Close</ui5-button
 		></div
 	>

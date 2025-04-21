@@ -125,7 +125,7 @@ export class EnergyConsumerGroupsComponent implements OnInit {
 	}
 
 	refreshEditData() {
-		const url = `EnergyConsumerGroups?$filter=is_active eq true and id eq ${this.selectedEnergyConsumerGroup?.id}`;
+		const url = `EnergyConsumerGroups?$filter=id eq ${this.selectedEnergyConsumerGroup?.id}`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -240,7 +240,7 @@ export class EnergyConsumerGroupsComponent implements OnInit {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedEnergyConsumerGroup, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

@@ -1,47 +1,95 @@
 <div class="content">
-	<div
-		class="workload-container p-4"
-		style="height: calc(100% - 49px)">
-		<div style="height: 33%; margin-bottom: 10px">
-			<app-grid-workload
-				[demandsData]="demandsData"
-				[capacityData]="capacityData"
-				[capacitySettings]="capacitySettings"
-				[startDate]="startDate"
-				[endDate]="endDate"
-				[reportType]="ReportType.WORK_LOAD"
-				[gridTitle]="'Workload'"
-				[dataField]="'hall'"
-				[accessorKey]="accessorKey"
-				[valueFormatType]="ReportValueEnum.PERCENT_VALUE">
-			</app-grid-workload>
+	<div class="workload-container p-4 h-[calc(100%-49px)]">
+		<div class="w-full flex h-[25%]">
+			<div class="bg-white-700 p-4 w-[267px]"> </div>
+			<div style="width: calc(100% - 267px)">
+				<app-combined-bullet-column-line-chart
+					[bullterColumnChartData]="bullterColumnChartData">
+				</app-combined-bullet-column-line-chart>
+			</div>
 		</div>
-		<div style="height: 33%; margin-bottom: 10px">
-			<app-grid-workload
-				[demandsData]="demandsData"
-				[capacityData]="capacityData"
-				[capacitySettings]="capacitySettings"
-				[gridTitle]="'Staff Workload'"
-				[dataField]="'hall'"
-				[reportType]="ReportType.STAFF_WORKLOAD"
-				[startDate]="startDate"
-				[endDate]="endDate"
-				[accessorKey]="accessorKey"
-				[valueFormatType]="ReportValueEnum.RAW_VALUE">
-			</app-grid-workload>
+
+		<!-- Workload Section -->
+		<div class="shadow-md rounded-2xl pb-2.5 mb-2.5 h-[24%]">
+			<div class="w-full flex justify-end">
+				<ui5-bar class="shadow-none w-full">
+					<ui5-title
+						slot="startContent"
+						level="H4"
+						>{{ workloadTitle }}</ui5-title
+					>
+				</ui5-bar>
+			</div>
+			<div class="pb-2.5 h-[calc(100%-40px)]">
+				<app-grid-workload
+					[demandsData]="demandsData"
+					[capacityData]="capacityData"
+					[capacitySettings]="capacitySettings"
+					[startDate]="startDate"
+					[endDate]="endDate"
+					[reportType]="ReportType.WORK_LOAD"
+					[gridTitle]="'Hall 1'"
+					[dataField]="'hall'"
+					[accessorKey]="accessorKey"
+					(staffWorkloadEvent)="updateStaffWorkloadTitle($event)"
+					[valueFormatType]="ReportValueEnum.PERCENT_VALUE">
+				</app-grid-workload>
+			</div>
 		</div>
-		<div style="height: 33%; margin-bottom: 10px">
-			<app-grid-workload
-				[demandsData]="demandsData"
-				[capacitySettings]="capacitySettings"
-				[gridTitle]="'Staff Needed'"
-				[dataField]="'hall'"
-				[reportType]="ReportType.STAFF_NEEDED"
-				[startDate]="startDate"
-				[endDate]="endDate"
-				[accessorKey]="accessorKey"
-				[valueFormatType]="ReportValueEnum.RAW_VALUE">
-			</app-grid-workload>
+
+		<!-- Staff Workload Section -->
+		<div class="shadow-md rounded-2xl pb-2.5 mb-2.5 h-[24%]">
+			<div class="w-full flex justify-end">
+				<ui5-bar class="shadow-none w-full">
+					<ui5-title
+						slot="startContent"
+						level="H4"
+						>{{ staffWorkloadTitle }}</ui5-title
+					>
+				</ui5-bar>
+			</div>
+			<div class="pb-2.5 h-[calc(100%-40px)]">
+				<app-grid-workload
+					[demandsData]="demandsData"
+					[capacityData]="capacityData"
+					[capacitySettings]="capacitySettings"
+					[gridTitle]="'Hall 2'"
+					[dataField]="'hall'"
+					[reportType]="ReportType.STAFF_WORKLOAD"
+					[startDate]="startDate"
+					[endDate]="endDate"
+					[accessorKey]="accessorKey"
+					(staffWorkloadEvent)="updateStaffWorkloadTitle($event)"
+					[valueFormatType]="ReportValueEnum.RAW_VALUE">
+				</app-grid-workload>
+			</div>
+		</div>
+
+		<!-- Staff Needed Section -->
+		<div class="shadow-md rounded-2xl pb-2.5 mb-2.5 h-[24%]">
+			<div class="w-full flex justify-end">
+				<ui5-bar class="shadow-none w-full">
+					<ui5-title
+						slot="startContent"
+						level="H4"
+						>{{ staffNeededTitle }}</ui5-title
+					>
+				</ui5-bar>
+			</div>
+			<div class="pb-2.5 h-[calc(100%-40px)]">
+				<app-grid-workload
+					[demandsData]="demandsData"
+					[capacitySettings]="capacitySettings"
+					[gridTitle]="'Hall 3'"
+					[dataField]="'hall'"
+					[reportType]="ReportType.STAFF_NEEDED"
+					[startDate]="startDate"
+					[endDate]="endDate"
+					[accessorKey]="accessorKey"
+					(staffWorkloadEvent)="updateStaffWorkloadTitle($event)"
+					[valueFormatType]="ReportValueEnum.RAW_VALUE">
+				</app-grid-workload>
+			</div>
 		</div>
 	</div>
 </div>

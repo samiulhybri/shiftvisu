@@ -15,6 +15,7 @@ import {
 	ProdOrderPosOperationStatusClass,
 } from "@app/shared/enums/ProdOrderPosOperationStatus";
 import { DecimalPipe } from "@angular/common";
+import { formatNumber } from "@app/shared/utils/number-formatter";
 
 @Component({
 	selector: "app-view-2",
@@ -51,6 +52,10 @@ export class View2Component {
 		this.cardTypeText =
 			MachineStateStateTypeClass.getStateTranslate(this.cardType) ||
 			ProdOrderPosOperationStatusClass.getStateTranslate(this.cardType);
+	}
+
+	format(value: any) {
+		return formatNumber(Number(value) ?? 0);
 	}
 
 	close() {

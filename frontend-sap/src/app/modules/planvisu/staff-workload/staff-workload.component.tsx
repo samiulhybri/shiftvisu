@@ -17,6 +17,7 @@ import { forkJoin } from "rxjs";
 import { ActivatedRoute } from "@angular/router";
 import { ReportType } from "@app/shared/enums/ReportType";
 import { ChartInterval } from "@app/shared/enums/chartInterval";
+import { PlanVisuService } from "app/modules/planvisu/services/plan-visu.service";
 
 interface UserworkloadData {
 	hall_id: number;
@@ -50,16 +51,22 @@ export class StaffWorkloadComponent {
 	staffWorkloadAPI = "";
 	staffHourDemandAPI = "";
 	hall = 1;
-	accessorKey: string = 'hall_name';
+	accessorKey: string = "hall_name";
 	ReportType = ReportType;
 	ReportValueEnum = ReportValueEnum;
 	ChartInterval = ChartInterval;
+	weeksList: { Year: number; Week: number; YearWeek: string }[] = [];
+	bullterColumnChartData: any = [];
 
 	// TODO: This value will come from settings configurations
 	public distributionTime: number;
 	public userUtilizationPercentage: number;
 	public overtimeFactor: number;
 	public addedHours: number;
+
+	totalHallsForWorkload: number = 0;
+	totalHallsForStaffWorkload: number = 0;
+	totalHallsForStaffNeeded: number = 0;
 
 	startDate: Date = new Date();
 	endDate: Date = new Date();
@@ -75,7 +82,8 @@ export class StaffWorkloadComponent {
 		public commonService: CommonService,
 		private weekService: WeekGeneratorService,
 		private monthService: MonthGeneratorService,
-		private route: ActivatedRoute
+		private route: ActivatedRoute,
+		private planVisuService: PlanVisuService
 	) {
 		this.distributionTime = 10;
 		this.userUtilizationPercentage = 80;
@@ -89,6 +97,40 @@ export class StaffWorkloadComponent {
 				this.loadMasterData();
 			},
 		});
+	}
+
+	getTitle(label: string, count: number): string {
+		return `${label} (${count})`;
+	}
+
+	get workloadTitle(): string {
+		return this.getTitle("Workload", this.totalHallsForWorkload);
+	}
+
+	get staffWorkloadTitle(): string {
+		return this.getTitle("Staff Workload", this.totalHallsForStaffWorkload);
+	}
+
+	get staffNeededTitle(): string {
+		return this.getTitle("Staff Needed", this.totalHallsForStaffNeeded);
+	}
+
+	updateStaffWorkloadTitle(event: { counter: number; type: string }) {
+		const reportType =
+			ReportType[event.type as keyof typeof ReportType] || ReportType.WORK_LOAD;
+
+		const workloadMap: Record<ReportType, string> = {
+			[ReportType.WORK_LOAD]: "totalHallsForWorkload",
+			[ReportType.STAFF_NEEDED]: "totalHallsForStaffNeeded",
+			[ReportType.STAFF_WORKLOAD]: "totalHallsForStaffWorkload",
+			[ReportType.MACHINE_WORKLOAD]: "totalHallsForMachineWorkload",
+		};
+
+		const key = workloadMap[reportType] as keyof this;
+
+		if (key in this) {
+			(this as any)[key] = event.counter; // Type assertion to avoid type errors
+		}
 	}
 
 	loadMasterData() {
@@ -123,6 +165,17 @@ export class StaffWorkloadComponent {
 				this.masterData = res.capacity.mainData;
 				this.demandsData = res.demand.mainData;
 				this.capacityData = res.capacity.mainData;
+				this.weeksList = this.weekService.getWeeksAndYearsBetweenDates(
+					this.startDate,
+					this.endDate
+				);
+				this.bullterColumnChartData = this.planVisuService.generateCombineBulletChartData(
+					this.demandsData,
+					this.capacityData,
+					"",
+					this.weeksList
+				);
+				this.planVisuService.updateCombineBulletChartData(this.bullterColumnChartData);
 				this.capacitySettings = res.capacity.capacitySettings;
 			},
 		});
@@ -130,8 +183,7 @@ export class StaffWorkloadComponent {
 
 	ngAfterViewInit(): void {}
 
-	ngOnDestroy(): void {
-	}
+	ngOnDestroy(): void {}
 
 	closeDialog() {
 		this.isDialogOpen = false;

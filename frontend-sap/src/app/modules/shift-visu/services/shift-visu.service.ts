@@ -1,7 +1,5 @@
 import { Injectable } from "@angular/core";
-
 import { BehaviorSubject, of } from "rxjs";
-
 import { CommonService } from "@app/shared/services/common.service";
 import { Hall } from "@app/shared/models/hall.model";
 

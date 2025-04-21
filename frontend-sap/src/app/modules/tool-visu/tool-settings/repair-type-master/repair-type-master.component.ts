@@ -59,7 +59,7 @@ export class RepairTypeMasterComponent {
 			accessor: "custom_id",
 			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: true,
+			disableSortBy: false,
 			showSearch: false,
 			isSelected: true
 		},

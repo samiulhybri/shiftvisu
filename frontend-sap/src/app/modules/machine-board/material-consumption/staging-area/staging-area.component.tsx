@@ -254,32 +254,6 @@ export class StagingAreaComponent implements OnInit, OnDestroy {
 			disableSortBy: true,
 		},
 		{
-			Header: $localize`Item State Id`,
-			accessor: "item_state.custom_id",
-			disableFilters: true,
-			disableGroupBy: true,
-			disableSortBy: true,
-			isSelected: true,
-			hAlign: "Left",
-			Cell: (instance: any) => {
-				const { row } = instance;
-				const rowData = row.original;
-
-				switch (rowData.stockable_type) {
-					case BackendModelType.ITEMPLANT:
-						return rowData?.item_state?.custom_id ?? "";
-					case BackendModelType.Equipment:
-						return rowData?.item_state?.custom_id ?? "";
-
-					case BackendModelType.HANDLINGUNIT:
-						return ProdOrderPosOperationHandlingUnitTypeClass.getStateTranslate(rowData?.state_type?.type) ?? "";
-
-					default:
-						return ""
-				}
-			}
-		},
-		{
 			Header: $localize`Quantity`,
 			accessor: "quantity",
 			disableFilters: true,
@@ -327,7 +301,7 @@ export class StagingAreaComponent implements OnInit, OnDestroy {
 
 				return (
 					<React.StrictMode>
-						<FlexBox>
+						<FlexBox className="gap-3">
 							{this.isQuantityExit || this.isQuantityEntry ? (
 								<FlexBox>
 									{row.depth == 0 ? (

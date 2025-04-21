@@ -14,7 +14,7 @@
 			[showDownload]="false"
 			[showActiveButton]="false"
 			[showEditButton]="false"
-			addButtonText="New"
+			addButtonText="Add"
 			i18n-addButtonText
 			[showNewButton]="true"
 			[addButtonDisable]="implementedActionGrid?.isBusy || !eightDReportId"
@@ -34,14 +34,16 @@
 	[title]="'Add'">
 	<ui5-card class="max-h-[500px] h-[calc(100vh-375px)] max-w-[870px] w-[90vw]">
 		<div class="max-h-[475px] h-[calc(100vh-400px)]">
-			@if(isActionToImplementDialogOpen) {
+			@if (isActionToImplementDialogOpen) {
 				<app-grid-table
 					headerTitle="Corrective Actions List"
 					i18n-headerTitle
 					url="/EightDReportActions"
 					[filterQuery]="filterQueryCorrecitve"
 					[columns]="columns"
-					[isBusy]="actionToImplementGrid?.isBusy || isSaving || isSavingActionToImplement"
+					[isBusy]="
+						actionToImplementGrid?.isBusy || isSaving || isSavingActionToImplement
+					"
 					[showSearch]="true"
 					[showDownload]="false"
 					[showActiveButton]="false"
@@ -107,7 +109,8 @@
 	state="Critical"
 	[open]="deleteId != null"
 	(ui5BeforeClose)="closeDialog('delete')">
-	<p i18n>Do you really want to remove this task from Implemented Actions?</p>
+	<p class="w-full" i18n>Do you really want to remove this task from Implemented Actions?</p>
+	<ui5-busy-indicator [active]="isDeletingImplementedTask" class="w-full"></ui5-busy-indicator>
 	<div
 		slot="footer"
 		class="footer-style gap-8">

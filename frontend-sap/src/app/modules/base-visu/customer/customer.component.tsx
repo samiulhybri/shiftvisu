@@ -285,7 +285,7 @@ export class CustomerComponent {
 	}
 
 	refreshEditData() {
-		const url = `Customers?$filter=is_active eq true and id eq ${this.selectedCustomer?.id}&$orderby=custom_id asc&$expand=deliveryTerm,paymentTerm,salesArea,salesGroup,customerGroup,country,sector`;
+		const url = `Customers?$filter=id eq ${this.selectedCustomer?.id}&$orderby=custom_id asc&$expand=deliveryTerm,paymentTerm,salesArea,salesGroup,customerGroup,country,sector`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -425,7 +425,7 @@ export class CustomerComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedCustomer, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 
 				this._toasterSrv.showToast(recordDeleted, "success");

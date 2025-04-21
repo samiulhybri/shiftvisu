@@ -8,6 +8,7 @@ import { ProdOrderPosOperation } from "@app/shared/models/prod-order-pos-operati
 import { DataService } from "@app/shared/services/data.service";
 import ButtonDesign from "@ui5/webcomponents/dist/types/ButtonDesign";
 import { MachineboardService } from "@app/modules/machine-board/services/machineboard.service";
+import { formatNumber } from "@app/shared/utils/number-formatter";
 
 @Component({
 	selector: "app-order-details2",
@@ -44,6 +45,8 @@ export class OperationDetails2Component {
 		} else {
 			this.orderDetails = [];
 			this.selectedOperations = undefined;
+			this.dataService.orderDetails = [];
+			this.dataService.selectedOrderDetails = null;
 			this.triggerEvent.emit(new Item().deserialize({}));
 			this.selectedOperationEvent.emit({});
 		}
@@ -52,10 +55,16 @@ export class OperationDetails2Component {
 	constructor(
 		public machineboardService: MachineboardService,
 		private dataService: DataService
-	) {}
+	) {
+		this.machineboardService.updateOperations([]);
+	}
 
 	ngOnInit() {
 		if (this.prodOrderPosOperationsIds?.length) this.loadData();
+	}
+
+	format(value: any) {
+		return formatNumber(Number(value) ?? 0);
 	}
 
 	loadData(prodOrderPosOperationsIds?: number[]) {

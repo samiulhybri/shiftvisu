@@ -43,7 +43,7 @@ export class MachineStateCurrentComponent {
 	resetMachine() {
 		this.isBusy = true;
 		const id = this.route.snapshot.params["id"];
-		this.commonService.get(`machine/${id}/machine-current-state/machineBoard`, false).subscribe({
+		this.commonService.get(`machine/${id}/machine-current-state`, false).subscribe({
 			next: (value: any) => {
 				this.selectedMachine = new Machine().deserialize(value);
 				this.isBusy = false;
@@ -75,7 +75,7 @@ export class MachineStateCurrentComponent {
 	}
 
 	isReady() {
-		return this.selectedMachine?.status == MachineStateStateType.READY 
+		return this.selectedMachine?.status == MachineStateStateType.READY
 				&& this.selectedMachine?.machine_board_type == MachineBoardTypeClass.getStateTranslate(MachineBoardType.VIEW_2);
 	}
 

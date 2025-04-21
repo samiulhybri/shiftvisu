@@ -3,8 +3,9 @@ import { ChangeDetectorRef, Component, Input, SimpleChanges, ViewChild } from "@
 import { FlexBox, Button } from "@ui5/webcomponents-react";
 import React from "react";
 import moment from "moment";
+import { ToastComponent } from "@ui5/webcomponents-ngx";
 
-import { CustomReactGridTable } from "@app/shared/components/CustomGridTable";
+import { CustomReactGridTable, GridTableColumnDataType } from "@app/shared/components/CustomGridTable";
 import { EightDReportTabType } from "@app/shared/enums/EightDReportTabType";
 import { Localization } from "@app/shared/utils/common-localize";
 import { returnChanges } from "@app/shared/utils/return-changes";
@@ -21,6 +22,8 @@ export class PreventRecurrenceComponent {
 		| CustomReactGridTable
 		| undefined;
 
+	@ViewChild("toast") toast?: ToastComponent;
+
 	localization = Localization;
 
 	@Input() eightDReportId: number = 0;
@@ -34,6 +37,7 @@ export class PreventRecurrenceComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Responsible Person`,
@@ -42,6 +46,8 @@ export class PreventRecurrenceComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
+			dataType: GridTableColumnDataType.NestedString,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -62,7 +68,9 @@ export class PreventRecurrenceComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 			hAlign: "Right",
+			dataType: GridTableColumnDataType.Date,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { cell, row, webComponentsReactProperties } = instance;
 				const rowData = row.original;
@@ -71,7 +79,9 @@ export class PreventRecurrenceComponent {
 				return (
 					<React.StrictMode>
 						<FlexBox>
-							{formattedDate.isValid() ? formattedDate.format("DD.MM.YYYY") : ""}
+							{formattedDate.isValid()
+								? moment.utc(formattedDate).local().format("DD.MM.YYYY")
+								: ""}
 						</FlexBox>
 					</React.StrictMode>
 				);
@@ -79,23 +89,21 @@ export class PreventRecurrenceComponent {
 		},
 		{
 			Header: $localize`Progress`,
-			accessor: "status",
+			accessor: "progress",
 			disableFilters: false,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 			hAlign: "Right",
 			width: 100,
+			dataType: GridTableColumnDataType.Number,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
 				return (
 					<React.StrictMode>
-						<>
-							{rowData.progress && rowData.progress >= 0
-								? rowData.progress + "%"
-								: ""}
-						</>
+						<>{(rowData.progress ?? 0) >= 0 ? rowData.progress + "%" : ""}</>
 					</React.StrictMode>
 				);
 			},
@@ -103,10 +111,11 @@ export class PreventRecurrenceComponent {
 		{
 			Header: $localize`Description`,
 			accessor: "description",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
+			autoResizable: true,
 			width: 120,
 			hAlign: "Center",
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
@@ -158,6 +167,7 @@ export class PreventRecurrenceComponent {
 	};
 
 	selectedTask: any = { ...this.emptyTask };
+	toastMessage: string = "";
 
 	constructor(
 		private qualiVisuService: QualiVisuService,
@@ -208,9 +218,10 @@ export class PreventRecurrenceComponent {
 			payload = { ...returnChanges(this.initialTask, data) };
 		}
 
-		if (Object.keys(payload).length === 0) {
-			this.isTaskSaveDialogOpen = false;
-			return;
+		if (payload.end_date) {
+			payload.end_date = moment(payload.end_date, "DD.MM.YYYY", true)
+				.endOf("day")
+				.toISOString();
 		}
 
 		this.isSavingTask = true;
@@ -221,12 +232,16 @@ export class PreventRecurrenceComponent {
 				this.saveMode = "patch";
 				this.isSavingTask = false;
 				this.isTaskSaveDialogOpen = false;
+				this.toastMessage = this.localization.recordSavedSuccessfully;
+				this.toast!.open = true;
 			},
 			error => {
 				this.preventReccurenceGrid?.onFilterAndSorting();
 				this.saveMode = "patch";
 				this.isSavingTask = false;
 				this.isTaskSaveDialogOpen = false;
+				this.toastMessage = this.localization.failedToSaveData;
+				this.toast!.open = true;
 			}
 		);
 	}
@@ -246,7 +261,7 @@ export class PreventRecurrenceComponent {
 
 		let data = { ...event };
 
-		data.end_date = data.end_date ? moment(data.end_date).format("DD.MM.YYYY") : "";
+		data.end_date = data.end_date ? moment.utc(data.end_date).local().format("DD.MM.YYYY") : "";
 
 		this.initialTask = { ...data };
 		this.selectedTask = { ...data };

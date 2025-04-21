@@ -205,7 +205,6 @@ export class MaterialConsumptionComponent {
 		this.bomSelectedRowData = bomSelectedRowData;
 	}
 
-
 	loadData() {
 		this.isLoading = true;
 		let requests: ODataBatchCall[] = [];
@@ -245,11 +244,11 @@ export class MaterialConsumptionComponent {
 				this.setting = new Setting().deserialize(response.responses[4]?.body?.value?.[0]);
 
 				if (!this.setting.is_ewm_enabled) {
-					this.billOfMaterialRef.addActonColumn();
+					this.billOfMaterialRef?.addActionColumn();
 				}
 
 				if (this.setting.is_ewm_enabled) {
-					this.billOfMaterialRef.addItemTypeColumn();
+					this.billOfMaterialRef?.addItemTypeColumn();
 				} else if (this.fromTransportOrder) {
 					this.getTransportOrderPos();
 				}
@@ -286,7 +285,6 @@ export class MaterialConsumptionComponent {
 			this.storageLocationListPopover.open = false;
 		}
 	}
-
 
 	deleteMaterialClick(data: any, columnIdentifier?: string) {
 		const deletedObject = data;
@@ -736,6 +734,12 @@ export class MaterialConsumptionComponent {
 	onTabSelect(event: any) {
 		const tabId = event.detail.tab.id;
 		this.selectedTab = tabId;
+
+		setTimeout(() => {
+			if (this.selectedTab == "Bom" && !this.setting.is_ewm_enabled) {
+				this.billOfMaterialRef?.addActionColumn(); // Add action column after tab is rendered
+			}
+		}, 500);
 	}
 
 	onAddPackagingMaterial() {

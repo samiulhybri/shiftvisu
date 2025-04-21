@@ -91,6 +91,15 @@ export class OrderViewTreeComponent {
 		{ id: "1", name: $localize`Active Orders` },
 		{ id: "2", name: $localize`Closed Orders` },
 	];
+	isShowOperationPopupField: any = {
+		'customer': true,
+		'item': true,
+		'prod_order': true,
+		'due_date': true,
+		'release_date': true,
+		'constraint_type': true,
+		'alt_machine': true
+	}
 	url = "";
 	filterQuery = ``;
 	expandQuery = "";

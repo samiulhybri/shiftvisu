@@ -480,7 +480,7 @@ export class MachineStateComponent {
 	}
 
 	refreshEditData() {
-		const url = `MachineStates?$filter=is_active eq true and id eq ${this.selectedRowValue?.id}&$orderby=custom_id asc&$expand=machineStateGroup,machines`;
+		const url = `MachineStates?$filter=id eq ${this.selectedRowValue?.id}&$orderby=custom_id asc&$expand=machineStateGroup,machines`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -500,7 +500,7 @@ export class MachineStateComponent {
 		this.commonService.delete(`/MachineStates(${this.selectedRowValue.id})`).subscribe({
 			next: () => {
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue.id, null);
 				this.disableButtonDuringRequest = false;
 
 				this.closeDialogDelete();

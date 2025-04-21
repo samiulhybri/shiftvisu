@@ -8,6 +8,7 @@ import { ReplaySubject, takeUntil } from "rxjs";
 import { QuantityChartComponent } from "./quantity-chart/quantity-chart.component";
 import { ProdOrderPosOperationStatus } from "@app/shared/enums/ProdOrderPosOperationStatus";
 import { MachineBoardEventHandleService } from "@app/modules/machine-board/services/machine-board-event-handle.service";
+import { MachineboardService } from "@app/modules/machine-board/services/machineboard.service";
 
 @Component({
 	selector: "app-machine-board",
@@ -31,7 +32,8 @@ export class MachineBoardComponent {
 		private route: ActivatedRoute,
 		public commonService: CommonService,
 		private dataService: DataService,
-		private machineBoardEventService: MachineBoardEventHandleService
+		private machineBoardEventService: MachineBoardEventHandleService,
+		private machineboardService: MachineboardService,
 	) {}
 
 	async ngOnInit(): Promise<void> {
@@ -77,6 +79,7 @@ export class MachineBoardComponent {
 			.pipe(takeUntil(this.destroyed$))
 			.subscribe((machineResponse: any) => {
 				this.machine = new Machine(this.commonService).deserialize(machineResponse);
+				this.machineboardService.updateSelectedMachine(this.machine);
 				this.dataService.machineData = new Machine().deserialize(machineResponse);
 				this.isBusy = false;
 			});
@@ -85,6 +88,7 @@ export class MachineBoardComponent {
 	ngOnDestroy(): void {
 		this.renderer.removeClass(document.body, "sapUiSizeCozy");
 		this.renderer.addClass(document.body, "sapUiSizeCompact");
+		this.machineboardService.updateSelectedMachine(undefined);
 		this.destroyed$.next(true);
 		this.destroyed$.complete();
 		this.machineEventSubscription.unsubscribe();

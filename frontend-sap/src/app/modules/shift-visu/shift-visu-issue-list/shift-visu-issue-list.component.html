@@ -6,8 +6,8 @@
 		<ui5-title
 			level="H5"
 			slot="startContent"
-			>{{ this.hall.name }} <span i18n>Issues</span> </ui5-title
-		>
+			>{{ this.hall.name }}<span i18n>Issues</span>
+		</ui5-title>
 		<ui5-input
 			id="valueHelpInput"
 			placeholder="Search"
@@ -18,7 +18,6 @@
 				slot="icon"
 				name="search"></ui5-icon>
 		</ui5-input>
-
 		<div
 			class="daterange-picker-width"
 			slot="endContent">
@@ -33,7 +32,6 @@
 		</ui5-button>
 		<ui5-button
 			slot="endContent"
-			i18n
 			>{{ localization.reset }}
 		</ui5-button>
 
@@ -149,7 +147,10 @@
 
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label showColon i18n>Hall</ui5-label>
+								<ui5-label
+									showColon
+									i18n>Hall</ui5-label
+								>
 								<ui5-input
 									readonly="true"
 									i18n-placeholder
@@ -157,14 +158,22 @@
 									class="w-full"></ui5-input>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label showColon required i18n>Creator</ui5-label>
+								<ui5-label
+									showColon
+									required
+									i18n>Creator</ui5-label
+								>
 								<ui5-input
 									readonly="true"
 									value="{{ this.creator }}"
 									class="w-full"></ui5-input>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label showColon required i18n>Error</ui5-label>
+								<ui5-label
+									showColon
+									required
+									i18n>Error</ui5-label
+								>
 								<ui5-combobox
 									id="viewTypeCombobox"
 									class="w-full"
@@ -182,7 +191,7 @@
 							</div>
 						</div>
 
-						<div>
+						<div *ngIf="failureComponentList">
 							<ui5-label
 								showColon
 								required
@@ -195,121 +204,185 @@
 							</app-text-editor>
 						</div>
 
-						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Machine No</ui5-label>
-								<ui5-combobox
-									placeholder="Select Machine"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Serial No</ui5-label>
-								<ui5-combobox
-									placeholder="Choose Serial Number"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
+						<ng-container *ngFor="let group of componentGroups">
+							<ng-container *ngFor="let field of group.components">
+								<div *ngIf="field.component_type?.toString() === 'TEXTAREA'">
+									<ui5-label
+										showColon
+										required
+										class="mt-2">{{ field.name }}</ui5-label
+									>
+									<ui5-textarea
+										placeholder="Write here."
+										[(ngModel)]="formData[field.id]"
+										class="w-full">
+									</ui5-textarea>
+								</div>
+							</ng-container>
+						</ng-container>
 
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>NCR NO</ui5-label>
-								<ui5-input
-									readonly="true"
-									value="5"
-									class="w-full"></ui5-input>
-							</div>
+						<div class="grid grid-cols-3 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'COMBOBOX'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-combobox
+											[placeholder]="'Select ' + field.name"
+											(selection-change)="overviewComboboxValues($event , field.id)"
+											class="w-full">
+											<ui5-cb-item
+												text="{{item.option}}"
+												id="{{item.id}}"
+												*ngFor="let item of field.options">
+											</ui5-cb-item>
+										</ui5-combobox>
+									</div>
+								</ng-container>
+							</ng-container>
+
+							<ng-container *ngFor="let group of componentGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="
+											field.component_type?.toString() === 'DROPDOWN_MULTI'
+										">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-multi-combobox
+											[placeholder]="'Select ' + field.name"
+											(selection-change)="overviewMultiComboboxValues($event, field.id)"
+											class="w-full">
+											<ui5-mcb-item
+												[text]="item.option"
+												[id]="item.id"
+												*ngFor="let item of field.options">
+											</ui5-mcb-item>
+										</ui5-multi-combobox>
+									</div>
+								</ng-container>
+							</ng-container>
+
+							<ng-container *ngFor="let group of componentGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="
+											field.component_type?.toString() === 'DROPDOWN_SINGLE'
+										">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-select 
+										  (change)="overviewSingleSelectValues($event , field.id)"
+										  class="w-full">
+ 											<ui5-option id="{{item.id}}" *ngFor="let item of field.options">{{item.option}}</ui5-option>
+										</ui5-select>
+									</div>
+								</ng-container>
+							</ng-container>
+
+							<ng-container *ngFor="let group of componentGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'DATE'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-date-picker format-pattern="dd.MM.yyyy" [(ngModel)]="formData[field.id]">
+										</ui5-date-picker>
+									</div>
+								</ng-container>
+							</ng-container>
 						</div>
 
-						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Part No</ui5-label>
-								<ui5-combobox
-									placeholder="Select Part"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Plan Part</ui5-label>
-								<ui5-combobox
-									placeholder="Select Plan Part"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Tool No</ui5-label>
-								<ui5-combobox
-									placeholder="Choose Tool"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
+						<div class="grid grid-cols-2 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'DATETIME'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-datetime-picker
+											format-pattern="dd.MM.yyyy, hh:mm"
+											[(ngModel)]="formData[field.id]">
+										</ui5-datetime-picker>
+									</div>
+								</ng-container>
+							</ng-container>
+						</div>
+						<div class="grid grid-cols-2 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'TEXTFIELD'">
+										<ui5-label showColon>{{ field.name }}</ui5-label>
+										<ui5-input placeholder="Write here." class="w-full"  [(ngModel)]="formData[field.id]"></ui5-input>
+									</div>
+								</ng-container>
+							</ng-container>
 						</div>
 
-						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Machine No</ui5-label>
-								<ui5-combobox
-									placeholder="Select Machine"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Serial No</ui5-label>
-								<ui5-combobox
-									placeholder="Choose Serial Number"
-									i18n-placeholder
-									class="w-full">
-									<ui5-cb-item text="Austria"></ui5-cb-item>
-									<ui5-cb-item text="Bulgaria"></ui5-cb-item>
-									<ui5-cb-item text="Germany"></ui5-cb-item>
-									<ui5-cb-item text="Italy"></ui5-cb-item>
-									<ui5-cb-item text="Spain"></ui5-cb-item>
-								</ui5-combobox>
-							</div>
+						<div class="grid grid-cols-3 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'CHECKBOX'">
+										<ui5-checkbox
+											[text]="field.name"
+											[(ngModel)]="formData[field.id]">
+										</ui5-checkbox>
+									</div>
+								</ng-container>
+							</ng-container>
+						</div>
 
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>NCR NO</ui5-label>
-								<ui5-input
-									readonly="true"
-									value="5"
-									class="w-full"></ui5-input>
-							</div>
+						<div class="grid grid-cols-3 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'SWITCH'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-switch [(ngModel)]="formData[field.id]"></ui5-switch>
+									</div>
+								</ng-container>
+							</ng-container>
+						</div>
+						<div class="w-full mt-4">
+							<ng-container *ngFor="let group of componentGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'RADIO'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<div class="grid grid-cols-4 gap-4 ">
+											<ui5-radio-button 
+											*ngFor="let item of field.options"
+											name="{{ field.id }}"
+											[text]="item.option"
+											[id]="item.id"
+											(change)="onRadioChange($event, field.id, item)">
+										  </ui5-radio-button>
+										  
+										</div>
+									</div>
+								</ng-container>
+							</ng-container>
 						</div>
 					</ui5-tab>
 
@@ -319,7 +392,10 @@
 						text="Emergency Measures">
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label showColon i18n>Emergency Measures</ui5-label>
+								<ui5-label
+									showColon
+									i18n>Emergency Measures</ui5-label
+								>
 								<ui5-combobox
 									placeholder="Select Emergency Measures"
 									i18n-placeholder
@@ -334,7 +410,10 @@
 								</ui5-combobox>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label showColon i18n>Final Measures</ui5-label>
+								<ui5-label
+									showColon
+									i18n>Final Measures</ui5-label
+								>
 								<ui5-combobox
 									placeholder="Choose Final Measures"
 									i18n-placeholder
@@ -351,7 +430,10 @@
 							</div>
 
 							<div class="flex-col flex">
-								<ui5-label showColon i18n>Further Use</ui5-label>
+								<ui5-label
+									showColon
+									i18n>Further Use</ui5-label
+								>
 								<ui5-combobox
 									placeholder="Choose Further Use"
 									i18n-placeholder
@@ -369,7 +451,11 @@
 						</div>
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex items-center">
-								<ui5-title level="H5" size="H5" i18n>Emergency Measure</ui5-title>
+								<ui5-title
+									level="H5"
+									size="H5"
+									i18n>Emergency Measure</ui5-title
+								>
 							</div>
 							<div class="flex items-center">
 								<ui5-checkbox
@@ -377,13 +463,21 @@
 									i18n-text></ui5-checkbox>
 							</div>
 							<div class="flex items-center justify-end">
-								<ui5-label showColon i18n>Finished</ui5-label>
+								<ui5-label
+									showColon
+									i18n>Finished</ui5-label
+								>
 								<ui5-switch class="ml-2"></ui5-switch>
 							</div>
 						</div>
 
 						<div>
-							<ui5-label showColon required class="mb-2" i18n>Emergency Measure Description</ui5-label>
+							<ui5-label
+								showColon
+								required
+								class="mb-2"
+								i18n>Emergency Measure Description</ui5-label
+							>
 							<app-text-editor
 								[notes]="failureDescriptionNote"
 								[isReadOnly]="false">
@@ -392,18 +486,27 @@
 
 						<div class="grid grid-cols-2 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label showColon i18n>Restart</ui5-label>
+								<ui5-label
+									showColon
+									i18n>Restart</ui5-label
+								>
 								<ui5-datetime-picker
 									format-pattern="dd.MM.yyyy, hh:mm"></ui5-datetime-picker>
 							</div>
 							<div class="flex-col flex">
-								<ui5-label showColon i18n>End Date</ui5-label>
+								<ui5-label
+									showColon
+									i18n>End Date</ui5-label
+								>
 								<ui5-datetime-picker
 									format-pattern="dd.MM.yyyy, hh:mm"></ui5-datetime-picker>
 							</div>
 
 							<div class="flex-col flex">
-								<ui5-label showColon i18n>Responsible</ui5-label>
+								<ui5-label
+									showColon
+									i18n>Responsible</ui5-label
+								>
 								<ui5-combobox
 									placeholder="Select Machine"
 									i18n-placeholder>
@@ -419,7 +522,10 @@
 						</div>
 						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 							<div class="flex-col flex">
-								<ui5-label showColon i18n>Status</ui5-label>
+								<ui5-label
+									showColon
+									i18n>Status</ui5-label
+								>
 								<ui5-range-slider
 									start-value="0"
 									end-value="25"
@@ -465,70 +571,160 @@
 					</ui5-tab>
 
 					<ui5-tab
+					    *ngIf="componentDetailsGroups.length > 0"
 						i18n-text
 						class="h-[calc(100vh-304px)]"
 						text="Details">
-						<div class="">
-							<ui5-label showColon i18n>Reason</ui5-label>
-							<ui5-textarea
-								placeholder="Write here."
-								i18n-placeholder
-								class="w-full h-[100px]"></ui5-textarea>
+
+						<div class="flex items-center">
+							<ng-container *ngFor="let group of componentDetailsGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div  *ngIf="field.component_type?.toString() === 'TEXTAREA'">
+										<ui5-label
+											showColon
+											required
+											class="mt-2">{{ field.name }}</ui5-label
+										>
+										<ui5-textarea
+											placeholder="Write here."
+											class="w-full"></ui5-textarea>
+									</div>
+								</ng-container>
+							</ng-container>
 						</div>
 
-						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Hall</ui5-label>
-								<ui5-input
-									readonly="true"
-									value="Sct"
-									class="w-full"></ui5-input>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label showColon required i18n>Creator</ui5-label>
-								<ui5-select
-									class="w-full"
-									i18n-placeholder>
-									<ui5-option>Abram Elias</ui5-option>
-									<ui5-option>Tablet</ui5-option>
-									<ui5-option>Phone</ui5-option>
-								</ui5-select>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label showColon required i18n>Error</ui5-label>
-								<ui5-select
-									class="w-full"
-									i18n-placeholder>
-									<ui5-option>Server Issue</ui5-option>
-									<ui5-option>Client Issue</ui5-option>
-									<ui5-option>Qa Issue</ui5-option>
-								</ui5-select>
-							</div>
-						</div>
-						<div>
-							<ui5-label showColon i18n>Department(Originator)</ui5-label>
-							<ui5-textarea
-								placeholder="Write here."
-								i18n-placeholder
-								class="w-full h-[100px]"></ui5-textarea>
+						<div class="grid grid-cols-3 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentDetailsGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'COMBOBOX'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-combobox
+											[placeholder]="'Select ' + field.name"
+											class="w-full">
+											<ui5-cb-item
+												text="{{item.option}}"
+												*ngFor="let item of field.options"></ui5-cb-item>
+										</ui5-combobox>
+									</div>
+								</ng-container>
+							</ng-container>
+
+							<ng-container *ngFor="let group of componentDetailsGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="
+											field.component_type?.toString() === 'DROPDOWN_MULTI'
+										">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-multi-combobox
+											[placeholder]="'Select ' + field.name"
+											class="w-full">
+											<ui5-mcb-item
+												[text]="item.option"
+												*ngFor="let item of field.options"></ui5-mcb-item>
+										</ui5-multi-combobox>
+									</div>
+								</ng-container>
+							</ng-container>
+
+							<ng-container *ngFor="let group of componentDetailsGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="
+											field.component_type?.toString() === 'DROPDOWN_SINGLE'
+										">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-select class="w-full">
+											<ui5-option
+												*ngFor="let item of field.options"
+												>{{item.option}}</ui5-option
+											>
+										</ui5-select>
+									</div>
+								</ng-container>
+							</ng-container>
+
+							<ng-container *ngFor="let group of componentDetailsGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'DATE'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-date-picker format-pattern="dd.MM.yyyy">
+										</ui5-date-picker>
+									</div>
+								</ng-container>
+							</ng-container>
 						</div>
 
-						<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Cost</ui5-label>
-								<ui5-input
-									readonly="true"
-									value="Sct"
-									class="w-full"></ui5-input>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Network Cost Announced</ui5-label>
-								<ui5-switch></ui5-switch>
-							</div>
-							<div class="flex-col flex">
-								<ui5-label showColon i18n>Still Mill Error</ui5-label>
-								<ui5-switch></ui5-switch>
-							</div>
+						<div class="grid grid-cols-2 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentDetailsGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'DATETIME'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-datetime-picker
+											format-pattern="dd.MM.yyyy, hh:mm"></ui5-datetime-picker>
+									</div>
+								</ng-container>
+							</ng-container>
+						</div>
+						<div class="grid grid-cols-2 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentDetailsGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'TEXTFIELD'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-input placeholder="Write here." class="w-full"></ui5-input>
+									
+									</div>
+								</ng-container>
+							</ng-container>
+						</div>
+
+						<div class="grid grid-cols-3 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentDetailsGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'CHECKBOX'">
+										<ui5-checkbox [text]="field.name"></ui5-checkbox>
+									</div>
+								</ng-container>
+							</ng-container>
+						</div>
+
+						<div class="grid grid-cols-3 gap-4 mt-4">
+							<ng-container *ngFor="let group of componentDetailsGroups">
+								<ng-container *ngFor="let field of group.components">
+									<div
+										class="flex-col flex"
+										*ngIf="field.component_type?.toString() === 'SWITCH'">
+										<ui5-label
+											showColon>{{ field.name }}</ui5-label
+										>
+										<ui5-switch></ui5-switch>
+									</div>
+								</ng-container>
+							</ng-container>
 						</div>
 					</ui5-tab>
 
@@ -575,7 +771,64 @@
 								</ui5-input>
 							</ui5-bar>
 
-							<ui5-illustrated-message name="NoData"> </ui5-illustrated-message>
+						<ui5-list class="h-full">
+							<ui5-li-custom class="mt-2 h-[90px]">
+								<div class="flex items-center justify-between w-full">
+									<div class="flex items-center gap-4">
+										<div class="w-[70px]">
+											<ui5-icon design="Neutral" class="h-full w-full"
+												name="doc-attachment"></ui5-icon>
+										</div>
+										<div class="flex flex-col">
+											<ui5-text i18n class="text-blue-500 text-[17px]">Overview.doc</ui5-text>
+
+											<ui5-label  class="text-xs text-gray-500"
+											  i18n>Uploaded By: Jane Burns -Uploaded On:09/06/2023</ui5-label
+											>
+											<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
+										</div>
+									</div>
+								</div>
+							</ui5-li-custom>
+
+							<ui5-li-custom class="mt-2 h-[90px]">
+								<div class="flex items-center justify-between w-full">
+									<div class="flex items-center gap-4">
+										<div class="w-[70px]">
+											<img src="assets/images/derga_logo.png" slot="image" alt="Picture"
+												class="w-full h-full bg-cover rounded-md" />
+										</div>
+
+										<div class="flex flex-col">
+											<ui5-text class="text-blue-500 text-[17px]" i18n>Picture.png</ui5-text>
+											<ui5-label  class="text-xs text-gray-500"
+											  i18n>Uploaded By: Jane Burns -Uploaded On: 09/06/2023</ui5-label
+											>
+											<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
+										</div>
+									</div>
+								</div>
+							</ui5-li-custom>
+							<ui5-li-custom class="mt-2 h-[90px]">
+								<div class="flex items-center justify-between w-full">
+									<div class="flex items-center gap-4">
+										<div class="w-[70px]">
+											<ui5-icon design="Neutral" class="h-full w-full"
+												name="pdf-attachment"></ui5-icon>
+										</div>
+
+										<div class="flex flex-col">
+											<ui5-text class="text-blue-500 text-[17px]" i18n>Picture.png</ui5-text>
+											<ui5-label  class="text-xs text-gray-500"
+											  i18n>Uploaded By: Jane Burns -Uploaded On: 09/06/2023</ui5-label
+											>
+											<ui5-label i18n class="text-xs text-gray-500">File Size: 100 KB</ui5-label>
+										</div>
+									</div>
+								</div>
+							</ui5-li-custom>
+
+						</ui5-list>
 						</ui5-card>
 					</ui5-tab>
 				</ui5-tabcontainer>
@@ -590,6 +843,7 @@
 					design="Emphasized"
 					slot="endContent"
 					[disabled]="isIssueTabLoading"
+					(click)="submitFailureForm()"
 					>{{ localization.save }}</ui5-button
 				>
 				<ui5-button
@@ -612,17 +866,29 @@
 		<form action="">
 			<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 				<div class="flex items-center">
-					<ui5-title level="H5" size="H5" i18n>Corrective Measure</ui5-title>
+					<ui5-title
+						level="H5"
+						size="H5"
+						i18n>Corrective Measure</ui5-title
+					>
 				</div>
 				<div class="flex items-center"> </div>
 				<div class="flex items-center justify-end">
-					<ui5-label showColon i18n>Finished</ui5-label>
+					<ui5-label
+						showColon
+						i18n>Finished</ui5-label
+					>
 					<ui5-switch class="ml-2"></ui5-switch>
 				</div>
 			</div>
 
 			<div>
-				<ui5-label showColon required class="mb-2" i18n>Corrective Measure Description</ui5-label>
+				<ui5-label
+					showColon
+					required
+					class="mb-2"
+					i18n>Corrective Measure Description</ui5-label
+				>
 				<app-text-editor
 					[notes]="failureDescriptionNote"
 					[isReadOnly]="false">
@@ -631,17 +897,25 @@
 
 			<div class="grid grid-cols-3 gap-2 items-center mt-3 mb-3 w-full">
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>Restart</ui5-label
+					<ui5-label
+						showColon
+						i18n>Restart</ui5-label
 					>
 					<ui5-datetime-picker format-pattern="dd.MM.yyyy, hh:mm"></ui5-datetime-picker>
 				</div>
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>End Date</ui5-label>
+					<ui5-label
+						showColon
+						i18n>End Date</ui5-label
+					>
 					<ui5-datetime-picker format-pattern="dd.MM.yyyy, hh:mm"></ui5-datetime-picker>
 				</div>
 
 				<div class="flex-col flex">
-					<ui5-label showColon i18n>Responsible</ui5-label>
+					<ui5-label
+						showColon
+						i18n>Responsible</ui5-label
+					>
 					<ui5-combobox
 						placeholder="Select Machine"
 						class="w-full"
@@ -697,7 +971,12 @@
 			<ui5-icon
 				name="ai"
 				design="Information"></ui5-icon>
-			<ui5-title level="H5" size="H5" class="ml-2" i18n-title>DAQ</ui5-title>
+			<ui5-title
+				level="H5"
+				size="H5"
+				class="ml-2"
+				i18n-title>DAQ</ui5-title
+			>
 		</div>
 
 		<ui5-list
@@ -705,37 +984,39 @@
 			class="pl-3"
 			style="margin-block-end: 0.75rem">
 			<div class="flex items-center p-2">
-				<ui5-title
-					level="H5"
-					size="H5"
-					i18n-title>Failure Description :</ui5-title
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Failure Description</ui5-label
 				>
-				<ui5-label class="ml-1"
-					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
-					libero tempora error quidem, quas omnis necessitatibus cum</ui5-label
-				>
-			</div>
-			<div class="flex items-center p-2">
-				<ui5-title
-					level="H5"
-					size="H5"
-					i18n-title>Error Measure :</ui5-title
-				>
-				<ui5-label class="ml-1"
-					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
-					libero
-				</ui5-label>
-			</div>
-			<div class="flex items-center p-2">
-				<ui5-title
-					level="H5"
-					size="H5"
-					i18n-title>Corrective Measure :</ui5-title
-				>
-				<ui5-label class="ml-1"
+				<ui5-label
+					class="ml-1"
 					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
 				>
 			</div>
+			<div class="flex items-center p-2">
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Emergency Measure Description</ui5-label
+				>
+				<ui5-label
+					class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Corrective Measure Description</ui5-label
+				>
+				<ui5-label
+					class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+
 		</ui5-list>
 	</ui5-card>
 	<ui5-card class="mb-4">
@@ -756,35 +1037,39 @@
 			class="pl-3"
 			style="margin-block-end: 0.75rem">
 			<div class="flex items-center p-2">
-				<ui5-title
-					level="H5"
-					size="H5" i18n-title>Failure Description :</ui5-title
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Failure Description</ui5-label
 				>
-				<ui5-label class="ml-1"
-					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
-					libero tempora error quidem, quas omnis necessitatibus cum</ui5-label
-				>
-			</div>
-			<div class="flex items-center p-2">
-				<ui5-title
-					level="H5"
-					size="H5" i18n-title>Error Measure :</ui5-title
-				>
-				<ui5-label class="ml-1"
-					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
-					libero
-				</ui5-label>
-			</div>
-			<div class="flex items-center p-2">
-				<ui5-title
-					level="H5"
-					size="H5"
-					i18n-title>Corrective Measure :</ui5-title
-				>
-				<ui5-label class="ml-1"
+				<ui5-label
+					class="ml-1"
 					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
 				>
 			</div>
+			<div class="flex items-center p-2">
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Emergency Measure Description</ui5-label
+				>
+				<ui5-label
+					class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Corrective Measure Description</ui5-label
+				>
+				<ui5-label
+					class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+
 		</ui5-list>
 	</ui5-card>
 	<ui5-card class="mb-4">
@@ -805,35 +1090,92 @@
 			class="pl-3"
 			style="margin-block-end: 0.75rem">
 			<div class="flex items-center p-2">
-				<ui5-title
-					level="H5"
-					size="H5" i18n-title>Failure Description :</ui5-title
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Failure Description</ui5-label
 				>
-				<ui5-label class="ml-1"
-					>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
-					libero tempora error quidem, quas omnis necessitatibus cum</ui5-label
-				>
-			</div>
-			<div class="flex items-center p-2">
-				<ui5-title
-					level="H5"
-					size="H5" i18n-title>Error Measure :</ui5-title
-				>
-				<ui5-label class="ml-1"
-					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum optio itaque
-					libero
-				</ui5-label>
-			</div>
-			<div class="flex items-center p-2">
-				<ui5-title
-					level="H5"
-					size="H5"
-					i18n-title>Corrective Measure :</ui5-title
-				>
-				<ui5-label class="ml-1"
+				<ui5-label
+					class="ml-1"
 					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
 				>
 			</div>
+			<div class="flex items-center p-2">
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Emergency Measure Description</ui5-label
+				>
+				<ui5-label
+					class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Corrective Measure Description</ui5-label
+				>
+				<ui5-label
+					class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+
+		</ui5-list>
+	</ui5-card>
+	<ui5-card class="mb-4">
+		<div class="flex items-center p-2 mt-3 pl-3">
+			<ui5-icon
+				name="ai"
+				design="Information"></ui5-icon>
+			<ui5-title
+				level="H5"
+				size="H5"
+				class="ml-2"
+				i18n-title>DAQ</ui5-title
+			>
+		</div>
+
+		<ui5-list
+			separators="None"
+			class="pl-3"
+			style="margin-block-end: 0.75rem">
+			<div class="flex items-center p-2">
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Failure Description</ui5-label
+				>
+				<ui5-label
+					class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Emergency Measure Description</ui5-label
+				>
+				<ui5-label
+					class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+			<div class="flex items-center p-2">
+				<ui5-label
+				    class="font-extrabold text-black"
+					show-colon
+					i18n>Corrective Measure Description</ui5-label
+				>
+				<ui5-label
+					class="ml-1"
+					i18n>Lorem ipsum dolor sit amet consectetur adipisicing elit.</ui5-label
+				>
+			</div>
+
 		</ui5-list>
 	</ui5-card>
 

@@ -7,10 +7,17 @@ import { ShiftVisuIssueTypeModel } from "@app/shared/models/shift-visu-issue-typ
 import { AuthService } from "@app/shared/services/auth.service";
 import { Localization } from "@app/shared/utils/common-localize";
 import { ShiftVisuService } from "@shift-visu/services/shift-visu.service";
+import { ComponentConfigService } from "@shift-visu/services/component-config.service";
 import { DialogComponent } from "@app/shared/components/dialog/dialog.component";
+import { FailureInfo } from "@shift-visu/interfaces/failure.interface";
+import { ComponentPayload } from "@shift-visu/interfaces/failure.interface";
+import { ShiftVisuComponentGroup } from "@shift-visu/interfaces/failure.interface";
+import { ShiftVisuFailureComponentResponse } from "@shift-visu/interfaces/failure.interface";
 import "@ui5/webcomponents/dist/Button.js";
 import "@ui5/webcomponents-fiori/dist/IllustratedMessage.js";
 import "@ui5/webcomponents-fiori/dist/illustrations/NoData.js";
+import { MultiComboBoxSelectionChangeEventDetail } from "@ui5/webcomponents/dist/MultiComboBox";
+import { NgModel } from "@angular/forms";
 @Component({
 	selector: "app-shift-visu-issue-list",
 	templateUrl: "./shift-visu-issue-list.component.html",
@@ -27,15 +34,23 @@ export class ShiftVisuIssueListComponent implements OnInit {
 	localization = Localization;
 	creator: string = "";
 	hallId: number = 0;
+	failureId: number = 0;
 	hall = new Hall();
 	saveMode: "post" | "patch" | null = null;
 	failureList: ShiftVisuIssueTypeModel[] = [];
 	failureComponent: ShiftVisuComponentModel[] = [];
-
+	ComponentPayload: ComponentPayload[] = [];
+	componentGroups: ShiftVisuComponentGroup[] = [];
+	componentDetailsGroups: ShiftVisuComponentGroup[] = [];
+	FailureInfo: FailureInfo = {} as FailureInfo;
+	failureComponentList: ShiftVisuFailureComponentResponse =
+		{} as ShiftVisuFailureComponentResponse;
+	formData: { [key: number]: any } = {};
 	constructor(
 		private route: ActivatedRoute,
 		private shiftVisuService: ShiftVisuService,
-		public authService: AuthService
+		public authService: AuthService,
+		public ComponentConfigService: ComponentConfigService
 	) {}
 
 	ngOnInit() {
@@ -47,6 +62,66 @@ export class ShiftVisuIssueListComponent implements OnInit {
 				this.creator = this.authService.getUser()?.name || "";
 			}
 		});
+	}
+
+	overviewMultiComboboxValues(event: any, fieldId: number) {
+		const customEvent = event as CustomEvent;
+		const selectedValues = customEvent.detail.items.map((item: any) => ({
+			id: item.id,
+			text: item.text,
+		}));
+		this.formData[fieldId] = selectedValues;
+	}
+	onRadioChange(event: any, fieldId: number, item: any) {
+		this.formData[fieldId] = {
+			id: item.id,
+			text: item.option,
+		};
+	}
+
+	overviewComboboxValues(event: any, fieldId: number) {
+		const selectedValue = {
+			id: event.detail.item.id,
+			text: event.detail.item.text,
+		};
+		this.formData[fieldId] = selectedValue;
+	}
+
+	overviewSingleSelectValues(event: any, fieldId: number) {
+		const selectedOption = event.target.selectedOption;
+		const selectedValue = {
+			id: selectedOption.getAttribute("id"),
+			text: selectedOption.text[0].data,
+		};
+		this.formData[fieldId] = selectedValue;
+	}
+
+	submitFailureForm() {
+		this.FailureInfo = {
+			id: undefined,
+			hall_id: this.hallId,
+			creator_id: this.authService.getUser()?.id || 0,
+			error_id: this.failureId,
+			error_type: "",
+			description: "",
+		};
+
+		for (const group of this.componentGroups) {
+			for (const field of group.components) {
+				const value = this.formData[field.id];
+				this.ComponentPayload.push({
+					component_type: field.component_type?.toString() || "",
+					component_id: field.id,
+					component_model_type: field.model_type,
+					value: value !== undefined ? value : null,
+				});
+			}
+		}
+
+		const payload = {
+			failure_info: this.FailureInfo,
+			component_info: this.ComponentPayload,
+		};
 	}
 
 	getHallInfo() {
@@ -135,21 +210,23 @@ export class ShiftVisuIssueListComponent implements OnInit {
 	onFailureValues(data: any) {
 		const failureName = data.detail.item.text;
 		const failurId = data.detail.item.id;
-		this.getFailureComponent(failurId);
+		this.failureId = failurId;
+		this.onFailureSelected(failurId);
 	}
 
-	getFailureComponent(id: number) {
+	onFailureSelected(failureId: number) {
 		this.isIssueTabLoading = true;
-		this.shiftVisuService["get"](
-			`ShiftVisuIssueTypes(${id})?$expand=components`,
-			true
-		).subscribe({
-			next: async (response: any) => {
-				this.failureComponent = structuredClone(response.components);
+		this.ComponentConfigService.getFailureComponent(failureId).subscribe({
+			next: response => {
+				const overviewData = response?.OVERVIEW?.component_types || [];
+				const detailData = response?.DETAILS?.component_types || [];
+				this.failureComponentList = response;
+				this.componentGroups = overviewData;
+				this.componentDetailsGroups = detailData;
 				this.isIssueTabLoading = false;
 			},
-			error: async (error: any) => {
-				console.log(error);
+			error: err => {
+				console.error(err);
 				this.isIssueTabLoading = false;
 			},
 		});

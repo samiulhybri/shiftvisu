@@ -322,7 +322,7 @@ export class QualificationsComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.qualification, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},
@@ -552,7 +552,11 @@ export class QualificationsComponent {
 				this.allUserQualification.find(
 					(qualificationUser: any) => qualificationUser.user_id == value?.id
 				) || new QualificationUser().deserialize({});
-			// this.loadUserQualificationData(value.id);
+
+			if(!this.selectedQualificationUser?.id){
+				this.selectedQualificationUser.user = new User().deserialize(value);
+				this.selectedQualificationUser.qualification = new Qualification().deserialize({id: this.qualification?.id});
+			}
 
 			this.isAssociateUpdateDialogOpen = true;
 		}
@@ -690,12 +694,18 @@ export class QualificationsComponent {
 			qualification_id: this.selectedQualificationUser.qualification?.id,
 			user_id: this.selectedQualificationUser.user?.id,
 			note: this.selectedQualificationUser.note,
+			total_hours: this.selectedQualificationUser.total_hours,
+			total_operations: this.selectedQualificationUser.total_operations,
+			operations_imported: this.selectedQualificationUser.operations_imported,
+			hours_imported: this.selectedQualificationUser.hours_imported,
 		};
 
 		this.isAssignedUserLoading = true;
 
-		this.commonService
-			.put(`QualificationUsers(${this.selectedQualificationUser.id})`, payload)
+		const url = this.selectedQualificationUser.id ? `QualificationUsers(${this.selectedQualificationUser.id})` : 'QualificationUsers';
+		const method = this.selectedQualificationUser.id ? `patch` : 'post';
+
+		this.commonService[method](url, payload)
 			.subscribe({
 				next: res => {
 					this.isAssignedUserLoading = false;

@@ -113,7 +113,7 @@ export class CustomerCategoriesComponent {
     }
   
     refreshEditData() {
-      const url = `CustomerCategories?$filter=is_active eq true and id eq ${this.selectedCustomerCategory?.id}`;
+      const url = `CustomerCategories?$filter=id eq ${this.selectedCustomerCategory?.id}`;
       this.commonService.get(url).subscribe({
         next: (response: any) => {
           this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -243,7 +243,7 @@ export class CustomerCategoriesComponent {
         next: () => {
           this.closeDialogDelete();
           this.isLoading = false;
-          this.childComponent?.onFilterAndSortingForEdit(this.selectedCustomerCategory, null);
+          this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
           this.disableButtonDuringRequest = false;
 
           this._toasterSrv.showToast(recordDeleted, "success");

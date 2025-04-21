@@ -32,7 +32,7 @@ export class ToolRepairComponent {
     @ViewChild("childComponentRef", { static: false }) childComponent: CustomReactGridTable | undefined;
     @ViewChild("activeRepairTable", { static: false }) activeRepairTable!: ActiveRepairComponent;
 
-    public expandQuery: string = `$select=id,custom_id,name,is_active,is_tool,height,length,width,total_weight&$expand=media($select=id),prodOrderPos($filter=(status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}');$expand=prodOrder($select=id;filter=order_type eq '${ProdOrderType.MAINTENANCE}'))`;
+    public expandQuery: string = `$select=id,custom_id,name,is_active,is_tool,height,length,width,total_weight,repair_req_percentage&$expand=media($select=id),prodOrderPos($filter=(status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}');$expand=prodOrder($select=id;filter=order_type eq '${ProdOrderType.MAINTENANCE}'))`;
 
     private allTableData: any;
     private currentStateTableData: any;
@@ -117,7 +117,8 @@ export class ToolRepairComponent {
             disableGroupBy: true,
             isSelected: true,
             disableSortBy: false,
-            hAlign: "Left"
+            hAlign: "Left",
+            dataType: GridTableColumnDataType.String,
         },
         {
             Header: $localize`Name`,
@@ -127,12 +128,12 @@ export class ToolRepairComponent {
             disableSortBy: false,
             isSelected: true,
             hAlign: "Left",
+            dataType: GridTableColumnDataType.String,
         },
         {
             Header: $localize`Attachment`,
             accessor: "id",
             disableFilters: true,
-            dataType: GridTableColumnDataType.Number,
             disableGroupBy: true,
             disableSortBy: true,
             isSelected: true,
@@ -163,7 +164,6 @@ export class ToolRepairComponent {
             disableGroupBy: true,
             disableSortBy: true,
             isSelected: true,
-            dataType: GridTableColumnDataType.Number,
             hAlign: "Left",
             Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
                 const { row } = instance;
@@ -255,7 +255,6 @@ export class ToolRepairComponent {
             disableGroupBy: true,
             disableSortBy: true,
             isSelected: true,
-            dataType: GridTableColumnDataType.Number,
             hAlign: "Left",
             Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
                 const { row } = instance;
@@ -279,7 +278,7 @@ export class ToolRepairComponent {
             accessor: "category",
             disableFilters: true,
             disableGroupBy: true,
-            disableSortBy: false,
+            disableSortBy: true,
             isSelected: false,
             dataType: GridTableColumnDataType.String,
             hAlign: "Left",
@@ -287,10 +286,9 @@ export class ToolRepairComponent {
         {
             Header: $localize`Action`,
             accessor: "created_at",
-            dataType: GridTableColumnDataType.Date,
             disableFilters: true,
             disableGroupBy: true,
-            disableSortBy: false,
+            disableSortBy: true,
             isSelected: true,
             hAlign: "Center",
             Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
@@ -331,10 +329,13 @@ export class ToolRepairComponent {
     }
 
     async loadAllData() {
+        let sortBy = this.childComponent?.sortBy;
+        let sortType = this.childComponent?.sortType;
+
+        let url: string =  `/Items?$filter=is_tool eq true and is_active eq true&$select=id,custom_id,name,is_active,is_tool,height,length,width,total_weight,repair_req_percentage&$expand=media($select=id),prodOrderPos($filter=(status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}');$expand=prodOrder($select=id;filter=order_type eq '${ProdOrderType.MAINTENANCE}'))&$top=10000000&$skip=0`;
+        if(sortBy && sortType) url += `&orderBy=${sortBy} ${sortType}`;
         this._commonSrv
-            .get(
-                `/Items?$filter=is_tool eq true and is_active eq true&$select=id,custom_id,name,is_active,is_tool,height,length,width,total_weight&$expand=media($select=id),prodOrderPos($filter=(status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}');$expand=prodOrder($select=id;filter=order_type eq '${ProdOrderType.MAINTENANCE}'))&$top=10000000&$skip=0`
-            )
+            .get(url)
             .subscribe({
                 next: (response: any) => {
                     this.allTableData = response.value;
@@ -346,6 +347,7 @@ export class ToolRepairComponent {
     }
 
     filterHandler(fieldName: string = "", value: string = "", filterOperator: string = "Contain") {
+        console.log('sort');
         this.childComponent?.onFilterAndSorting(fieldName, value, filterOperator);
     }
 
@@ -416,7 +418,7 @@ export class ToolRepairComponent {
             this.isActiveRepairsDialogOpen = true;
             this._commonSrv
                 .get(
-                    `/Items(${data.id})?$filter=is_tool eq true and is_active eq true&$select=id&$expand=prodOrderPos($filter=(status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}');$expand=media($select=id),userCreator($select=id,custom_id,name),userResponsible($select=id,custom_id,name),toolSupplier($select=id,custom_id,name),prodOrder($select=id,custom_id,order_type;$filter=order_type eq '${ProdOrderType.MAINTENANCE}'),item($select=id,name,custom_id,is_active,is_tool);$orderby=id;)`
+                    `/Items(${data.id})?$filter=is_tool eq true and is_active eq true&$select=id&$expand=prodOrderPos($filter=(status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}');$expand=media($select=id),userCreator($select=id,custom_id,name),userResponsible($select=id,custom_id,name),toolSupplier($select=id,custom_id,name),prodOrder($select=id,custom_id,order_type;$filter=order_type eq '${ProdOrderType.MAINTENANCE}'),item($select=id,name,custom_id,is_active,is_tool),prodOrderPosOperations($select=id,is_automatic_created_repair);$orderby=id;)`
                 )
                 .subscribe({
                     next: (response: any) => {
@@ -478,6 +480,7 @@ export class ToolRepairComponent {
     }
 
     async changeWithUpdatedData(event: any = null): Promise<any> {
+        await this.loadAllData();
         this.currentStateTableData = event[0];  
         this.hasGlobalFilterKey = this.childComponent?.globalSearchFieldValue ? true : false;    
         this.onFilterToolGrid();
@@ -586,7 +589,7 @@ export class ToolRepairComponent {
 
     reloadWholeGrid(tableData: any) {
         this.childComponent!.data = tableData;
-        this.childComponent?.render();
+        this.childComponent!.render();
     }
 }
 

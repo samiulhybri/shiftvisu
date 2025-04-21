@@ -23,6 +23,7 @@ import { formatNumber } from "@app/shared/utils/number-formatter";
 import { Setting } from "@app/shared/models/setting.model";
 import Stock from "@app/shared/models/stock.models";
 import { BackendModelType, BackendModelTypeClass } from "@app/shared/enums/BackendModelType";
+import {DecimalPipe} from "@angular/common";
 
 @Component({
 	selector: "app-bill-of-material",
@@ -62,8 +63,6 @@ export class BillOfMaterialComponent {
 	isMultipleOrder: boolean = false;
 	@Output() transportOrderNoDataEmitter = new EventEmitter<boolean>();
 	selectedStatus: string = "all";
-	totalStockQuantity: number = 0;
-	totalPSAQuantity: number = 0;
 	selectedBomPosIndex: number = 0;
 	showWarningForItemType: boolean = false;
 	filteredBomPos: any = [];
@@ -71,8 +70,8 @@ export class BillOfMaterialComponent {
 	bomPosItemTypes = BomPosItemTypes;
 	prodOrderPosOperationId: number | undefined;
 	itemTypeText = $localize`Item Type`;
-	actionText = $localize`Acton`;
-	psaText = $localize`PSA`;
+	actionText = $localize`Action`;
+	uoMText = $localize`UoM`;
 	stocksForItemPlant: Stock[] = [];
 	isItemPlantBusy = false;
 
@@ -99,7 +98,7 @@ export class BillOfMaterialComponent {
 			this.getBomData(dataItem);
 		}
 	}
-	constructor(public commonService: CommonService) {}
+	constructor(public commonService: CommonService, private decimalPipe: DecimalPipe) {}
 
 	ngOnInit(): void {
 		this.bomSelectedRows = [];
@@ -224,8 +223,6 @@ export class BillOfMaterialComponent {
 					error: () => {},
 				});
 		} else {
-			this.getQuantityData(prod_order_pos_operation_id);
-
 			this.commonService
 				.get(
 					`ProdOrderPosBomPos?$filter=prod_order_pos_operation_id eq ${prod_order_pos_operation_id}&$expand=prodOrderPos($expand=prodOrder),unitOfMeasure(name,custom_id),item($expand=itemPlants),prodOrderPosOperation($expand=machine($expand=plant)),warehouse&$orderby=pos asc`
@@ -269,14 +266,6 @@ export class BillOfMaterialComponent {
 		});
 		this.clonedBomSelectedRows = bomData;
 		this.createMultipleOrder().then();
-	}
-	getQuantityData(prod_order_pos_operation_id: number | undefined) {
-		this.commonService
-			.get(`stock/${prod_order_pos_operation_id}/total-quantity`, false)
-			.subscribe((response: any) => {
-				this.totalStockQuantity = response.total_stock_quantity;
-				this.totalPSAQuantity = response.total_psa_quantity;
-			});
 	}
 
 	multipleRowSelect(event: any): void {
@@ -422,7 +411,7 @@ export class BillOfMaterialComponent {
 			};
 
 			const index = this.billOfMaterialColumns.findIndex(
-				(col: any) => col.Header == this.psaText
+				(col: any) => col.Header == this.uoMText
 			);
 
 			this.billOfMaterialColumns.splice(index, 0, itemTypeColumn);
@@ -443,7 +432,7 @@ export class BillOfMaterialComponent {
 		);
 
 		this.commonService
-			.get(`stock/${itemPlant?.id}/get-stocks-for-item-plant`, false)
+			.get(`stock/itemPlant/${itemPlant?.id}/get-stocks-by-type`, false)
 			.subscribe({
 				next: (response: any) => {
 					this.isItemPlantBusy = false;
@@ -456,7 +445,11 @@ export class BillOfMaterialComponent {
 			});
 	}
 
-	addActonColumn() {
+	closeStocksForItem(){
+		this.isShowStockDialogOpen = false
+	}
+
+	addActionColumn() {
 		const isAlreadyExist = this.billOfMaterialColumns.find(
 			(col: any) => col.Header == this.actionText
 		);
@@ -538,7 +531,7 @@ export class BillOfMaterialComponent {
 				const rowData = row.original;
 				const quantity = rowData.prodOrderPos.quantity;
 
-				return formatNumber(quantity);
+				return this.decimalPipe.transform(quantity, '1.0-' + 3);
 			},
 		},
 		{
@@ -890,28 +883,7 @@ export class BillOfMaterialComponent {
 			disableGroupBy: true,
 			canReorder: false,
 			isSelected: true,
-		},
-		{
-			Header: $localize`PSA`,
-			accessor: "id",
-			hAlign: "Left",
-			disableFilters: false,
-			disableSortBy: false,
-			disableResizing: false,
-			disableGroupBy: true,
-			canReorder: false,
-			isSelected: true,
-			Cell: (instance: any) => {
-				const { row } = instance;
-				const psaQuantity = row?.original?.total_psa_quantity ?? this.totalPSAQuantity;
-
-				return (
-					<React.StrictMode>
-						<Text>{psaQuantity}</Text>
-					</React.StrictMode>
-				);
-			},
-		},
+		}
 	];
 
 	stockForItemPlantColumns: any = [

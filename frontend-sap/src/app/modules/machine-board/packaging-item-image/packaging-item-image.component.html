@@ -6,10 +6,13 @@
                 <ui5-busy-indicator [active]="isLoading" size="M"></ui5-busy-indicator>
             </div>
 
-            <div class="image-section" *ngIf="(settings?.is_external_dms_enabled && externalImageUrl) || (displayedImage && displayedImage.path)">
-                <img [src]="settings?.is_external_dms_enabled ? externalImageUrl : displayedImage.path" [alt]="displayedImage?.file_name ?? ''" draggable="false" (click)="openImagePopUp()" (error)="resetExternalImageUrl()"/>
+            <div class="image-section" *ngIf="(settings?.is_external_dms_enabled && fileSrc) || (displayedImage && displayedImage.path)">
+                <object *ngIf="fileSrc" [data]="fileSrc" type="application/pdf" (error)="resetExternalImageUrl()" width="100%" height="100%">
+                    <p>Your browser does not support PDFs.</p>
+                </object>
+                <img *ngIf="!settings?.is_external_dms_enabled" [src]="displayedImage.path" [alt]="displayedImage.file_name ?? ''" draggable="false"/>
             </div>
-            <div *ngIf="!isLoading && !displayedImage && !(settings?.is_external_dms_enabled && externalImageUrl)" class="no-image-section" [ngStyle]="{'height': cardHeight}">
+            <div *ngIf="!isLoading && !displayedImage && !(settings?.is_external_dms_enabled && fileSrc)" class="no-image-section" [ngStyle]="{'height': cardHeight}">
                 <span class="cursor-pointer" (click)="openImagePopUp()" i18n>No Image Found!</span>
             </div>
         </div>
@@ -22,10 +25,13 @@
             <ui5-busy-indicator [active]="isLoading" size="M"></ui5-busy-indicator>
         </div>
 
-        <div class="image-section" *ngIf="(settings?.is_external_dms_enabled && externalImageUrl) || (displayedImage && displayedImage.path)">
-            <img [src]="!settings?.is_external_dms_enabled ? displayedImage.path : externalImageUrl" [alt]="displayedImage?.file_name ?? ''" draggable="false" (error)="resetExternalImageUrl()"/>
+        <div class="image-section" *ngIf="(settings?.is_external_dms_enabled && fileSrc) || (displayedImage && displayedImage.path)">
+            <object *ngIf="fileSrc" [data]="fileSrc" type="application/pdf" (error)="resetExternalImageUrl()" width="100%" height="100%">
+                <p>Your browser does not support PDFs.</p>
+            </object>
+            <img *ngIf="!settings?.is_external_dms_enabled" [src]="displayedImage.path" [alt]="displayedImage.file_name ?? ''" draggable="false"/>
         </div>
-        <div *ngIf="!isLoading && !displayedImage && !(settings?.is_external_dms_enabled && externalImageUrl)" class="no-image-section" [ngStyle]="{'height': cardHeight}">
+        <div *ngIf="!isLoading && !displayedImage && !(settings?.is_external_dms_enabled && fileSrc)" class="no-image-section" [ngStyle]="{'height': cardHeight}">
             <span i18n>No Image Found!</span>
         </div>
     </div>

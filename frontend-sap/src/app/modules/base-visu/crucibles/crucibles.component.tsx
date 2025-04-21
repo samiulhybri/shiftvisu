@@ -163,7 +163,7 @@ export class CruciblesComponent {
 				this.disableButtonDuringRequest = false;
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue.id, null);
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},
 			error: err => {

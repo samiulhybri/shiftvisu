@@ -152,6 +152,10 @@ export class EightDReportGeneralComponent implements OnChanges, AfterViewInit {
 	supplierValue = "";
 	plantValue = "";
 
+	get moment() {
+		return moment;
+	}
+
 	constructor(private qualiVisuService: QualiVisuService) {}
 
 	ngOnChanges(changes: SimpleChanges): void {
@@ -255,9 +259,7 @@ export class EightDReportGeneralComponent implements OnChanges, AfterViewInit {
 		);
 		this.data[row.index] = {
 			...this.data[row.index],
-			department: selectedUser?.user_group?.length
-				? selectedUser?.user_group[0].name
-				: (this.data[row.index].department ?? ""),
+			department: selectedUser?.user_group?.length ? selectedUser?.user_group[0].name : "",
 			email: selectedUser?.email ?? "",
 		};
 

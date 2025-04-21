@@ -17,6 +17,7 @@
 				selectionMode="Single"
 				(newButtonClick)="newButtonClick()"
 				(processData)="selectFirstRowIfNeeded()"
+				[editPermission]="authService.isPermissionValid('DOCVISU_DIRECTORY_STRUCTURE_ADD')"
 				[customUrl]="apiUrl"
 				[useOdataStyles]="false"
 				(rowClick)="handleRowClick($event)"
@@ -55,21 +56,26 @@
 			<div
 				slot="footer"
 				class="flex justify-end items-center space-x-4 h-[46px] pr-4 border border-solid border-t border-gray-300">
-				<ui5-button
-					design="Emphasized"
-					id="saveButtonUserGroup"
-					(click)="updateStructure()"
-					[disabled]="disableButtonDuringRequest || selectedStructureId === 0"
-					>{{ localization.save }}</ui5-button
-				>
-				<ui5-button
-					design="Negative"
-					class="ml-8"
-					id="deleteButtonUserGroup"
-					[disabled]="selectedStructureId == 0 || isLoading"
-					(click)="openDeleteStructureDialog()"
-					>{{ localization.delete }}</ui5-button
-				>
+				@if (authService.isPermissionValid(permissionEnums.DOCVISU_DIRECTORY_STRUCTURE_EDIT)) {
+					<ui5-button
+						design="Emphasized"
+						id="saveButtonUserGroup"
+						(click)="updateStructure()"
+						[hidden]="authService.isPermissionValid('DOCVISU_DIRECTORY_STRUCTURE_EDIT')"
+						[disabled]="disableButtonDuringRequest || selectedStructureId === 0"
+						>{{ localization.save }}</ui5-button
+					>
+				}
+				@if (authService.isPermissionValid(permissionEnums.DOCVISU_DIRECTORY_STRUCTURE_DELETE)) {
+					<ui5-button
+						design="Negative"
+						class="ml-8"
+						id="deleteButtonUserGroup"
+						[disabled]="selectedStructureId == 0 || isLoading"
+						(click)="openDeleteStructureDialog()"
+						>{{ localization.delete }}</ui5-button
+					>
+				}
 			</div>
 		</div>
 	</ui5-card>

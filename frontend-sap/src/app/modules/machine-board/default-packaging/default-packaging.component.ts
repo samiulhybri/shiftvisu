@@ -77,7 +77,7 @@ export class DefaultPackagingComponent {
         private commonService: CommonService,
 		private dataService: DataService,
 		private machineBoardEventService: MachineBoardEventHandleService
-    ) { 
+    ) {
         this.getCurrentMachine();
         this.getSelectedOrderDetails();
         this.plantsService.plantId.subscribe((plantId: number | undefined) => {
@@ -100,7 +100,7 @@ export class DefaultPackagingComponent {
 					const nextPackagingInstruction = machineOperationTimes[0].packagingInstruction;
 					const nextPackagingInstructionParent = machineOperationTimes[0].packagingInstructionParent;
 					const nextPackagingItem = machineOperationTimes[0].itemPackaging;
-	
+
 					if(nextPackagingItem) {
 						this.selectedItemName = nextPackagingItem.name;
 						this.selectedItem = new Item().deserialize({
@@ -109,7 +109,7 @@ export class DefaultPackagingComponent {
 							custom_id: nextPackagingItem.custom_id,
 						});
 					}
-	
+
 					const savedPackaging = this.packagingInstructions.find(el => el.packaging_instruction_custom_id_child == nextPackagingInstruction?.custom_id && el.packaging_instruction_custom_id_parent == nextPackagingInstructionParent?.custom_id);
 
 					if(savedPackaging) {
@@ -296,7 +296,7 @@ export class DefaultPackagingComponent {
 					}
 					return acc;
 				}, {})) as PackagingInstructionPos[];
-				
+
 				const resData = uniquePackagingInstPos.filter(el=> el.packagingInstruction).map((res) => {
 					const packagingInstructionContent = packagingInstructionPos.find((pos: PackagingInstructionPos)=> pos.is_container === false && pos.packaging_instruction_id === res.packagingInstruction.id);
 					let targetedQuantity: number = 0;
@@ -342,12 +342,12 @@ export class DefaultPackagingComponent {
 		const childId = event.item.dataset.childid;
 		const parentId = event.item.dataset.parentid;
 		this.instructionCustomID = customId;
-		
+
 		const packagingInstruction = this.packagingInstructions.find(el=> el.packaging_instruction_id_child == childId && el.packaging_instruction_id_parent == parentId);
 
 		this.instructionCustomID = packagingInstruction.item_custom_id_container + ' - ' +  packagingInstruction?.target_quantity;
 
-		if(packagingInstruction) { 
+		if(packagingInstruction) {
 			this.selectedPackagingInstruction = packagingInstruction;
 
 			if(this.selectedPackagingInstruction) {
@@ -397,7 +397,7 @@ export class DefaultPackagingComponent {
 			"isLinkedOrder": this.selectedOrderDetails?.isLinkedOrder ?? null,
 			'targetQuantity': this.selectedPackagingInstruction?.target_quantity ?? null,
         }
-        
+
         this.commonService.post('machine-board/next-packaging', payload, false)
         .pipe(
             takeUntil(this.destroyed$),

@@ -162,9 +162,9 @@
 				<div class="order-card">
 					<ui5-title
 						level="H5"
-						>{{ machine?.operationDetails?.orderQuantity || 0 }}
+						>{{ format(machine?.operationDetails?.orderQuantity) || 0 }}
 						{{ machine?.operationDetails?.unitOfMeasureCustomId }} |
-						{{ machine?.operationDetails?.residualQuantity || 0 }}
+						{{ format(machine?.operationDetails?.residualQuantity) || 0 }}
 						{{ machine?.operationDetails?.unitOfMeasureCustomId }}</ui5-title
 					>
 
@@ -184,11 +184,11 @@
 						id="scrap"
 						class="text-end"
 						level="H5"
-						>{{ machine?.operationDetails?.goodItemsCount || 0 }}
+						>{{ format(machine?.operationDetails?.goodItemsCount) || 0 }}
 						{{ machine?.operationDetails?.unitOfMeasureCustomId }} |
-						{{ machine?.operationDetails?.reworkItemsCount || 0 }}
+						{{ format(machine?.operationDetails?.reworkItemsCount) || 0 }}
 						{{ machine?.operationDetails?.unitOfMeasureCustomId }} |
-						{{ machine?.operationDetails?.badItemsCount || 0 }}
+						{{ format(machine?.operationDetails?.badItemsCount) || 0 }}
 						{{ machine?.operationDetails?.unitOfMeasureCustomId }}</ui5-title
 					>
 					<ui5-label

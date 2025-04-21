@@ -438,7 +438,7 @@ export class StandardValueKeyComponent {
 		this.commonService.delete(`/StandardValueKeys(${this.deleteItemId})`).subscribe({
 			next: () => {
 				this.disableButtonDuringRequest = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.standardValueKey, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deleteItemId, null);
 				this.isLoading = false;
 				this.closeDialogDelete();
 				this._toasterSrv.showToast(recordDeleted, "success");
@@ -479,7 +479,7 @@ export class StandardValueKeyComponent {
 	}
 
 	refreshEditData() {
-		const url = `StandardValueKeys?$filter=is_active eq true and id eq ${this.standardValueKey?.id}&$orderby=custom_id asc&$expand=standardValueKeyActivityTypes($expand=standardValueKey)`;
+		const url = `StandardValueKeys?$filter=id eq ${this.standardValueKey?.id}&$orderby=custom_id asc&$expand=standardValueKeyActivityTypes($expand=standardValueKey)`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);

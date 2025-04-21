@@ -123,6 +123,9 @@ export class RepairDetailsComponent {
     public otherRepairTabCount: number = 0;
     public hasAuth: boolean = true;
     public isOrderHistory: boolean = false;
+    public isDisableProdDate: boolean = false;
+    public isInvalidProdDate: boolean = false;
+    public prodDateDialogTitle: string = '';
 
     public otherRepairColumns: any = [
         {
@@ -144,7 +147,7 @@ export class RepairDetailsComponent {
                                     onSelectionChange={(e: any) => this.handleRepairTypeChange(e, rowIndex)}
                                     valueState={this.selectedNewOtherRepairOp.length > 1 && this.selectedNewOtherRepairOp[rowIndex].custom_id == '' ? ValueState.Negative : ValueState.None}
                                     placeholder={$localize`Select Repair Type`}
-                                    disabled={this.isPlannedOrder}
+                                    disabled={this.selectedNewOtherRepairOp[rowIndex].is_auto_created || this.isPlannedOrder}
                                 >
                                     {this.allRepairTypeList.map((plan: OperationPlan) => (
                                         <ComboBoxItem key={plan.id} id={plan.id!.toString()} text={plan.custom_id} />
@@ -204,22 +207,35 @@ export class RepairDetailsComponent {
                     this.selectedNewOtherRepairOp[rowIndex].name = ui5Input.value;
                 };
 
-                return (
-                    <React.StrictMode>
-                        <FlexBox>
-                            <UI5Input
-                                value={this.isPlannedOrder ? this.selectedNewOtherRepairOp[rowIndex].prodOrderPosOperation.name : this.selectedNewOtherRepairOp[rowIndex].name}
-                                onInput={(e: any) => this.handleRepairChange(e, rowIndex)}
-                                onKeyDown={handleInput}
-                                placeholder={$localize`Enter Name`}
-                                type="Text"
-                                valueState={this.selectedNewOtherRepairOp[rowIndex]?.custom_id != '' && this.selectedNewOtherRepairOp[rowIndex]?.name?.trim() != '' ? ValueState.None : ValueState.Negative}
-                                disabled={this.selectedNewOtherRepairOp[rowIndex].custom_id == '' || this.isPlannedOrder}
-                                readonly={this.modalType == 'view'}
-                            />
-                        </FlexBox>
-                    </React.StrictMode>
-                );
+                if(this.modalType == 'view') {
+                    return (
+                        <React.StrictMode>
+                            <FlexBox>
+                                <UI5Input
+                                    value={this.isPlannedOrder ? this.selectedNewOtherRepairOp[rowIndex].prodOrderPosOperation.name : this.selectedNewOtherRepairOp[rowIndex].name}
+                                    type="Text"
+                                    readonly
+                                />
+                            </FlexBox>
+                        </React.StrictMode>
+                    );
+                } else {
+                    return (
+                        <React.StrictMode>
+                            <FlexBox>
+                                <UI5Input
+                                    value={this.isPlannedOrder ? this.selectedNewOtherRepairOp[rowIndex].prodOrderPosOperation.name : this.selectedNewOtherRepairOp[rowIndex].name}
+                                    onInput={(e: any) => this.handleRepairChange(e, rowIndex)}
+                                    onKeyDown={handleInput}
+                                    placeholder={$localize`Enter Name`}
+                                    type="Text"
+                                    valueState={this.selectedNewOtherRepairOp[rowIndex]?.custom_id != '' && this.selectedNewOtherRepairOp[rowIndex]?.name?.trim() != '' ? ValueState.None : ValueState.Negative}
+                                    disabled={this.selectedNewOtherRepairOp[rowIndex].custom_id == '' || this.selectedNewOtherRepairOp[rowIndex].is_auto_created || this.isPlannedOrder}
+                                />
+                            </FlexBox>
+                        </React.StrictMode>
+                    );
+                }
             },
         },
         {
@@ -239,7 +255,8 @@ export class RepairDetailsComponent {
                             <Button
                                 icon='delete'
                                 onClick={(e: any) => this.handleDeleteRepair(e, rowIndex)}
-                                design="Transparent">
+                                design="Transparent"
+                                disabled={this.selectedNewOtherRepairOp[rowIndex].is_auto_created}>
                             </Button>
                         </FlexBox>
                     </React.StrictMode>
@@ -452,7 +469,7 @@ export class RepairDetailsComponent {
 
         let url = '';
         if (this.modalType === 'edit') {
-            url = `ProdOrderPos/${id}?$select=id,is_sampling_required,is_sampling_done,notes,estimated_hours,actual_time,cost,label,prod_order_id,item_id,user_id_creator,user_id_responsible,start,created_at,updated_at,status,status_plan,release_date,is_production_possible,supplier_id_tool&$expand=prodOrder($select=id,custom_id,order_type),prodOrderPosOperations($select=id,user_id,name,pos,prod_order_pos_id,operation_plan_pos_id_origin,operation_plan_id_origin,is_repair_completed,repair_completed_date;$expand=operationPlan,user($select=id,name),operationPlanPos($select=id,name,operation_plan_id,pos);$top=100000),item($select=id,name,custom_id,height,length,width,total_weight),userCreator($select=id,name),userResponsible($select=id,name),toolSupplier($select=id,name),media($select=id)`;
+            url = `ProdOrderPos/${id}?$select=id,is_sampling_required,is_sampling_done,notes,estimated_hours,actual_time,cost,label,prod_order_id,item_id,user_id_creator,user_id_responsible,start,created_at,updated_at,status,status_plan,release_date,is_production_possible,supplier_id_tool,is_prod_date_manual&$expand=prodOrder($select=id,custom_id,order_type),prodOrderPosOperations($select=id,user_id,name,pos,prod_order_pos_id,operation_plan_pos_id_origin,operation_plan_id_origin,is_repair_completed,repair_completed_date,is_automatic_created_repair;$expand=operationPlan,user($select=id,name),operationPlanPos($select=id,name,operation_plan_id,pos);$top=100000),item($select=id,name,custom_id,height,length,width,total_weight),userCreator($select=id,name),userResponsible($select=id,name),toolSupplier($select=id,name),media($select=id)`;
         } else if (this.modalType === 'view') {
             url = `ProdOrderPos(${id})?$expand=media($select=id),userCreator($select=id,name,custom_id),userResponsible($select=id,name,custom_id),toolSupplier($select=id,name),item($select=id,name,custom_id,is_active,is_tool,height,length,width,total_weight),prodOrder($select=id,custom_id,order_type),prodOrderPosOperations($expand=operationPlan($select=id,custom_id),operationPlanPos($select=id,name),user($select=id,name);$top=100000)`;
         }
@@ -703,7 +720,7 @@ export class RepairDetailsComponent {
     }
 
     async getPlanVisuStartDateProduction() {
-        let url = `ProdOrderPosOperations?$select=id,start,end,status,status_plan,show_in_planvisu,machine_id&$filter=status ne '${ProdOrderPosOperationStatus.IN_PRODUCTION}' and status ne '${ProdOrderPosOperationStatus.CLOSED}' and status ne '${ProdOrderPosOperationStatus.DELETED}' and show_in_planvisu eq true and (item_id_tool eq ${ this.selectedItem.id })&$orderby=start asc&$expand=machine($select=id,name,custom_id;$filter=sectionActivatables/any(a:a/section eq '${ SectionActivatableTypes.PLANVISU }') and sectionActivatables/any(a:a/is_active eq true);$expand=sectionActivatables($select=section,is_active))`;
+        let url = `ProdOrderPosOperations?$select=id,start,end,status,status_plan,show_in_planvisu,machine_id&$filter=(status eq '${ProdOrderPosOperationStatus.PLANNED}' OR status eq '${ProdOrderPosOperationStatus.RELEASED}' OR status eq '${ProdOrderPosOperationStatus.PROPOSED}') and show_in_planvisu eq true and (item_id_tool eq ${ this.selectedItem.id })&$orderby=start asc&$expand=machine($select=id,name,custom_id;$filter=sectionActivatables/any(a:a/section eq '${ SectionActivatableTypes.PLANVISU }') and sectionActivatables/any(a:a/is_active eq true);$expand=sectionActivatables($select=section,is_active))`;
         this._commonSrv.get(url).subscribe({
             next: (response: any) => {
                 let operationsData = response.value;
@@ -718,15 +735,18 @@ export class RepairDetailsComponent {
                 }
                 if(date && date != '') {
                     this.prodOrderPosData.release_date = new Date(date);
+                    this.isDisableProdDate = true;
                 } else {
                     this.isToolRepairProductionDateManual = true;
                     this.productiondateSubText = $localize`Manual`;
+                    this.isDisableProdDate = false;
                 }
             },
             error: (error: any) => {
                 console.error("Error while getting Planvisu start date: ", error);
                 this.isToolRepairProductionDateManual = true;
                 this.productiondateSubText = $localize`Manual`;
+                this.isDisableProdDate = false;
             },
         });
     }
@@ -772,6 +792,15 @@ export class RepairDetailsComponent {
         this.openNewOtherRepairDialog();
     }
 
+    getUtcDate(date: string) {
+        const utcDate = new Date(date);
+        return new Date(
+            utcDate.getUTCFullYear(),
+            utcDate.getUTCMonth(),
+            utcDate.getUTCDate()
+        );
+    }
+
     async prepareDataForEditModal(): Promise<any> {
         this.isSaveOrUpdate = $localize`Update`;
         this.dialogTitle = `${$localize`Edit Repair Details`}`;
@@ -780,6 +809,8 @@ export class RepairDetailsComponent {
         this.prodOrderData = this.selectedProdOrderPos.prodOrder;
         this.selectedItem = this.selectedProdOrderPos.item;
         this.prodOrderPosData = { ...this.selectedProdOrderPos };
+        this.isDisableProdDate = this.prodOrderPosData.is_prod_date_manual ? false : true;
+        this.productiondateSubText = this.isDisableProdDate ? $localize`PlanVisu` : $localize`Manual`;
 
         this.prodOrderPosData.media = [];
         this.selectedProdOrderPos.media?.map((elm: any) => {
@@ -787,9 +818,10 @@ export class RepairDetailsComponent {
         });
         this.attachmentCount = this.prodOrderPosData.media.length;
 
-        this.prodOrderPosData.created_at = new Date(this.selectedProdOrderPos.created_at);
-        this.prodOrderPosData.start = new Date(this.selectedProdOrderPos.start);
-        this.prodOrderPosData.release_date = new Date(this.selectedProdOrderPos.release_date);
+        this.prodOrderPosData.created_at = this.getUtcDate(this.selectedProdOrderPos.created_at);
+        this.prodOrderPosData.start = this.getUtcDate(this.selectedProdOrderPos.start);
+        this.prodOrderPosData.release_date = this.getUtcDate(this.selectedProdOrderPos.release_date);
+
         this.prodOrderPosData.label = this.selectedProdOrderPos.label;
         this.prodOrderPosData.userCreator = this.selectedProdOrderPos.userCreator ? new User().deserialize(this.selectedProdOrderPos.userCreator) : new User().deserialize({});
         this.prodOrderPosData.userResponsible = this.selectedProdOrderPos.userResponsible ? new User().deserialize(this.selectedProdOrderPos.userResponsible) : new User().deserialize({});
@@ -812,7 +844,8 @@ export class RepairDetailsComponent {
                     this.selectedNewOtherRepairOp.push({
                         name: elm.name,
                         operation_plan_id_origin: elm.operation_plan_id_origin,
-                        custom_id: tempData ? tempData.custom_id : ''
+                        custom_id: tempData ? tempData.custom_id : '',
+                        is_auto_created: elm.is_automatic_created_repair
                     });
                     this.otherRepairTabCount++;
                 }
@@ -824,7 +857,8 @@ export class RepairDetailsComponent {
             this.selectedNewOtherRepairOp.push({
                 name: '',
                 custom_id: '',
-                operation_plan_id_origin: null
+                operation_plan_id_origin: null,
+                is_auto_created: false
             });
         }
     }
@@ -843,10 +877,13 @@ export class RepairDetailsComponent {
         });
         this.attachmentCount = this.prodOrderPosData.media.length;
 
-        this.prodOrderPosData.start = new Date(this.selectedProdOrderPos.start);
-        this.prodOrderPosData.created_at = new Date(this.selectedProdOrderPos.created_at);
-        this.prodOrderPosData.release_date = new Date(this.selectedProdOrderPos.release_date);
-        this.prodOrderPosData.label = this.selectedProdOrderPos.label;
+        this.isDisableProdDate = this.prodOrderPosData.is_prod_date_manual ? false : true;
+        this.productiondateSubText = this.isDisableProdDate ? $localize`PlanVisu` : $localize`Manual`;
+
+        this.prodOrderPosData.created_at = this.getUtcDate(this.selectedProdOrderPos.created_at);
+        this.prodOrderPosData.start = this.getUtcDate(this.selectedProdOrderPos.start);
+        this.prodOrderPosData.release_date = this.getUtcDate(this.selectedProdOrderPos.release_date);
+
         this.prodOrderPosData.userCreator = this.selectedProdOrderPos.userCreator ? new User().deserialize(this.selectedProdOrderPos.userCreator) : new User().deserialize({});
         this.prodOrderPosData.userResponsible = this.selectedProdOrderPos.userResponsible ? new User().deserialize(this.selectedProdOrderPos.userResponsible) : new User().deserialize({});
         this.prodOrderPosData.toolSupplier = this.selectedProdOrderPos.toolSupplier ? new Suppliers().deserialize(this.selectedProdOrderPos.toolSupplier) : new Suppliers().deserialize({});
@@ -892,7 +929,8 @@ export class RepairDetailsComponent {
                         prodOrderPosOperation: elm,
                         name: elm.name,
                         operation_plan_id_origin: elm.operation_plan_id_origin,
-                        custom_id: elm.operationPlan ? elm.operationPlan.custom_id : ''
+                        custom_id: elm.operationPlan ? elm.operationPlan.custom_id : '',
+                        is_auto_created: elm.is_automatic_created_repair
                     });
                     this.otherRepairTabCount++;
                 }
@@ -911,7 +949,8 @@ export class RepairDetailsComponent {
             this.selectedNewOtherRepairOp[rowIndex] = {
                 name: '',
                 operation_plan_id_origin: parseInt(selectedPlanId),
-                custom_id: tempData ? tempData.custom_id : ''
+                custom_id: tempData ? tempData.custom_id : '',
+                is_auto_created: false
             };
             this.otherRepairTabCount++;
         } else if (event.target.value != '') {
@@ -920,14 +959,16 @@ export class RepairDetailsComponent {
             this.selectedNewOtherRepairOp[rowIndex] = {
                 name: '',
                 operation_plan_id_origin: parseInt(tempData?.id),
-                custom_id: tempData ? tempData.custom_id : ''
+                custom_id: tempData ? tempData.custom_id : '',
+                is_auto_created: false
             };
             this.otherRepairTabCount++;
         } else {
             this.selectedNewOtherRepairOp[rowIndex] = {
                 name: '',
                 operation_plan_id_origin: null,
-                custom_id: ''
+                custom_id: '',
+                is_auto_created: false
             };
         }
         this.childComponentGrid?.render();
@@ -941,7 +982,8 @@ export class RepairDetailsComponent {
             this.selectedNewOtherRepairOp[rowIndex] = {
                 name: '',
                 operation_plan_id_origin: null,
-                custom_id: ''
+                custom_id: '',
+                is_auto_created: false
             };
         }
         this.childComponentGrid?.render();
@@ -972,7 +1014,8 @@ export class RepairDetailsComponent {
             this.selectedNewOtherRepairOp.push({
                 name: '',
                 custom_id: '',
-                operation_plan_id_origin: null
+                operation_plan_id_origin: null,
+                is_auto_created: false
             });
             this.childComponentGrid?.render();
         } else this.showModalToast($localize`Fill the previous fields!`, 'error');
@@ -1139,63 +1182,70 @@ export class RepairDetailsComponent {
         const releaseDateWithoutTime = releaseDate ? new Date(releaseDate.getFullYear(), releaseDate.getMonth(), releaseDate.getDate()) : null;
         const startDateWithoutTime = startDate ? new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()) : null;
 
-        let check = this.prodOrderData.custom_id &&
+        let generalCheck = this.prodOrderData.custom_id &&
             this.userCreatorName !== '' &&
             this.userResponsibleName !== '' &&
             startDateWithoutTime &&
             releaseDateWithoutTime &&
             (this.selectedNewTypeRepairOp.length > 0 || this.selectedNewOtherRepairOp.length > 0)
+        
+        let isRepairsFound: boolean = false;
+        for (let i = 0; i < this.selectedNewTypeRepairOp.length; i++) {
+            let type = this.selectedNewTypeRepairOp[i];
+            if (type.operation_plan_id_origin && type.operation_plan_pos_id_origin) {
+                // isValid = true;
+                isRepairsFound = true;
+            } else {
+                // isValid = false;
+                isRepairsFound = false;
+            }
+        }
 
-        let checkDates: boolean = releaseDateWithoutTime && startDateWithoutTime ? startDateWithoutTime.getTime() <= releaseDateWithoutTime.getTime() : true;
-        if (check && checkDates) {
-            for (let i = 0; i < this.selectedNewTypeRepairOp.length; i++) {
-                let type = this.selectedNewTypeRepairOp[i];
-                if (type.operation_plan_id_origin && type.operation_plan_pos_id_origin) isValid = true;
-                else {
-                    isValid = false;
-                    return isValid;
+        if (this.selectedNewTypeRepairOp.length > 0 && (this.selectedNewOtherRepairOp.length == 1 && this.selectedNewOtherRepairOp[0].custom_id == '' && this.selectedNewOtherRepairOp[0]?.name?.trim() == '')) {
+            // isValid = true;
+            isRepairsFound = true;
+        } else if (this.selectedNewTypeRepairOp.length == 0 && (this.selectedNewOtherRepairOp.length == 1 && this.selectedNewOtherRepairOp[0].custom_id == '' && this.selectedNewOtherRepairOp[0]?.name?.trim() == '')) {
+            // isValid = false;
+            isRepairsFound = false;
+        } else {
+            for (let i = 0; i < this.selectedNewOtherRepairOp.length; i++) {
+                let type = this.selectedNewOtherRepairOp[i];
+                if (type.custom_id != '' && type.name != '') {
+                    // isValid = true;
+                    isRepairsFound = true;
+                } else {
+                    // isValid = false;
+                    isRepairsFound = false;
+                    // return isValid;
                 }
             }
-
-            if (this.selectedNewTypeRepairOp.length > 0 && (this.selectedNewOtherRepairOp.length == 1 && this.selectedNewOtherRepairOp[0].custom_id == '' && this.selectedNewOtherRepairOp[0]?.name?.trim() == '')) {
+        }
+        
+        if (generalCheck && isRepairsFound) {
+            let checkDates: boolean = releaseDateWithoutTime && startDateWithoutTime ? startDateWithoutTime.getTime() <= releaseDateWithoutTime.getTime() : true;
+            if(checkDates) {
                 isValid = true;
-            } else if (this.selectedNewTypeRepairOp.length == 0 && (this.selectedNewOtherRepairOp.length == 1 && this.selectedNewOtherRepairOp[0].custom_id == '' && this.selectedNewOtherRepairOp[0]?.name?.trim() == '')) {
-                isValid = false;
-                return isValid;
             } else {
-                for (let i = 0; i < this.selectedNewOtherRepairOp.length; i++) {
-                    let type = this.selectedNewOtherRepairOp[i];
-                    if (type.custom_id != '' && type.name != '') isValid = true;
-                    else {
-                        isValid = false;
-                        return isValid;
-                    }
-                }
+                isValid = false;
+                this.isInvalidProdDate = true;
+                this.prodDateDialogTitle = $localize`Confirmation`;
             }
         } else isValid = false;
         return isValid;
     }
 
+    saveProdDate() {
+        this.closeProdDateDialog();
+        this.startSavingprocedure();
+    }
+
     async saveNewToolRepair(): Promise<any> {
-        if(this.modalType == 'view'){
-            this.saveOnlyProdOrderPos(this.prodOrderPosData)
-        }else{
+        if(this.modalType == 'view') this.saveOnlyProdOrderPos(this.prodOrderPosData)
+        else {
             try {
                 let checkValidity: boolean = await this.checkValidDataBeforeSaving();
                 if (checkValidity) {
-                    this.isLoading = true;
-                    let prodOrder = new ProdOrder().deserialize(this.prodOrderData);
-                    if (this.modalType == 'add') {
-                        this.prodOrderData.order_type = ProdOrderType.MAINTENANCE;
-                        prodOrder = await this.saveProdOrder();
-                    } else if (this.modalType == 'edit') prodOrder = await this.saveProdOrder();
-    
-                    this.prodOrderPosData.prodOrder = prodOrder;
-                    let prodOrderPos = await this.saveProdOrderPos();
-    
-                    if (!this.isPlannedOrder) await this.saveProdOrderPosOperations(prodOrderPos);
-                    else await this.saveProdOrderPosOperationsForPlannedOrder(prodOrderPos)
-                    await this.saveItemAttachments(prodOrderPos);
+                    this.startSavingprocedure();
                 } else {
                     let fullMsg: string = '';
                     let errorMessage: string = '';
@@ -1239,22 +1289,37 @@ export class RepairDetailsComponent {
                         const startDateWithoutTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
     
                         // if(this.modalType == 'add' && startDateWithoutTime.getTime() < today.getTime()) tempMsg = $localize`Invalid Start Date`;
-                        if (startDateWithoutTime.getTime() > releaseDateWithoutTime.getTime()) tempMsg = (tempMsg !== '' ? tempMsg + ', ' : '') + $localize`Invalid Start Production Date`;
+                        // if (startDateWithoutTime.getTime() > releaseDateWithoutTime.getTime()) tempMsg = (tempMsg !== '' ? tempMsg + ', ' : '') + $localize`Invalid Start Production Date`;
     
                         fullMsg = (fullMsg != '' ? fullMsg + '\n\n' : '') + tempMsg;
                     }
     
-                    this.showModalToast(fullMsg, 'error');
+                    if(fullMsg) this.showModalToast(fullMsg, 'error');
                 }
             } catch (err) {
                 this.isLoading = false;
                 console.log(err);
                 this.showModalToast(this.localization.someThingWentWrong, 'error');
             }
-        }
-        
-        
+        }    
     }
+
+    async startSavingprocedure(): Promise<any> {
+        this.isLoading = true;
+        let prodOrder = new ProdOrder().deserialize(this.prodOrderData);
+        if (this.modalType == 'add') {
+            this.prodOrderData.order_type = ProdOrderType.MAINTENANCE;
+            prodOrder = await this.saveProdOrder();
+        } else if (this.modalType == 'edit') prodOrder = await this.saveProdOrder();
+
+        this.prodOrderPosData.prodOrder = prodOrder;
+        let prodOrderPos = await this.saveProdOrderPos();
+
+        if (!this.isPlannedOrder) await this.saveProdOrderPosOperations(prodOrderPos);
+        else await this.saveProdOrderPosOperationsForPlannedOrder(prodOrderPos);
+        await this.saveItemAttachments(prodOrderPos);
+    }
+
     saveOnlyProdOrderPos(prodOrderPos:any){
         let data = {
             'is_sampling_required' : prodOrderPos.is_sampling_required,
@@ -1314,6 +1379,8 @@ export class RepairDetailsComponent {
                 elm => elm.name == this.toolSupplierName
             );
         } 
+
+        this.prodOrderPosData.is_prod_date_manual = !this.isDisableProdDate ? true : false;
         
         return new Promise((resolve, reject) => {
             if (this.modalType == 'add') {
@@ -1526,6 +1593,10 @@ export class RepairDetailsComponent {
         this.isLoading = true;
         let requests: ODataBatchCall[] = [];
 
+        let isAutoRepair: boolean = false;
+        let isComplete: boolean = false;
+        let autoRepairIds: number[] = [];
+
         if (this.modalType == 'edit') {
             this.updatedOperationdata.forEach((elm: any) => {
                 let call = new ODataBatchCall(
@@ -1539,6 +1610,16 @@ export class RepairDetailsComponent {
                     user_id: elm.userId
                 };
                 requests.push(call);
+
+                if (elm.is_auto_created && elm.isRepairCompleted) {
+                    isAutoRepair = true;
+                    isComplete = true;
+                    const lastDigit = elm.name?.match(/\d+$/)?.[0];
+
+                    if (lastDigit) {
+                        autoRepairIds.push(parseInt(lastDigit, 10));
+                    }
+                }
             });
         }
         return new Promise((resolve, reject) => {
@@ -1546,6 +1627,7 @@ export class RepairDetailsComponent {
                 requests: requests,
             }).subscribe({
                 next: (response: any) => {
+                    if (autoRepairIds.length > 0) this.callV10Api(autoRepairIds);
                     resolve(response);
                 },
                 error: (e: any) => {
@@ -1553,6 +1635,19 @@ export class RepairDetailsComponent {
                     reject(e);
                 },
             });
+        });
+    }
+
+    callV10Api(repairType: any) {
+        let tool = new Item().deserialize(this.selectedItem);
+        this._commonSrv.getDataFromV10(`base_visu/php/base_visu_data_service.php?service=update_shot_next_maintenance&tool_nr=${tool.custom_id}&repair_type=${repairType}`).subscribe({
+            next: (response: any) => {
+                if(response == 1) console.log("updated v10 shot data successfully");
+                else console.error("Error while updating shot data in v10");
+            },
+            error: (error: any) => {
+                console.error("Error while updating shot data in v10: ", error);
+            },
         });
     }
 
@@ -1718,12 +1813,24 @@ export class RepairDetailsComponent {
             rowData.prodOrderPosOperation.repair_completed_date = rowData.prodOrderPosOperation.is_repair_completed ? new Date() : null;
         }
 
-        this.updatedOperationdata.push({
-            prodOrderPosOperationsId: clickFrom == 'newTypeOfRepair' ? rowData?.id : rowData?.prodOrderPosOperation?.id,
-            isRepairCompleted: clickFrom == 'newTypeOfRepair' ? rowData?.is_repair_completed : rowData.prodOrderPosOperation.is_repair_completed,
-            completedDate: clickFrom == 'newTypeOfRepair' ? rowData?.repair_completed_date : rowData.prodOrderPosOperation.repair_completed_date,
-            userId: rowData?.prodOrderPosOperation?.is_repair_completed || rowData?.is_repair_completed ? this.authUser.id : null
-        })
+        const operationId = clickFrom === 'newTypeOfRepair' ? rowData?.id : rowData?.prodOrderPosOperation?.id;
+        const existingOperation = this.updatedOperationdata.find((op: any) => op.prodOrderPosOperationsId === operationId);
+
+        if (existingOperation) {
+            existingOperation.isRepairCompleted = clickFrom === 'newTypeOfRepair' ? rowData?.is_repair_completed : rowData.prodOrderPosOperation.is_repair_completed;
+            existingOperation.completedDate = clickFrom == 'newTypeOfRepair' ? rowData?.repair_completed_date : rowData.prodOrderPosOperation.repair_completed_date;
+            existingOperation.userId = rowData?.prodOrderPosOperation?.is_repair_completed || rowData?.is_repair_completed ? this.authUser.id : null;
+        } else {
+            this.updatedOperationdata.push({
+                name: clickFrom == 'newTypeOfRepair' ? rowData?.name : rowData?.prodOrderPosOperation?.name,
+                prodOrderPosOperationsId: clickFrom == 'newTypeOfRepair' ? rowData?.id : rowData?.prodOrderPosOperation?.id,
+                isRepairCompleted: clickFrom == 'newTypeOfRepair' ? rowData?.is_repair_completed : rowData.prodOrderPosOperation.is_repair_completed,
+                completedDate: clickFrom == 'newTypeOfRepair' ? rowData?.repair_completed_date : rowData.prodOrderPosOperation.repair_completed_date,
+                userId: rowData?.prodOrderPosOperation?.is_repair_completed || rowData?.is_repair_completed ? this.authUser.id : null,
+                is_auto_created: clickFrom == 'newTypeOfRepair' ? rowData?.is_automatic_created_repair : rowData.prodOrderPosOperation.is_automatic_created_repair
+            })
+        }
+        
         if (clickFrom == 'other') {
             this.selectedNewOtherRepairOp.forEach((item: any) => {
                 if (item.prodOrderPosOperation.id == rowData.prodOrderPosOperation.id) {
@@ -1800,4 +1907,9 @@ export class RepairDetailsComponent {
             this.typeOfRepairTree.searching = searchWord;
         }
     }
+
+    closeProdDateDialog() {
+		this.isInvalidProdDate = false;
+		this.prodDateDialogTitle = "";
+	}
 }

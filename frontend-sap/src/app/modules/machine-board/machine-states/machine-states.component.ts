@@ -51,7 +51,8 @@ export class MachineStatesComponent {
 			this.machineId = parameter.split("/")[0];
 
 			if (this.machineId) this.bindMachineData(parseInt(this.machineId));
-			this.checkAuthorized(parseInt(this.machineId));
+			
+			this.checkAuthorized();
 		} catch (error) {
 			console.log(error);
 		}
@@ -78,7 +79,11 @@ export class MachineStatesComponent {
 	itemClick(state: MachineState) {
 		const lastStateCondition = this.machineStates?.find(state => state.isSelected);
 		const saveBtn = document.getElementById("stateDialogSaveBtn") as Button;
-		saveBtn.disabled = false;
+
+		if (saveBtn) {
+			saveBtn.disabled = false;
+		}
+
 		this.machineStates?.forEach(machineStates => (machineStates.isSelected = false));
 		const selectedId = state.id;
 
@@ -117,7 +122,11 @@ export class MachineStatesComponent {
 				machine_state_id: this.selectedState?.id ?? null,
 			};
 			this.commonService
-				.patch(`machine/${this.machineId}/machine-state-time/${this.stateData?.id}`, payload, false)
+				.patch(
+					`machine/${this.machineId}/machine-state-time/${this.stateData?.id}`,
+					payload,
+					false
+				)
 				.subscribe({
 					next: res => {
 						this.isLoading = false;
@@ -143,7 +152,7 @@ export class MachineStatesComponent {
 				.pipe(
 					switchMap((res: any) => {
 						allStates = res.machineState;
-                        allStates.sort((a ,  b) => (a.name ?? '').localeCompare(b.name ?? ''))
+						allStates.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
 						return this.commonService.get(
 							`machines/${machineId}/machine-machine-state-time`,
 							false
@@ -173,11 +182,13 @@ export class MachineStatesComponent {
 		}
 	}
 
-	checkAuthorized(machineId: number) {
-		if (machineId) {
-			this.commonService
-				.get(`machine/${machineId}/qualification`, false)
-				.subscribe((status: any) => (this.isAuthorized = status ? true : false));
-		}
+	checkAuthorized() {
+		if (
+			(this.authService.isQualified() &&
+				this.authService.isPermissionValid("MACHINEBOARD_MACHINE_STATE_CHANGE_EDIT_IF_QUALIFIED")) ||
+			this.authService.isPermissionValid("MACHINEBOARD_MACHINE_STATE_CHANGE_EDIT")
+		) {
+			this.isAuthorized = true;
+		} else this.isAuthorized = false;
 	}
 }

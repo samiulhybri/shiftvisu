@@ -26,11 +26,11 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 
 	public combineOrderDialog: boolean = false;
 
-	public groups: any[] = [];
+	public groups: Set<number>[] = [];
 	public group: Set<number> = new Set<number>();
 	public inGroup: Map<number, any> = new Map<number, any>();
 	public forCombineOrders: any = [];
-	public combineOrders: any = [];
+	public selectedCombineOrders: any = [];
 	public selectedOrders: string = "";
 	public selectedOrderIds: number[] = [];
 	public isOrderDetailsDialogOpen: boolean = false;
@@ -47,6 +47,7 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 	public willBeSave: boolean = false;
 	public needToSaveOrderIds: Set<number> = new Set<number>();
 	private destroy$ = new Subject<void>();
+	public cardHeaderText = $localize`Machine Schedule`;
 
 	constructor(
 		private commonService: CommonService,
@@ -102,18 +103,20 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 
 					const groups = this.getGroups();
 					this.groups = structuredClone(groups);
-					for (let i = 0; i < groups.length; i++) {
-						const group = groups[i];
-						for (let j = 0; j < group.length; j++) {
-							const id = group[j];
+
+					let groupCount: number = 0;
+					groups.forEach((group: Set<number>) => {
+						++groupCount;
+						const _group = Array.from(group);
+						_group.forEach((id: number) => {
 							const index = this.orders.findIndex((order: any) => order.id === id);
 							if (index > -1) {
 								this.orders[index].belongsToGroup = true;
-								this.orders[index].belongsToOrder = group[0];
-								this.orders[index].belongsToGroupId = i + 1;
+								this.orders[index].belongsToOrder = _group[0];
+								this.orders[index].belongsToGroupId = groupCount;
 							}
-						}
-					}
+						});
+					});
 
 					this.isLoading = false;
 				},
@@ -123,7 +126,7 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 
 	formatTime(date?: any) {
 		if (date) {
-			return moment.utc(date).local().format("DD.MM.YYYY HH:mm:ss");
+			return moment.utc(date).local().format("DD.MM.YYYY HH:mm");
 		} else {
 			return "";
 		}
@@ -132,12 +135,18 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 	onChangeStartTime(value: any, order: any) {
 		const index = this.orders.findIndex((x: any) => x.id === order.id);
 		if (index > -1) {
-			const parsedDate = moment(value, "DD.MM.YYYY HH:mm:ss", true);
+			const parsedDate = moment(value, "DD.MM.YYYY HH:mm", true);
 			if (!parsedDate.isValid()) {
 				this._toaster.showToast($localize`Invalid date format`, "error");
 				return;
 			}
-			this.orders[index].start = parsedDate.format("DD.MM.YYYY HH:mm:ss");
+			const difference = moment(this.orders[index].end).diff(moment(this.orders[index].start));
+
+			this.orders[index].start = parsedDate.format("YYYY-MM-DD HH:mm");
+
+			this.orders[index].end = moment(this.orders[index].start)
+				.add(difference)
+				.format("YYYY-MM-DD HH:mm");
 		}
 	}
 
@@ -150,8 +159,8 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 				continue;
 			}
 			const payload = {
-				start: moment.utc(this.orders[i].start).format(),
-				end: moment.utc(this.orders[i].end).format(),
+				start: moment.utc(this.orders[i].start).format('YYYY-MM-DD HH:mm'),
+				end: moment.utc(this.orders[i].end).format('YYYY-MM-DD HH:mm'),
 			};
 			const request = new ODataBatchCall(
 				i,
@@ -183,41 +192,25 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 	combineOrder(order: any) {
 		this.initialSelectedOrders = "";
 		this.selectedParentOrder = order;
-		this.combineOrders = [];
+		this.selectedCombineOrders = [];
 		this.forCombineOrders = [];
-		this.group.add(order.id);
+		this.group.clear();
 
-		const inGroup = new Set<number>();
-		for (let i = 0; i < this.groups.length; ++i) {
+		for (let i = 0; i < this.groups.length; i++) {
 			const group = this.groups[i];
-			if (group.includes(this.selectedParentOrder.id)) {
-				for (let j = 0; j < group.length; ++j) {
-					const id = group[j];
-					inGroup.add(id);
-					const index = this.orders.findIndex((item: any) => item.id === id);
-					if (index > -1) {
-						if (this.selectedParentOrder.id !== this.orders[index].id) {
-							this.forCombineOrders.push(this.orders[index]);
-						}
-						this.group.add(this.orders[index].id);
-						this.initialSelectedOrders =
-						`${this.initialSelectedOrders} ${this.orders[index].id}`.trim();
-					}
-				}
+			if (group.has(order.id)) {
+				this.group = structuredClone(group);
+				break;
 			}
 		}
 
-		for (let i = 0; i < this.orders.length; i++) {
-			const id = this.orders[i].id;
-			if (inGroup.has(id)) {
-				continue;
-			}
-			if (this.selectedParentOrder.id !== id) {
-				if (this.orders[i].status !== ProdOrderPosOperationStatus.IN_PRODUCTION) {
-					this.forCombineOrders.push(this.orders[i]);
-				}
-			}
-		}
+		this.forCombineOrders = this.orders
+			.filter((order: any) => order.status !== ProdOrderPosOperationStatus.IN_PRODUCTION)
+			.filter((item: any) => item.id !== order.id);
+
+		this.initialSelectedOrders = [...this.group].join(" ");
+
+		this.group.add(order.id);
 
 		this.combineOrderDialog = true;
 	}
@@ -229,11 +222,8 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 
 		for (let i = 0; i < this.groups.length; i++) {
 			const group = this.groups[i];
-			if (group.includes(order.id)) {
-				const index = group.indexOf(order.id);
-				if (index > -1) {
-					group.splice(index, 1);
-				}
+			if (group.has(order.id)) {
+				group.delete(order.id);
 			}
 		}
 	}
@@ -242,12 +232,15 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 		this.initialSelectedOrders = "";
 		this.group.clear();
 		this.combineOrderDialog = false;
+		this.forCombineOrders = [];
+		this.selectedCombineOrders = [];
+		this.selectedParentOrder = null;
 	}
 
 	getGroups() {
 		if (this.orders.length > 0) {
 			let startTime = this.orders[0].start;
-			const groups: any[] = [];
+			const groups: Set<number>[] = [];
 			const group: Set<number> = new Set<number>();
 			for (let i = 1; i < this.orders.length; ++i) {
 				if (this.orders[i].status === ProdOrderPosOperationStatus.IN_PRODUCTION) {
@@ -262,7 +255,7 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 					}
 				} else {
 					if (group.size > 0) {
-						groups.push(Array.from(group));
+						groups.push(structuredClone(group));
 						group.clear();
 					}
 				}
@@ -270,7 +263,7 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 			}
 
 			if (group.size > 0) {
-				groups.push(Array.from(group));
+				groups.push(structuredClone(group));
 				group.clear();
 			}
 
@@ -282,76 +275,67 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 	onSelectCombineOrder(event: any) {
 		const state = event.target._state;
 		const selected = state.selected.trim();
-		const selectedIds = selected.split(" ");
-		this.combineOrders = [];
+		const selectedIds = selected.split(" ").map(Number);
+		this.selectedCombineOrders = [];
+
 		this.group.clear();
+		selectedIds.forEach((id: number) => this.group.add(id));
 		this.group.add(this.selectedParentOrder.id);
-		if (selectedIds.length > 0) {
-			for (let i = 0; i < selectedIds.length; ++i) {
-				const id = Number(selectedIds[i]);
-				const order = this.forCombineOrders.find((x: any) => x.id === id);
-				if (order) {
-					if (order.status === ProdOrderPosOperationStatus.IN_PRODUCTION) {
-						continue;
-					}
-					this.group.add(order.id);
-					this.combineOrders.push(order);
-				}
-			}
-		}
+
+		this.selectedCombineOrders = this.orders
+			.filter((order: any) => order.status !== ProdOrderPosOperationStatus.IN_PRODUCTION)
+			.filter((item: any) => this.group.has(item.id));
 	}
 
 	confirmCombineOrder() {
-		for (let i = 0; i < this.combineOrders.length; ++i) {
-			const index = this.orders.findIndex((x: any) => x.id === this.combineOrders[i].id);
+		let index = -1;
+		for (let i = 0; i < this.groups.length; ++i) {
+			const group = this.groups[i];
+			if (group.has(this.selectedParentOrder.id)) {
+				index = i;
+			} else {
+				this.group.forEach((id: number) => {
+					if (group.has(id)) {
+						group.delete(id);
+					}
+				});
+			}
+		}
+
+		if (index > -1) {
+			this.groups[index] = structuredClone(this.group);
+		} else {
+			this.groups.push(structuredClone(this.group));
+		}
+
+		let groupCount: number = 0;
+		this.groups.forEach((group: Set<number>) => {
+			++groupCount;
+			const _group = Array.from(group);
+			_group.forEach((id: number) => {
+				const index = this.orders.findIndex((order: any) => order.id === id);
+				if (index > -1) {
+					this.orders[index].belongsToGroup = true;
+					this.orders[index].belongsToOrder = _group[0];
+					this.orders[index].belongsToGroupId = groupCount;
+				}
+			});
+		});
+
+		this.group.forEach((id: number) => {
+			const index = this.orders.findIndex((order: any) => order.id === id);
+			const difference = moment(this.orders[index].end).diff(moment(this.orders[index].start));
 			if (index > -1) {
 				this.orders[index].start = this.selectedParentOrder.start;
-				this.orders[index].end = this.selectedParentOrder.end;
+				this.orders[index].end = moment(this.orders[index].start).add(difference);
 			}
-
-			if (!this.selectedOrderIds.find(id => id === this.combineOrders[i].id)) {
-				this.selectedOrderIds.push(this.combineOrders[i].id);
-			}
-		}
-		if (!this.selectedOrderIds.find(id => id === this.selectedParentOrder.id)) {
-			this.selectedOrderIds.push(this.selectedParentOrder.id);
-		}
+		});
 
 		this.orders.sort((a: any, b: any) => {
 			return moment(a.start).isSame(moment(b.start))
 				? moment(a.end).diff(moment(b.end))
 				: moment(a.start).diff(moment(b.start));
 		});
-
-		let populate = false;
-		for (let i = 0; i < this.groups.length; ++i) {
-			const group = this.groups[i];
-			if (group.includes(this.selectedParentOrder.id)) {
-				populate = true;
-				this.groups[i] = structuredClone(this.selectedOrderIds);
-				for (let j = 0; j < this.groups[i].length; ++i) {
-					const id = this.groups[i][j];
-					const index = this.orders.findIndex((x: any) => x.id === id);
-					if (index > -1) {
-						this.orders[index].belongsToGroup = true;
-						this.orders[index].belongsToOrder = this.groups[i][0];
-						this.orders[index].belongsToGroupId = i + 1;
-					}
-				}
-			}
-		}
-		if (!populate) {
-			this.groups.push(structuredClone(this.selectedOrderIds));
-			for (let i = 0; i < this.selectedOrderIds.length; ++i) {
-				const id = this.selectedOrderIds[i];
-				const index = this.orders.findIndex((x: any) => x.id === id);
-				if (index > -1) {
-					this.orders[index].belongsToGroup = true;
-					this.orders[index].belongsToOrder = this.selectedOrderIds[0];
-					this.orders[index].belongsToGroupId = this.groups.length;
-				}
-			}
-		}
 
 		this.closeCombineOrderDialog();
 	}
@@ -366,7 +350,7 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 		this.isOrderDetailsDialogOpen = false;
 	}
 
-	reSchedule(group?: number[]) {
+	reSchedule() {
 		if (this.orders.length > 0) {
 			this.isLoading = true;
 			const ids: number[] = [];
@@ -379,13 +363,15 @@ export class MachineOrdersModalComponent implements OnInit, OnDestroy {
 				}
 			}
 			const firstOrder = this.orders.find((x: any) => x.id === ids[0]);
-			const startTime = moment(firstOrder.start, "DD.MM.YYYY HH:mm:ss", true)
+			const startTime = moment(firstOrder.start, "YYYY-MM-DD HH:mm", true)
 				.utc()
-				.format("YYYY-MM-DD HH:mm:ss");
+				.format("YYYY-MM-DD HH:mm");
+
+			const groups = this.groups.map((group: Set<number>) => Array.from(group));
 
 			this.commonService
 				.get(
-					`capacity-plan/machine/${this.machineId}/re-schedule?operations=${ids}&start=${startTime}&groups=${JSON.stringify(this.groups)}`,
+					`capacity-plan/machine/${this.machineId}/re-schedule?operations=${ids}&start=${startTime}&groups=${JSON.stringify(groups)}`,
 					false
 				)
 				.pipe(takeUntil(this.destroy$))

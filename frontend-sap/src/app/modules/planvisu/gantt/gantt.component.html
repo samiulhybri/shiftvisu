@@ -14,7 +14,7 @@
 				name="value-help"
 				(click)="valueHelperIconClick(valueHelperType.CUSTOMER)"></ui5-icon>
 		</ui5-input>
-		<ui5-multi-combobox
+		<ui5-multi-combobox [hidden]="!isShowHall"
 			#hallRef
 			id="hallMultiComboBox"
 			(selectionChange)="selectHall($event)"
@@ -28,7 +28,7 @@
 				[id]="hall.id">
 			</ui5-mcb-item>
 		</ui5-multi-combobox>
-		<ui5-multi-combobox
+		<ui5-multi-combobox [hidden]="!isShowMachineGroup"
 			#machineGroupRef
 			id="machineGroupMultiComboBox"
 			(selectionChange)="selectMachineGroup($event)"
@@ -41,7 +41,7 @@
 				[id]="machineGroup.id">
 			</ui5-mcb-item>
 		</ui5-multi-combobox>
-		<ui5-multi-combobox
+		<ui5-multi-combobox [hidden]="!isShowMachine"
 			#machineRef
 			id="machineMultiComboBox"
 			(selectionChange)="selectMachine($event)"
@@ -54,7 +54,7 @@
 				[id]="machine.id">
 			</ui5-mcb-item>
 		</ui5-multi-combobox>
-		<ui5-input
+		<ui5-input [hidden]="!isShowItem"
 			id="itemInput"
 			placeholder="Select Item"
 			[required]="true"
@@ -69,7 +69,7 @@
 				name="value-help"
 				(click)="valueHelperIconClick(valueHelperType.ITEM)"></ui5-icon>
 		</ui5-input>
-		<ui5-input
+		<ui5-input [hidden]="!isShowProdOrder"
 			id="prodOrderInput"
 			placeholder="Select Prod Order"
 			[required]="true"
@@ -186,106 +186,27 @@
 				(onSelectionChange)="onSchedulerSelectionChange()"
 				(onTimeAxisChange)="timeAxisChange$.next($event)"
 				(onAfterEventDrop)="onAfterEventDrop()"
-                (onEventMouseEnter)="onEventMouseEnter($event)"
+				(onEventMouseEnter)="onEventMouseEnter($event)"
                 (onEventMouseLeave)="onEventMouseLeave()"
                 >
 			</bryntum-scheduler-pro>
 		</ui5-busy-indicator>
-		@if (clientName == "ict") {
+		
+		<ng-container *ngIf="colorSchemeList && colorSchemeList.length > 0; else basicLegendsTemplete"> 
 			<div class="absolute top-[27px] left-[200px] z-50 flex flex-row">
-				<div
-					class="h-20px w-[20px]"
-					style="background-color: #b5deb7"></div>
-
-				<ui5-label
-					i18n
-					class="ml-[10px] mr-[10px]">In Production</ui5-label>
-
-				<div
-					class="h-20px w-[20px] ml-[10px]"
-					style="background-color: #cd7a00"></div>
-
-				<ui5-label
-					i18n
-					class="ml-[10px] mr-[10px]">In Setup</ui5-label>
-
-				<div
-					class="h-20px w-[20px] ml-[10px] mr-[10px]"
-					style="background-color: #4fb6ac"></div>
-
-				<ui5-label
-					i18n
-					class="mr-[10px]">Components prepared</ui5-label
-				>
-
-				<div
-					class="h-20px w-[20px] ml-[10px] mr-[10px]"
-					style="background-color: #ff7043"></div>
-
-				<ui5-label
-					i18n
-					class="mr-[10px]">Printed</ui5-label>
-				<div
-					class="h-20px bg-blue-400 w-[20px] ml-[10px]"
-					style="background-color: #0b77cf"></div>
-
-				<ui5-label
-					i18n
-					class="ml-[10px] mr-[10px]">Components available</ui5-label>
-
-				<div
-					class="h-20px w-[20px] ml-[10px]"
-					style="background-color: #707070"></div>
-
-				<ui5-label
-					i18n
-					class="ml-[10px] mr-[10px]">Others</ui5-label>
-
-				<div
-					class="h-20px w-[20px] ml-[10px]"
-					style="border: 2px solid red"></div>
-				<ui5-label
-					i18n
-					class="ml-[10px]">Restrictions</ui5-label>
+				<div *ngFor="let base of colorSchemeList" class="flex items-center ml-[10px]">
+					<div 
+						class="h-[16px] w-[20px]" 
+						[ngStyle]="{
+							'background-color': formatColor(base, 'background'),
+							'border': formatColor(base, 'border')
+						}">
+					</div>
+					<ui5-label i18n class="ml-[10px] mr-[10px]">{{ base.value_string }}</ui5-label>
+				</div>
 			</div>
-		 } @else if(clientName=='shopfloor') {
-            <div class="absolute top-[27px] left-[200px] z-50 flex flex-row">
-				<div
-					class="h-20px w-[20px] ml-[10px]"
-					style="background-color: #f07371"></div>
-				<ui5-label
-					i18n
-					class="ml-[10px] mr-[10px]">Design</ui5-label>
-				<div
-					class="h-20px bg-blue-400 w-[20px] ml-[10px]"
-					style="background-color: #85c988"></div>
-
-				<ui5-label
-					i18n
-					class="ml-[10px] mr-[10px]">Development</ui5-label>
-				<div
-					class="h-20px bg-blue-400 w-[20px] ml-[10px]"
-					style="background-color: #68b7f7"></div>
-
-				<ui5-label
-					i18n
-					class="ml-[10px] mr-[10px]">QA Dev</ui5-label>
-				<div
-					class="h-20px w-[20px] ml-[10px]"
-					style="background-color: #ffa533"></div>
-				<ui5-label
-					i18n
-					class="ml-[10px] mr-[10px]">QA Test</ui5-label>
-
-                <div
-					class="h-20px w-[20px] ml-[10px]"
-					style="border: 2px solid #FF5C00"></div>
-				<ui5-label
-					i18n
-					class="ml-[10px]">Running Task</ui5-label>
-			</div>
-
-         }@else {
+		</ng-container>
+		<ng-template #basicLegendsTemplete>
 			<div class="absolute top-[27px] left-[200px] z-50 flex flex-row">
 				<div
 					class="h-20px w-[20px] ml-[10px]"
@@ -324,20 +245,21 @@
 				<ui5-label
 					i18n
 					class="ml-[10px] mr-[10px]">Suspended</ui5-label>
-                <div
+				<div
 					class="h-20px w-[20px] ml-[10px]"
 					style="border: 2px solid red"></div>
 				<ui5-label
 					i18n
 					class="ml-[10px]">Restrictions</ui5-label>
 			</div>
-		}
+		</ng-template>
 	</div>
 </div>
 
      <app-order-details-dialog
          #orderDetailsDialog
          [open]="isDialogOpen"
+		 [showfields]="isShowOperationPopupField"
          [isSaveButton]="isSaveButton"
          [isPlanVisuGanttRestrictionRemove]="isPlanVisuGanttRestrictionRemove"
          [isEndBusy]="isEndBusy"

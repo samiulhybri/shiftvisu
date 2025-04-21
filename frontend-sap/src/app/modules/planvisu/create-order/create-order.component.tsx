@@ -9,14 +9,15 @@ import { ToastService } from '@app/shared/services/toaster.service';
 import { Localization } from '@app/shared/utils/common-localize';
 import ValueState from '@ui5/webcomponents-base/dist/types/ValueState';
 import React from 'react';
-import { ComboBoxItem, FlexBox, Text } from '@ui5/webcomponents-react';
+import { Button, ComboBoxItem, FlexBox, Text } from '@ui5/webcomponents-react';
 import { ComboBox, DateTimePicker, Input as UI5Input, Input, Icon } from "@ui5/webcomponents-react";
 import { DatePicker } from '@ui5/webcomponents-react';
 import { ProdOrderPos } from '@app/shared/models/prod-order-pos.model';
 import { ProdOrderPosOperation } from '@app/shared/models/prod-order-pos-operation.model';
 import moment from 'moment';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { DatePipe } from '@angular/common';
+import { ProdOrderPosOperationStatus } from '@app/shared/enums/ProdOrderPosOperationStatus';
 
 @Component({
 	selector: 'app-create-order',
@@ -47,6 +48,8 @@ export class CreateOrderComponent {
 	@ViewChild("machineValuEHelperGrid", { static: false }) machineValuEHelperGrid:
 		| CustomReactGridTable
 		| undefined;
+	prodOrderPosOperationStatus = ProdOrderPosOperationStatus;
+	machineConstraintType = MachineConstraintType
 	prodOrderAllData: ProdOrder[] = [];
 	customIdValueStateText: string = Localization.idIsRequired;
 	isLoadingCustomId: boolean = false;
@@ -93,6 +96,7 @@ export class CreateOrderComponent {
 	positionAddButtonDisable = true
 	operationAddButtonDisable = true
 	isFinalDataDisabled = false;
+	isReScheduleButtonDisabled = true;
 	callOffsDateRange: any;
 	callOffsStartDate: any = moment.now();
 	callOffsEndDate: any = moment.now();
@@ -311,7 +315,7 @@ export class CreateOrderComponent {
 							value={row.original.due_date ? row.original.due_date : ''}
 							onChange={(event)=>{
 								row.original.due_date = event.detail.value;
-								this.dueDateUpdate(row.original.due_date, row.original.quantity)
+								this.posQuantityChange(row.original.quantity)
 							}}
 						/>
 					</React.StrictMode>
@@ -420,7 +424,7 @@ export class CreateOrderComponent {
 							<ComboBox
 								value={MachineConstraintTypeClass.getStateTranslate(rowData?.constraint_type)}
 								onInput={()=>{}}
-								onSelectionChange={(e:any)=>{rowData.constraint_type = MachineConstraintTypeClass.getStateValue(e.detail.item.text); this.prodOrderPosOperationGrid?.render()
+								onSelectionChange={(e:any)=>{rowData.constraint_type = MachineConstraintTypeClass.getStateValue(e.detail.item.text); this.prodOrderPosOperationGrid?.render(); this.isReScheduleButtonDisabled = false; this.isFinalDataDisabled = true;
 								}}
 							>
 								{MachineConstraintTypeClass.getEnumArray().map((type: any) => (
@@ -454,7 +458,8 @@ export class CreateOrderComponent {
 						value={row.original.start ? row.original.start : ''}
 						onChange={(event)=>{
 							row.original.start = event.detail.value;
-							this.updateAllOperationsStartAndEnd(row.original)
+							this.updateAllOperationsStartAndEnd(row.original);
+							this.isReScheduleButtonDisabled = false; this.isFinalDataDisabled = true;
 						}}
 						show-time-picker
 						/>
@@ -508,7 +513,8 @@ export class CreateOrderComponent {
 							value={row.original.te}
 							onChange={ (event:any) =>{
 								row.original.te = event.target.value;
-								this.updateAllOperationsStartAndEnd(row.original)
+								this.updateAllOperationsStartAndEnd(row.original);
+								this.isReScheduleButtonDisabled = false; this.isFinalDataDisabled = true;
 							}}
 						/>
 					</React.StrictMode>
@@ -533,7 +539,8 @@ export class CreateOrderComponent {
 							value={row.original.cavity}
 							onChange={(event)=>{
 								row.original.cavity = event.target.value;
-								this.updateAllOperationsStartAndEnd(row.original)
+								this.updateAllOperationsStartAndEnd(row.original);
+								this.isReScheduleButtonDisabled = false; this.isFinalDataDisabled = true;
 							}}
 						/>
 					</React.StrictMode>
@@ -559,7 +566,8 @@ export class CreateOrderComponent {
 							onChange={ (event:any) =>{
 								row.original.lead_time_days = event.target.value;
 								this.operationTableRowData = row.original;
-								this.updateAllOperationsStartAndEnd(this.operationTableRowData)
+								this.updateAllOperationsStartAndEnd(this.operationTableRowData);
+								this.isReScheduleButtonDisabled = false; this.isFinalDataDisabled = true;
 							}}
 						/>
 					</React.StrictMode>
@@ -585,10 +593,31 @@ export class CreateOrderComponent {
 							onChange={ (event:any) =>{
 								row.original.send_ahead_quantity = event.target.value;
 								this.operationTableRowData = row.original;
-								this.updateAllOperationsStartAndEnd(this.operationTableRowData)
+								this.updateAllOperationsStartAndEnd(this.operationTableRowData);
+								this.isReScheduleButtonDisabled = false; this.isFinalDataDisabled = true;
 							}}
 						/>
 					</React.StrictMode>
+				);
+			},
+		},
+		{
+			Header: $localize`Overdue`,
+			accessor: "abc",
+			disableFilters: true,
+			disableGroupBy: true,
+			disableSortBy: true,
+			isSelected: true,
+			hAlign: "Center",
+			width:150,
+			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+				const { row } = instance;
+				return (
+					<React.StrictMode>
+					<FlexBox alignItems='Stretch'>
+						{this.checkOverDue(row.original) ? <Button id='showViewModalButton' icon="information" design='Transparent' onClick={() =>{} }></Button> : null}
+					</FlexBox>
+				</React.StrictMode>
 				);
 			},
 		},
@@ -601,9 +630,27 @@ export class CreateOrderComponent {
 		}
 		this.isMachineValueHelpDialog = true;
 	}
+	checkOverDue(operation:any){
+		// console.log(operation.end, this.selectedPosRow.original.due_date, operation.lead_time_days);
+		let [endDatePart, endTimePart] = operation.end.split(' ');
+		let [day, month, year] = endDatePart.split('.').map(Number);
+		let [hours, minutes] = endTimePart.split(':').map(Number);
+		
+		let endDate = new Date(year, month - 1, day);
+		
+		// Add lead time days
+		endDate.setDate(endDate.getDate() + operation.lead_time_days);
+		
+		// Convert 'dueDate' to a Date object (assuming format: 'DD.MM.YYYY')
+		let [dueDay, dueMonth, dueYear] = this.selectedPosRow.original.due_date.split('.').map(Number);
+		let dueDateObj = new Date(dueYear, dueMonth - 1, dueDay);
+		
+		// Compare dates
+		return endDate > dueDateObj;
+	}
 	async updateOperationEndDate(rowData:any){
 		const duration =
-		(rowData.te / (rowData.cavity ? rowData.cavity : 1)) * this.selectedPosRow.original.quantity;
+		new ProdOrderPosOperation().deserialize({...rowData, prodOrderPos:this.selectedPosRow.original}).calculateDuration();		
 	  	// Await API response
 	  	let res: any = await firstValueFrom(
 			this.commonService.get(
@@ -649,7 +696,7 @@ export class CreateOrderComponent {
 	posQuantityChange(quantity:any){
 		if(this.prodOrderPosOperationGrid?.data?.length > 0){
 			this.prodOrderPosOperationGrid?.data?.forEach(async (element:any) => {
-				let duration = (element.te / (element.cavity ? element.cavity : 1)) * quantity;
+				let duration = new ProdOrderPosOperation().deserialize({element, machine:element.machine, prodOrderPos:this.selectedPosRow.original}).calculateDuration();				
 				let res: any = await firstValueFrom(
 					this.commonService.get(
 					  `capacity-plan/machine/${element.machine.id}?start=${element.start}&duration=${duration}`,
@@ -659,9 +706,83 @@ export class CreateOrderComponent {
 				  element.end = moment(res.end).format('DD.MM.YYYY HH:mm');
 				  this.prodOrderPosOperationGrid?.render()
 			});
+			this.reSchedule();
 		}
 
 	}
+	async reSchedule() {
+		const reSchedulableOperations = this.prodOrderPosOperationGrid?.data.filter(
+			(operation: any) =>
+				operation.status !== this.prodOrderPosOperationStatus.IN_PRODUCTION &&
+				(operation.constraint_type === this.machineConstraintType.MANUAL ||
+					operation.constraint_type === this.machineConstraintType.CONSTRAINT)
+		);
+	
+		const operationRequests = reSchedulableOperations.map((operation: any) => {
+			return new Promise<void>((resolve) => {
+				const data = {
+					pos: operation.pos,
+					machine_id: operation.machine.id,
+					start: moment(operation.start, "DD.MM.YYYY HH:mm").toISOString(),
+					operations: this.prodOrderPosOperationGrid!.data,
+					quantity: parseInt(this.selectedPosRow.original.quantity, 10),
+					constraint_type: operation.constraint_type,
+				};
+	
+				this.commonService.post(
+					"plan_visu/constrainged_operation_date",
+					data,
+					false
+				).subscribe({
+					next: (res: any) => {
+						if (res.length > 0) {
+							this.prodOrderPosOperationGrid?.data.forEach((op: any) => {
+								const matchingRes = res.find((r: any) => r.pos === op.pos);
+								if (matchingRes) {
+									op.start = moment(matchingRes.start).format('DD.MM.YYYY HH:mm');
+									op.end = moment(matchingRes.end).format('DD.MM.YYYY HH:mm');
+								}
+							});
+						}
+						this.prodOrderPosOperationGrid!.render();
+						this.isReScheduleButtonDisabled = true;
+						this.isFinalDataDisabled = false;
+						resolve(); // Resolve the promise after API call completion
+					}
+				});
+			});
+		});
+	
+		// Wait for all API calls to finish
+		await Promise.all(operationRequests);
+	
+		// Now execute the final loop
+		
+		this.getPossibleDueDate()
+	}
+
+	 getPossibleDueDate() {
+		let maxDueDate = moment(this.selectedPosRow.original.due_date, "DD.MM.YYYY");
+		let updated = false;
+		this.prodOrderPosOperationGrid?.data.forEach((op: any) => {
+			// Parse operation end date
+			let opEndDate = moment(op.end, "DD.MM.YYYY HH:mm");
+			
+			// Add lead time days
+			let calculatedDueDate = opEndDate.add(op.lead_time_days, 'days');
+			
+			// Compare with maxDueDate
+			if (calculatedDueDate.isAfter(maxDueDate)) {
+				maxDueDate = calculatedDueDate;
+				updated = true;
+			}
+		});
+	
+		if (updated) {
+			this._toasterSrv.showToast($localize`Possible Due date` + `${maxDueDate.format("DD.MM.YYYY")}`, 'success')
+		};
+	}
+	
 	updateOperationStartandEndDate(data:any){
 		let start: any = new Date(
 			this.selectedPosRow.original.due_date.split('.').reverse().join('-')
@@ -671,15 +792,6 @@ export class CreateOrderComponent {
 		  this.operationTableRowData.start =  start;
 		  this.prodOrderPosOperationGrid?.render()
 		  this.updateOperationEndDate(this.operationTableRowData);
-	}
-	dueDateUpdate(dueDate:any, quantity:any){
-		this.prodOrderPosOperationGrid?.data?.forEach((ele:any)=>{
-			let date:any = new Date(dueDate.split(".").reverse().join("-"));
-			date.setDate(date.getDate() - 40);
-			date = moment(date).format('DD.MM.YYYY HH:mm');
-			ele.start = date;
-		})
-		this.posQuantityChange(quantity)
 	}
 	newButtonClick() {
 		this.positionPos = 0;
@@ -737,8 +849,8 @@ export class CreateOrderComponent {
 				if (type === 'copy') {
 				  position.prodOrderPosOperations = [];
 				  for(let i = copyData.length - 1; i>=0; i--){
-					const duration =
-						(copyData[i].te / (copyData[i].cavity ? copyData[i].cavity : 1)) * this.selectedPosRow.original.quantity;
+					const duration = new ProdOrderPosOperation().deserialize({...copyData[i], prodOrderPos:this.selectedPosRow.original}).calculateDuration()
+						
 						if(i == copyData.length - 1){
 							let end: any = new Date(
 								this.selectedPosRow.original.due_date.split('.').reverse().join('-')
@@ -906,7 +1018,8 @@ export class CreateOrderComponent {
 		}
 	}
 
-	changeBatchQuantityFlag(){
+	changeBatchQuantityFlag(isBatchQuantity:boolean){
+
 		if(this.isBatchQuantity){
 			this.isBatchQuantity = false;
 		}else{
@@ -930,7 +1043,7 @@ export class CreateOrderComponent {
 		if(this.finalSelectedCallOff &&  Object.keys(this.finalSelectedCallOff).length != 0 && this.finalSelectedCallOff.custom_id !=''){
 			let due_date = moment(this.selectedCallOff.date).format("DD.MM.YYYY");
 			this.positionPos +=10;
-			this.prodOrderAllData[0]?.prodOrderPos?.push(new ProdOrderPos().deserialize({pos:this.positionPos,item:this.finalSelectedCallOff.item, quantity:(this.finalSelectedCallOff.item.batch_quantity && this.isBatchQuantity) ? this.finalSelectedCallOff.item.batch_quantity : this.finalSelectedCallOff.quantity, due_date:due_date}))
+			this.prodOrderAllData[0]?.prodOrderPos?.push(new ProdOrderPos().deserialize({pos:this.positionPos,item:this.finalSelectedCallOff.item, quantity:(this.finalSelectedCallOff.item.batch_quantity > 0 && this.isBatchQuantity) ? this.finalSelectedCallOff.item.batch_quantity : this.finalSelectedCallOff.quantity, due_date:due_date}))
 			this.operationAddButtonDisable = false;
 		}
 		this.prodOrderPosGrid!.data = this.prodOrderAllData[0]?.prodOrderPos;

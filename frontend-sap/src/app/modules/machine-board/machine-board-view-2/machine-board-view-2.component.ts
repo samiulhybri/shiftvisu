@@ -4,6 +4,7 @@ import { MachineBoardType, MachineBoardTypeClass } from "@app/shared/enums/Machi
 import { OrderDetails } from "@app/shared/interfaces/OrderDetails";
 import { Item } from "@app/shared/models/item.model";
 import { Machine } from "@app/shared/models/machine.model";
+import {MachineboardService} from "@app/modules/machine-board/services/machineboard.service";
 
 @Component({
 	selector: "app-machine-board-view-2",
@@ -28,6 +29,10 @@ export class MachineBoardView2Component {
 	ngOnChanges() {
 		this.setHeight();
 	}
+
+	constructor(
+		private machineboardService: MachineboardService,
+	) {}
 
 	setHeight() {
 		const height = window.innerHeight;
@@ -55,5 +60,6 @@ export class MachineBoardView2Component {
 
 	onSelectOperation(operation: any) {
 		this.selectedOperation = operation;
+		this.machineboardService.updateSelectedOperation = this.selectedOperation;
 	}
 }

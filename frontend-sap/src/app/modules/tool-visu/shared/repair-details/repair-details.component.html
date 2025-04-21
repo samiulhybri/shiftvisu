@@ -118,13 +118,14 @@
                                     [readonly]="modalType == 'view'"></ui5-date-picker>
                             </div>
                             <div class="prod-date ml-5 grid col-span-2">
-                                <ui5-label required show-colon i18n>Start Date Production ({{ productiondateSubText }})</ui5-label>
+                                <ui5-label required show-colon i18n>Start Date Production ({{ productiondateSubText
+                                    }})</ui5-label>
                                 <ui5-date-picker name="release_date" class="w-100 date-picker"
                                     format-pattern="dd.MM.yyyy"
                                     [value]="prodOrderPosData.release_date ? (prodOrderPosData.release_date | dateFormat:'dd.MM.yyyy') : ''"
                                     [valueState]="!prodOrderPosData.release_date ? 'Negative' : 'None'"
                                     (change)="onUpdateValue($event, 'release_date')"
-                                    [readonly]="modalType == 'view' || !isToolRepairProductionDateManual"></ui5-date-picker>
+                                    [readonly]="modalType == 'view' || isDisableProdDate"></ui5-date-picker>
                             </div>
                         </div>
                         <div class="mb-5 w-full items-center grid grid-flow-col grid-cols-4" *ngIf="!isAddToolRepair">
@@ -201,18 +202,19 @@
                             </div>
                         </div>
                         <div class="flex items-center justify-between w-[100%]">
-                            <ui5-label show-colon i18n class="w-[60%]" style="font-size: medium;font-weight: bold;">Sampling Required</ui5-label>
-                            <ui5-switch id="sampling_required" class="w-[40%]" name="sampling_required" [(ngModel)]="prodOrderPosData.is_sampling_required"
-                            [disabled]="!hasAuth"
-                            (change)="onSamplingRequiredChange()"
-                                >
+                            <ui5-label show-colon i18n class="w-[60%]"
+                                style="font-size: medium;font-weight: bold;">Sampling Required</ui5-label>
+                            <ui5-switch id="sampling_required" class="w-[40%]" name="sampling_required"
+                                [(ngModel)]="prodOrderPosData.is_sampling_required" [disabled]="!hasAuth"
+                                (change)="onSamplingRequiredChange()">
                             </ui5-switch>
                         </div>
-                        <div class="flex items-center justify-between w-[100%]" *ngIf="prodOrderPosData.is_sampling_required">
-                            <ui5-label show-colon i18n style="font-size: medium;font-weight: bold;" class="w-[60%]">Sampling Done</ui5-label>
-                            <ui5-switch id="sampling_done" class="w-[40%]" name="sampling_done" [(ngModel)]="prodOrderPosData.is_sampling_done"
-                            [disabled]="!hasAuth"
-                                >
+                        <div class="flex items-center justify-between w-[100%]"
+                            *ngIf="prodOrderPosData.is_sampling_required">
+                            <ui5-label show-colon i18n style="font-size: medium;font-weight: bold;"
+                                class="w-[60%]">Sampling Done</ui5-label>
+                            <ui5-switch id="sampling_done" class="w-[40%]" name="sampling_done"
+                                [(ngModel)]="prodOrderPosData.is_sampling_done" [disabled]="!hasAuth">
                             </ui5-switch>
                         </div>
                     </div>
@@ -235,14 +237,14 @@
                             <ui5-tab #typeRepairTab required i18n-text text="Repair Type" id="type_of_repair_tab"
                                 additionalText="{{ typeOfRepairTabCount }}"
                                 [selected]="selectedTab === 'type_of_repair_tab'"></ui5-tab>
-                            <ui5-tab #otherRepairTab required i18n-text text="Other Repair" id="other_repair_tab" 
-                                additionalText="{{ otherRepairTabCount }}" 
+                            <ui5-tab #otherRepairTab required i18n-text text="Other Repair" id="other_repair_tab"
+                                additionalText="{{ otherRepairTabCount }}"
                                 [selected]="selectedTab === 'other_repair_tab'"></ui5-tab>
                             <ui5-tab #notesTab i18n-text text="Remarks" id="notes_tab"
                                 additionalText="{{ prodOrderPosData.notes != '' ? 1 : 0 }}"
                                 [selected]="selectedTab === 'notes_tab'"></ui5-tab>
-                            <ui5-tab #attachmentTab i18n-text text="Attachment" id="attachment_tab" 
-                                additionalText="{{ attachmentCount }}" 
+                            <ui5-tab #attachmentTab i18n-text text="Attachment" id="attachment_tab"
+                                additionalText="{{ attachmentCount }}"
                                 [selected]="selectedTab === 'attachment_tab'"></ui5-tab>
                         </ui5-tabcontainer>
 
@@ -308,12 +310,22 @@
     </ui5-busy-indicator>
 
     <div slot="footer" class="dialog-footer">
-        <ui5-button *ngIf="modalType != 'view' || hasAuth" class="ml-8" (click)="saveNewToolRepair()" design="Emphasized"
-            [disabled]="disableButtonDuringRequest">
-            {{isSaveOrUpdate}}
-        </ui5-button>
+        <ui5-button *ngIf="modalType != 'view' || hasAuth" class="ml-8" (click)="saveNewToolRepair()"
+            design="Emphasized" [disabled]="disableButtonDuringRequest">{{isSaveOrUpdate}}</ui5-button>
         <ui5-button class="ml-8" design="Transparent" (click)="closeCreateDialog()" i18n>
             {{ localization.close }}</ui5-button>
     </div>
     <ui5-toast #detailModalToast id="detailModalToast" placement="BottomCenter">{{ toastMessage }}</ui5-toast>
 </app-dialog>
+
+<div *ngIf="isInvalidProdDate">
+    <app-dialog id="prodDateConfirmDialog" [isDialogOpen]="isInvalidProdDate" [title]="prodDateDialogTitle"
+        (onBeforeClose)="closeProdDateDialog()">
+        <p i18n>The given production date is smaller than the start repair date. Do you want to continue saving the order?</p>
+
+        <div slot="footer" class="dialog-footer">
+            <ui5-button class="ml-8" design="Emphasized" (click)="saveProdDate()" i18n>{{ localization.yes }}</ui5-button>
+            <ui5-button class="ml-8" design="Transparent" (click)="closeProdDateDialog()" i18n>{{ localization.no }}</ui5-button>
+        </div>
+    </app-dialog>
+</div>

@@ -1,0 +1,10 @@
+@media (min-width: 300px) and (max-width: 519px) {
+    .custom-margin {
+        margin-bottom: 7rem;
+    }
+}
+@media (min-width: 520px) and (max-width: 799px) {
+    .custom-margin {
+        margin-bottom: 6rem;
+    }
+}

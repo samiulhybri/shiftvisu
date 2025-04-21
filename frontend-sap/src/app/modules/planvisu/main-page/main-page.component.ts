@@ -51,6 +51,7 @@ export class MainPageComponent {
 			"/planvisu/staff-workload",
 			"/planvisu/user-scheduler",
 			"/planvisu/order-tree-view",
+			"/planvisu/user-planning-overview"
 		];
 		this.showHallCombobox = !noHallComboboxRoutes.includes(href);
 	}
@@ -198,7 +199,7 @@ export class MainPageComponent {
 				this.router.navigate(["planvisu", "export-import"]);
 				break;
 			case "userPlan":
-				this.router.navigate(["planvisu", "user-plan"]);
+				this.router.navigate(["planvisu", "user-planning-overview"]);
 				this.showHallCombobox = false;
 				break;
 			case "settings":

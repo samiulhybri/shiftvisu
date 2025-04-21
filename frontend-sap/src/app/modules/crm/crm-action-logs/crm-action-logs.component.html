@@ -24,6 +24,24 @@
 							<ui5-cb-item id="{{ crmAction.id }}" *ngFor="let crmAction of crmActions" text="{{ crmAction.name }}"></ui5-cb-item>
 						</ui5-combobox>
 					</div>
+					<div class="flex flex-col mt-2">
+						<ui5-label
+							for="start"
+							show-colon
+							i18n
+							>Date</ui5-label
+						>
+						<ui5-datetime-picker
+							id="startDatePicker"
+							name="start"
+							[(ngModel)]="selectedCCActionLog.log_date"
+							[readonly]="false"
+							#startInput="ngModel"
+							class="w-[300px]"
+							format-pattern="dd.MM.yyyy, HH:mm"
+							(keydown)="preventKeys($event)">
+						</ui5-datetime-picker>
+					</div>
 					<div class="flex-col gap-[5px] mt-2">
 						<ui5-label show-colon i18n>Note</ui5-label>
 						<ui5-textarea

@@ -1,10 +1,12 @@
 <ui5-dialog [open]="showDialog" class="h-[800px] w-[1800px]" cdkDropList (cdkDropListDropped)="drop($event)">
 	<ui5-bar slot="header" class="h-[44px]" design="Header">
-		<ui5-title level="H5" slot="startContent">{{machineName}}</ui5-title>
+		<ui5-title level="H5" slot="startContent">{{cardHeaderText}}</ui5-title>
 		<ui5-button slot="endContent" design="Emphasized" [disabled]="isLoading" (click)="openCreateOrderModal()" id="createOrder" i18n>Create Order</ui5-button>
 	</ui5-bar>
 	<ui5-busy-indicator [active]="isLoading"
 		class="rounded-lg shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] w-full h-full">
+		<ui5-card class="h-[98%] w-[99%]">
+			<div class="p-3"><ui5-title level="H6" >{{machineName}}</ui5-title></div>
 		<ui5-table id="table" class="h-full w-full">
 			<ui5-table-selection mode="Multiple" id="selection" [selected]="selectedOrders" slot="features" (change)="onSelectOrder($event)"></ui5-table-selection>
 			<ui5-table-header-row class="list-table" slot="headerRow" sticky>
@@ -21,7 +23,7 @@
 					<ui5-table-cell><ui5-label>{{ order?.prodOrderPos?.item?.custom_id }} - {{ order?.prodOrderPos?.item?.name }}</ui5-label></ui5-table-cell>
 					<ui5-table-cell><ui5-label>{{ order.status }}</ui5-label></ui5-table-cell>
 					<ui5-table-cell>
-						<ui5-datetime-picker [readonly]="$index !== 0 || order.status === prodOrderPosOperationStatus.IN_PRODUCTION" [ngModel]="order.start | date: 'dd.MM.yyyy HH:mm'"
+						<ui5-datetime-picker class="custom-datetime-width" [readonly]="$index !== 0 || order.status === prodOrderPosOperationStatus.IN_PRODUCTION" [ngModel]="order.start | date: 'dd.MM.yyyy HH:mm'"
 							(ngModelChange)="onChangeStartTime($event, order)" formatPattern="dd.MM.YYYY HH:mm"></ui5-datetime-picker>
 						</ui5-table-cell>
 						<ui5-table-cell>
@@ -48,6 +50,7 @@
 				</ui5-table-row>
 			}
 		</ui5-table>
+	    </ui5-card>
 	</ui5-busy-indicator>
 
 	<div slot="footer" class="footer-style gap-8">
@@ -60,12 +63,12 @@
 @if (combineOrderDialog) {
 	<ui5-dialog [open]="combineOrderDialog" class="h-[720px] w-[1600px]">
 		<ui5-bar slot="header" class="h-[44px]" design="Header">
-			<ui5-title level="H5" slot="startContent" i18n>
-				{{ selectedParentOrder?.prodOrderPos?.prodOrder?.custom_id }} | {{ selectedParentOrder?.prodOrderPos?.item?.custom_id }} - {{ selectedParentOrder?.prodOrderPos?.item?.name }} | {{ selectedParentOrder?.start | date: 'dd.MM.yyyy HH:mm' }} - {{ selectedParentOrder?.start | date: 'dd.MM.yyyy HH:mm' }}
-			</ui5-title>
+			<ui5-title level="H5" slot="startContent">{{cardHeaderText}}</ui5-title>
 		</ui5-bar>
 		<ui5-busy-indicator [active]="isLoading"
 			class="rounded-lg shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] w-full h-full">
+			<ui5-card class="h-[98%] w-[99%]">
+				<div class="p-3"><ui5-title level="H6" >{{ selectedParentOrder?.prodOrderPos?.prodOrder?.custom_id }} | {{ selectedParentOrder?.prodOrderPos?.item?.custom_id }} - {{ selectedParentOrder?.prodOrderPos?.item?.name }} | {{ selectedParentOrder?.start | date: 'dd.MM.yyyy HH:mm' }} - {{ selectedParentOrder?.start | date: 'dd.MM.yyyy HH:mm' }}</ui5-title></div>
 			<ui5-table id="table" class="h-full w-full">
 				<ui5-table-selection mode="Multiple" id="selection" [selected]="initialSelectedOrders" slot="features" (change)="onSelectCombineOrder($event)"></ui5-table-selection>
 				<ui5-table-header-row class="list-table" slot="headerRow" sticky>
@@ -85,7 +88,7 @@
 						<ui5-table-cell><ui5-label>{{ order.end | date: 'dd.MM.yyyy HH:mm' }}</ui5-label></ui5-table-cell>
 					</ui5-table-row>
 				}
-			</ui5-table>
+			</ui5-table></ui5-card>
 		</ui5-busy-indicator>
 
 		<div slot="footer" class="footer-style gap-8">

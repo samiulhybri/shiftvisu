@@ -47,7 +47,7 @@ export class RepairTypeComponent {
 			accessor: "name",
 			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: true,
+			disableSortBy: false,
 			isSelected: true
 		}
 	];

@@ -154,7 +154,7 @@ export class CrmActionsComponent {
         next: () => {
           this.closeDialogDelete();
           this.isLoading = false;
-          this.childComponent?.onFilterAndSortingForEdit(this.selectedCrmAction, null);
+          this.childComponent?.onFilterAndSortingForEdit(this.selectedId, null);
           this.disableButtonDuringRequest = false;
           this._toasterSrv.showToast(recordDeleted, "success");
         },
@@ -206,7 +206,7 @@ export class CrmActionsComponent {
     }
   
     refreshEditData() {
-      const url = `CrmActions?$filter=is_active eq true and id eq ${this.selectedCrmAction?.id}`;
+      const url = `CrmActions?$filter=id eq ${this.selectedCrmAction?.id}`;
       this.commonService.get(url).subscribe({
         next: (response: any) => {
           this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);

@@ -21,7 +21,7 @@
 				<div class="flex flex-col">
 					<div class="flex flex-space-between gap-10 w-150">
 						<div class="flex flex-col">
-							<div class="flex flex-row">
+							<div class="flex flex-row" *ngIf="showfields?.prod_order">
 								<div class="flex flex-col w-[90%]">
 									<ui5-label
 										for="orderNumber"
@@ -123,7 +123,7 @@
 									</ui5-datetime-picker>
 								</ui5-busy-indicator>
 							</div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col" *ngIf="showfields?.due_date">
                                 <div class="flex flex-col mt-2">
                                     <ui5-label
                                         show-colon
@@ -133,7 +133,7 @@
                                     <ui5-text class="mt-1.5 mb-1.5">{{ getDueDate() || "" }}</ui5-text>
                                 </div>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col" *ngIf="showfields?.constraint_type">
                                 <div class="flex flex-col mt-2">
                                     <ui5-label
                                     for="constraint"
@@ -254,7 +254,7 @@
                                         [value]="selectedOperation.pos"></ui5-input>
                                 </div>
                             </div>
-                             <div class="flex flex-col mt-2">
+                            <div class="flex flex-col mt-2" *ngIf="showfields?.release_date">
 								<ui5-label
 									show-colon
 									i18n
@@ -262,9 +262,17 @@
 								>
 								<ui5-text class="mt-1.5 mb-1.5">{{ getReleasedDate() || "" }}</ui5-text>
 							</div>
+                             <div class="flex flex-col mt-2">
+								<ui5-label
+									show-colon
+									i18n
+									>Batch</ui5-label
+								>
+								<ui5-text class="mt-1.5 mb-1.5">{{ selectedOperation.prodOrderPos?.batch ?? "" }}</ui5-text>
+							</div>
 						</div>
 						<div class="flex flex-col">
-							<div class="flex flex-col">
+							<div class="flex flex-col" *ngIf="showfields?.item">
 								<ui5-label
 									for="item"
 									show-colon
@@ -411,7 +419,7 @@
                                         ></ui5-switch>
                                 </div>
 							</div>
-							<div class="flex flex-row">
+							<div class="flex flex-row" *ngIf="showfields?.customer">
 								<ui5-label for="customerName" show-colon i18n>Customer Name</ui5-label>
 								<ui5-text
 									id="customer" 
@@ -424,7 +432,7 @@
 						</div>
 
 					</div>
-					<div class="flex flex-col mt-2">
+					<div class="flex flex-col mt-2" *ngIf="showfields?.alt_machine">
 						<ui5-label
 							show-colon
 							i18n

@@ -76,7 +76,7 @@ export class TpmGroupComponent {
 	}
 
 	refreshEditData() {
-		const url = `TpmGroups?$filter=is_active eq true and id eq ${this.selectedTPMGroup?.id}&$orderby=custom_id asc`;
+		const url = `TpmGroups?$filter=id eq ${this.selectedTPMGroup?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -204,7 +204,7 @@ export class TpmGroupComponent {
 		this.commonService.delete(`/TpmGroups(${this.deleteItemId})`).subscribe({
 			next: () => {
 				this.closeDialogDelete();
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedTPMGroup, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deleteItemId, null);
 				this.isLoading = false;
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");

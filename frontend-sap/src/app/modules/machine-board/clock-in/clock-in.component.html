@@ -251,13 +251,13 @@
 											color-scheme="4"
 											wrappingType="None"
 											[title]="clockedInMachineIds.includes(machine.id!)
-											? 'Clocked In'
-											: 'Clock In'"
-											i18n>
+											? clockedInText
+											: clockInText"
+											>
 											{{
 												clockedInMachineIds.includes(machine.id!)
-													? "Clocked In"
-													: "Clock In"
+													? clockedInText
+													: clockInText
 											}}
 										</ui5-tag>
 									} @else if (clockedInMachineIds.includes(machine.id!)) {
@@ -403,15 +403,15 @@
 			slot="footer"
 			class="left-component-footer">
 			<ui5-button
+				(click)="closeAndNavigate()"
+				i18n
+			>Confirm</ui5-button>
+			<ui5-button
 				id="clockInCloseButton"
+				class="ml-8"
 				design="Emphasized"
 				(click)="onCancelWarning()"
 				i18n>Cancel</ui5-button>
-			<ui5-button
-				class="ml-8"
-				(click)="closeAndNavigate()"
-				i18n
-				>Confirm</ui5-button>
 		</div>
 	</app-dialog>
 </div>

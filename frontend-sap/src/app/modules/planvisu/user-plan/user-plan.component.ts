@@ -14,6 +14,7 @@ import { Machine } from "@app/shared/models/machine.model";
 import moment from "moment";
 import { Hall } from "@app/shared/models/hall.model";
 import { User } from "@app/shared/models/user.model";
+import { BehaviorSubject, debounceTime, Subject } from "rxjs";
 
 @Component({
 	selector: "app-user-plan",
@@ -46,6 +47,7 @@ export class UserPlanComponent {
 
 	selectedMachines: number[] = [];
 	comboBoxMachines: Machine[] = [];
+	onSearchInputBehibor$ = new Subject();
 
 	selectedOperation: ProdOrderPosOperation = new ProdOrderPosOperation().deserialize({
 		prodOrderPos: { quantity: 0, prodOrder: { custom_id: "" } },
@@ -74,6 +76,10 @@ export class UserPlanComponent {
 
 	ngOnInit(): void {
 		this.generateNextSevenDays();
+		setInterval(()=> this.dateFilter(), 600000);
+		this.onSearchInputBehibor$.pipe(debounceTime(500)).subscribe(next=>{
+			this.dateFilter();			
+		})
 	}
 
 	ngAfterViewInit(): void {
@@ -94,37 +100,13 @@ export class UserPlanComponent {
 
 		return this.dates;
 	}
-
 	onSearchInput(event: any) {
 		if (event.target) {
 			this.searchedValue = event.target?.typedInValue?.trim().toLowerCase();
 		} else {
 			this.searchedValue = "";
 		}
-		if (!this.searchedValue) {
-			this.filteredMachines = [...this.machines];
-			return;
-		}
-		this.filteredMachines = this.machines?.filter((mach: any) => {
-			if (mach.prodOrderPosOperations.length > 0) {
-				return (
-					(mach?.name && mach?.name?.toLowerCase().includes(this.searchedValue)) ||
-					mach.prodOrderPosOperations?.some((operation: any) =>
-						operation?.prodOrderPos?.prodOrder?.custom_id
-							.toLowerCase()
-							.includes(this.searchedValue)
-					) ||
-					mach.prodOrderPosOperations.some(
-						(operation: any) =>
-							operation?.itemTool?.custom_id
-								.toLowerCase()
-								.includes(this.searchedValue) ||
-							operation?.itemTool?.name.toLowerCase().includes(this.searchedValue)
-					)
-				);
-			}
-			return false;
-		});
+		this.onSearchInputBehibor$.next(1)
 	}
 
 	getComboBoxData() {
@@ -244,7 +226,6 @@ export class UserPlanComponent {
 	dateFilter() {
 		if (this.startDate && this.endDate) {
 			this.dates = this.generateDatesBetween(this.startDate, this.endDate);
-			this.searchedValue = "";
 			this.loadData();
 		}
 	}
@@ -286,11 +267,11 @@ export class UserPlanComponent {
 		const machineName = machineUserTime?.machine?.name ?? "";
 		switch (title) {
 			case "Machine":
-				return `${$localize`Machine`}: ${machineUserTime?.machine?.custom_id ?? ""} - ${this.truncatePipe.transform(machineName, 25)}`;
+				return ` ${machineUserTime?.machine?.custom_id ?? ""}-${this.truncatePipe.transform(machineName, 20)}`;
 			case "Start Date":
 				return `${$localize`Start`}: ${machineUserTime?.start_time ? moment.utc(machineUserTime?.start_time).local().format("DD.MM.YYYY, HH:mm") : ""} `;
 			case "End Date":
-				return `${$localize`Start`}: ${machineUserTime?.end_time ? moment.utc(machineUserTime?.end_time).local().format("DD.MM.YYYY, HH:mm") : ""} `;
+				return `${$localize`End`}: ${machineUserTime?.end_time ? moment.utc(machineUserTime?.end_time).local().format("DD.MM.YYYY, HH:mm") : ""} `;
 			default:
 				return "";
 		}
@@ -327,6 +308,7 @@ export class UserPlanComponent {
 				hall_ids: selectedHallIds,
 				user_ids: selectedUsers,
 				machine_ids: selectedMachines,
+				userName: this.searchedValue,
 			};
 
 			this.commonService

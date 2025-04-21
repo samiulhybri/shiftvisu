@@ -42,7 +42,7 @@ export class ToolOverviewComponent {
 	public isRepairHistoryComponentShow: boolean = false;
 	localization = Localization;
 
-	public expandQuery: string = `$select=id,custom_id,name,is_active,is_tool&$expand=prodOrderPos($select=id,is_production_possible,status,status_plan,pos;$expand=prodOrder($select=id;$filter=order_type eq '${ ProdOrderType.MAINTENANCE }'),prodOrderPosOperations($select=id,name,status,operation_plan_id_origin,operation_plan_pos_id_origin);$filter=(status ne '${ProdOrderPosStatus.CLOSED}' and status ne '${ProdOrderPosStatus.DELETED}') or (status_plan ne '${ProdOrderPosStatus.CLOSED}' and status_plan ne '${ProdOrderPosStatus.DELETED}'))`;
+	public expandQuery: string = `$select=id,custom_id,name,is_active,is_tool,repair_req_percentage&$expand=prodOrderPos($select=id,is_production_possible,status,status_plan,pos;$expand=prodOrder($select=id;$filter=order_type eq '${ ProdOrderType.MAINTENANCE }'),prodOrderPosOperations($select=id,name,status,operation_plan_id_origin,operation_plan_pos_id_origin,is_automatic_created_repair);$filter=(status ne '${ProdOrderPosStatus.CLOSED}' and status ne '${ProdOrderPosStatus.DELETED}') or (status_plan ne '${ProdOrderPosStatus.CLOSED}' and status_plan ne '${ProdOrderPosStatus.DELETED}'))`;
 
 	columns: any = [
 		{
@@ -288,10 +288,10 @@ export class ToolOverviewComponent {
 
 		try {
 			if (isCompletedOrders) {
-				url = `/Items(${this.selectedTool.id})?$select=id&$expand=prodOrderPos($filter=(status eq '${ProdOrderPosStatus.CLOSED}' or status_plan eq '${ProdOrderPosStatus.CLOSED}');$expand=media($select=id),userCreator($select=id,custom_id,name),userResponsible($select=id,custom_id,name),toolSupplier($select=id,custom_id,name),prodOrder($select=id,custom_id,order_type;$filter=order_type eq '${ProdOrderType.MAINTENANCE}'),item($select=id,name,custom_id,is_active,is_tool))`;
+				url = `/Items(${this.selectedTool.id})?$select=id&$expand=prodOrderPos($filter=(status eq '${ProdOrderPosStatus.CLOSED}' or status_plan eq '${ProdOrderPosStatus.CLOSED}');$expand=media($select=id),userCreator($select=id,custom_id,name),userResponsible($select=id,custom_id,name),toolSupplier($select=id,custom_id,name),prodOrder($select=id,custom_id,order_type;$filter=order_type eq '${ProdOrderType.MAINTENANCE}'),item($select=id,name,custom_id,is_active,is_tool),prodOrderPosOperations($select=id,is_automatic_created_repair))`;
 				this.activeRepairTable.gridHeader = $localize`Completed Order List`;
 			} else {
-				url = `/Items(${this.selectedTool.id})?$select=id&$expand=prodOrderPos($filter=(status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}');$expand=media($select=id),userCreator($select=id,custom_id,name),userResponsible($select=id,custom_id,name),toolSupplier($select=id,custom_id,name),prodOrder($select=id,custom_id,order_type;$filter=order_type eq '${ProdOrderType.MAINTENANCE}'),item($select=id,name,custom_id,is_active,is_tool))`;
+				url = `/Items(${this.selectedTool.id})?$select=id&$expand=prodOrderPos($filter=(status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}');$expand=media($select=id),userCreator($select=id,custom_id,name),userResponsible($select=id,custom_id,name),toolSupplier($select=id,custom_id,name),prodOrder($select=id,custom_id,order_type;$filter=order_type eq '${ProdOrderType.MAINTENANCE}'),item($select=id,name,custom_id,is_active,is_tool),prodOrderPosOperations($select=id,is_automatic_created_repair))`;
 				this.activeRepairTable.gridHeader = $localize`Active Order List`;
 			}
 			

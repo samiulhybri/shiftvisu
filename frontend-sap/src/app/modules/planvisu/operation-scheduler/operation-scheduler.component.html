@@ -1,43 +1,50 @@
 <ui5-dialog [open]="true" class="h-[820px] w-[1880px] max-w-[94%]">
 	<ui5-bar slot="header" class="w-full h-[44px]" design="Header">
-			<ui5-title level="H5" slot="startContent"><span i18n>Operations Re-Schedule</span> ({{ operationCustomId }})</ui5-title>
+			<ui5-title class="ml-[-25px]" level="H5" slot="startContent"><span i18n>Operations Re-Schedule</span> ({{ operationCustomId }})</ui5-title>
 			<ui5-title level="H5" slot="endContent">
 				<ui5-button (ui5Click)="deleteModalOpen('order')" icon="delete"></ui5-button></ui5-title>
 	</ui5-bar>
 	<ui5-busy-indicator [active]="isLoading"
-		class="rounded-lg shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] w-[98%] h-full pl-4">
+		class="rounded-lg shadow-[var(--_ui5-v1-20-1_side_navigation_box_shadow)] w-[98%] h-[98%] pl-4">
 
 		<div class="flex flex-col w-full">
 			@for (pos of prodOrderPos; track $index) {
-				<div class="flex items-center gap-2">
+				<div class="flex gap-14 mb-6 items-center">
+					<div class="flex">
 					<ui5-label
 						[showColon]="true"
 						i18n
 						>Item</ui5-label>
-					<ui5-text>{{ pos.item.custom_id }} - {{ pos.item?.name2 ?? pos.item?.name }}</ui5-text>
-				</div>
-
-				<div class="flex items-center gap-2">
+					<ui5-text>{{ pos.item.custom_id }} - {{ pos.item?.name2 ?? pos.item?.name }}</ui5-text></div>
+                    <div class="flex">
 					<ui5-label
 						[showColon]="true"
 						i18n
 						>Due Date Time</ui5-label>
-					<ui5-text>{{ pos.due_date | date: 'dd.MM.yyyy HH:mm' }}</ui5-text>
+					<ui5-text>{{ pos.due_date | date: 'dd.MM.yyyy HH:mm'}}</ui5-text></div>
+                    <div class="flex items-center gap-1">
+					<ui5-label
+						[showColon]="true"
+						i18n
+						>Quantity</ui5-label>
+						<ui5-input class="w-[150px]" type="Number" [(ngModel)]="pos.quantity"></ui5-input></div>
 				</div>
-
-				<ui5-table id="table" class="w-full mt-1 mb-8">
+                <ui5-card class="h-[100%]">
+					<ui5-card-header i18n [titleText]="cardHeaderText"></ui5-card-header>									
+				<ui5-table id="table" class="w-full mt-1 mb-8 ">
 					<ui5-table-selection mode="Multiple" id="selection" slot="features" (change)="onSelectOrder($event, pos)"></ui5-table-selection>
 					<ui5-table-header-row class="list-table" slot="headerRow" sticky>
 						<ui5-table-header-cell class="overflow-visible w-[8%]" id="pos" i18n>Pos</ui5-table-header-cell>
-						<ui5-table-header-cell class="overflow-visible w-[12%]" id="machine" i18n>Machine</ui5-table-header-cell>
-						<ui5-table-header-cell class="overflow-visible w-[16%]" id="startTime" i18n>Start Time</ui5-table-header-cell>
+						<ui5-table-header-cell class="overflow-visible w-[10%]" id="machine" i18n>Machine</ui5-table-header-cell>
+						<ui5-table-header-cell class="overflow-visible min-w-[23%]" id="startTime" i18n>Start Time</ui5-table-header-cell>
 						<ui5-table-header-cell class="overflow-visible w-[16%]" id="endTime" i18n>End Time</ui5-table-header-cell>
-						<ui5-table-header-cell class="overflow-visible w-[8%]" id="constrain" i18n>Constraint</ui5-table-header-cell>
-						<ui5-table-header-cell class="overflow-visible w-[8%]" id="te" i18n>TE(Seconds)</ui5-table-header-cell>
-						<ui5-table-header-cell class="overflow-visible w-[8%]" id="cavity" i18n>Cavity</ui5-table-header-cell>
+						<ui5-table-header-cell class="overflow-visible w-[7%]" id="constrain" i18n>Constraint</ui5-table-header-cell>
+						<ui5-table-header-cell class="overflow-visible w-[7%]" id="te" i18n>TE(Seconds)</ui5-table-header-cell>
+						<ui5-table-header-cell class="overflow-visible w-[6%]" id="cavity" i18n>Cavity</ui5-table-header-cell>
 						<ui5-table-header-cell class="overflow-visible w-[8%]" id="leadTimeD" i18n>Lead Time Days</ui5-table-header-cell>
-						<ui5-table-header-cell class="overflow-visible w-[8%]" id="sendAheadQ" i18n>Send Ahead Quantity</ui5-table-header-cell>
-						<ui5-table-header-cell class="overflow-visible w-[8%]" id="action" i18n>Action</ui5-table-header-cell>
+						<ui5-table-header-cell class="overflow-visible w-[6%]" id="sendAheadQ" i18n>Send Ahead Quantity</ui5-table-header-cell>
+						<ui5-table-header-cell class="overflow-visible w-[4%]" id="duration" i18n>Duration</ui5-table-header-cell>
+						<ui5-table-header-cell class="overflow-visible w-[4%]" id="action" i18n>Action</ui5-table-header-cell>
 					</ui5-table-header-row>
 					@for (operation of pos.prodOrderPosOperations; track $index) {
 						<ui5-table-row class="list-table-item" [rowKey]="pos.id">
@@ -45,10 +52,11 @@
 							<ui5-table-cell><ui5-label>{{ operation.machine?.name }}</ui5-label></ui5-table-cell>
 							
 							<ui5-table-cell>
-								<ui5-datetime-picker
+								<ui5-datetime-picker 
+								    class="custom-datetime-width"
 									[readonly]="operation.status === prodOrderPosOperationStatus.IN_PRODUCTION || !(operation.constraint_type === machineConstraintType.MANUAL || operation.constraint_type === machineConstraintType.CONSTRAINT )"
 									[ngModel]="operation.start | date: 'dd.MM.yyyy HH:mm'" (ngModelChange)="onChangeStartTime($event, operation)"
-									format-pattern="dd.MM.yyyy HH:mm"></ui5-datetime-picker>
+									format-pattern="dd.MM.yyyy HH:mm" class="w-[200px]"></ui5-datetime-picker>
 							</ui5-table-cell>
 
 							<ui5-table-cell>
@@ -70,10 +78,11 @@
 								</ui5-combobox>
 							</ui5-table-cell>
 
-							<ui5-table-cell><ui5-input class="w-[150px]" type="Number" [(ngModel)]="operation.te"></ui5-input></ui5-table-cell>
-							<ui5-table-cell><ui5-input class="w-[150px]" type="Number" [(ngModel)]="operation.cavity"></ui5-input></ui5-table-cell>
-							<ui5-table-cell><ui5-input class="w-[150px]" type="Number" [(ngModel)]="operation.lead_time_days"></ui5-input></ui5-table-cell>
-							<ui5-table-cell><ui5-input class="w-[150px]" type="Number" [(ngModel)]="operation.send_ahead_quantity"></ui5-input></ui5-table-cell>
+							<ui5-table-cell><ui5-input class="w-[80px]" type="Number" [(ngModel)]="operation.te"></ui5-input></ui5-table-cell>
+							<ui5-table-cell><ui5-input class="w-[80px]" type="Number" [(ngModel)]="operation.cavity"></ui5-input></ui5-table-cell>
+							<ui5-table-cell><ui5-input class="w-[80px]" type="Number" [(ngModel)]="operation.lead_time_days"></ui5-input></ui5-table-cell>
+							<ui5-table-cell><ui5-input class="w-[80px]" type="Number" [(ngModel)]="operation.send_ahead_quantity"></ui5-input></ui5-table-cell>
+							<ui5-table-cell><ui5-input class="w-[80px]" type="Text" [readonly]="true" [value]="getOperationDuration(operation, pos)"></ui5-input></ui5-table-cell>
 
 							<ui5-table-cell><ui5-button
 								(ui5Click)="deleteModalOpen('operation' , operation)" 
@@ -82,15 +91,15 @@
 
 						</ui5-table-row>
 					}
-				</ui5-table>
+				</ui5-table></ui5-card>
 			}
 		</div>
 
 	</ui5-busy-indicator>
 
 	<div slot="footer" class="footer-style gap-8">
-		<ui5-button design="Emphasized" [disabled]="isLoading || !willBeSave || selectedPositions.length == 0" (click)="saveOrder()" id="saveButton" i18n>Save</ui5-button>
-		<ui5-button [disabled]="isLoading || selectedPositions.length == 0" (click)="reSchedule()" id="schedule" i18n>Re-Schedule</ui5-button>
+		<ui5-button design="Emphasized" [disabled]="!hasOperationEditPermission || (isLoading || !willBeSave || selectedPositions.length == 0)" (click)="saveOrder()" id="saveButton" i18n>Save</ui5-button>
+		<ui5-button [disabled]="!hasOperationEditPermission || (isLoading || selectedPositions.length == 0)" (click)="reSchedule()" id="schedule" i18n>Re-Schedule</ui5-button>
 		<ui5-button (click)="closeDialog()" id="closeOverlapButton">{{ localization.close }}</ui5-button>
 	</div>
 </ui5-dialog>

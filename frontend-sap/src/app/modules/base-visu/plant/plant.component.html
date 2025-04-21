@@ -322,7 +322,7 @@
 							show-colon
 							required
 							i18n
-							>Block QualiVisu for Inspection Point after</ui5-label
+							>Block QualiVisu for Inspection Point After</ui5-label
 						>
 						<ui5-input
 							id="qualivisuBlockThresholdInput"
@@ -346,7 +346,7 @@
 							show-colon
 							required
 							i18n
-							>QualiVisu Shift Check offset</ui5-label
+							>QualiVisu Shift Check Offset</ui5-label
 						>
 						<ui5-input
 							id="qualivisuShiftCheckOffsetInput"
@@ -422,10 +422,11 @@
 									</ui5-busy-indicator>
 								</div>
 
-								<div class="flex-column">
-									<ui5-busy-indicator
-										[active]="isLoadingOperation"
-										size="S">
+								<ui5-busy-indicator
+									[active]="isLoadingOperation"
+									class="flex-column w-full"
+									size="S">
+									<div class="flex-column w-full">
 										<ui5-label
 											showColon
 											i18n
@@ -447,8 +448,8 @@
 												</ui5-cb-item>
 											</ng-container>
 										</ui5-combobox>
-									</ui5-busy-indicator>
-								</div>
+									</div>
+								</ui5-busy-indicator>
 							</div>
 
 							<div

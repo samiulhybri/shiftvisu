@@ -12,17 +12,26 @@
 					<ui5-title
 						level="H5"
 						slot="startContent"
-						>{{ fileName }}</ui5-title
+                        i18n
+						>Attachment</ui5-title
 					>
 				</ui5-bar>
-				<iframe class="h-[calc(90vh-200px)] w-full" [src]="fileSrc"> </iframe>
+				@if(fileNotFound) {
+					<div class="h-[calc(90vh-200px)] border-none w-[37vw] shadow-[0px_4px_8px_rgba(0,0,0,0.2)] flex justify-center items-center">
+						<img alt="404" [src]="fileSrc">
+					</div>
+				} @else {
+                    <object *ngIf="fileSrc" [data]="fileSrc" type="application/pdf" class="h-[calc(90vh-200px)] border-none w-[37vw] shadow-[0px_4px_8px_rgba(0,0,0,0.2)]">
+                        <p>Your browser does not support PDFs.</p>
+                    </object>
+				}
 			</ui5-card>
 		}
 
-		<div class="h-full w-full flex">
+		<div class="h-full w-full flex" [ngClass]="{'flex-col': fileSrc && hasSingleCharacteristics}">
 			<form
 				#characteristicsForm="ngForm"
-				class="flex-grow grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] p-[10px] h-fit max-h-[calc(90vh-170px)] gap-[10px] overflow-auto">
+				class="grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] p-[10px] gap-[10px] overflow-auto custom-height" [ngClass]="[fileSrc && hasSingleCharacteristics ? '' : 'flex-grow',fileSrc && hasSingleCharacteristics ? 'h-[63%]' : 'h-fit max-h-[calc(90vh-170px)]']">
 				<ui5-card class="h-[450px]">
 					<ui5-bar
 						slot="header"
@@ -35,8 +44,8 @@
 							>Info</ui5-title
 						>
 					</ui5-bar>
-					<div class="flex flex-col !h-[360px] justify-between w-full gap-[10px] p-[10px]">
-						<div class="order-card justify-center mr-[20px]">
+					<div class="flex flex-col !h-[380px] justify-between w-full gap-[10px] p-[10px]">
+						<div class="order-card justify-center mr-[20px] pt-[15px] px-[5px]">
 							<ui5-title
 								level="H5"
 								id="operation"
@@ -49,7 +58,7 @@
 								>Operation</span
 							>
 						</div>
-						<div class="order-card justify-center mr-[20px]">
+						<div class="order-card justify-center mr-[20px] pt-[15px] px-[5px]">
 							<ui5-title
 								level="H5"
 								id="operation"
@@ -63,11 +72,11 @@
 						</div>
 
 						@if (selectedInspectionOperation?.frequency) {
-							<div class="order-card justify-center mr-[20px]">
+							<div class="order-card justify-center mr-[20px] pt-[15px] px-[5px]">
 								<ui5-title
 									level="H5"
 									id="operation"
-									>{{ frequency }}</ui5-title
+									>{{ ProdInspectionOperationFrequencyClass.getTypeTranslate(selectedInspectionOperation?.frequency) }}</ui5-title
 								>
 								<span
 									class="label-style"
@@ -78,24 +87,26 @@
 						}
 
 						@if (availableResourceEquipmentType.length > 0) {
-							@for (resource of availableResource; track $index) {
-								<div class="order-card justify-center mr-[20px]">
-									<ui5-title
-										level="H5"
-										[id]="'resource_' + $index"
-										>{{ resource?.equipment?.custom_id }} - {{ resource?.equipment?.name }}</ui5-title
-									>
-									<span
-										class="label-style"
-										i18n
-										>Measuring Instrument</span
-									>
-								</div>
+							@for (resource of availableResourceEquipmentType; track $index) {
+								@if(resource.id && resource.equipment) {
+									<div class="order-card justify-center mr-[20px] pt-[15px] px-[5px]">
+										<ui5-title
+											level="H5"
+											[id]="'resource_' + $index"
+											>{{ resource?.equipment?.custom_id }} - {{ resource?.equipment?.name }}</ui5-title
+										>
+										<span
+											class="label-style"
+											i18n
+											>Measuring Instrument</span
+										>
+									</div>
+								}
 							}
 						}
 
 						@if (selectedInspectionOperation?.pos) {
-							<div class="order-card justify-center mr-[20px]">
+							<div class="order-card justify-center mr-[20px] pt-[15px] px-[5px]">
 								<ui5-title
 									level="H5"
 									id="operation"
@@ -149,7 +160,7 @@
 										i18n
 										#characteristicInput
 										[name]="'character' + $index"
-										[placeholder]="c?.value_target ?? ''"
+										placeholder="{{c.value_target | number:'1.0-'+ c.decimals}}"
 										[valueState]="getValueState(c, character)"
 										[(ngModel)]="c.inserted_value"
 										(wheel)="$event.preventDefault()"
@@ -171,7 +182,8 @@
 												c.value_upper_limit,
 												c?.unit_of_measure?.name,
 												c?.value_upper_limit_plausible,
-												c?.value_lower_limit_plausible
+												c?.value_lower_limit_plausible,
+                                                c.decimals
 											)
 										) {
 											<div slot="valueStateMessage">
@@ -182,7 +194,8 @@
 														c.value_upper_limit,
 														c?.unit_of_measure?.name,
 														c?.value_upper_limit_plausible,
-														c?.value_lower_limit_plausible
+														c?.value_lower_limit_plausible,
+                                                        c.decimals
 													)
 												}}</div
 											>
@@ -201,7 +214,7 @@
 												design="Information"></ui5-icon>
 											<div class="text-[15px] text-[color:--infoColor]"
                                                  i18n
-												>Lower Limit: {{ c.value_lower_limit }}
+												>Lower Limit: {{ c.value_lower_limit | number : '1.0-' + c.decimals }}
 												{{ c.unit_of_measure?.name ?? "" }}</div
 											>
 										</div>
@@ -214,7 +227,7 @@
 												design="Information"></ui5-icon>
 											<div class="text-[15px] text-[color:--infoColor]"
                                                  i18n
-												>Upper Limit: {{ c.value_upper_limit }}
+												>Upper Limit: {{ c.value_upper_limit | number : '1.0-' + c.decimals }}
 												{{ c.unit_of_measure?.name ?? "" }}</div
 											>
 										</div>
@@ -314,7 +327,7 @@
 				}
 			</form>
 			@if(hasSingleCharacteristics) {
-				<div class="m-[10px] p-[10px] flex-grow shadow-[0px_2px_5px_rgba(0,0,0,0.15)] rounded-[1rem]" [ngClass]="{ 'w-[30%]': !fileSrc }">
+				<div class="m-[10px] p-[10px] flex-grow shadow-[0px_2px_5px_rgba(0,0,0,0.15)] rounded-[1rem]" [ngClass]="{ 'w-[30%]': !fileSrc, 'w-[96%]': fileSrc }">
 					<app-line-graphs
 						[chartData]="restructuredDataForGraph"
 						[dateLines]="qualiEvents"
@@ -337,7 +350,7 @@
 <ui5-dialog
 	id="addGroupDialog"
 	[open]="isInfoDialogueOpen"
-	(beforeClose)="closeDialog()"
+	(before-close)="closeDialog()"
 	[headerText]="dialogTitle"
 	class="w-[calc(90vw-100px)] h-[calc(90vh-100px)]">
 	<div class="w-[calc(90vw-210px)] h-[calc(90vh-230px)] flex">
@@ -350,18 +363,21 @@
 					<ui5-title
 						level="H5"
 						slot="startContent"
-						>{{ fileName }}</ui5-title
+                        i18n
+						>Attachment</ui5-title
 					>
 				</ui5-bar>
-				<iframe class="h-[calc(90vh-200px)] w-full" [src]="fileSrc"> </iframe>
-			</ui5-card>
+                <object *ngIf="fileSrc" [data]="fileSrc" type="application/pdf" class="h-[calc(90vh-200px)] w-full">
+                    <p>Your browser does not support PDFs.</p>
+                </object>
+            </ui5-card>
 		}
 
 		<div
 			class="{{
 				fileSrc ? 'w-[60%] !flex-col' : 'h-[calc(90vh-210px)] w-full flex-row'
 			}} flex">
-			<ui5-card class="{{ fileSrc ? 'h-[calc(90vh-498px)] overflow-y-auto' : 'w-[30%]' }} p-[10px]">
+			<ui5-card class="{{ fileSrc ? 'h-[calc(90vh-550px)] overflow-y-auto' : 'w-[30%]' }} p-[10px]">
 				<ui5-bar
 					slot="header"
 					class="h-[44px]"
@@ -375,7 +391,7 @@
 				</ui5-bar>
 
 				@if (selectedCharacteristic) {
-					<div class="p-[10px] h-[calc(90vh-290px)] overflow-auto overflow-y-auto flex-grow">
+					<div class="{{fileSrc ? 'h-[calc(45vh-175px)]' : 'h-[calc(90vh-290px)]'}} p-[10px] overflow-auto flex-grow">
 						@if (selectedCharacteristic.is_quantitative) {
 							<div class="w-full flex items-center gap-[10px]">
 								<ui5-input
@@ -498,7 +514,7 @@
 				}
 			</ui5-card>
 			@if (selectedCharacteristic?.is_quantitative) {
-				<div class="m-[10px] p-[10px] flex-grow shadow-[0px_2px_5px_rgba(0,0,0,0.15)] rounded-[1rem]">
+				<div class="m-[10px] p-[10px] flex-grow shadow-[0px_2px_5px_rgba(0,0,0,0.15)] rounded-[1rem] w-[calc(50vw-67px)]">
 					<app-line-graphs
 						[chartData]="restructuredDataForGraph"
 						[dateLines]="qualiEvents"

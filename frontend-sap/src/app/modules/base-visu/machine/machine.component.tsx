@@ -46,6 +46,7 @@ import { QuantityTypeClass } from "@app/shared/enums/QuantityType";
 import { SerialNumberProfile } from "@app/shared/models/SerialNumberProfile.model";
 import { HandleRowClickService } from "@app/shared/services/handle-row-click.service";
 import { MachineConstraintType, MachineConstraintTypeClass } from "@app/shared/enums/MachineConstraintType";
+import { MachineQualificationImportTypeClass } from "@app/shared/enums/MachineQualificationImportType";
 
 @Component({
 	selector: "app-machine",
@@ -76,6 +77,7 @@ export class MachineComponent {
 	standardValueKeys: StandardValueKey[] = [];
 	shiftModels: ShiftModel[] = [];
 	machineGroups: MachineGroup[] = [];
+	machineQualificationImportTypeClass = MachineQualificationImportTypeClass.getEnumArray();
 	statusBoardCardTypeItems = StatusBoardCardTypeClass.getEnumArray();
 	machineBoardTypeItems = MachineBoardTypeClass.getEnumArray();
 	productionPlanTypeItems = ProductionPlanTypeClass.getEnumArray();
@@ -110,6 +112,7 @@ export class MachineComponent {
 	@ViewChild("errorDialogMachines", { static: false }) errorDialogMachines: any;
 	@ViewChild("machine_board_type") machineBoardType!: ComboBoxComponent;
 	@ViewChild("machine_board_state_type") machineBoardStateType!: ComboBoxComponent;
+	@ViewChild("qualification_import_type") qualificationImportType!: ComboBoxComponent;
 	@ViewChild("quantity_type") quantityType!: ComboBoxComponent;
 	@ViewChild("confirmation_type") machineConfirmationType!: ComboBoxComponent;
 	@ViewChild("machine_state_type") machineStateType!: ComboBoxComponent;
@@ -370,6 +373,41 @@ export class MachineComponent {
 			disableSortBy: false,
 			isSelected: false,
 			comboBoxValues: this.statusBoardCardTypeItems,
+			minWidth: 50,
+			autoResizable: true,
+		},
+		{
+			Header: $localize`Machine Qualification Import Type`,
+			accessor: "qualification_import_type",
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: false,
+			isSelected: false,
+			comboBoxValues: this.machineQualificationImportTypeClass,
+			minWidth: 50,
+			autoResizable: true,
+		},
+		{
+			Header: $localize`Default Qualification Hours`,
+			accessor: "default_qualification_hours",
+			dataType: GridTableColumnDataType.Number,
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: false,
+			isSelected: false,
+			hAlign: "End",
+			minWidth: 50,
+			autoResizable: true,
+		},
+		{
+			Header: $localize`Default Qualification Operations`,
+			accessor: "default_qualification_operations",
+			dataType: GridTableColumnDataType.Number,
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: false,
+			isSelected: false,
+			hAlign: "End",
 			minWidth: 50,
 			autoResizable: true,
 		},
@@ -682,14 +720,14 @@ export class MachineComponent {
 		public authService: AuthService,
 		private configService: ConfigService,
 		public _toasterSrv: ToastService,
-		plantService: PlantsService		
+		plantService: PlantsService
 	) {
 		this.selectedMachine = new Machine().deserialize({});
 		this.getCustomId();
 		plantService.plantId.subscribe((plantId: number | undefined) => {
 			if (plantId) {
 				this.plantId = plantId;
-				this.expandedQuery = `$expand=hall,machineGroup,itemStates,machineState,standardValueKey,sectionActivatables,machineStateProduction,machineStateOff,machineComponentSerialNumberProfiles,machineLastSerialNumberProfiles,machineMiddleSerialNumberProfiles`;
+				this.expandedQuery = `$expand=hall,machineGroup,itemStates,machineState,standardValueKey,sectionActivatables,machineStateProduction,machineStateOff,machineStateSetup,machineStateAvailable,machineComponentSerialNumberProfiles,machineLastSerialNumberProfiles,machineMiddleSerialNumberProfiles`;
 			}
 		});
 	}
@@ -698,6 +736,12 @@ export class MachineComponent {
 		this.loadData();
 		this.machineConfig = this.configService.getConfigValue("machine");
 	}
+
+	getTabContainerMargin(): string {
+		const isTwoColumnLayout = window.innerWidth < 768;
+		return isTwoColumnLayout ? "-28px" : "-46px";
+	}
+
 	showPreview(data: any, title: string, column: any) {
 		this.filterHandler();
 		this.associateDialogTitle = title;
@@ -897,8 +941,7 @@ export class MachineComponent {
 					.then(() => {
 						if (!this.isUpdate) {
 							this.filterHandler();
-						}
-						else {
+						} else {
 							this.refreshEditData();
 						}
 						this.isLoading = false;
@@ -942,8 +985,9 @@ export class MachineComponent {
 		this.isUpdate = true;
 		this.selectedMachine = this.selectedMachine?.deserialize(value);
 		if (this.selectedMachine.machine_board_state_type == null) {
-			this.selectedMachine.machine_board_state_type = MachineBoardStateTypeClass.getStateTranslate(MachineBoardStateType.MACHINE_STATE)
-		};
+			this.selectedMachine.machine_board_state_type =
+				MachineBoardStateTypeClass.getStateTranslate(MachineBoardStateType.MACHINE_STATE);
+		}
 		this.selectedMachine.usage_factor =
 			parseFloat((this.selectedMachine.usage_factor as string) || "0") * 100 + "%";
 
@@ -996,15 +1040,11 @@ export class MachineComponent {
 	}
 
 	refreshEditData() {
-		const url = `Machines?$filter=is_active eq true and plant_id eq ${this.plantId} and id eq ${this.selectedMachine?.id}&$orderby=custom_id asc&$expand=hall,machineGroup,itemStates,machineState,standardValueKey,sectionActivatables,machineStateProduction,machineStateOff,machineComponentSerialNumberProfiles,machineLastSerialNumberProfiles,machineMiddleSerialNumberProfiles&$count=true`;
+		const url = `Machines?$filter=plant_id eq ${this.plantId} and id eq ${this.selectedMachine?.id}&$orderby=custom_id asc&$expand=hall,machineGroup,itemStates,machineState,standardValueKey,sectionActivatables,machineStateProduction,machineStateOff,machineStateSetup,machineStateAvailable,machineComponentSerialNumberProfiles,machineLastSerialNumberProfiles,machineMiddleSerialNumberProfiles&$count=true`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
-				const index = this.childComponent?.data.findIndex((data: any) => data.id === response?.value[0].id);
-				this.childComponent!.data[index] = new Machine().deserialize(
-					this.childComponent!.data[index]
-				);
-			}
+			},
 		});
 	}
 
@@ -1012,6 +1052,7 @@ export class MachineComponent {
 		(this.form as any).onReset();
 		this.machineBoardType.element.valueState = "None";
 		this.machineBoardStateType.element.valueState = "None";
+		this.qualificationImportType.element.valueState = "None";
 		this.quantityType.element.valueState = "None";
 		this.machineConfirmationType.element.valueState = "None";
 		this.machineStateType.element.valueState = "None";
@@ -1044,7 +1085,7 @@ export class MachineComponent {
 			next: () => {
 				this.disableButtonDuringRequest = false;
 				this.closeDialogDelete();
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedMachine, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.isLoading = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},
@@ -1147,6 +1188,10 @@ export class MachineComponent {
 	onChangeMachineBoardState(event: any) {
 		this.selectedMachine.machine_board_state_type = event.detail.item.text;
 	}
+	
+	onChangeQualificationImportType(event: any) {
+		this.selectedMachine.qualification_import_type = event.detail.item.text;
+	}
 
 	onChangeMachineConstraint(event: any) {
 		this.selectedMachine.constraint_type = event.detail.item.text;
@@ -1168,6 +1213,24 @@ export class MachineComponent {
 	onChangeMachineStateDefaultOff(event: any) {
 		if (this.selectedMachine && this.selectedMachine.machineStateOff)
 			this.selectedMachine.machineStateOff = new MachineState().deserialize({
+				id: parseInt(event.detail.item.id) || 0,
+				name: event.detail.item.text || "",
+				custom_id: event.detail.item.additionalText || "",
+			});
+	}
+
+	onChangeMachineStateDefaultSetup(event: any) {
+		if (this.selectedMachine && this.selectedMachine.machineStateSetup)
+			this.selectedMachine.machineStateSetup = new MachineState().deserialize({
+				id: parseInt(event.detail.item.id) || 0,
+				name: event.detail.item.text || "",
+				custom_id: event.detail.item.additionalText || "",
+			});
+	}
+
+	onChangeMachineStateDefaultAvailable(event: any) {
+		if (this.selectedMachine && this.selectedMachine.machineStateAvailable)
+			this.selectedMachine.machineStateAvailable = new MachineState().deserialize({
 				id: parseInt(event.detail.item.id) || 0,
 				name: event.detail.item.text || "",
 				custom_id: event.detail.item.additionalText || "",
@@ -1258,6 +1321,32 @@ export class MachineComponent {
 		);
 		if (!matchMachineStateData && this.selectedMachine?.machineStateOff) {
 			this.selectedMachine.machineStateOff = new MachineState().deserialize({
+				id: null,
+				name: "",
+			});
+		}
+	}
+
+	onMachineStateDefaultSetupInputChange(event: any) {
+		const inputValue = event.target.value;
+		const matchMachineStateData = this.machineStates.find(
+			machineState => machineState.name === inputValue
+		);
+		if (!matchMachineStateData && this.selectedMachine?.machineStateSetup) {
+			this.selectedMachine.machineStateSetup = new MachineState().deserialize({
+				id: null,
+				name: "",
+			});
+		}
+	}
+
+	onMachineStateDefaultAvailableInputChange(event: any) {
+		const inputValue = event.target.value;
+		const matchMachineStateData = this.machineStates.find(
+			machineState => machineState.name === inputValue
+		);
+		if (!matchMachineStateData && this.selectedMachine?.machineStateAvailable) {
+			this.selectedMachine.machineStateAvailable = new MachineState().deserialize({
 				id: null,
 				name: "",
 			});
@@ -1375,6 +1464,13 @@ export class MachineComponent {
 	}
 
 	checkAllRequiredComboboxes(): boolean {
+		if (!this.qualificationImportType.element.value) {
+			this.qualificationImportType.element.valueState = "Negative";
+			return false;
+		} else {
+			this.qualificationImportType.element.valueState = "None";
+		}
+		
 		if (!this.machineBoardStateType.element.value) {
 			this.machineBoardStateType.element.valueState = "Negative";
 			return false;

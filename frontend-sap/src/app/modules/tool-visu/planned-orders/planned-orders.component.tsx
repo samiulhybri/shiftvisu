@@ -22,6 +22,7 @@ import bwipjs from 'bwip-js';
 import { environment } from '@app/environments/environment';
 import { PermissionEnum } from '@app/shared/enums/PermissionEnum';
 import { Suppliers } from '@app/shared/models/suppliers.model';
+import { ProdOrderPosOperation } from '@app/shared/models/prod-order-pos-operation.model';
 
 @Component({
   selector: 'app-planned-orders',
@@ -61,30 +62,55 @@ export class PlannedOrdersComponent {
   localization = Localization;
   isOtherRepairTableTableShow = true;
   tableTitle: string = $localize`Repair Type`;
-  selectedRow:any;
-  isRemarkModal:boolean = false;
+  selectedRow: any;
+  isRemarkModal: boolean = false;
   orderNote = '';
   barcodeSvg: any;
   clientName = environment.clientName ?? ''
-  query = `(item/any(s:s/is_active eq true) and item/any(b:b/is_tool eq true)) and (prodOrder/any(x:x/order_type eq '${ProdOrderType.MAINTENANCE}')) and ((status ne '${ProdOrderPosStatus.CLOSED}' and status ne '${ProdOrderPosStatus.DELETED}') or (status_plan ne '${ProdOrderPosStatus.CLOSED}' and status_plan ne '${ProdOrderPosStatus.DELETED}'))&$select=id,is_sampling_required,is_sampling_done,notes,label,status,actual_time,cost,status_plan,is_production_possible,item_id,prod_order_id,start,release_date,user_id_creator,user_id_responsible,supplier_id_tool&$expand=media($select=id),prodOrder($select=id,custom_id,order_type),item($select=custom_id,is_tool,name, height, width, length, total_weight),userResponsible($select=id,name)`
+  query = `(item/any(s:s/is_active eq true) and item/any(b:b/is_tool eq true)) and (prodOrder/any(x:x/order_type eq '${ProdOrderType.MAINTENANCE}')) and ((status ne '${ProdOrderPosStatus.CLOSED}' and status ne '${ProdOrderPosStatus.DELETED}') or (status_plan ne '${ProdOrderPosStatus.CLOSED}' and status_plan ne '${ProdOrderPosStatus.DELETED}'))&$select=id,is_sampling_required,is_sampling_done,notes,label,status,actual_time,cost,status_plan,is_production_possible,item_id,prod_order_id,start,release_date,user_id_creator,user_id_responsible,supplier_id_tool&$expand=media($select=id),prodOrder($select=id,custom_id,order_type),item($select=custom_id,is_tool,name, height, width, length, total_weight),userResponsible($select=id,name),prodOrderPosOperations($select=id,is_automatic_created_repair)`
 
   columns: any = [
     {
-      Header: $localize`Order No.`,
-      accessor: "prodOrder.custom_id",
+      Header: $localize`Auto Repair`,
+      accessor: "is_automatic_created_repair",
+      hAlign: "Center",
+      isSelected: true,
+      dataType: GridTableColumnDataType.Boolean,
       disableFilters: true,
       disableGroupBy: true,
-      disableSortBy: false,
+      disableSortBy: true,
+      minWidth: 150,
+      Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+        const { cell, row, webComponentsReactProperties } = instance;
+        const rowData = row.original;
+        const operations = rowData.prodOrderPosOperations;
+        let isAutoRepairFound: boolean = operations ? operations.find((elm: ProdOrderPosOperation) => elm.is_automatic_created_repair == true) : false;
+
+        return (
+          <React.StrictMode>
+            <FlexBox>
+              <Icon name={isAutoRepairFound ? "accept" : "decline"} />
+            </FlexBox>
+          </React.StrictMode>
+        );
+      },
+    },
+    {
+      Header: $localize`Order No.`,
+      accessor: "prodOrder.custom_id",
+      disableFilters: false,
+      disableGroupBy: true,
+      disableSortBy: true,
       isSelected: true,
       dataType: GridTableColumnDataType.NestedString,
-      width:200
+      width: 200
     },
     {
       Header: $localize`No.`,
       accessor: "item.custom_id",
-      disableFilters: true,
+      disableFilters: false,
       disableGroupBy: true,
-      disableSortBy: false,
+      disableSortBy: true,
       isSelected: true,
       dataType: GridTableColumnDataType.NestedString,
       width: 200
@@ -92,12 +118,12 @@ export class PlannedOrdersComponent {
     {
       Header: $localize`Name`,
       accessor: "item.name",
-      disableFilters: true,
+      disableFilters: false,
       disableGroupBy: true,
-      disableSortBy: false,
+      disableSortBy: true,
       isSelected: true,
       dataType: GridTableColumnDataType.NestedString,
-      width:200
+      minWidth: 200
     },
     {
       Header: $localize`Start Date`,
@@ -115,7 +141,7 @@ export class PlannedOrdersComponent {
         return (
           <React.StrictMode>
             <FlexBox alignItems='End'>
-              <Text>{rowData.start ? moment(rowData.start).format("DD.MM.YYYY"): null}</Text>
+              <Text>{rowData.start ? moment(rowData.start).format("DD.MM.YYYY") : null}</Text>
             </FlexBox>
           </React.StrictMode>
         );
@@ -171,12 +197,12 @@ export class PlannedOrdersComponent {
     {
       Header: $localize`Responsible`,
       accessor: "userResponsible.name",
-      disableFilters: true,
+      disableFilters: false,
       disableGroupBy: true,
-      disableSortBy: false,
+      disableSortBy: true,
       isSelected: true,
       dataType: GridTableColumnDataType.NestedString,
-      width:200
+      minWidth: 200
     },
     {
       Header: $localize`Repair Type`,
@@ -250,7 +276,7 @@ export class PlannedOrdersComponent {
         return (
           <React.StrictMode>
             <FlexBox alignItems='Stretch'>
-               {rowData?.is_sampling_required ? <Icon name={rowData?.is_sampling_required ? "accept": "decline"}/> : null}
+              {rowData?.is_sampling_required ? <Icon name={rowData?.is_sampling_required ? "accept" : "decline"} /> : null}
 
             </FlexBox>
           </React.StrictMode>
@@ -273,7 +299,7 @@ export class PlannedOrdersComponent {
         return (
           <React.StrictMode>
             <FlexBox alignItems='Stretch'>
-              {rowData?.is_sampling_required ? <Icon name={rowData?.is_sampling_done ? "accept": "decline"}/>: null}
+              {rowData?.is_sampling_required ? <Icon name={rowData?.is_sampling_done ? "accept" : "decline"} /> : null}
 
             </FlexBox>
           </React.StrictMode>
@@ -296,7 +322,7 @@ export class PlannedOrdersComponent {
         return (
           <React.StrictMode>
             <FlexBox>
-            <Button design='Transparent' icon='hint' onClick={() => this.openNoteModal(rowData.notes)}></Button>
+              <Button design='Transparent' icon='hint' onClick={() => this.openNoteModal(rowData.notes)}></Button>
             </FlexBox>
           </React.StrictMode>
         );
@@ -334,7 +360,7 @@ export class PlannedOrdersComponent {
       Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
         const { row } = instance;
         const rowData = row.original;
-        
+
         return (
           <React.StrictMode>
             <FlexBox alignItems='Stretch'>
@@ -370,56 +396,56 @@ export class PlannedOrdersComponent {
       autoResizable: true,
       hAlign: "Center",
       Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
-          const { row } = instance;
-          const rowData = row.original;
-          return (
-              <React.StrictMode>
-                  <FlexBox alignItems='Center'>
-                      {rowData.pos ? <CheckBox
-                          text=""
-                          valueState="None"
-                          disabled={true}
-                          checked={rowData.prodOrderPosOperation.is_repair_completed}
-                      /> : null}
-                  </FlexBox>
-              </React.StrictMode>
-          );
+        const { row } = instance;
+        const rowData = row.original;
+        return (
+          <React.StrictMode>
+            <FlexBox alignItems='Center'>
+              {rowData.pos ? <CheckBox
+                text=""
+                valueState="None"
+                disabled={true}
+                checked={rowData.prodOrderPosOperation.is_repair_completed}
+              /> : null}
+            </FlexBox>
+          </React.StrictMode>
+        );
       },
-  },
-  {
+    },
+    {
       Header: $localize`Completed Date`,
       headerTooltip: $localize`Completed`,
       accessor: 'repair_completed_date',
       autoResizable: true,
       Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
-          const { row } = instance;
-          const rowData = row.original;
-          return (
-              <React.StrictMode>
-                  <FlexBox alignItems='Stretch'>
-                      {rowData.pos && rowData.prodOrderPosOperation.repair_completed_date ? moment(rowData.prodOrderPosOperation.repair_completed_date).format('DD.MM.YYYY') : null}
-                  </FlexBox>
-              </React.StrictMode>
-          );
-      },
-  },
-  {
-    Header: $localize`Completed By`,
-    headerTooltip: $localize`Completed`,
-    accessor: 'user.name',
-    autoResizable: true,
-    Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
         const { row } = instance;
         const rowData = row.original;
         return (
-            <React.StrictMode>
-                <FlexBox alignItems='Stretch'>
-                    {rowData.pos && rowData.prodOrderPosOperation.user ? rowData.prodOrderPosOperation.user.name  : null}
-                </FlexBox>
-            </React.StrictMode>
+          <React.StrictMode>
+            <FlexBox alignItems='Stretch'>
+              {rowData.pos && rowData.prodOrderPosOperation.repair_completed_date ? moment(rowData.prodOrderPosOperation.repair_completed_date).format('DD.MM.YYYY') : null}
+            </FlexBox>
+          </React.StrictMode>
         );
+      },
     },
-}
+    {
+      Header: $localize`Completed By`,
+      headerTooltip: $localize`Completed`,
+      accessor: 'user.name',
+      autoResizable: true,
+      Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+        const { row } = instance;
+        const rowData = row.original;
+        return (
+          <React.StrictMode>
+            <FlexBox alignItems='Stretch'>
+              {rowData.pos && rowData.prodOrderPosOperation.user ? rowData.prodOrderPosOperation.user.name : null}
+            </FlexBox>
+          </React.StrictMode>
+        );
+      },
+    }
 
   ]
   otherRepairColumns: any = [
@@ -445,54 +471,54 @@ export class PlannedOrdersComponent {
       hAlign: 'Center',
       autoResizable: true,
       Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
-          const { row } = instance;
-          const rowData = row.original;
-          return (
-              <React.StrictMode>
-                  <FlexBox alignItems='Center'>
-                      <CheckBox
-                          text=""
-                          disabled={true}
-                          checked={rowData.prodOrderPosOperation.is_repair_completed}
-                          valueState="None"
-                      />
-                  </FlexBox>
-              </React.StrictMode>
-          );
+        const { row } = instance;
+        const rowData = row.original;
+        return (
+          <React.StrictMode>
+            <FlexBox alignItems='Center'>
+              <CheckBox
+                text=""
+                disabled={true}
+                checked={rowData.prodOrderPosOperation.is_repair_completed}
+                valueState="None"
+              />
+            </FlexBox>
+          </React.StrictMode>
+        );
       },
-  },
-  {
-          Header: $localize`Completed Date`,
-          headerTooltip: $localize`Completed`,
-          accessor: 'repair_completed_date',
-          autoResizable: true,
-          Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
-              const { row } = instance;
-              const rowData = row.original;
-              return (
-                  <React.StrictMode>
-                      <FlexBox alignItems='Stretch'>
-                          {rowData.prodOrderPosOperation.repair_completed_date ? moment(rowData.prodOrderPosOperation.repair_completed_date).format('DD.MM.YYYY') : null}
-                      </FlexBox>
-                  </React.StrictMode>
-              );
-          },
-  },
+    },
+    {
+      Header: $localize`Completed Date`,
+      headerTooltip: $localize`Completed`,
+      accessor: 'repair_completed_date',
+      autoResizable: true,
+      Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+        const { row } = instance;
+        const rowData = row.original;
+        return (
+          <React.StrictMode>
+            <FlexBox alignItems='Stretch'>
+              {rowData.prodOrderPosOperation.repair_completed_date ? moment(rowData.prodOrderPosOperation.repair_completed_date).format('DD.MM.YYYY') : null}
+            </FlexBox>
+          </React.StrictMode>
+        );
+      },
+    },
     {
       Header: $localize`Completed By`,
       headerTooltip: $localize`Completed`,
       accessor: 'prodOrderPosOperation.user.name',
       autoResizable: true,
       Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
-          const { row } = instance;
-          const rowData = row.original;
-          return (
-              <React.StrictMode>
-                  <FlexBox alignItems='Stretch'>
-                      {rowData.prodOrderPosOperation.is_repair_completed && rowData.prodOrderPosOperation.user ? rowData.prodOrderPosOperation.user.name  : null}
-                  </FlexBox>
-              </React.StrictMode>
-          );
+        const { row } = instance;
+        const rowData = row.original;
+        return (
+          <React.StrictMode>
+            <FlexBox alignItems='Stretch'>
+              {rowData.prodOrderPosOperation.is_repair_completed && rowData.prodOrderPosOperation.user ? rowData.prodOrderPosOperation.user.name : null}
+            </FlexBox>
+          </React.StrictMode>
+        );
       },
     }
 
@@ -508,10 +534,10 @@ export class PlannedOrdersComponent {
 
   ngOnInit() {
     this.authUser = this._authSrv.getUser();
-    const checkAuth = this.authUser.roleString?.includes('SUPERADMIN') || 
-                      this.authUser.roleString?.includes('ADMIN_TOOLVISU') ||
-                      this._authSrv.isPermissionValid(PermissionEnum.TOOLVISU_PLANNED_ORDERS_EDIT);
-    if(checkAuth) this.hasAuth = true;
+    const checkAuth = this.authUser.roleString?.includes('SUPERADMIN') ||
+      this.authUser.roleString?.includes('ADMIN_TOOLVISU') ||
+      this._authSrv.isPermissionValid(PermissionEnum.TOOLVISU_PLANNED_ORDERS_EDIT);
+    if (checkAuth) this.hasAuth = true;
     else this.hasAuth = false;
 
     this.loadLists();
@@ -577,36 +603,36 @@ export class PlannedOrdersComponent {
       error: e => { },
     });
   }
-  openNoteModal(note:any){
+  openNoteModal(note: any) {
     this.isRemarkModal = true;
     this.orderNote = note;
   }
-  openDeleteModal(selectedRowData:any){
+  openDeleteModal(selectedRowData: any) {
     this.idDeleteModalOpen = true;
     this.selectedRow = selectedRowData;
   }
-  DeleteThisOrder(){
-    this._commonService.put(`ProdOrderPos(${this.selectedRow.id})`, {status: ProdOrderPosStatus.DELETED, status_plan:ProdOrderPosStatus.DELETED}).subscribe({
-      next:()=>{
+  DeleteThisOrder() {
+    this._commonService.put(`ProdOrderPos(${this.selectedRow.id})`, { status: ProdOrderPosStatus.DELETED, status_plan: ProdOrderPosStatus.DELETED }).subscribe({
+      next: () => {
         this.closeDialog('delete')
         this._toastSrv.showToast(this.localization.recordDeleted, 'success');
         this.selectedRow = undefined
         this.filterHandler();
       },
-      error:()=>{
+      error: () => {
         this._toastSrv.showToast(this.localization.someThingWentWrong, 'error-toaster');
         this.closeDialog('delete')
       }
     })
 
   }
-  closeDialog(type='view') {
+  closeDialog(type = 'view') {
     this.isViewDialogOpen = false;
-    if(type== 'delete'){
+    if (type == 'delete') {
       this.selectedRow = undefined
       this.idDeleteModalOpen = false;
     }
-    if(type = 'remark'){
+    if (type = 'remark') {
       this.isRemarkModal = false;
     }
   }
@@ -615,166 +641,166 @@ export class PlannedOrdersComponent {
     this.itemId = itemId
     this.isAttachmentDialogOpen = true;
   }
-  openPrintModal(data:any){
+  openPrintModal(data: any) {
     this.generateBarcode(data.item.custom_id)
     fetch('assets/view/plannedOrderPrint.html').then(response => response.text()).then(content => {
-    var iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.width = '0px';
-    iframe.style.height = '0px';
-    document.body.appendChild(iframe);
-    let changeData = [
-      {
-          key:'valueClientName',
+      var iframe = document.createElement('iframe');
+      iframe.style.position = 'absolute';
+      iframe.style.width = '0px';
+      iframe.style.height = '0px';
+      document.body.appendChild(iframe);
+      let changeData = [
+        {
+          key: 'valueClientName',
           value: this.clientName
-      },
-      {
-          key:"valuePresentDate",
+        },
+        {
+          key: "valuePresentDate",
           value: moment().format('D. MMMM YYYY')
-      },
-      {
-          key:'titleOrderNr',
-          value: $localize `Tool Order Nr.`
-      },
-      {
-          key:'valueOrderNr',
+        },
+        {
+          key: 'titleOrderNr',
+          value: $localize`Tool Order Nr.`
+        },
+        {
+          key: 'valueOrderNr',
           value: data.prodOrder.custom_id
-      },
-      {
-          key:'titleRepairStartDate',
-          value: $localize `Repair Start-Date`
-      },
-      {
-          key:'valueRepairStartDate',
+        },
+        {
+          key: 'titleRepairStartDate',
+          value: $localize`Repair Start-Date`
+        },
+        {
+          key: 'valueRepairStartDate',
           value: moment(data.start).format("DD.MM.YYYY")
-      },
-      {
-          key:'titleRepairEndDate',
-          value: $localize `Repair End-Date`
-      },
-      {
-          key:'valueRepairEndDate',
+        },
+        {
+          key: 'titleRepairEndDate',
+          value: $localize`Repair End-Date`
+        },
+        {
+          key: 'valueRepairEndDate',
           value: ''
-      },
-      {
-          key:'barcodeSvg',
+        },
+        {
+          key: 'barcodeSvg',
           value: this.barcodeSvg
-      },
-      {
-          key:'ToolName',
+        },
+        {
+          key: 'ToolName',
           value: data.item.name
-      },
-      {
-          key:'titleToolNr',
-          value: $localize `Machine/Tool-Nr.`
-      },
-      {
-          key:'valueToolNr',
+        },
+        {
+          key: 'titleToolNr',
+          value: $localize`Machine/Tool-Nr.`
+        },
+        {
+          key: 'valueToolNr',
           value: data.item.custom_id
-      },
-      {
-          key:'titleToolCalculation',
-          value: $localize `Mass(L x W x H)`
-      },
-      {
-          key:"valueLenghtWidthHeight",
+        },
+        {
+          key: 'titleToolCalculation',
+          value: $localize`Mass(L x W x H)`
+        },
+        {
+          key: "valueLenghtWidthHeight",
           value: `${data.item.length ? data.item.length : 0} x ${data.item.width ? data.item.width : 0} x
                             ${data.item.height ? data.item.height : 0}`,
-      },
-      {
-          key:'titleTotalWeight',
-          value: $localize `Weight(kg)`
-      },
-      {
-          key:'valueTotalWeight',
+        },
+        {
+          key: 'titleTotalWeight',
+          value: $localize`Weight(kg)`
+        },
+        {
+          key: 'valueTotalWeight',
           value: `${data.item.total_weight ? data.item.total_weight : 0}`
-      },
-      {
-          key:'titleRessGrp',
-          value:$localize `Nr.Ress.-Gruppe`
-      },
-      {
-          key:'titleRessNr',
-          value: $localize `Ressourcennr.`
-      },
-      {
-          key:'titleIsProduction',
-          value: $localize `Prod. Stop`
-      },
-      {
+        },
+        {
+          key: 'titleRessGrp',
+          value: $localize`Nr.Ress.-Gruppe`
+        },
+        {
+          key: 'titleRessNr',
+          value: $localize`Ressourcennr.`
+        },
+        {
+          key: 'titleIsProduction',
+          value: $localize`Prod. Stop`
+        },
+        {
           key: 'valueIsProductionPossible',
-          value: data.is_production_possible ? $localize `No` : $localize `Yes`
-      },
-      {
-          key:'titleLabelExternal',
-          value: $localize `Label External`
-      },
-      {
-          key:'valueLabelExternal',
-          value: data.label == 'INTERNAL' ? $localize `No` : $localize `Yes`
-      },
-      {
-          key:'titleSuppliers',
-          value: $localize `Suppliers`
-      },
-      {
-          key:'titleContactRef',
-          value: $localize `Contract Ref.`
-      },
-      {
-          key:'titleRemarks',
-          value: $localize `Remarks:`
-      },
-      {
-          key:'valueRemarks',
+          value: data.is_production_possible ? $localize`No` : $localize`Yes`
+        },
+        {
+          key: 'titleLabelExternal',
+          value: $localize`Label External`
+        },
+        {
+          key: 'valueLabelExternal',
+          value: data.label == 'INTERNAL' ? $localize`No` : $localize`Yes`
+        },
+        {
+          key: 'titleSuppliers',
+          value: $localize`Suppliers`
+        },
+        {
+          key: 'titleContactRef',
+          value: $localize`Contract Ref.`
+        },
+        {
+          key: 'titleRemarks',
+          value: $localize`Remarks:`
+        },
+        {
+          key: 'valueRemarks',
           value: data.notes
-      },
-      {
-          key:'titleCompletedBy',
-          value: $localize `Completed By:`
-      },
-      {
-          key:'titleTime',
-          value: $localize `at:`
-      },
-    ]
-    changeData.forEach(f=>{
-      content = content.replace(f.key,f.value)
-    })
-    var iframeDocument = iframe.contentDocument || iframe?.contentWindow?.document;
-    iframeDocument?.open();
-    iframeDocument?.write(content)
-    iframeDocument?.close();
-    iframe.contentWindow?.focus();
-    iframe.contentWindow?.print();
-    document.body.removeChild(iframe);
+        },
+        {
+          key: 'titleCompletedBy',
+          value: $localize`Completed By:`
+        },
+        {
+          key: 'titleTime',
+          value: $localize`at:`
+        },
+      ]
+      changeData.forEach(f => {
+        content = content.replace(f.key, f.value)
+      })
+      var iframeDocument = iframe.contentDocument || iframe?.contentWindow?.document;
+      iframeDocument?.open();
+      iframeDocument?.write(content)
+      iframeDocument?.close();
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      document.body.removeChild(iframe);
     }).catch(error => console.error('Error reading the file:', error));
   }
-	openEditOrVIewModal(repair: any, modalType: string) {
-		if (modalType == "view") {
-			this.typeOfRepairTreeTableData = [];
-			this.otherRepairTableData = [];
-			this.isViewDialogOpen = true;
+  openEditOrVIewModal(repair: any, modalType: string) {
+    if (modalType == "view") {
+      this.typeOfRepairTreeTableData = [];
+      this.otherRepairTableData = [];
+      this.isViewDialogOpen = true;
       this.isTypeOfRepairLoadingView!.active = true;
       this._commonService
-			.get(
-				`ProdOrderPos/${repair.id}?$select=id,notes,estimated_hours,label,prod_order_id,item_id,user_id_creator,user_id_responsible,start,created_at,updated_at,status,release_date,is_production_possible,supplier_id_tool&$expand=prodOrder($select=id,custom_id,order_type),prodOrderPosOperations($select=id,user_id,name,prod_order_pos_id,operation_plan_pos_id_origin,operation_plan_id_origin,is_repair_completed,repair_completed_date;$expand=operationPlan,user($select=id,name),operationPlanPos($select=id,name,operation_plan_id,pos)),item($select=id,name,custom_id),userCreator($select=id,name),userResponsible($select=id,name),toolSupplier($select=id,name)`
-			).subscribe({
-        next: async(res:any)=>{
-          res.prodOrderPosOperations!.forEach((op: any) => {
-            if(!op.operation_plan_id_origin && !op.operation_plan_pos_id_origin) return;
-            if(!op.operationPlanPos){              
-              op.operationPlan.prodOrderPosOperation = {
-                ...op,
-                operationPlan: undefined,
-                operationPlanPos: undefined,
-              };
-              this.otherRepairTableData.push(op.operationPlan);
-            }else{
-              const opPlan = this.typeOfRepairTreeTableData.find(
+        .get(
+          `ProdOrderPos/${repair.id}?$select=id,notes,estimated_hours,label,prod_order_id,item_id,user_id_creator,user_id_responsible,start,created_at,updated_at,status,release_date,is_production_possible,supplier_id_tool&$expand=prodOrder($select=id,custom_id,order_type),prodOrderPosOperations($select=id,user_id,name,prod_order_pos_id,operation_plan_pos_id_origin,operation_plan_id_origin,is_repair_completed,repair_completed_date;$expand=operationPlan,user($select=id,name),operationPlanPos($select=id,name,operation_plan_id,pos)),item($select=id,name,custom_id),userCreator($select=id,name),userResponsible($select=id,name),toolSupplier($select=id,name)`
+        ).subscribe({
+          next: async (res: any) => {
+            res.prodOrderPosOperations!.forEach((op: any) => {
+              if (!op.operation_plan_id_origin && !op.operation_plan_pos_id_origin) return;
+              if (!op.operationPlanPos) {
+                op.operationPlan.prodOrderPosOperation = {
+                  ...op,
+                  operationPlan: undefined,
+                  operationPlanPos: undefined,
+                };
+                this.otherRepairTableData.push(op.operationPlan);
+              } else {
+                const opPlan = this.typeOfRepairTreeTableData.find(
                   (p: any) => p?.id == op?.operationPlan?.id
                 )
-                if (!opPlan && op.operationPlan){
+                if (!opPlan && op.operationPlan) {
                   op.operationPlan.prodOrderPosOperation = {
                     ...op,
                     operationPlan: undefined,
@@ -783,53 +809,53 @@ export class PlannedOrdersComponent {
                   };
                   this.typeOfRepairTreeTableData.push(op.operationPlan)
                 }
-            }
-          });
-    
-          res.prodOrderPosOperations!.forEach((op: any) => {
-            if (!op.operationPlanPos) return;
-            op.operationPlanPos.prodOrderPosOperation = {
-              ...op,
-              operationPlan: undefined,
-              operationPlanPos: undefined,
-            };
-    
-            const opPlan2 = this.typeOfRepairTreeTableData.find(
-              (p: any) => p?.id == op.operationPlanPos?.operation_plan_id
-            );
-            if (opPlan2 && !opPlan2?.operationPlanPos) {
-              opPlan2.operationPlanPos = [];
-            }
-    
-            if (opPlan2) {
-              const operationPlanPosTemp = opPlan2!.operationPlanPos!.find(
-                (k: any) => k.id == op.operationPlanPos.id
+              }
+            });
+
+            res.prodOrderPosOperations!.forEach((op: any) => {
+              if (!op.operationPlanPos) return;
+              op.operationPlanPos.prodOrderPosOperation = {
+                ...op,
+                operationPlan: undefined,
+                operationPlanPos: undefined,
+              };
+
+              const opPlan2 = this.typeOfRepairTreeTableData.find(
+                (p: any) => p?.id == op.operationPlanPos?.operation_plan_id
               );
-              if (!operationPlanPosTemp)
-                opPlan2!.operationPlanPos!.push(op.operationPlanPos);
-            }
-          });
-          if (this.typeOfRepairTreeTableData.length == 0)
-          	this.isTreeTableShow = false;
-          else this.isTreeTableShow = true;
-          if (this.otherRepairTableData.length == 0)
-          	this.isOtherRepairTableTableShow = false;
-          else this.isOtherRepairTableTableShow = true;
-    
-          this.treeComponent?.render();
-          this.childComponentRefOtherRepairTable?.render();
-          this.isTypeOfRepairLoadingView!.active = false;
-        }
-      })
-		}else{
+              if (opPlan2 && !opPlan2?.operationPlanPos) {
+                opPlan2.operationPlanPos = [];
+              }
+
+              if (opPlan2) {
+                const operationPlanPosTemp = opPlan2!.operationPlanPos!.find(
+                  (k: any) => k.id == op.operationPlanPos.id
+                );
+                if (!operationPlanPosTemp)
+                  opPlan2!.operationPlanPos!.push(op.operationPlanPos);
+              }
+            });
+            if (this.typeOfRepairTreeTableData.length == 0)
+              this.isTreeTableShow = false;
+            else this.isTreeTableShow = true;
+            if (this.otherRepairTableData.length == 0)
+              this.isOtherRepairTableTableShow = false;
+            else this.isOtherRepairTableTableShow = true;
+
+            this.treeComponent?.render();
+            this.childComponentRefOtherRepairTable?.render();
+            this.isTypeOfRepairLoadingView!.active = false;
+          }
+        })
+    } else {
       this.isSaveProdOrderPos = false;
       this.selectedActiveRepair = repair
-		  this.isEditDialogOpen = true;
+      this.isEditDialogOpen = true;
     }
-	}
-  public handleRowDoubleClick = (rowData: any): void => {	
-    const modalType = this.hasAuth ? 'edit' : 'show'; 
-    this.openEditOrVIewModal(rowData, modalType); 
+  }
+  public handleRowDoubleClick = (rowData: any): void => {
+    const modalType = this.hasAuth ? 'edit' : 'show';
+    this.openEditOrVIewModal(rowData, modalType);
   };
   closeUpdateDialog() {
     this.isEditDialogOpen = false;
@@ -843,6 +869,6 @@ export class PlannedOrdersComponent {
     this.isSaveProdOrderPos = true;
   }
   closeAttachmentDialog() {
-      this.isAttachmentDialogOpen = false
+    this.isAttachmentDialogOpen = false
   }
 }

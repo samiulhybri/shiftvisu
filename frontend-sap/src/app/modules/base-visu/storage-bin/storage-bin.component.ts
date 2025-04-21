@@ -207,7 +207,7 @@ export class StorageBinComponent {
 	}
 
 	refreshEditData() {
-		const url = `StorageBins?$filter=is_active eq true and id eq ${this.selectedStorageBin?.id}&$orderby=custom_id asc`;
+		const url = `StorageBins?$filter=id eq ${this.selectedStorageBin?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -230,7 +230,7 @@ export class StorageBinComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedStorageBin, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 
 				this._toasterSrv.showToast(recordDeleted, "success");

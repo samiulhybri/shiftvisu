@@ -48,9 +48,9 @@
 
 		<div class="order-card">
 			<ui5-title level="H5"
-				>{{ selectedOperations?.orderQuantity }}
+				>{{ format(selectedOperations?.orderQuantity) }}
 				{{ selectedOperations?.unitOfMeasureCustomId }} |
-				{{ selectedOperations?.residualQuantityDetails2 }}
+				{{ format(selectedOperations?.residualQuantityDetails2) }}
 				{{ selectedOperations?.unitOfMeasureCustomId }}</ui5-title
 			>
 
@@ -65,11 +65,11 @@
 			<ui5-title
 				id="scrap"
 				level="H5"
-				>{{ selectedOperations?.goodItemsCount }}
+				>{{ format(selectedOperations?.goodItemsCount) }}
 				{{ selectedOperations?.unitOfMeasureCustomId }} |
-				{{ selectedOperations?.reworkItemsCount }}
+				{{ format(selectedOperations?.reworkItemsCount) }}
 				{{ selectedOperations?.unitOfMeasureCustomId }} |
-				{{ selectedOperations?.badItemsCount }}
+				{{ format(selectedOperations?.badItemsCount) }}
 				{{ selectedOperations?.unitOfMeasureCustomId }}</ui5-title
 			>
 			<ui5-label
@@ -83,7 +83,7 @@
 			<ui5-title
 				id="itemName"
 				level="H5"
-				>{{ selectedOperations?.standardVelocity | number: "2.0-2" }}
+				>{{ +(selectedOperations?.standardCycle || 0) > 0 ? (selectedOperations?.standardVelocity | number: "2.0-2") : ' - '}}
 				{{
 					machineStateTypeClass.getStateValue(machine?.machine_state_type) ==
 					machineStateType.IIOT

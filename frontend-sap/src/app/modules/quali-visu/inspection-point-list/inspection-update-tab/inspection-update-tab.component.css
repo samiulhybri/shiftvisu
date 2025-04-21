@@ -16,3 +16,21 @@
 	font-size: var(--title-text-font-size);
 	color: var(--list-description-text-color);
 }
+
+@media (min-width: 2450px) {
+	.custom-height {
+	  height: 46% !important;
+	}
+}
+
+@media (min-width: 2350px) and (max-width: 2400px) {
+	.custom-height {
+	  height: 49% !important;
+	}
+}
+
+@media (min-width: 2050px) and (max-width: 2300px) {
+	.custom-height {
+	  height: 56% !important;
+	}
+}

@@ -7,6 +7,7 @@ import {
 	MachineBoardStateType,
 	MachineBoardStateTypeClass,
 } from "@app/shared/enums/MachineBoardStateType";
+import {MachineboardService} from "@app/modules/machine-board/services/machineboard.service";
 
 @Component({
 	selector: "app-machine-board-view-1",
@@ -28,7 +29,10 @@ export class MachineBoardView1Component {
 	@Input() prodOrderPosOperations: any[] = [];
 	selectedOperation?: OrderDetails;
 
-	constructor(private renderer: Renderer2) {}
+	constructor(
+		private renderer: Renderer2,
+		private machineboardService: MachineboardService,
+	) {}
 
 	async ngOnInit(): Promise<void> {
 		this.renderer.addClass(document.body, "sapUiSizeCozy");
@@ -66,5 +70,6 @@ export class MachineBoardView1Component {
 
 	onSelectOperation(operation: OrderDetails) {
 		this.selectedOperation = operation;
+		this.machineboardService.updateSelectedOperation = this.selectedOperation;
 	}
 }

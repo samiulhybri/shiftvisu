@@ -12,6 +12,10 @@ import {
 	MachineConstraintType,
 	MachineConstraintTypeClass,
 } from "@app/shared/enums/MachineConstraintType";
+import { ProdOrderPosOperation } from "@app/shared/models/prod-order-pos-operation.model";
+import { convertSeconds } from "@app/shared/utils/duration-to-hour";
+import { AuthService } from "@app/shared/services/auth.service";
+import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
 
 @Component({
 	selector: "app-operation-scheduler",
@@ -34,20 +38,25 @@ export class OperationSchedulerComponent {
 	public isLoading: boolean = false;
 	public willBeSave: boolean = false;
 	public isDeleteModalOpen: boolean = false;
-
+	public hasOperationEditPermission = false;
 	public prodOrderPos: any = [];
 	public selectedOperationsIds: any = [];
 	public machineConstraintType = MachineConstraintType;
 	public needToPositionIds: Set<number> = new Set<number>();
+	public cardHeaderText = $localize`POS`;
 	private destroy$ = new Subject<void>();
 
 	constructor(
 		private commonService: CommonService,
+		private authService: AuthService,
 		private _toaster: ToastService
 	) {}
 
 	ngOnInit(): void {
 		this.loadOperations();
+		const checkOperationEditPermission =  this.authService.isPermissionValid(PermissionEnum.PLANVISU_OPERATION_RESCHEDULE);
+		if(checkOperationEditPermission) this.hasOperationEditPermission = true;
+		else this.hasOperationEditPermission = false;
 	}
 
 	ngOnDestroy(): void {
@@ -226,7 +235,7 @@ export class OperationSchedulerComponent {
 							machine_id: operation.machine_id,
 							start: moment(operation.start).toISOString(),
 							operations: pos.prodOrderPosOperations,
-							quantity: pos.quantity,
+							quantity:  pos.quantity ? parseInt(pos.quantity, 10) : 0,
 							constraint_type: operation.constraint_type,
 						};
 
@@ -278,7 +287,11 @@ export class OperationSchedulerComponent {
 			this.isLoading = false;
 		}
 	}
-
+	getOperationDuration(operation:any, pos:any){
+		let duration =  convertSeconds(new ProdOrderPosOperation().deserialize({...operation, prodOrderPos: pos}).calculateDuration(),true)
+		return duration ?? ''
+		
+	}
 	onChangeStartTime(value: any, operation: any) {
 		const parsedDate = moment(value, "DD.MM.YYYY HH:mm", true);
 		if (!parsedDate.isValid()) {
@@ -334,7 +347,17 @@ export class OperationSchedulerComponent {
 							return request;
 						}
 					);
-
+					const additionalPayload = {
+						quantity: pos.quantity ? parseInt(pos.quantity, 10) : 0
+					};
+			
+					const newRequest = new ODataBatchCall(
+						requests.length, // New index
+						"patch",
+						`/odata/ProdOrderPos/${pos.id}`
+					);
+					newRequest.body = additionalPayload;
+					requests.push(newRequest); // Ad
 					return lastValueFrom(this.commonService.post("$batch", { requests }));
 				});
 

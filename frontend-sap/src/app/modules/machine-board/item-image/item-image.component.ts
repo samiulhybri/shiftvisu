@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, Output, SimpleChange, SimpleChanges } from "@angular/core";
-import { CommonService } from "@app/shared/services/common.service";
-import { Setting } from "@app/shared/models/setting.model";
+import {Component, EventEmitter, Input, Output, SimpleChange, SimpleChanges} from "@angular/core";
+import {CommonService} from "@app/shared/services/common.service";
+import {Setting} from "@app/shared/models/setting.model";
+import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
 
 @Component({
-	selector: "app-item-image",
-	templateUrl: "./item-image.component.html",
-	styleUrl: "./item-image.component.css",
+    selector: "app-item-image",
+    templateUrl: "./item-image.component.html",
+    styleUrl: "./item-image.component.css",
 })
 export class ItemImageComponent {
     @Input() headerTitle?: string;
@@ -13,14 +14,14 @@ export class ItemImageComponent {
     @Input() itemCustomId?: string;
     @Input() isCard?: boolean;
     @Input() isSingleImage?: boolean;
-	@Input() height: string = "";
+    @Input() height: string = "";
 
     @Output() triggerItemEvent = new EventEmitter<any>();
-    
+
     public settings?: Setting;
-    
-	public displayedImage: any;
-	public isLoading: boolean = false;
+
+    public displayedImage: any;
+    public isLoading: boolean = false;
     public cardHeight: any;
     public cardHeaderText = $localize`Item Image`;
 
@@ -41,10 +42,14 @@ export class ItemImageComponent {
         ],
         txt: ['text/plain'],
     };
-    
-    externalImageUrl: string = "";
 
-    constructor(public _commonSrv: CommonService) { }
+    fileSrc?: string | SafeResourceUrl;
+
+    constructor(
+        public _commonSrv: CommonService,
+        private sanitizer: DomSanitizer,
+    ) {
+    }
 
     async ngOnChanges(changes: any) {
         this.headerTitle = changes.headerTitle ? changes.headerTitle.currentValue : this.headerTitle;
@@ -52,9 +57,9 @@ export class ItemImageComponent {
         this.itemCustomId = changes.itemCustomId ? changes.itemCustomId.currentValue : undefined;
         this.cardHeight = (parseInt(this.height, 10) - 45) + 'px';
 
-        this.cardHeaderText = this.itemCustomId ? $localize`Item Image` +' '+ `(${this.itemCustomId})` : $localize`Item Image`;
+        this.cardHeaderText = this.itemCustomId ? $localize`Item Image` + ' ' + `(${this.itemCustomId})` : $localize`Item Image`;
 
-        if(this.settings) {
+        if (this.settings) {
             this.getMediaInit();
         }
     }
@@ -67,7 +72,7 @@ export class ItemImageComponent {
         this._commonSrv.get('Settings').subscribe({
             next: (response: any) => {
                 this.settings = new Setting().deserialize(response.value[0]);
-                
+
                 this.getMediaInit();
             }
         });
@@ -75,11 +80,18 @@ export class ItemImageComponent {
 
     getMediaInit() {
         if (this.settings?.is_external_dms_enabled) {
-            if(this.itemCustomId) {
-                this.externalImageUrl = this._commonSrv.getImageUrlForExternalImage(this.itemCustomId);
+            if (this.itemCustomId) {
+                this._commonSrv.getOption(`import-image-from-btp/${this.itemCustomId}`, false, true).subscribe({
+                    next: (blob) => {
+                        if (blob.type !== 'application/pdf') {
+                            console.error('Error: Received non-PDF content', blob);
+                            return;
+                        }
+                        this.fileSrc = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob));
+                    },
+                });
             }
-        }
-        else {
+        } else {
             this.getMedia();
         }
     }
@@ -94,14 +106,14 @@ export class ItemImageComponent {
                     var count: number = 0;
 
                     this.triggerItemEvent.emit(response);
-                    
-                    if(response.media.length) {
+
+                    if (response.media.length) {
                         response.media.forEach(async (elm: any) => {
                             var type = await this.checkFileType(elm);
-                            if(type == 'image') file_arr.push(elm);
+                            if (type == 'image') file_arr.push(elm);
                             count++;
 
-                            if(count == response.media.length && file_arr) {
+                            if (count == response.media.length && file_arr) {
                                 if (this.isSingleImage) {
                                     file_arr.forEach((e: any) => {
                                         e.name = e.file_name;
@@ -140,10 +152,6 @@ export class ItemImageComponent {
     }
 
     resetExternalImageUrl() {
-        this.externalImageUrl = "";
-    }
-
-    alert() {
-        alert("adadasda");
+        this.fileSrc = undefined;
     }
 }

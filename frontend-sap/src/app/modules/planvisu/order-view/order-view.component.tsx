@@ -34,6 +34,7 @@ import { ValueHelperType } from "@app/modules/planvisu/gantt/enums/ValueHelperTy
 import Input from "@ui5/webcomponents/dist/Input";
 import { LogicalOperator } from "@app/shared/enums/LogicalOperator";
 import { environment } from "@app/environments/environment";
+import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
 
 @Component({
 	selector: "app-order-view",
@@ -48,6 +49,9 @@ export class OrderViewComponent {
 	) {}
 	ngOnInit() {
 		this.getAllComboBoxData();
+		const checkOperationEditPermission =  this.authService.isPermissionValid(PermissionEnum.PLANVISU_OPERATION_EDIT);
+		if(checkOperationEditPermission) this.saveButtonEnable = true;
+		else this.saveButtonEnable = false;
 	}
 	@ViewChild("prodOrderGrid", { static: false }) prodOrderGrid: CustomReactGridTable | undefined;
 	@ViewChild("childComponentRef", { static: false }) childComponent:
@@ -73,7 +77,7 @@ export class OrderViewComponent {
 	isValueHelpDialog: boolean = false;
 	isDialogEditable: boolean = true;
 	isDialogOpen: boolean = false;
-	saveButtonEnable: boolean = true;
+	saveButtonEnable: boolean = false;
 	isBusy: boolean = false;
 	isLoading: boolean = false;
 	dialogTitle: string = "";
@@ -91,6 +95,15 @@ export class OrderViewComponent {
 		{ id: "1", name: $localize`Active Orders` },
 		{ id: "2", name: $localize`Closed Orders` },
 	];
+	isShowOperationPopupField: any = {
+		'customer': true,
+		'item': true,
+		'prod_order': true,
+		'due_date': true,
+		'release_date': true,
+		'constraint_type': true,
+		'alt_machine': true
+	}
 	url = "";
 	filterQuery = ``;
 	expandQuery = "";
@@ -619,7 +632,6 @@ export class OrderViewComponent {
 
 	async onSaveOrderViewDialog() {
 		this.isBusy = true;
-		this.saveButtonEnable = true;
 		this.isLoading = true;
 		const payload = {
 			plan_machine_id: this.selectedOperation.plan_machine_id,
@@ -646,13 +658,11 @@ export class OrderViewComponent {
 				this.prodOrderGrid!.onFilterAndSorting("", "", "contains");
 				this.prodOrderGrid!.render();
 				this.isDialogOpen = false;
-				this.saveButtonEnable = true;
 				this.isBusy = false;
 				this.isLoading = false;
 			})
 			.catch(() => {
 				this.isBusy = false;
-				this.saveButtonEnable = false;
 				this.isLoading = false;
 			});
 	}
@@ -755,7 +765,6 @@ export class OrderViewComponent {
 
 	closeDialog() {
 		this.isDialogOpen = false;
-		this.saveButtonEnable = true;
 	}
 
 	onLoadMoreForCustomAPI() {
@@ -770,7 +779,6 @@ export class OrderViewComponent {
 
 	public onDoubleClick = (rowData: any): void => {	
 		this.isDialogOpen = true;
-		this.saveButtonEnable = false;
 		this.selectedOperation = new ProdOrderPosOperation().deserialize(rowData);
 
 		setTimeout(() => {

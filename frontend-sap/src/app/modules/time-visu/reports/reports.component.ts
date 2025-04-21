@@ -139,11 +139,10 @@ export class ReportsComponent implements AfterViewInit {
     createReport() {
         this.pdfSrc = null;
         let lan = readCookie('sct_language') ?? 'en';
-        let client: string = environment.homeLogo;
         let url: string = '';
         let start_date = moment(this.start).format("YYYY-MM-DD");
         let end_date = moment(this.end).format("YYYY-MM-DD");
-        url = this.reportType == 'toolvisu' ? `time-visu/report/tool-visu-hour/${start_date}/${end_date}/${lan}/${client}` : '';
+        url = this.reportType == 'toolvisu' ? `time-visu/report/tool-visu-hour/${start_date}/${end_date}/${lan}` : '';
         if (url != '') {
             this.isBusy = true;
             this._commonSrv

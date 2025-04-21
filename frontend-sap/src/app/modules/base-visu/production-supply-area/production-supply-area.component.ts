@@ -206,7 +206,7 @@ export class ProductionSupplyAreaComponent {
 	}
 
 	refreshEditData() {
-		const url = `ProductionSupplyAreas?$filter=is_active eq true and id eq ${this.selectedProductionSupplyArea?.id}&$orderby=custom_id asc`;
+		const url = `ProductionSupplyAreas?$filter=id eq ${this.selectedProductionSupplyArea?.id}&$orderby=custom_id asc`;
 
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
@@ -230,7 +230,7 @@ export class ProductionSupplyAreaComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedProductionSupplyArea, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 
 				this._toasterSrv.showToast(recordDeleted, "success");

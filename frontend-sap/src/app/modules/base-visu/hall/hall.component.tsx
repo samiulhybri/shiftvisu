@@ -237,7 +237,7 @@ export class HallComponent {
 	}
 
 	refreshEditData() {
-		const url = `Halls?$filter=is_active eq true and id eq ${this.selectedHall?.id}&$orderby=custom_id asc`;
+		const url = `Halls?$filter=id eq ${this.selectedHall?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -260,7 +260,7 @@ export class HallComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedHall, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

@@ -199,7 +199,7 @@ export class ShiftModelComponent {
 				this.selectedShiftModelId = undefined;
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedShiftModel, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedShiftModel.id, null);
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},
 			error: err => {

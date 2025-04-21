@@ -13,6 +13,7 @@ import moment from "moment";
 })
 export class OrderDetailsDialogComponent {
 	@Input() dialogTitle: string = "";
+	@Input() showfields: any;
 	@Input() isDialogEditable: boolean = false;
 	@Input() isTEeditable: boolean = false;
 	@Input() open: boolean = false;
@@ -53,7 +54,6 @@ export class OrderDetailsDialogComponent {
 	prodOrderPosOperationStatusClass = ProdOrderPosOperationStatusClass;
 	prodOrderPosOperationStatus = ProdOrderPosOperationStatus;
 	toastMessage: string = "";
-
 
 	@Input() public set operationEnd(date: string) {
 		if (date) {

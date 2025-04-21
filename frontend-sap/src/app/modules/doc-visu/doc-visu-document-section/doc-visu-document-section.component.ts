@@ -18,6 +18,7 @@ import { IDirectory } from "@app/shared/interfaces/directory.interface.";
 import { PlantsService } from "@app/shared/services/plants.service";
 
 import { DocVisuService } from "@doc-visu/doc-visu.service";
+import { AuthService } from "@app/shared/services/auth.service";
 
 @Component({
 	selector: "app-doc-visu-document-section",
@@ -157,6 +158,7 @@ export class DocVisuDocumentSectionComponent implements OnInit, OnDestroy {
 		private router: Router,
 		public _toasterSrv: ToastService,
 		private docVisuService: DocVisuService,
+		public authService: AuthService,
 		private cdr: ChangeDetectorRef,
 		private plantsService: PlantsService
 	) {

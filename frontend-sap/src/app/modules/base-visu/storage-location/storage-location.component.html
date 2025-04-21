@@ -26,7 +26,7 @@
 		[enableServerSideFiltering]="true"
 		selectionMode="Single"
 		sortBy="custom_id"
-		expandQuery="$expand=warehouse"
+		expandQuery="$expand=warehouse,transportOrderType"
 		[plantId]="plantId"
 		#childComponentRef>
 	</app-grid-table>
@@ -187,6 +187,29 @@
 									id="{{ wareHouse.id }}"
 									[additionalText]="wareHouse.custom_id"
 									text="{{ wareHouse.name }}">
+								</ui5-cb-item>
+							</ng-container>
+						</ui5-combobox>
+					</div>
+					<div class="flex-column w-full">
+						<ui5-label
+							show-colon
+							i18n
+							>Transport Order Type</ui5-label>
+						<ui5-combobox
+							#transportOrderTypeComboBox
+							id="transportOrderTypeComboBox"
+							class="w-full"
+							[value]="selectedStorageLocation.transportOrderType?.name || ''"
+							(change)="inputInvalidEntryRestrict($event, selectedStorageLocation.transportOrderType?.name)"
+							(selection-change)="onChangeTransportOrder($event)"
+							(input)="onTransportOrderPosInputChange($event)">	
+							<ng-container *ngFor="let transportOrderType of transportOrderTypes"> 
+								<ui5-cb-item
+									*ngIf="transportOrderType.is_active"
+									id="{{ transportOrderType.id }}"
+									[additionalText]="transportOrderType.custom_id"
+									text="{{ transportOrderType.name }}">
 								</ui5-cb-item>
 							</ng-container>
 						</ui5-combobox>

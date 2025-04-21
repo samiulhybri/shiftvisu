@@ -213,7 +213,7 @@ export class WarehouseComponent {
 	}
 	
 	refreshEditData() {
-		const url = `Warehouses?$filter=is_active eq true and id eq ${this.selectedWarehouse?.id}&$orderby=custom_id asc`;
+		const url = `Warehouses?$filter=id eq ${this.selectedWarehouse?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -236,7 +236,7 @@ export class WarehouseComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedWarehouse, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

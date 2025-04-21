@@ -74,8 +74,6 @@ export class EightDTaskFormComponent {
 		}
 
 		this.onPopupSave.emit({ ...this.task });
-
-		this.responsibleText = "";
 	}
 
 	setResponsible(event: ComboBoxSelectionChangeEventDetail) {

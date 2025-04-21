@@ -17,6 +17,8 @@ import { ToastService } from "@app/shared/services/toaster.service";
 import { Subscription, timer } from "rxjs";
 import { MachineboardService } from "@app/modules/machine-board/services/machineboard.service";
 import { convertToMS } from "@app/shared/utils/calculate-time";
+import { DataService } from "@app/shared/services/data.service";
+import { ProdInspectionOperation } from "@app/shared/models/prod-inspection-operation.model";
 
 @Component({
 	selector: "app-machine-board-sidebar",
@@ -27,7 +29,8 @@ export class MachineBoardSidebarComponent implements OnInit {
 	@Input() display?: string;
 	@Input() machine?: Machine;
 	@Input() operationId?: number;
-
+    @Input() translationType: 'DEFAULT' | 'BEN' = 'DEFAULT';
+	
 	isClicked: boolean = false;
 	machineBoardButtonNames = MachineBoardSideBar;
 	isClockInBusy: boolean = false;
@@ -51,10 +54,11 @@ export class MachineBoardSidebarComponent implements OnInit {
 		private router: Router,
 		public authService: AuthService,
 		private machineBoardEventService: MachineBoardEventHandleService,
-		public _toasterSrv: ToastService
+		public _toasterSrv: ToastService,
+		private dataService: DataService
 	) {}
 
-	ngOnInit() {
+	ngOnInit() { 
 		this.loadMachineUserTimes();
 		this.checkRoute();
 		this.loadQualificationUser();
@@ -82,6 +86,7 @@ export class MachineBoardSidebarComponent implements OnInit {
 				next: (data: any) => {
 					this.isClockInBusy = false;
 					this.totalClockedInUsers = data.value.length;
+					this.authService.totalClockedInUsers = this.totalClockedInUsers;
 				},
 			});
 	}
@@ -91,7 +96,7 @@ export class MachineBoardSidebarComponent implements OnInit {
 		this.machineboardService
 			.get(`machines/${id}/check-qualified-clockin-users`, false)
 			.subscribe(
-				(res: any) => (this.hasQualifiedUsers = res.hasQualifiedUsers ? true : false)
+				(res: any) => (this.authService.hasQualifiedUsers = this.hasQualifiedUsers = res.hasQualifiedUsers ? true : false)
 			);
 	}
 
@@ -110,8 +115,13 @@ export class MachineBoardSidebarComponent implements OnInit {
 		this.clockInSubscription = this.machineBoardEventService.clockInChangeEvent.subscribe(
 			() => {
 				this.loadMachineUserTimes();
+				this.loadQualificationUser();
 			}
 		);
+
+		this.dataService.orderDetails$.subscribe(data=>{
+			this.loadQualificationUser();
+		})
 	}
 
 	checkIfInMachineboardMain() {
@@ -143,10 +153,14 @@ export class MachineBoardSidebarComponent implements OnInit {
 					return;
 				}
 
+				if (this.operationIds.length == 0) {
+					return;
+				}
+
 				let payload = {
 					prod_order_pos_operation_ids: this.operationIds,
 				};
-
+				
 				this.machineboardService
 					.post(`quali-visu/get-inspections-by-operations`, payload, false)
 					.subscribe({
@@ -164,10 +178,16 @@ export class MachineBoardSidebarComponent implements OnInit {
 								return;
 							}
 
-							let inspectioOperations = response.inspection_operations;
-							this.numberOfOpenInspections = inspectioOperations.filter(
-								(iO: any) => iO.is_open
-							).length;
+
+                            let inspectionOperations: ProdInspectionOperation[] = response.inspection_operations.map(
+                                (inspection_operation: any) => {
+                                    return new ProdInspectionOperation().deserialize(inspection_operation);
+                                }
+                            );
+
+							this.numberOfOpenInspections = inspectionOperations.reduce((openInspectionPoints, inspectionOperation) => {
+                                return openInspectionPoints + inspectionOperation.numberOfOpenInspectionPoints();
+                            }, 0);
 
 							if (this.numberOfOpenInspections > 0) {
 								this.isQualiVisuWarningDialogOpen = true;
@@ -199,10 +219,15 @@ export class MachineBoardSidebarComponent implements OnInit {
 						return;
 					}
 
-					let inspectionOperations = response.inspection_operations;
-					this.numberOfOpenInspections = inspectionOperations.filter(
-						(iO: any) => iO.is_open
-					).length;
+                    let inspectionOperations: ProdInspectionOperation[] = response.inspection_operations.map(
+                        (inspection_operation: any) => {
+                            return new ProdInspectionOperation().deserialize(inspection_operation);
+                        }
+                    );
+
+                    this.numberOfOpenInspections = inspectionOperations.reduce((openInspectionPoints, inspectionOperation) => {
+                        return openInspectionPoints + inspectionOperation.numberOfOpenInspectionPoints();
+                    }, 0);
 
 					if (this.numberOfOpenInspections > 0) {
 						this.isQualiVisuWarningDialogOpen = true;
@@ -231,7 +256,7 @@ export class MachineBoardSidebarComponent implements OnInit {
 	}
 
 	getStateTranslate(state: MachineBoardSideBar): string {
-		return MachineBoardSideBarClass.getStateTranslate(state);
+		return MachineBoardSideBarClass.getStateTranslate(state, this.translationType);
 	}
 
 	onButtonClick(machineBoardButtonNames: MachineBoardSideBar, qualiPopUpRedirection: boolean = false) {
@@ -248,7 +273,7 @@ export class MachineBoardSidebarComponent implements OnInit {
 				) {
 					this.goToProductionPlan();
 
-				} else if (this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_PRODUCTION_PLAN_EDIT)) {
+				} else {
 					this.navigateIfQualified(
 						"MACHINEBOARD_PRODUCTION_PLAN_EDIT",
 						this.goToProductionPlan.bind(this)
@@ -278,7 +303,7 @@ export class MachineBoardSidebarComponent implements OnInit {
 					this.goToQuantity.bind(this)
 				);
 				break;
-			case MachineBoardSideBar.MATERIAL_CONSUMTION:
+			case MachineBoardSideBar.MATERIAL_CONSUMPTION:
 				this.selectedButton = machineBoardButtonNames;
 				this.navigateIfQualified(
 					"MACHINEBOARD_MATERIAL_CONSUMPTION_EDIT",
@@ -302,12 +327,6 @@ export class MachineBoardSidebarComponent implements OnInit {
 			case MachineBoardSideBar.PRINT_HU:
 				this.selectedButton = machineBoardButtonNames;
 				this.openPrintHUDialog();
-				break;
-			case MachineBoardSideBar.RE_PACKAGING:
-				this.selectedButton = machineBoardButtonNames;
-				break;
-			case MachineBoardSideBar.GOODS_RECEIPT:
-				this.selectedButton = machineBoardButtonNames;
 				break;
 			case MachineBoardSideBar.QUALI_VISU:
 				this.selectedButton = machineBoardButtonNames;

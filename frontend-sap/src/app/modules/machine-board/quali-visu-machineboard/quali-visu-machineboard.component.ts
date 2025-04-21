@@ -2,12 +2,8 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 
 import { Localization } from "@app/shared/utils/common-localize";
-import { AuthService } from "@app/shared/services/auth.service";
-import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
-import { ToastService } from "@app/shared/services/toaster.service";
 import { MachineboardService } from "@app/modules/machine-board/services/machineboard.service";
-
-import { InspectionOperationFilterEnum } from "@app/modules/quali-visu/enums/inspection-operation-filter-enum";
+import {ProdInspectionOperation} from "@app/shared/models/prod-inspection-operation.model";
 
 @Component({
 	selector: "app-quali-visu-machineboard",
@@ -16,18 +12,17 @@ import { InspectionOperationFilterEnum } from "@app/modules/quali-visu/enums/ins
 })
 export class QualiVisuMachineboardComponent implements OnInit, OnDestroy {
 	baseTitle: string = $localize`QualiVisu`;
-	qualiVisuPage: string = this.baseTitle;
 	localization = Localization;
 	isDialogOpen = true;
 	operationIds: number[] = [];
 	isUserBlocked: boolean = false;
+	noOpenPointsAvailable: boolean = false;
+    selectedInspectionOperation: ProdInspectionOperation | undefined;
 
 	constructor(
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
-		private authService: AuthService,
 		private machineboardService: MachineboardService,
-		private toastService: ToastService
 	) {}
 
 	ngOnInit(): void {
@@ -44,8 +39,8 @@ export class QualiVisuMachineboardComponent implements OnInit, OnDestroy {
 
 			},
 			complete: () => {}
-		})
-		
+		});
+
 		document.addEventListener('keydown', this.onKeyDown.bind(this));
 	}
 
@@ -70,11 +65,7 @@ export class QualiVisuMachineboardComponent implements OnInit, OnDestroy {
 		this.router.navigate(["../"], { relativeTo: this.activatedRoute });
 	}
 
-	updateTitle(title: any) {
-		if (title) {
-			this.qualiVisuPage = this.baseTitle + " - " + title;
-		} else {
-			this.qualiVisuPage = this.baseTitle;
-		}
-	}
+    setSelectedInspectionOperation(operation: ProdInspectionOperation | undefined) {
+        this.selectedInspectionOperation = operation;
+    }
 }

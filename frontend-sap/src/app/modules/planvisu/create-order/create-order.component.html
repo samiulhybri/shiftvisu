@@ -3,7 +3,7 @@
 	<ui5-card class="h-full">
 
 		<div class="flex-col gap-2 overflow-hidden rounded-lg w-full" style="height: calc(100vh - 74px);">
-			<div class="flex gap-2 w-[calc(100%-1px)]  rounded-lg" style="height: 50%;">
+			<div class="flex gap-2 w-[calc(100%-1px)]  rounded-lg" style="height: 45%;">
 				<div class="w-2/5 border border-solid border-gray-300 bg-white rounded-lg overflow-hidden">
 					<app-grid-table headerTitle="Orders" i18n-headerTitle [columns]="columns" [customData]="true"
 						[data]="prodOrderAllData" [showDownload]="false" [showActiveButton]="false"
@@ -27,7 +27,7 @@
 						#prodOrderPosGrid [editPermission]="authService.isPermissionValid('PLANVISU_ORDER_CREATE_PAGE_EDIT')"></app-grid-table>
 				</div>
 			</div>
-			<div class="border border-solid border-gray-300 shadow-lg rounded-lg bg-white" style="height: 50%;">
+			<div class="border border-solid border-gray-300 shadow-lg rounded-lg bg-white" style="height: 55%;">
 				<div class="rounded-lg overflow-hidden h-full">
 					<app-grid-table headerTitle="Operations" i18n-headerTitle [columns]="prodOrderPosOperationsColumns"
 						[customData]="true" (newButtonClick)="operationNewButtonClick('new',{})"
@@ -40,9 +40,10 @@
 						selectionMode="Single" #prodOrderPosOperationGrid [editPermission]="authService.isPermissionValid('PLANVISU_ORDER_CREATE_PAGE_EDIT')"></app-grid-table>
 				</div>
 			</div>
-			<ui5-card-header class="flex items-center justify-end p-3"
+			<ui5-card-header class="flex items-center gap-1 justify-end p-3"
 				style="height: 30px; border-top: 1px solid gray;">
-				<div slot="action"><ui5-button (click)="saveFullData()" [disabled]="isFinalDataDisabled">Final Save</ui5-button></div>
+				<div slot="action" class="mr-1"><ui5-button (click)="reSchedule()" [disabled]="isReScheduleButtonDisabled">Re-Schedule</ui5-button></div>
+				<div slot="action"><ui5-button design="Emphasized" (click)="saveFullData()" [disabled]="isFinalDataDisabled || prodOrderAllData.length ==0">Final Save</ui5-button></div>
 			</ui5-card-header>
 		</div>
 
@@ -112,11 +113,12 @@
 									</div>
 									<div class="flex items-center gap-[5px] w-full" *ngIf="finalSelectedCallOff?.item?.batch_quantity">
 										<ui5-label show-colon i18n>Batch Quantity</ui5-label>
-										<ui5-input  value-state="None" readonly placeholder="Select CallOff" class="w-[100px]" name="call_off" [value]="finalSelectedCallOff?.item?.batch_quantity"></ui5-input>
+										<ui5-input  value-state="None" readonly type="Text" class="w-[100px]" name="batch-quantity" [value]="finalSelectedCallOff?.item?.batch_quantity"></ui5-input>
 										<ui5-checkbox
-											id="batch-quantity"
-											(change)="changeBatchQuantityFlag()"
-											[(ngModel)]="isBatchQuantity"
+											name="batch-quantity-flag"
+											id="batch-quantity-flag"
+											(change)="changeBatchQuantityFlag(isBatchQuantity)"
+											[checked]="isBatchQuantity"
 											i18n-text>
 										</ui5-checkbox>
 									</div>

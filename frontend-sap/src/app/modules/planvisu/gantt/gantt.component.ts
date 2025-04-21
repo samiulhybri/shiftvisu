@@ -63,6 +63,8 @@ import { round } from "@amcharts/amcharts5/.internal/core/util/Time";
 import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
 import { MachineConstraintTypeClass } from "@app/shared/enums/MachineConstraintType";
 import { Setting } from "@app/shared/models/setting.model";
+import { ColorSchemeSorting } from "@app/shared/models/color-scheme-sorting.model";
+import { PlanVisuWorkingDaysSettings } from "@app/shared/models/plan_visu_working_days_settings.model";
 @Component({
 	selector: "app-gantt",
 	templateUrl: "./gantt.component.html",
@@ -142,7 +144,7 @@ export class GanttComponent implements AfterViewInit {
 	isOnGoWithOperationSelected = false;
 	presets = presets;
 	showPopOver = false;
-    currentTasks = [];
+	currentTasks = [];
 	opener = "";
 	clientName = environment.clientName;
 	eventMenuFeature: any = {
@@ -169,6 +171,10 @@ export class GanttComponent implements AfterViewInit {
 				return items;
 			}
 
+			if (this.clientName == "ict") {
+				return;
+			}
+
 			items.other = {
 				text: $localize`Close Operation`,
 				onItem: ({ eventRecord, resourceRecord }: any): void => eventRecord.remove(),
@@ -176,19 +182,35 @@ export class GanttComponent implements AfterViewInit {
 		},
 		items: {
 			machineSchedule: {
-				text: `Machine Schedule`,
+				text: $localize`Machine Schedule`,
 				onItem: ({ resourceRecord }: any) => {
 					this.selectedMachineId = resourceRecord.id;
 				},
 			},
 			showPlanOperation: {
-				text: `Show Operation Plan`,
+				text: $localize`Show Operation Plan`,
 				onItem: ({ eventRecord }: any) => {
 					this.showOperationPlan(eventRecord.id);
 				},
 			},
+			showConnections: {
+				text: $localize`Show/Hide Connections`,
+				onItem: ({ eventRecord }: any) => {
+					const op = this.operations.find((op: any) => op.id == eventRecord.id);
+					const posId = op && op.prod_order_pos_id ? op.prod_order_pos_id : undefined;
+
+					if (this.lastDependencyPosId == posId) {
+						this.setDependencies$.next(undefined);
+						this.lastDependencyPosId = undefined;
+					} else {
+						this.setDependencies$.next(posId);
+						this.lastDependencyPosId = posId;
+					}
+
+				}
+			},
 			showConflicts: {
-				text: `Show Conflicts`,
+				text: $localize`Show Conflicts`,
 				onItem: ({ eventRecord }: any) => {
 					console.log(eventRecord);
 				},
@@ -200,6 +222,7 @@ export class GanttComponent implements AfterViewInit {
 			deleteEvent: false,
 		},
 	};
+	lastDependencyPosId: number | undefined;
 	@CoreInput() set viewPresetfromUserScheduler(dataItem: string) {
 		if (dataItem) (this.schedulerPro.viewPreset as any) = dataItem;
 	}
@@ -210,8 +233,8 @@ export class GanttComponent implements AfterViewInit {
 			name: "Work week",
 			intervals: [
 				{
-					recurrentStartDate: this.clientName == "shopfloor" ? "on Fri" :"on Sat",
-					recurrentEndDate: this.clientName == "shopfloor"? "on Sun": "on Mon",
+					recurrentStartDate: this.clientName == "shopfloor" ? "on Fri" : "on Sat",
+					recurrentEndDate: this.clientName == "shopfloor" ? "on Sun" : "on Mon",
 					isWorking: false,
 				},
 			],
@@ -270,45 +293,111 @@ export class GanttComponent implements AfterViewInit {
 	isToolChanged: boolean = false;
 	planvisuGeneralSection: Setting[] = [];
 	isCustomer?: boolean;
+	public isShowHall?: boolean;
+	public isShowMachineGroup?: boolean;
+	public isShowMachine?: boolean;
+	public isShowItem?: boolean;
+	public isShowProdOrder?: boolean;
+	public colorSchemeList: ColorSchemeSorting[] = [];
+	public weekDaysList: PlanVisuWorkingDaysSettings[] = [];
+	public isShowOperationPopupField: any = {
+		'customer': true,
+		'item': true,
+		'prod_order': true,
+		'due_date': true,
+		'release_date': true,
+		'constraint_type': true,
+		'alt_machine': true
+	}
 
 	constructor(
 		private commonService: CommonService,
 		private authService: AuthService
-	) {}
+	) { }
+
+	async loadWeekDays() {
+		this.commonService.get(`/PlanVisuWorkingDaysSettings`).subscribe({
+			next: async (res: any) => {
+				res.value.map((data: any) => {
+					this.weekDaysList.push(new PlanVisuWorkingDaysSettings().deserialize(data))
+				});
+				await this.generateCalendarsFromWeekdays();
+			},
+			error: err => {
+				console.error(err);
+			},
+		});
+	}
+
+	async generateCalendarsFromWeekdays() {
+		const weekdayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+		const weekends = this.weekDaysList
+			.filter(day => !day.is_working_day)
+			.map(day => day.day)
+			.sort((a, b) => weekdayOrder.indexOf(a) - weekdayOrder.indexOf(b));
+
+		if (weekends) {
+			const startDay = weekends[0];
+			const lastWeekendDay = weekends[weekends.length - 1];
+
+			let lastIndex = weekdayOrder.indexOf(lastWeekendDay);
+			const nextDayIndex = (lastIndex + 1) % 7;
+			const nextDay = weekdayOrder[nextDayIndex];
+
+			const recurrentStartDate = startDay ? `on ${startDay?.slice(0, 3)}` : 'on Sat';
+			const recurrentEndDate = nextDay ? `on ${nextDay?.slice(0, 3)}` : 'on Mon';
+
+			this.calendars = [
+				{
+					id: "workweek",
+					name: "Work week",
+					intervals: [
+						{
+							recurrentStartDate: recurrentStartDate,
+							recurrentEndDate: recurrentEndDate,
+							isWorking: false,
+						},
+					],
+				},
+			];
+			this.project.calendars = this.calendars;
+		}
+	}
 
 	getStartDate() {
-		if(environment.clientName != "ict") {
+		if (environment.clientName != "ict") {
 			return moment().subtract(0, "days").toISOString();
 		}
 
 		const dateStrings = localStorage.getItem("gantt-dates");
 		console.log(dateStrings);
 
-		if(!dateStrings) {
+		if (!dateStrings) {
 			return moment().subtract(0, "days").toISOString();
-		}else {
+		} else {
 			return JSON.parse(dateStrings).start
 		}
 	}
 
 	getEndDate() {
-		if(environment.clientName != "ict") {
+		if (environment.clientName != "ict") {
 			return moment().add(1, "months").toISOString();
 		}
 
 		const dateStrings = localStorage.getItem("gantt-dates")
 
-		if(!dateStrings) {
+		if (!dateStrings) {
 			return moment().add(2, "months").toISOString();
-		}else {
+		} else {
 			return JSON.parse(dateStrings).end
 		}
 	}
 	async setAllData() {
+		await this.getAllColorSchemeSorting();
 		await this.getAllComboBoxData();
 		await this.setmachineData();
 		await this.getHallMachine();
-        await this.setCurrentTaskData();
+		await this.setCurrentTaskData();
 
 		this.prodOrderPosOperationStatusData =
 			ProdOrderPosOperationStatusClass.getEnumArray().filter(
@@ -332,24 +421,49 @@ export class GanttComponent implements AfterViewInit {
 		setTimeout(() => this.dataFilterEmmiter.emit(data), 100);
 	}
 
-    setCurrentTaskData() {
-        return new Promise<void>((resolve) => {
-            if(this.clientName=='shopfloor') {
-                this.commonService.get('plan_visu/running_tasks',false).subscribe({
-                    next: (res: any) => {
-                        this.currentTasks = res;
-                        resolve();
-                    },
-                    error: (err) => {
-                        console.log(err);
-                        resolve();
-                    }
-                });
-            }else{
-                resolve();
-            }
-        });
-    }
+	async getAllColorSchemeSorting() {
+		this.colorSchemeList = [];
+		this.commonService.get('PlanVisuColorSchemeSortings?$expand=colorScheme($select=id,custom_id)', true).subscribe({
+			next: (res: any) => {
+				this.colorSchemeList = res.value;
+			},
+			error: (err) => {
+				console.log(err);
+			}
+		});
+	}
+
+	formatColor(base: any, type: string): string {
+		switch (type) {
+			case 'background':
+				if (!base.color) return '#CCCCCC';
+				return base.color.startsWith('#') ? base.color : `#${base.color}`;
+			case 'border':
+				if (!base.has_border) return 'none';
+				return base.border_color.startsWith('#') ? `2px solid ${base.border_color}` : `2px solid #${base.border_color}`;
+			default:
+				return '';
+		}
+	}
+
+	setCurrentTaskData() {
+		return new Promise<void>((resolve) => {
+			if (this.clientName == 'shopfloor') {
+				this.commonService.get('plan_visu/running_tasks', false).subscribe({
+					next: (res: any) => {
+						this.currentTasks = res;
+						resolve();
+					},
+					error: (err) => {
+						console.log(err);
+						resolve();
+					}
+				});
+			} else {
+				resolve();
+			}
+		});
+	}
 
 	cacheHalls() {
 		const cachedHalls = JSON.parse(localStorage.getItem("Hall") || "[]");
@@ -387,9 +501,24 @@ export class GanttComponent implements AfterViewInit {
 	handleCustomerData(data: Setting[]) {
 		this.planvisuGeneralSection = data;
 		this.isCustomer = this.planvisuGeneralSection[0].show_customer;
+		this.isShowHall = this.planvisuGeneralSection[0].show_filter_hall;
+		this.isShowMachineGroup = this.planvisuGeneralSection[0].show_filter_machine_group;
+		this.isShowMachine = this.planvisuGeneralSection[0].show_filter_machine;
+		this.isShowItem = this.planvisuGeneralSection[0].show_filter_item;
+		this.isShowProdOrder = this.planvisuGeneralSection[0].show_filter_prod_order;
+		this.isShowOperationPopupField = {
+			'customer': this.planvisuGeneralSection[0].show_op_customer,
+			'item': this.planvisuGeneralSection[0].show_op_item,
+			'prod_order': this.planvisuGeneralSection[0].show_op_prod_order,
+			'due_date': this.planvisuGeneralSection[0].show_op_due_date,
+			'release_date': this.planvisuGeneralSection[0].show_op_release_date,
+			'constraint_type': this.planvisuGeneralSection[0].show_op_constraint_type,
+			'alt_machine': this.planvisuGeneralSection[0].show_op_alt_machine
+		}
 	}
 
-	ngAfterViewInit(): void {
+	async ngAfterViewInit() {
+		await this.loadWeekDays();
 		// Save grid, scheduler and project instances to this object
 		this.schedulerPro = this.schedulerProComponent.instance;
 		this.project = this.projectComponent.instance;
@@ -424,7 +553,7 @@ export class GanttComponent implements AfterViewInit {
 		this.project.calendars = this.calendars;
 		this.project.calendar = "workweek";
 
-		this.setAllData().then(() => {});
+		this.setAllData().then(() => { });
 
 		this.timeAxisChange$.pipe(debounceTime(500)).subscribe(event => {
 			this.dateChange(event);
@@ -523,6 +652,8 @@ export class GanttComponent implements AfterViewInit {
 				(alt: ProdOrderPosOperationAltMachine) => machine.id == alt.machine_id
 			);
 
+			const opMachineId = op.machine_id;
+
 			requestData.body = {
 				start: moment(record.startDate).toISOString(),
 				plan_start: moment(record.startDate).toISOString(),
@@ -533,8 +664,8 @@ export class GanttComponent implements AfterViewInit {
 				operation_code_plan: altMachine?.reference_nr ?? "",
 				machine_id: machine.id,
 				plan_machine_id: machine.id,
-				plan_te: altMachine?.te ?? op.te ?? 0,
-				te: altMachine?.te ?? op.te ?? 0,
+				plan_te: opMachineId == machine.id ? op.te : altMachine?.te ?? op.te ?? 0,
+				te: opMachineId == machine.id ? op.te : altMachine?.te ?? op.te ?? 0,
 			};
 
 			if (op) {
@@ -763,9 +894,9 @@ export class GanttComponent implements AfterViewInit {
 		if (dates.length > 1) {
 			this.start = moment.utc(dates[0], "DD/MM/YYYY").local().toISOString();
 			this.end = moment.utc(dates[1], "DD/MM/YYYY").local().toISOString();
-			if(this.clientName == "ict") {
-				const dateObj = {start: this.start, end : this.end};
-				localStorage.setItem("gantt-dates",JSON.stringify(dateObj));
+			if (this.clientName == "ict") {
+				const dateObj = { start: this.start, end: this.end };
+				localStorage.setItem("gantt-dates", JSON.stringify(dateObj));
 			}
 		}
 	}
@@ -800,8 +931,8 @@ export class GanttComponent implements AfterViewInit {
 
 		const otherLogic = op
 			? op.prodOrderPosOperationAltMachines?.filter(
-					(alteredMachine: any) => alteredMachine.machine_id == event.newResource.id
-				).length > 0 || op.machine_id == event.newResource.id
+				(alteredMachine: any) => alteredMachine.machine_id == event.newResource.id
+			).length > 0 || op.machine_id == event.newResource.id
 			: false;
 
 		// Only allow drops on the timeaxis
@@ -853,7 +984,7 @@ export class GanttComponent implements AfterViewInit {
 					e.id != eventId &&
 					Math.abs(moment.utc(eventStartDate).diff(moment.utc(e.end), "seconds")) >= 0 &&
 					Math.abs(moment.utc(eventStartDate).diff(moment.utc(e.end), "seconds")) <
-						this.getEventSkippingTime()
+					this.getEventSkippingTime()
 				);
 			});
 
@@ -1003,7 +1134,6 @@ export class GanttComponent implements AfterViewInit {
 
 	getMachineQuery() {
 		if (this.isItemSelected()) return this.getItemQuery();
-
 		if (this.isOrderSelected()) return this.getProdOrderQuery();
 
 		return this.getLodataQuery();
@@ -1037,16 +1167,16 @@ export class GanttComponent implements AfterViewInit {
 		return `Machines?$filter=is_active eq true${this.getSelectedMachineQuery()} ${this.selectedHalls.length > 0 ? `and ${this.getHallQuery()}` : ""} ${this.selectMachineGroups.length > 0 ? `and ${this.getMachineGroupQuery()}` : ""} &$expand=machineGroup&$expand=sectionActivatables($filter=section%20eq%20%27PLANVISU%27%20and%20is_active%20eq%20true)&$top=1000&orderby=sort_order asc`;
 	}
 
-	getSelectedMachineQuery(){
-		const query =  this.selectedMachineIds.join(",");
-	    return  this.selectedMachineIds.length ? ` and id in (${query})` : ""
+	getSelectedMachineQuery() {
+		const query = this.selectedMachineIds.join(",");
+		return this.selectedMachineIds.length ? ` and id in (${query})` : ""
 	}
 
 	getHallQuery() {
 		return this.selectedHalls.length ? `hall_id in (${this.selectedHalls.join(",")})` : "";
 	}
 	getMachineGroupQuery() {
-		return this.selectMachineGroups.length ? `machine_group_id in (${this.selectMachineGroups.join(',')})`: "";
+		return this.selectMachineGroups.length ? `machine_group_id in (${this.selectMachineGroups.join(',')})` : "";
 	}
 
 	setCapacity(m: Machine) {
@@ -1185,18 +1315,15 @@ export class GanttComponent implements AfterViewInit {
 				anchor: true,
 			},
 			header: false,
-
 			html: `
 				<div class="flex flex-row">
 					<div class="flex flex-col w-[500px] gap-3" id="startDiv">
-						<div class="flex flex-row">
-							<ui5-label
-								show-colon
-								class="w-2/4"
-								>${$localize`Order Number`}</ui5-label
-							>
-							<ui5-text class="w-3/4">${operation?.prodOrderPos?.prodOrder?.custom_id ?? ""}</ui5-text>
-						</div>
+						${this.isShowOperationPopupField.prod_order ? `
+							<div class="flex flex-row">
+								<ui5-label show-colon class="w-2/4">${$localize`Order Number`}</ui5-label>
+								<ui5-text class="w-3/4">${operation?.prodOrderPos?.prodOrder?.custom_id ?? ""}</ui5-text>
+							</div>` : ""}
+
 						<div class="flex flex-row">
 							<ui5-label
 								show-colon
@@ -1207,15 +1334,13 @@ export class GanttComponent implements AfterViewInit {
 								>${operation.machine?.custom_id} - ${operation?.machine?.name ?? ""}</ui5-text
 							>
 						</div>
-						<div class="flex flex-row">
-							<ui5-label
-								show-colon
-								class="w-2/4"
-								>${$localize`Item`}</ui5-label
-							>
-							<ui5-text class="w-3/4"
-								>${operation.prodOrderPos?.item?.custom_id ?? ""} - (${operation.prodOrderPos?.item?.name ?? ""})</ui5-text>
-						</div>
+
+						${this.isShowOperationPopupField.item ? `
+							<div class="flex flex-row">
+								<ui5-label show-colon class="w-2/4">${$localize`Item`}</ui5-label>
+								<ui5-text class="w-3/4">${operation.prodOrderPos?.item?.custom_id ?? ""} - (${operation.prodOrderPos?.item?.name ?? ""})</ui5-text>
+							</div>` : ""}
+						
 						<div class="flex flex-row">
 							<ui5-label
 								show-colon
@@ -1256,6 +1381,14 @@ export class GanttComponent implements AfterViewInit {
 								>${$localize`TR`}</ui5-label
 							>
 							<ui5-text class="w-3/4">${operation.tr ?? ""}</ui5-text>
+						</div>
+						<div class="flex flex-row">
+							<ui5-label
+								show-colon
+								class="w-2/4"
+								>${$localize`Batch`}</ui5-label
+							>
+							<ui5-text class="w-3/4">${operation.prodOrderPos?.batch ?? ""}</ui5-text>
 						</div>
 					</div>
 
@@ -1300,30 +1433,23 @@ export class GanttComponent implements AfterViewInit {
 							>
 							<ui5-text class="w-3/4">${status ?? ""}</ui5-text>
 						</div>
-						<div class="flex flex-row">
-							<ui5-label
-								show-colon
-								class="w-2/4"
-								>${$localize`Due Date`}</ui5-label
-							>
-							<ui5-text class="w-3/4">${operation.prodOrderPos.due_date ? moment.utc(operation.prodOrderPos.due_date).local().format("DD.MM.YYYY HH:mm") : ""}</ui5-text>
-						</div>
-						<div class="flex flex-row">
-							<ui5-label
-								show-colon
-								class="w-2/4"
-								>${$localize`Release Date`}</ui5-label
-							>
-							<ui5-text class="w-3/4">${operation.prodOrderPos.release_date ? moment.utc(operation.prodOrderPos.release_date).local().format("DD.MM.YYYY HH:mm") : ""}</ui5-text>
-						</div>
-						<div class="flex flex-row">
-							<ui5-label
-								show-colon
-								class="w-2/4"
-								>${$localize`Alternative Machines`}</ui5-label
-							>
-							<ui5-text class="w-3/4">${operation.prodOrderPosOperationAltMachines.map((alt: any) => `${alt.machine?.name}`).join()}</ui5-text>
-						</div>
+						${this.isShowOperationPopupField.due_date ? `
+							<div class="flex flex-row">
+								<ui5-label show-colon class="w-2/4">${$localize`Due Date`}</ui5-label>
+								<ui5-text class="w-3/4">${operation.prodOrderPos.due_date ? moment.utc(operation.prodOrderPos.due_date).local().format("DD.MM.YYYY HH:mm") : ""}</ui5-text>
+							</div>` : ""}
+
+						${this.isShowOperationPopupField.release_date ? `
+							<div class="flex flex-row">
+								<ui5-label show-colon class="w-2/4">${$localize`Release Date`}</ui5-label>
+								<ui5-text class="w-3/4">${operation.prodOrderPos.release_date ? moment.utc(operation.prodOrderPos.release_date).local().format("DD.MM.YYYY HH:mm") : ""}</ui5-text>
+							</div>` : ""}
+							
+						${this.isShowOperationPopupField.alt_machine ? `
+							<div class="flex flex-row">
+								<ui5-label show-colon class="w-2/4">${$localize`Alternative Machines`}</ui5-label>
+								<ui5-text class="w-3/4">${operation.prodOrderPosOperationAltMachines.map((alt: any) => `${alt.machine?.name}`).join()}</ui5-text>
+							</div>` : ""}
 					</div>
 
 					<div id="restriction" class="flex flex-col"></div>
@@ -1338,9 +1464,9 @@ export class GanttComponent implements AfterViewInit {
 				operation?.restrictions?.due_date_restriction?.status ||
 				operation?.restrictions?.overlapping_restriction?.status ||
 				operation?.restrictions?.tool_status?.status ==
-					ToolRepairStatus.NOT_READY_FOR_USE ||
+				ToolRepairStatus.NOT_READY_FOR_USE ||
 				operation?.restrictions?.tool_status?.status ==
-					ToolRepairStatus.MAINTENANCE_REQUIRED ||
+				ToolRepairStatus.MAINTENANCE_REQUIRED ||
 				operation?.restrictions?.tool_status?.sampling_required
 			) {
 				document.getElementById("leftDiv")!.style.borderRight = "1px solid black";
@@ -1527,21 +1653,21 @@ export class GanttComponent implements AfterViewInit {
 		localStorage.setItem("Hall", JSON.stringify(this.selectedHalls) || "");
 		this.getHallMachine()
 	}
-	selectedMachineIds:number[] = [];
-	filterMachines:Machine[] = [];
-	getHallMachine(){
-       this.commonService.get(this.getLodataQuery()).subscribe({
-			next:(res:any)=>{
+	selectedMachineIds: number[] = [];
+	filterMachines: Machine[] = [];
+	getHallMachine() {
+		this.commonService.get(this.getLodataQuery()).subscribe({
+			next: (res: any) => {
 				this.filterMachines = res.value?.filter(
 					(d: any) =>
 						d.sectionActivatables.length > 0 &&
 						d.sectionActivatables[0].is_active == true
 				);
 			}
-	   })
+		})
 	}
-	selectMachine(event:any){
-		this.selectedMachineIds =  event.srcElement.selectedValues.map(
+	selectMachine(event: any) {
+		this.selectedMachineIds = event.srcElement.selectedValues.map(
 			(el: any) => +el.id
 		) as number[];
 	}
@@ -1770,7 +1896,7 @@ export class GanttComponent implements AfterViewInit {
 	}
 	@Output() dataFilterEmmiter = new EventEmitter<any>();
 	async onGo(resetTimeSpan = true, recalculateQuantity = true) {
-		if(resetTimeSpan&&recalculateQuantity) this.dataFilterEmmiter.emit({ isBusy: true });
+		if (resetTimeSpan && recalculateQuantity) this.dataFilterEmmiter.emit({ isBusy: true });
 		const { calendarHighlight } = this.schedulerPro.features;
 		calendarHighlight.unhighlightCalendars(); // fix: if any row is highlighted and after filtering data whole row become invisible
 
@@ -1793,7 +1919,7 @@ export class GanttComponent implements AfterViewInit {
 		data.isBusy = true;
 		data.machines = this.machines;
 		data.zoom = (this.schedulerPro.viewPreset as any).data.id;
-		if(resetTimeSpan&&recalculateQuantity) this.dataFilterEmmiter.emit(data);
+		if (resetTimeSpan && recalculateQuantity) this.dataFilterEmmiter.emit(data);
 		/** */
 	}
 
@@ -1859,7 +1985,7 @@ export class GanttComponent implements AfterViewInit {
 			status: this.orderDetailsDialog.selectedOperation.status,
 			status_plan: this.orderDetailsDialog.selectedOperation.status,
 			te: this.orderDetailsDialog.selectedOperation.te.toString().replace(/,/g, "."),
-			plan_te: this.orderDetailsDialog.selectedOperation.te,
+			plan_te: this.orderDetailsDialog.selectedOperation.te.toString().replace(/,/g, "."),
 			tool_id: this.orderDetailsDialog.selectedOperation.tool?.id,
 			tool_reference_nr: this.orderDetailsDialog.selectedOperation.tool_reference_nr,
 			start: moment(this.orderDetailsDialog.operationStart, "DD.MM.YYYY, HH:mm")
@@ -1872,11 +1998,16 @@ export class GanttComponent implements AfterViewInit {
 			plan_end: moment(this.operationEnd, "DD.MM.YYYY, HH:mm").local().toISOString(),
 			is_changed: true,
 			cavity: this.orderDetailsDialog.selectedOperation.cavity,
+			plan_cavity: this.orderDetailsDialog.selectedOperation.cavity,
 			tr: this.orderDetailsDialog.selectedOperation.tr,
+			plan_tr: this.orderDetailsDialog.selectedOperation.tr,
 			teardown_time: this.orderDetailsDialog.selectedOperation.teardown_time,
+			plan_teardown_time: this.orderDetailsDialog.selectedOperation.teardown_time,
 			operation_code: this.orderDetailsDialog.selectedOperation.operation_code,
 			operation_code_plan: this.orderDetailsDialog.selectedOperation.operation_code,
 			component_availability:
+				this.orderDetailsDialog.selectedOperation.component_availability,
+			plan_component_availability:
 				this.orderDetailsDialog.selectedOperation.component_availability,
 			constraint_type: this.orderDetailsDialog.selectedOperation.constraint_type,
 		};
@@ -1943,7 +2074,7 @@ export class GanttComponent implements AfterViewInit {
 										false
 									)
 									.subscribe({
-										next: (item: any) => {},
+										next: (item: any) => { },
 									});
 							}
 						},
@@ -2133,51 +2264,66 @@ export class GanttComponent implements AfterViewInit {
 	}
 
 	getColor(operation: any) {
+		const colorFromScheme = (label: string) => {
+			const match = this.colorSchemeList.find((elm: any) => elm.value_string === label);
+			return match ? `#${match.color}` : null;
+		};
+
+		const defaultStatusToLabel: any = {
+			[ProdOrderPosOperationStatus.IN_PRODUCTION]: "In Production",
+			[ProdOrderPosOperationStatus.IN_SETUP]: "In Setup",
+			[ProdOrderPosOperationStatus.PROPOSED]: "Proposed",
+			[ProdOrderPosOperationStatus.TERMINATED]: "Released",
+			[ProdOrderPosOperationStatus.SUSPENDED]: "Suspended",
+			[ProdOrderPosOperationStatus.PLANNED]: "Planned"
+		};
+
 		switch (environment.clientName) {
 			case "ict":
-				if (operation.status == ProdOrderPosOperationStatus.IN_PRODUCTION) {
-					return "light-green";
-				} else if (operation.status == ProdOrderPosOperationStatus.IN_SETUP) {
-					return "orange";
-				} else if (operation.prodOrderPos.is_production_possible) {
-					return "teal";
-				} else if (operation.has_labels_prepared) {
-					return "deep-orange";
-				} else if (operation.component_availability == "FULL") {
-					return "blue";
-				} else {
-					return "gray";
-				}
+				if (operation.status === ProdOrderPosOperationStatus.IN_PRODUCTION)
+					return colorFromScheme("In Production") || "light-green";
+				else if (operation.status === ProdOrderPosOperationStatus.IN_SETUP)
+					return colorFromScheme("In Setup") || "orange";
+				else if (operation.has_components_prepared)
+					return colorFromScheme("Components prepared") || "teal";
+				else if (operation.has_labels_prepared)
+					return colorFromScheme("Printed") || "deep-orange";
+				else if (operation.component_availability === "FULL")
+					return colorFromScheme("Components available") || "blue";
+				else return colorFromScheme("Others") || "gray";
 			case "shopfloor":
-				switch (parseInt(operation.pos)) {
-					case 10:
-						return "red";
-					case 30:
-						return "green";
-					case 31:
-						return "green";
-					case 50:
-						return "blue";
-					case 60:
-						return "amber";
-					default:
-						return "black";
-				}
-
+				const colorFromPos = (position: number) => {
+					const match = this.colorSchemeList.find((elm: any) => elm.model_column === position);
+					return match ? match.color : null;
+				};
+				const posColorMap: Record<number, string> = {
+					10: colorFromPos(10) || "red",
+					30: colorFromPos(30) || "green",
+					31: colorFromPos(31) || "green",
+					50: colorFromPos(50) || "blue",
+					60: colorFromPos(60) || "amber"
+				};
+				return posColorMap[parseInt(operation.pos)] || (colorFromScheme("Running Task") || "black");
 			default:
-				switch (operation.status) {
-					case ProdOrderPosOperationStatus.IN_PRODUCTION:
-						return "green";
-					case ProdOrderPosOperationStatus.IN_SETUP:
-						return "orange";
-					case ProdOrderPosOperationStatus.PROPOSED:
-						return "gray";
-					case ProdOrderPosOperationStatus.TERMINATED:
-						return "deep-orange";
-					case ProdOrderPosOperationStatus.SUSPENDED:
-						return "yellow";
-					default:
-						return "blue";
+				if (colorFromScheme(defaultStatusToLabel[operation.status])) {
+					return colorFromScheme(defaultStatusToLabel[operation.status]);
+				} else {
+					
+					switch (operation.status) {
+						case ProdOrderPosOperationStatus.IN_PRODUCTION:
+							return "green";
+						case ProdOrderPosOperationStatus.IN_SETUP:
+							return "orange";
+						case ProdOrderPosOperationStatus.PROPOSED:
+							return "gray";
+						case ProdOrderPosOperationStatus.TERMINATED:
+							return "deep-orange";
+						case ProdOrderPosOperationStatus.SUSPENDED:
+							return "yellow";
+						default:
+							return "blue";
+					}
+
 				}
 		}
 	}
@@ -2221,7 +2367,7 @@ export class GanttComponent implements AfterViewInit {
 
 			this.commonService
 				.post(
-					`planned-operation?start=${moment.utc(this.start).subtract(7, "days").toISOString()}&end=${this.end}&isShowProposedData=${this.isShowProposedData}`,
+					`planned-operation?start=${this.start}&end=${this.end}&isShowProposedData=${this.isShowProposedData}`,
 					payload,
 					false
 				)
@@ -2265,13 +2411,23 @@ export class GanttComponent implements AfterViewInit {
 				(environment.clientName == "volaplast" || environment.clientName == "ict") &&
 				recalculateQuantity
 			) {
+				if(!operations.length) {
+					this.setBryntumData();
+					resolve();
+				}
 				this.commonService.get(`quantity/v10/${operations}`, false).subscribe({
 					next: (data: any) => {
 						this.cachedQuantities = data;
-						data.forEach((element: any) => {
-							this.operations.find(op => op.id == element.id).produced_quantity =
-								element.quantity;
-						});
+						if(data.length) {
+							data.forEach((element: any) => {
+								const foundOpIndex = this.operations.findIndex(op => op.id == element.id);
+	 
+								if(foundOpIndex != -1) {
+									this.operations[foundOpIndex].produced_quantity =
+									element.quantity;
+								}
+							});
+						}
 
 						this.setBryntumData();
 						resolve();
@@ -2283,10 +2439,16 @@ export class GanttComponent implements AfterViewInit {
 				});
 			} else if (environment.clientName == "volaplast" || environment.clientName == "ict") {
 				const data = this.cachedQuantities;
-				data.forEach((element: any) => {
-					this.operations.find(op => op.id == element.id).produced_quantity =
-						element.quantity;
-				});
+				if(data.length) {
+					data.forEach((element: any) => {
+						const foundOpIndex = this.operations.findIndex(op => op.id == element.id);
+
+						if(foundOpIndex != -1) {
+							this.operations[foundOpIndex].produced_quantity =
+							element.quantity;
+						}
+					});
+				}
 
 				this.setBryntumData();
 				resolve();
@@ -2356,9 +2518,9 @@ export class GanttComponent implements AfterViewInit {
 		this.schedulerPro.dependencyStore.commit();
 	}
 
-	onSplit() {}
+	onSplit() { }
 
-	onGridScroll(event: any) {}
+	onGridScroll(event: any) { }
 
 	getAllComboBoxData() {
 		return new Promise((resolve, reject) => {
@@ -2402,7 +2564,7 @@ export class GanttComponent implements AfterViewInit {
 					}
 					resolve(true);
 				},
-				error: e => {},
+				error: e => { },
 			});
 		});
 	}
@@ -2416,7 +2578,7 @@ export class GanttComponent implements AfterViewInit {
 		this.isEndBusy = true;
 		const quantity = isRecalculateOperation
 			? (this.orderDetailsDialog.selectedOperation.prodOrderPos!.quantity ?? 0) -
-				(this.orderDetailsDialog.selectedOperation.produced_quantity ?? 0)
+			(this.orderDetailsDialog.selectedOperation.produced_quantity ?? 0)
 			: (this.orderDetailsDialog.selectedOperation.prodOrderPos!.quantity ?? 0);
 		const te: number = (this.orderDetailsDialog.selectedOperation.te ?? 0)
 			.toString()
@@ -2489,30 +2651,35 @@ export class GanttComponent implements AfterViewInit {
 
 	eventRenderer({ eventRecord, renderData }: any) {
 		const operation = this.operations.find(op => op.id == eventRecord.id);
-        if(this.clientName == 'shopfloor' && operation) {
-            const controlPlanId = operation.prodOrderPos.item.custom_id;
-            const machineId = operation.machine.custom_id;
+		if (this.clientName == 'shopfloor' && operation) {
+			const controlPlanId = operation.prodOrderPos.item.custom_id;
+			const machineId = operation.machine.custom_id;
 
-            const isTaskRunning = this.currentTasks.find((task: any) => task.control_id == controlPlanId && task.user_id == machineId);
-
-            if(isTaskRunning) {
-                renderData.style += "border:2px solid #FF5C00;";
-            }
-
-        }else if (operation) {
+			const isTaskRunning = this.currentTasks.find((task: any) => task.control_id == controlPlanId && task.user_id == machineId);
+			if (isTaskRunning) {
+				let borderColor: string = '#FF5C00';
+				if (this.colorSchemeList) {
+					const item: any = this.colorSchemeList.find((item: any) => item.value_string === 'Running Task');
+					borderColor = item && item.has_border ? item.border_color : '#FF5C00';
+				}
+				renderData.style += `border:2px solid #${borderColor};`;
+			}
+		} else if (operation) {
 			if (
 				operation.restrictions?.due_date_restriction?.status ||
 				operation.restrictions?.overlapping_restriction?.status ||
 				operation.restrictions?.tool_restriction?.status ||
 				operation?.restrictions?.tool_status?.status ==
-					ToolRepairStatus.NOT_READY_FOR_USE ||
+				ToolRepairStatus.NOT_READY_FOR_USE ||
 				operation?.restrictions?.tool_status?.sampling_required
 			) {
-				renderData.style += "border:2px solid red;";
+				const restrictionItem: any = this.colorSchemeList.find((item: any) => item.value_string === 'Restrictions');
+				const borderColor = restrictionItem && restrictionItem.has_border ? restrictionItem.border_color : 'red';
+				renderData.style += `border:2px solid #${borderColor};`;
 			}
 		}
 
-		if (eventRecord.eventColor == "green" || eventRecord.eventColor == "light-green") {
+		if (eventRecord.eventColor == "green" || eventRecord.eventColor == "light-green" || eventRecord.eventColor == "#b5deb7") {
 			if (operation) {
 				const quantity = operation.prodOrderPos.quantity;
 				const producedQuantity = operation.produced_quantity ?? 0;
@@ -2532,15 +2699,31 @@ export class GanttComponent implements AfterViewInit {
 		};
 	}
 
-	isRestricted(eventId: any) {}
 	onEventMouseEnter(event: any) {
+		if(this.isAnyOperationSelectedFromHideOrUnHideOperation()) {
+			return;
+		}
 		const op = this.operations.find((op: any) => op.id == event.eventRecord.id);
 		const posId = op && op.prod_order_pos_id ? op.prod_order_pos_id : undefined;
 		this.setDependencies$.next(posId);
 	}
+
 	onEventMouseLeave() {
+		if(this.isAnyOperationSelectedFromHideOrUnHideOperation()) {
+			return;
+		}
 		this.setDependencies$.next(undefined);
 	}
+
+	isAnyOperationSelectedFromHideOrUnHideOperation() {
+		if(this.lastDependencyPosId) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	isRestricted(eventId: any) { }
 
 	async recalculateOperation() {
 		// const start = moment().toISOString();

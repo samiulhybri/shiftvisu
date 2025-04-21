@@ -142,7 +142,7 @@ export class MarketSegmentsComponent implements OnInit {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedMarketSegments, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},
@@ -194,7 +194,7 @@ export class MarketSegmentsComponent implements OnInit {
 	}
 
 	refreshEditData() {
-		const url = `MarketSegments?$filter=is_active eq true and id eq ${this.selectedMarketSegments?.id}`;
+		const url = `MarketSegments?$filter=id eq ${this.selectedMarketSegments?.id}`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);

@@ -124,7 +124,7 @@ export class TransportOrderTypeComponent implements OnInit {
 	}
 
 	refreshEditData() {
-		const url = `TransportOrderTypes?$filter=is_active eq true and id eq ${this.selectTransportOrderType?.id}&$orderby=id asc`;
+		const url = `TransportOrderTypes?$filter=id eq ${this.selectTransportOrderType?.id}&$orderby=id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -239,7 +239,7 @@ export class TransportOrderTypeComponent implements OnInit {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectTransportOrderType, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

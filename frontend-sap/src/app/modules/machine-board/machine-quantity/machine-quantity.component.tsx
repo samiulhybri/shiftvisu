@@ -32,13 +32,14 @@ import {QuantityType, QuantityTypeClass} from "@app/shared/enums/QuantityType";
 import {BarcodeFormat, BrowserCodeReader, BrowserMultiFormatReader, IScannerControls} from "@zxing/browser";
 import { HttpErrorResponse } from "@angular/common/http";
 import { OperationControlProfileConfirmationType } from "@app/shared/enums/operation_control_profile_confirmation_type.enum";
-import { debounceTime, defer, interval, Subject, Subscription, switchMap } from "rxjs";
+import { debounceTime, defer, interval, Subject, Subscription, switchMap, tap } from "rxjs";
 import { StagingAreaComponent } from "@app/modules/machine-board/material-consumption/staging-area/staging-area.component";
 import Dialog from "@ui5/webcomponents/dist/Dialog";
 import { MachineboardService } from "@app/modules/machine-board/services/machineboard.service";
 import MachineUserTime from "@app/shared/models/machine-user-time.model";
 import { QuantityErrorType } from "@app/modules/machine-board/enums/QuantityErrorType";
 import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
+import Toast from "@ui5/webcomponents/dist/Toast";
 
 type EntitySelectionDialogComponentProps = {
     entity: string;
@@ -98,16 +99,14 @@ export type OrderData = {
     templateUrl: "./machine-quantity.component.html",
     styleUrl: "./machine-quantity.component.css",
 })
-export class MachineQuantityComponent implements OnInit, OnDestroy {
+export class MachineQuantityComponent implements OnInit {
     isDialogOpen = true;
-    private subscription!: Subscription;
-    private clockedInUserSubscription!: Subscription;
-    private subscriptionForIOTQuantity!: Subscription;
 
     loggedInUser: User | undefined;
     clockedInUsers: MachineUserTime[] | undefined;
     selectedClockedInUser: MachineUserTime | undefined;
 
+    @ViewChild("clockinNotEnabledRef") clockinNotEnabledRef!: Toast;
     @ViewChild("childComponentRef") childComponentRef?: CustomReactGridTable;
     @ViewChild("statusToastTools", { static: false }) statusToastTools!: ToastComponent;
     @ViewChild("consumptionChildComponentRef") consumptionChildComponentRef?: CustomReactGridTable;
@@ -172,10 +171,6 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
         });
     }
 
-    ngOnDestroy() {
-        this.subscriptionForIOTQuantity?.unsubscribe(); // Prevent memory leaks
-    }
-
     prodOrderPosOperationQuantities: ProdOrderPosOperationQuantity[] = [];
     itemStates: ItemState[] = [];
 
@@ -202,6 +197,13 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
     machine_id = parseInt(this.activeRoute.parent?.snapshot.params["id"]);
     isEditQuantityRecording: boolean = false;
     isErrorDialog: boolean = false;
+    showClockedInDialog: boolean = false;
+    isLoadingUserId: boolean = false;
+    dialerButtonValue: string = '';
+    isErrorMessage: boolean = false;
+    customIdValueStateText: string = $localize`Error during the verification of data`;
+    private inputSubject: Subject<string> = new Subject<string>();
+
     selectedProdOrderPosOperationQuantity: ProdOrderPosOperationQuantity | null = null;
     toasterStatus!: string;
     errorStatus!: string;
@@ -253,6 +255,7 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
     showLoadingPage: boolean = true;
     isValueHelpDialog: boolean = false;
     isIOT: boolean = false;
+    isIndicator: boolean = false;
     private searchSubject = new Subject<string>();
 
     //For PSA
@@ -291,6 +294,70 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
             }
         }
     }
+
+    setInputValue(event: any, value: string = "") {
+		this.dialerButtonValue = value ? value : event.target ? event.target.typedInValue : "";
+		this.isErrorMessage = false;
+		this.isLoadingUserId = false;
+		if (this.dialerButtonValue) {
+			this.inputSubject.next(this.dialerButtonValue);
+		}
+	}
+
+    getUserById() {
+            this.inputSubject
+                .pipe(
+                    debounceTime(800),
+                    tap(() => {
+                        this.isLoadingUserId = true;
+                        this.isIndicator = true;
+                    }),
+                    switchMap(userID => {
+                        const userApiUrl = `Users?$filter=(custom_id eq '${userID}' or chip_number eq '${userID}') and is_active eq true&$expand=userGroup($filter=is_enabled_for_clockin eq true),machineUserTime($expand=machine($expand=standardValueKey($expand=standardValueKeyActivityTypes)),shift;filter=end eq null)`;
+                        return this.commonService.get(userApiUrl);
+                    })
+                )
+                .subscribe({
+                    next: (res: any) => {
+                        const result = res.value;
+                        if (result.length) {
+                            const isEnabledForClockin = this.checkIfUserGroupIsEnabled(result[0]);
+
+                            if(!isEnabledForClockin){ 
+                                this.clockinNotEnabledRef.open = true;
+                                this.selectedClockedInUser = undefined;
+                            }else {
+                                this.selectedClockedInUser = new MachineUserTime().deserialize({user_id: result[0]?.id});
+                            }
+
+                            this.isErrorMessage = false;    
+                        } else {
+                            this.selectedClockedInUser = undefined;
+                            this.isErrorMessage = true;
+                        }
+                        this.isLoadingUserId = false;
+                        this.isIndicator = false;
+                    },
+                    error: error => {
+                        this.isLoadingUserId = false;
+                    },
+                    complete: () => {},
+                });
+    }
+
+    checkIfUserGroupIsEnabled(user:any) {
+        if (user && user.userGroup && user.userGroup.length > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    onSaveClockedInUser(){
+        this.showClockedInDialog = false;
+        this.dialerButtonValue = '';
+        this.isErrorMessage = false;
+    }
+    
 
     onSortChange(){
         this.isASC = !this.isASC
@@ -441,7 +508,6 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
     }
 
     closeDialog() {
-        this.ngOnDestroy();
         this.isDialogOpen = false;
         this.router.navigate(["../../"], {relativeTo: this.activeRoute});
     }
@@ -465,31 +531,26 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
     }
 
     closeLoadingDialog() {
-        this.ngOnDestroy();
         this.router.navigate(["../../"], {relativeTo: this.activeRoute});
     }
 
     ngOnInit(): void {
         this.getQuantityData(true);
         this.getUserId();
+        this.getUserById();
         this.onProposeConsumptionAPICall();
         if(this.selectedOrder?.item?.id) this.getMaximum(this.selectedOrderId,this.selectedOrder.item.id);
         if(this.machine_id){
             this.generateFilterQuery();
         }
 
-        this.subscriptionForIOTQuantity = interval(30000)
-            .pipe(switchMap(() => defer(() => {
-                if(this.isIOT){
-                    this.getQuantityData(false, false);
-                }
-                return [];
-            })))
-            .subscribe();
-
         this.clockedInUsers = this.machineboardService.clockedInUser || [];
 
         if(this.clockedInUsers.length == 1) this.selectedClockedInUser = this.clockedInUsers[0];
+    }
+
+    refreshQuantityPopup(){
+        this.getQuantityData();
     }
 
     validateInput() {
@@ -612,7 +673,6 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
                 }
 
                 this.quantityType = order.prod_order_pos_operation.machine.quantity_type;
-                this.isIOT = order?.prod_order_pos_operation?.machine?.confirmation_type === MachineConfirmationType.PROPOSE_IIOT;
 
                 if (this.allOrders.length == 1) {
                     this.selectedOrder = order;
@@ -622,6 +682,8 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
                 if (!isOnInit && this.selectedOrder) this.selectedOrder = order;
 
                 if(needToShowLoading) this.hasProposedConsumptions = false;
+
+                this.isIOT = this.selectedOrder?.prod_order_pos_operation?.machine?.confirmation_type === MachineConfirmationType.PROPOSE_IIOT || this.selectedOrder?.prod_order_pos_operation?.machine?.confirmation_type === MachineConfirmationType.AUTOMATIC;
 
                 if(this.selectedOrder?.prod_order_pos_id){
                     this.getAllProdOrdersWithQuantity(this.selectedOrder?.prod_order_pos_id);
@@ -988,11 +1050,12 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
         }
 
         if (
-			!this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_QUANTITY_SAVE) &&
-			!this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_QUANTITY_SAVE_IF_QUALIFIED)
-		) {
-			return false;
-		}
+            !this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_QUANTITY_SAVE) &&
+            (!this.authService.isPermissionValid(PermissionEnum.MACHINEBOARD_QUANTITY_SAVE_IF_QUALIFIED) ||
+                !this.authService.isQualified())
+        ) {
+            return false;
+        }
 
         if (
             this.selectedOrder?.quantity_input_method === "QUANTITY" ||
@@ -1195,10 +1258,24 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
     onSaveQuantity(isSaveAndClose: boolean = false, fromWarningModal = false){
         this.closeDialogAfterSave = isSaveAndClose;
 
+        if(this.clockedInUsers?.length && this.clockedInUsers?.length === 1) {
+            this.selectedClockedInUser = this.clockedInUsers[0];
+            this.isClockedDialogOpen = false;
+        } else if(this.clockedInUsers?.length && !this.selectedClockedInUser){
+            if (this.selectedOrder?.prod_order_pos_operation?.machine?.save_operator_id === true) {
+                this.isClockedDialogOpen = true;
+                return;
+            } else {
+                this.selectedClockedInUser = undefined;
+            }
+        } else if(this.selectedOrder?.prod_order_pos_operation?.machine?.save_operator_id && !this.selectedClockedInUser){
+            this.showClockedInDialog = true;
+            this.dialerButtonValue = '';
+            this.isErrorMessage = false;
 
-        if(this.clockedInUsers?.length && !this.selectedClockedInUser){
-           this.isClockedDialogOpen = true;
-           return;
+            return ;    
+        } else {
+            this.isClockedDialogOpen = false;
         }
 
         const selectedQuantity =  Number(this.selectedQuantity) ?? 0;
@@ -1312,6 +1389,7 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
                     }
                     this.isEmptySerial = false;
                     this.isInvalidQuantity = false;
+                    this.selectedClockedInUser = undefined;
                 },
                 error: (httpError: HttpErrorResponse) => {
                     this.errorStatus = $localize`Something Went Wrong`;
@@ -1358,11 +1436,13 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
                         }
                     }
                     this.isErrorDialog = true;
+                    this.selectedClockedInUser = undefined;
                 }
             });
         } else {
             this.isErrorDialog = true;
             this.isLoading = false;
+            this.selectedClockedInUser = undefined;
         }
     }
 
@@ -1391,7 +1471,7 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
     }
 
     // Helper function to build the data for the API
-    buildDataToSend(): { quantity: Object; consumptions: any[]; last_proposed_id?: number } {
+    buildDataToSend(): { quantity: Object; consumptions: any[]; last_proposed_id?: number ; user_id?: number } {
         const quantityData = {
             prod_order_pos_operation_id: this.selectedOrder?.prod_order_pos_operation_id,
             item_state_id: this.selectedItemState?.id,
@@ -1409,6 +1489,7 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
             quantity: quantityData,
             consumptions: this.consumptionData,
             last_proposed_id: lastProposedId > 0 ? lastProposedId : undefined,
+            user_id: this.selectedClockedInUser?.user_id
         };
     }
 
@@ -1522,7 +1603,7 @@ export class MachineQuantityComponent implements OnInit, OnDestroy {
                 }
             }
         }
-        if (quantity > 0 && !this.selectedQuantity) {
+        if (quantity > 0) {
             this.selectedQuantity = quantity;
         }
 

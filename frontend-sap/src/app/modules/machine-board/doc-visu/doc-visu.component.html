@@ -5,28 +5,33 @@
 	[headerText]="docVisuPage"
 	i18n-headerText
 	(onBeforeClose)="closeDialogDocVisuProcessDetailsPage()">
-	<div slot="header" class="flex items-center justify-between p-2 ">
-		<ui5-button class="mr-2 ml-[-28px]"
-		icon="menu2"
-		design="Transparent"          
-		style="color: black;"
-		(click)="onClickSidebarChange()"
-	>
-	</ui5-button>
-	<span>{{ docVisuPage }}</span>
+	<div
+		slot="header"
+		class="flex items-center justify-between p-2">
+		<ui5-button
+			class="mr-2 ml-[-28px]"
+			icon="menu2"
+			design="Transparent"
+			style="color: black"
+			(click)="onClickSidebarChange()">
+		</ui5-button>
+		<span>{{ docVisuPage }}</span>
 	</div>
 
-	<div class="h-[calc(77vh-8px)] flex gap-[10px] overflow-visible"
-	[ngClass]="{
-		'lg:w-[calc(96vw-10px)]': !isSideNavCollapsed,
-		'2xl:w-[calc(85vw-10px)]': !isSideNavCollapsed, 
-		'lg:w-[calc(80vw-10px)]': isSideNavCollapsed,
-		'2xl:w-[calc(75vw-10px)]': isSideNavCollapsed, 
-	  }">
+	<div
+		class="h-[calc(77vh-8px)] flex gap-[10px] overflow-visible"
+		[ngClass]="{
+			'lg:w-[calc(96vw-10px)]': !isSideNavCollapsed,
+			'2xl:w-[calc(85vw-10px)]': !isSideNavCollapsed,
+			'lg:w-[calc(80vw-10px)]': isSideNavCollapsed,
+			'2xl:w-[calc(75vw-10px)]': isSideNavCollapsed,
+		}">
 		<ui5-busy-indicator
 			class="h-full"
 			[active]="isNavBarLoading">
-			<ui5-side-navigation [collapsed]="isSideNavCollapsed" class="rounded-lg">
+			<ui5-side-navigation
+				[collapsed]="isSideNavCollapsed"
+				class="rounded-lg">
 				<ui5-side-navigation-item
 					icon="machine"
 					#machineNavItem
@@ -68,18 +73,17 @@
 			</ui5-side-navigation>
 		</ui5-busy-indicator>
 
-		
-		<ui5-busy-indicator
-		[active]="isLoading">
+		<ui5-busy-indicator [active]="isLoading">
 			<div>
-			@if (!isProcessLoading && processId !== 0) {
-				<app-doc-visu-process-details			
-					[machineId]="machineId"
-					[processId]="processId"
-					[isMachineBoardActive]="isMachineBoardActive"
-				></app-doc-visu-process-details>
-			}
-		</div>
+				@if (!isProcessLoading && processId !== 0) {
+					<app-doc-visu-process-details
+						[machineId]="machineId"
+						[processId]="processId"
+						[isMachineBoardActive]="
+							isMachineBoardActive
+						"></app-doc-visu-process-details>
+				}
+			</div>
 		</ui5-busy-indicator>
 	</div>
 	<div

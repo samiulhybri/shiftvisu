@@ -1,4 +1,4 @@
-import { Button, FlexBox, ObjectStatus } from "@ui5/webcomponents-react";
+import { Button, FlexBox, Icon, ObjectStatus } from "@ui5/webcomponents-react";
 import { Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
 import { CustomReactGridTable, GridTableColumnDataType } from "@app/shared/components/CustomGridTable";
 import { ProdOrderPos } from "@app/shared/models/prod-order-pos.model";
@@ -18,6 +18,7 @@ import { Localization } from "@app/shared/utils/common-localize";
 import { AuthService } from "@app/shared/services/auth.service";
 import { Suppliers } from "@app/shared/models/suppliers.model";
 import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
+import { ProdOrderPosOperation } from "@app/shared/models/prod-order-pos-operation.model";
 
 @Component({
 	selector: "app-active-repair",
@@ -30,21 +31,21 @@ export class ActiveRepairComponent {
 	@Input() public isShowFilterButton: boolean = false;
 	@Input() public hasActionEditButton: boolean = true;
 	@Input() public activeRepairs: any[] = [];
-	public userList?:any;
-	public supplierList?:any;
-	@Input() public set allUserList(userList: User[] | undefined){
-		this.userList = userList ? userList : [];		 
+	public userList?: any;
+	public supplierList?: any;
+	@Input() public set allUserList(userList: User[] | undefined) {
+		this.userList = userList ? userList : [];
 	};
-	@Input() public set allSupplierList(supplierList: Suppliers[] | undefined){
-		this.supplierList = supplierList ? supplierList : [];		 
+	@Input() public set allSupplierList(supplierList: Suppliers[] | undefined) {
+		this.supplierList = supplierList ? supplierList : [];
 	};
-	public repairTypeList?:any;
-	@Input() public set allRepairTypeList(repairTypeList: OperationPlan[] | undefined){
-		this.repairTypeList = repairTypeList ? repairTypeList : [];		 
+	public repairTypeList?: any;
+	@Input() public set allRepairTypeList(repairTypeList: OperationPlan[] | undefined) {
+		this.repairTypeList = repairTypeList ? repairTypeList : [];
 	};
-	public itemForRepairFilter:any;
+	public itemForRepairFilter: any;
 	@Input() public set selectedTool(dataItem: Item) {
-		this.itemForRepairFilter = dataItem ?  dataItem : undefined;
+		this.itemForRepairFilter = dataItem ? dataItem : undefined;
 	}
 	@Output() public closeActiveRepairsDialog: EventEmitter<any> = new EventEmitter();
 	@Output() public afterSaveDetails: EventEmitter<any> = new EventEmitter();
@@ -69,9 +70,9 @@ export class ActiveRepairComponent {
 	public detailsModalType = '';
 	public isViewDialogOpen = false;
 	public itemId?: number;
-    public toastMessage: string = "";
+	public toastMessage: string = "";
 	public isShowToaster: boolean = false;
-    public isSaveProdOrderPos: boolean = false;
+	public isSaveProdOrderPos: boolean = false;
 	public segmentButtonItems = [
 		{ id: '1', name: $localize`Active Orders` },
 		{ id: '2', name: $localize`Completed Orders` }
@@ -79,11 +80,36 @@ export class ActiveRepairComponent {
 
 	columns: any = [
 		{
-			Header: $localize`Order No.`,
-			accessor: "prodOrder.custom_id",
+			Header: $localize`Auto Repair`,
+			accessor: "is_automatic_created_repair",
+			hAlign: "Center",
+			isSelected: true,
+			dataType: GridTableColumnDataType.Boolean,
 			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
+			maxWidth: 150,
+			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+				const { cell, row, webComponentsReactProperties } = instance;
+				const rowData = row.original;
+				const operations = rowData.prodOrderPosOperations;
+				let isAutoRepairFound: boolean = operations ? operations.find((elm: ProdOrderPosOperation) => elm.is_automatic_created_repair == true) : false;
+
+				return (
+					<React.StrictMode>
+						<FlexBox>
+							<Icon name={isAutoRepairFound ? "accept" : "decline"} />
+						</FlexBox>
+					</React.StrictMode>
+				);
+			},
+		},
+		{
+			Header: $localize`Order No.`,
+			accessor: "prodOrder.custom_id",
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: true,
 			hAlign: "Left",
 			maxWidth: 150
 		},
@@ -92,9 +118,9 @@ export class ActiveRepairComponent {
 			accessor: "userCreator.name",
 			disableFilters: false,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			hAlign: "Left",
-			maxWidth: 250,
+			minWidth: 150,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -112,9 +138,9 @@ export class ActiveRepairComponent {
 			accessor: "userResponsible.name",
 			disableFilters: false,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			hAlign: "Left",
-			maxWidth: 250,
+			minWidth: 150,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -130,13 +156,13 @@ export class ActiveRepairComponent {
 		{
 			Header: $localize`Status`,
 			accessor: "price",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
 			dataType: GridTableColumnDataType.NestedArray,
 			hAlign: "Left",
-			minWidth: 230,
+			maxWidth: 230,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -196,9 +222,9 @@ export class ActiveRepairComponent {
 			accessor: "actual_time",
 			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			hAlign: "Left",
-			maxWidth: 150
+			minWidth: 150
 		},
 		{
 			Header: $localize`Cost`,
@@ -208,15 +234,16 @@ export class ActiveRepairComponent {
 			disableSortBy: true,
 			hAlign: "Left",
 			dataType: GridTableColumnDataType.Number,
-			maxWidth: 150
+			minWidth: 100
 		},
 		{
 			Header: $localize`Attachment`,
 			accessor: "id",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			hAlign: "Left",
+			maxWidth: 120,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -240,12 +267,13 @@ export class ActiveRepairComponent {
 		{
 			Header: $localize`Date`,
 			accessor: "created_at",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
 			dataType: GridTableColumnDataType.String,
 			hAlign: "Right",
+			maxWidth: 100,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -267,16 +295,17 @@ export class ActiveRepairComponent {
 		{
 			Header: $localize`Action`,
 			accessor: "action",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			hAlign: "Center",
+			maxWidth: 100,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
-				
 
-				if(this.hasActionEditButton && this.hasAuth) {
+
+				if (this.hasActionEditButton && this.hasAuth) {
 					return (
 						<React.StrictMode>
 							<FlexBox>
@@ -312,20 +341,20 @@ export class ActiveRepairComponent {
 
 	ngOnInit() {
 		this.authUser = this._authSrv.getUser();
-		const checkAuth = this.authUser.roleString?.includes('SUPERADMIN') || 
-									this.authUser.roleString?.includes('ADMIN_TOOLVISU') ||
-									this._authSrv.isPermissionValid(PermissionEnum.TOOLVISU_TOOL_REPAIR_EDIT) ||
-									this._authSrv.isPermissionValid(PermissionEnum.TOOLVISU_PLANNED_ORDERS_EDIT);
-		if(checkAuth) this.hasAuth = true;
+		const checkAuth = this.authUser.roleString?.includes('SUPERADMIN') ||
+			this.authUser.roleString?.includes('ADMIN_TOOLVISU') ||
+			this._authSrv.isPermissionValid(PermissionEnum.TOOLVISU_TOOL_REPAIR_EDIT) ||
+			this._authSrv.isPermissionValid(PermissionEnum.TOOLVISU_PLANNED_ORDERS_EDIT);
+		if (checkAuth) this.hasAuth = true;
 		else this.hasAuth = false;
-		
+
 		this.preparedData = [];
 		this.gridHeader = $localize`Active Repair List`;
-		if(this.isShowFilterButton) this.dialogTitle = $localize`Tool Orders`;
+		if (this.isShowFilterButton) this.dialogTitle = $localize`Tool Orders`;
 		if (this.childComponent) this.childComponent.isBusy = true;
 
-		if(!this.isRepairHistoryComponentShow){
-			this.columns.splice(4,2)
+		if (!this.isRepairHistoryComponentShow) {
+			this.columns.splice(5, 2)
 		}
 	}
 
@@ -357,7 +386,7 @@ export class ActiveRepairComponent {
 		this.selectedTab = "active_order_tab";
 	}
 
-	openViewModal(data: ProdOrderPos, detailsModalType:string) {
+	openViewModal(data: ProdOrderPos, detailsModalType: string) {
 		this.detailsModalType = detailsModalType == 'edit' ? 'edit' : 'view'
 		this.itemId = data.id;
 		this.isViewDialogOpen = true;
@@ -369,7 +398,7 @@ export class ActiveRepairComponent {
 		this.isViewDialogOpen = false;
 	}
 
-	isSavedModal(){
+	isSavedModal() {
 		this.isSaveProdOrderPos = true;
 		this.afterSaveDetails.emit();
 	}
@@ -391,12 +420,12 @@ export class ActiveRepairComponent {
 		}
 	}
 	tabNavChanged(event: any) {
-        this.selectedTab = event.detail.tab.id;
-		if(this.selectedTab == 'active_order_tab') {
+		this.selectedTab = event.detail.tab.id;
+		if (this.selectedTab == 'active_order_tab') {
 			this.isLoading = true;
 			this.afterTabChange.emit()
 		}
-    }
+	}
 
 	isShowMessage(event: any) {
 		this.isShowToaster = true;
@@ -404,9 +433,9 @@ export class ActiveRepairComponent {
 	}
 
 	showModalToast() {
-        const toast = document.getElementById("modalToast") as Toast;
+		const toast = document.getElementById("modalToast") as Toast;
 		toast.setAttribute("z-index", "10000000");
 		toast.setAttribute("display", "block");
-        (toast as Toast).open = true;    
+		(toast as Toast).open = true;
 	}
 }

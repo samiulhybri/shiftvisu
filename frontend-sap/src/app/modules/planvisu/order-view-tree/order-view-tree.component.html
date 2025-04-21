@@ -84,6 +84,7 @@
 </ui5-dialog>
 
 <app-order-details-dialog #orderDetailsDialog [open]="isDialogOpen" [isLoading]="isLoading" [isBusy]="isBusy"
+	[showfields]="isShowOperationPopupField"
 	[selectedOperation]="selectedOperation" [isDialogEditable]="true" [isTEeditable]="true"
 	[dialogTitle]="dialogTitle || ''" [operationEnd]="operationEnd || ''" [operationStart]="operationStart || ''"
 	[selecteItem]="selecteItem" [isSaveButton]="true" [saveButtonEnable]="saveButtonEnable"

@@ -128,7 +128,7 @@ export class EnergyMeterComponent {
 	}
 
 	refreshEditData() {
-		const url = `EnergyMeters?$filter=is_active eq true and id eq ${this.selectedRowValue?.id}&$expand=energyConsumer`;
+		const url = `EnergyMeters?$filter=id eq ${this.selectedRowValue?.id}&$expand=energyConsumer`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -351,7 +351,7 @@ export class EnergyMeterComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

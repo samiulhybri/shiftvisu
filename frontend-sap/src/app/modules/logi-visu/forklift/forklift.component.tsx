@@ -73,6 +73,9 @@ export class ForkliftComponent {
 	isSearchingOn = false;
 	isQuantityDisabled = false;
 	duringButtonClick: boolean = false;
+	isShowStockDialogOpen: boolean = false;
+	isBusyForStocks: boolean = false;
+	stocksForItem: any[] = [];
 	columns = [
 		{
 			Header: $localize`Order Id`,
@@ -234,37 +237,12 @@ export class ForkliftComponent {
 			},
 		},
 		{
-			Header: $localize`Stocks`,
-			accessor: "total_stocks",
-			disableFilters: true,
-			disableGroupBy: true,
-			disableSortBy: true,
-			isSelected: true,
-			hAlign: "End",
-			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
-				const { row } = instance;
-				const stock =
-					row.original?.total_stocks % 1 === 0
-						? row.original?.total_stocks
-						: parseFloat(row.original?.total_stocks)?.toFixed(3);
-
-				const formattedStock = formatNumber(stock);
-
-				return (
-					<React.StrictMode>
-						<Text>{formattedStock}</Text>
-					</React.StrictMode>
-				);
-			},
-		},
-		{
 			Header: $localize`UoM`,
 			accessor: "unitOfMeasure.custom_id",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
 			isSelected: true,
-			hAlign: "End",
 		},
 		{
 			Header: $localize`Accepted`,
@@ -422,11 +400,10 @@ export class ForkliftComponent {
 	}
 
 	public orderTypeFilterItems = {
-        textAccessor: "name",
-        idAccessor: "id",
-        data: [
-		]
-    };
+		textAccessor: "name",
+		idAccessor: "id",
+		data: [],
+	};
 
 	ngOnInit() {
 		this.transportOrderPosCustomUrl = this.getUpdatedURL();
@@ -438,18 +415,18 @@ export class ForkliftComponent {
 		this.loadTransportOrderType();
 	}
 
-	loadTransportOrderType(){
+	loadTransportOrderType() {
 		this.commonService.get("TransportOrderTypes").subscribe({
 			next: (response: any) => {
 				this.orderTypeFilterItems.data = response.value.map((item: any) => {
 					return {
 						id: item.id,
 						name: item.custom_id,
-						key: item.custom_id
-					}
+						key: item.custom_id,
+					};
 				});
 				this.gridTable?.render();
-			}
+			},
 		});
 	}
 
@@ -634,10 +611,15 @@ export class ForkliftComponent {
 			const toRemove = new Set(
 				this.scannedStocks
 					?.filter((item: any) => {
-						return Number(item.quantity) === 0 ||
-						(this.selectedTransportOrderPos?.source_type && this.selectedTransportOrderPos?.source_id &&
-							this.selectedTransportOrderPos?.source_type !== item.positionable_type &&
-							this.selectedTransportOrderPos?.source_id !== item.positionable_id)
+						return (
+							Number(item.quantity) === 0 ||
+							(this.selectedTransportOrderPos?.source_type &&
+								this.selectedTransportOrderPos?.source_id &&
+								(this.selectedTransportOrderPos?.source_type !==
+									item.positionable_type ||
+									this.selectedTransportOrderPos?.source_id !==
+										item.positionable_id))
+						);
 					})
 					?.flatMap((item: any) => [item.stockable_custom_id, item.batch])
 					?.filter(Boolean)
@@ -652,9 +634,10 @@ export class ForkliftComponent {
 	openDeliveryDialog() {
 		this.scannedStocks = [];
 		this.selectedBatch = undefined;
-		this.isCompleted = false;
-
+		
 		this.quantity = this.selectedTransportOrderPos.quantity == 1 ? 1 : 0;
+		this.isCompleted = this.quantity == 1 ? true : false;
+
 		this.batchNumber = "";
 		this.isDeliveryDialogOpen = true;
 
@@ -722,17 +705,16 @@ export class ForkliftComponent {
 		this.selectedTransportOrderPos = undefined;
 		this.gridTable!.skip = 0;
 		this.page = 1;
-	
+
 		// Update API URL
 		this.transportOrderPosCustomUrl = this.getUpdatedURL();
-	
+
 		// Apply new URL to the table
 		if (this.gridTable) {
 			this.gridTable.customUrl = this.transportOrderPosCustomUrl;
 			this.gridTable.onPagination(true);
 		}
 	}
-	
 
 	segmentButtonChange(event: any) {
 		this.transportationMode = event.detail.selectedItems[0].id;
@@ -840,7 +822,7 @@ export class ForkliftComponent {
 
 		if (!this.quantity) return;
 
-		if(this.scannedStocks.length){
+		if (this.scannedStocks.length) {
 			this.scannedStocks.forEach((stock: any) => {
 				if (stock.isPresent) {
 					alreadyExistValues.push(stock.stockable_custom_id);
@@ -970,14 +952,13 @@ export class ForkliftComponent {
 		this.updateTableRowCount().then((count: number) => {
 			if (this.gridTable) this.gridTable.filteredDataCount = count;
 		});
-	
-		const transportOrderTypeFilter = this.selectedTransportOrderType.length 
-			? `&transportOrderType=${this.selectedTransportOrderType.join(',')}` 
-			: '';
-	
+
+		const transportOrderTypeFilter = this.selectedTransportOrderType.length
+			? `&transportOrderType=${this.selectedTransportOrderType.join(",")}`
+			: "";
+
 		return `/logi-visu/all-transport-orders?isDone=${this.isDone}&perPage=${this.perPage}&page=${this.page}&search=${this.globalSearchValue}${transportOrderTypeFilter}`;
 	}
-	
 
 	onLoadMoreForForklift() {
 		this.page += 1;
@@ -998,13 +979,12 @@ export class ForkliftComponent {
 			const index = this.gridTable?.data?.findIndex(
 				(data: any) => data.id == this.selectedTransportOrderPos?.id
 			);
-			if (this.gridTable?.data?.length) this.gridTable!.selectedRowsId = { [index]: true };
-		} else {
-			if (this.gridTable?.data?.length) this.gridTable!.selectedRowsId = { 0: true };
-			this.selectedTransportOrderPos = gridData[0];
+			if (this.gridTable?.data?.length) {
+				this.gridTable!.selectedRowsId = { [index]: true };
 
-			if (this.gridTable?.analyticalTableRef?.current)
-				this.gridTable?.analyticalTableRef?.current.scrollTo(0, "start");
+				this.selectedTransportOrderPos =
+					this.gridTable?.data[index] ?? this.selectedTransportOrderPos;
+			}
 		}
 
 		this.transportableType = this.selectedTransportOrderPos?.transportable_type || "";
@@ -1119,7 +1099,7 @@ export class ForkliftComponent {
 					},
 					complete: () => {
 						this.gridTable?.render();
-					}
+					},
 				});
 		});
 	}
@@ -1325,4 +1305,160 @@ export class ForkliftComponent {
 		if (value) return formatNumber(value);
 		else return "";
 	};
+
+	handleStockClick() {
+		this.isShowStockDialogOpen = true;
+		this.isBusyForStocks = true;
+		this.stocksForItem = [];
+		let type = "";
+
+		switch (this.selectedTransportOrderPos.transportable_type) {
+			case TransportableType.ITEM_PLANT:
+				type = "itemPlant";
+				break;
+			case TransportableType.HANDLING_UNIT:
+				type = "handlingUnit";
+				break;
+			case TransportableType.EQUIPMENT:
+				type = "equipment";
+				break;
+
+			default:
+				break;
+		}
+
+		this.commonService
+			.get(
+				`stock/${type}/${this.selectedTransportOrderPos.transportable_id}/get-stocks-by-type`,
+				false
+			)
+			.subscribe({
+				next: (response: any) => {
+					this.isBusyForStocks = false;
+					this.stocksForItem = response;
+				},
+
+				error: () => {
+					this.isBusyForStocks = false;
+				},
+			});
+	}
+
+	closeStocksForItem() {
+		this.isShowStockDialogOpen = false;
+	}
+
+	stockForItemPlantColumns: any = [
+		{
+			Header: $localize`Id`,
+			accessor: "item.custom_id",
+			hAlign: "Left",
+			disableFilters: false,
+			disableSortBy: false,
+			disableResizing: false,
+			disableGroupBy: true,
+			canReorder: false,
+			isSelected: true,
+		},
+		{
+			Header: $localize`Name`,
+			accessor: "item.name",
+			hAlign: "Left",
+			disableFilters: false,
+			disableSortBy: false,
+			disableResizing: false,
+			disableGroupBy: true,
+			canReorder: false,
+			isSelected: true,
+		},
+		{
+			Header: $localize`Quantity`,
+			accessor: "quantity",
+			hAlign: "Right",
+			disableFilters: false,
+			disableSortBy: false,
+			disableResizing: false,
+			disableGroupBy: true,
+			canReorder: false,
+			isSelected: true,
+		},
+		{
+			Header: $localize`Batch`,
+			accessor: "batch",
+			hAlign: "Left",
+			disableFilters: false,
+			disableSortBy: false,
+			disableResizing: false,
+			disableGroupBy: true,
+			canReorder: false,
+			isSelected: true,
+		},
+		{
+			Header: $localize`Position`,
+			accessor: "positionable_type", // just for placeholders
+			hAlign: "Left",
+			disableFilters: false,
+			disableSortBy: false,
+			disableResizing: false,
+			disableGroupBy: true,
+			canReorder: false,
+			isSelected: true,
+			Cell: (instance: any) => {
+				const { row } = instance;
+				const data = row.original;
+
+				const type = BackendModelTypeClass.getStateTranslate(data.positionable_type);
+
+				return (data?.position?.custom_id || "") + " - " + type?.text || "";
+			},
+		},
+		{
+			Header: $localize`Parent Position`,
+			accessor: "positionable_id", // just for placeholders
+			hAlign: "Left",
+			disableFilters: false,
+			disableSortBy: false,
+			disableResizing: false,
+			disableGroupBy: true,
+			canReorder: false,
+			isSelected: true,
+			Cell: (instance: any) => {
+				const { row } = instance;
+				const data = row.original;
+
+				const type = BackendModelTypeClass.getStateTranslate(
+					data?.parentPosition?.positionable_type
+				);
+
+				if (!data?.parentPosition?.positionable_type) {
+					return "";
+				}
+
+				if (data?.parentPosition?.positionable_type == BackendModelType.HANDLINGUNIT) {
+					const typeL2 = BackendModelTypeClass.getStateTranslate(
+						data?.parentPosition?.parentL2?.positionable_type
+					);
+					return (
+						<React.StrictMode>
+							<Text>
+								{(data?.parentPosition?.positionable?.custom_id || "") +
+									" - " +
+									(type?.text || "")}{" "}
+								<b className="px-2">→</b>{" "}
+								{(data?.parentPosition?.parentL2?.positionable?.custom_id || "") +
+									" - " +
+									(typeL2?.text || "")}
+							</Text>
+						</React.StrictMode>
+					);
+				} else {
+					return (
+						(data?.parentPosition?.positionable?.custom_id || "") +
+							" - " +
+							type?.text || ""
+					);
+				}
+			},
+		},
+	];
 }

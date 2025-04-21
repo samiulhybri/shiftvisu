@@ -114,11 +114,11 @@
 			<ui5-button
 				id="materialConsumptionButton"
 				class="sapHoverColor nav-button"
-				(click)="onButtonClick(machineBoardButtonNames.MATERIAL_CONSUMTION)"
+				(click)="onButtonClick(machineBoardButtonNames.MATERIAL_CONSUMPTION)"
 				[ngClass]="{
-					selected: selectedButton === machineBoardButtonNames.MATERIAL_CONSUMTION,
+					selected: selectedButton === machineBoardButtonNames.MATERIAL_CONSUMPTION,
 				}"
-				>{{ getStateTranslate(machineBoardButtonNames.MATERIAL_CONSUMTION) }}
+				>{{ getStateTranslate(machineBoardButtonNames.MATERIAL_CONSUMPTION) }}
 			</ui5-button>
 		</div>
 		<div
@@ -200,42 +200,6 @@
 				</ui5-button>
 			</div>
 		}
-		<!-- <div>
-        <ui5-button
-          id="materialConsumptionButton"
-          class="sapHoverColor nav-button"
-          (click)="onButtonClick(machineBoardButtonNames.MATERIAL_CONSUMTION)"
-          [ngClass]="{'selected': selectedButton === machineBoardButtonNames.MATERIAL_CONSUMTION}"
-          >{{ machineBoardButtonNames.MATERIAL_CONSUMTION }}
-        </ui5-button>
-      </div>
-     <div>
-        <ui5-button
-          id="docVisuButton"
-          class="sapHoverColor nav-button"
-          (click)="onButtonClick(machineBoardButtonNames.PACKAGING)"
-          [ngClass]="{'selected': selectedButton === machineBoardButtonNames.PACKAGING}"
-          >{{ machineBoardButtonNames.PACKAGING }}
-        </ui5-button>
-      </div>
-      <div>
-        <ui5-button
-          id="mesButton"
-          class="sapHoverColor nav-button"
-          (click)="onButtonClick(machineBoardButtonNames.RE_PACKAGING)"
-          [ngClass]="{'selected': selectedButton === machineBoardButtonNames.RE_PACKAGING}"
-          >{{ machineBoardButtonNames.RE_PACKAGING }}
-        </ui5-button>
-      </div>
-      <div>
-        <ui5-button
-          id="setUpButton"
-          class="sapHoverColor nav-button"
-          (click)="onButtonClick(machineBoardButtonNames.GOODS_RECEIPT)"
-          [ngClass]="{'selected': selectedButton === machineBoardButtonNames.GOODS_RECEIPT}"
-          >{{ machineBoardButtonNames.GOODS_RECEIPT }}
-        </ui5-button>
-      </div> -->
       <div
 	  	*ngIf="
 	  		authService.isPermissionValid(permissionEnums.MACHINEBOARD_QUALIVISU_EDIT) ||
@@ -302,9 +266,9 @@
 	id="qualiVisuWarningDialog"
 	[isDialogOpen]="isQualiVisuWarningDialogOpen && isInMachineboardMain"
 	[state]="'Critical'">
-	<div class="h-[20vh] w-[40vw]">
+	<div class="h-[20vh] w-[30vw]">
 		<p>
-			<span i18n class="text-[30px]">You have {{numberOfOpenInspections}} Inspection Operation(s) with open Inspection Points.</span>
+			<span i18n class="text-[30px]">There are {{numberOfOpenInspections}} open Inspection Points.</span>
 		</p>
 	</div>
 	<div
@@ -312,7 +276,7 @@
 		class="dialog-footer">
 
 		<ui5-button
-			id="cancelButton"
+			id="goToQualiVisu"
 			class="ml-8"
 			design="Emphasized"
 			(click)="onButtonClick(machineBoardButtonNames.QUALI_VISU,true)"
@@ -325,7 +289,7 @@
 			(click)="closeDialog('quali-visu')"
 			i18n>Cancel</ui5-button>
 		}
-		
+
 	</div>
 </app-dialog>
 

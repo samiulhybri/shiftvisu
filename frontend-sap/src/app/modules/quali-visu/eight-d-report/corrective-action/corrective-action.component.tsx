@@ -11,8 +11,9 @@ import {
 import { FlexBox, Button } from "@ui5/webcomponents-react";
 import React from "react";
 import moment from "moment";
+import { ToastComponent } from "@ui5/webcomponents-ngx";
 
-import { CustomReactGridTable } from "@app/shared/components/CustomGridTable";
+import { CustomReactGridTable, GridTableColumnDataType } from "@app/shared/components/CustomGridTable";
 import { ICustomButton } from "@app/shared/interfaces/custom-button.interface";
 import { EightDReportTabType } from "@app/shared/enums/EightDReportTabType";
 import { Localization } from "@app/shared/utils/common-localize";
@@ -32,6 +33,8 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 		| CustomReactGridTable
 		| undefined;
 
+	@ViewChild("toast") toast?: ToastComponent;
+
 	localization = Localization;
 
 	@Input() eightDReportId: number = 0;
@@ -45,6 +48,7 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Responsible Person`,
@@ -53,6 +57,8 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
+			dataType: GridTableColumnDataType.NestedString,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -73,7 +79,9 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 			hAlign: "Right",
+			dataType: GridTableColumnDataType.Date,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { cell, row, webComponentsReactProperties } = instance;
 				const rowData = row.original;
@@ -82,7 +90,9 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 				return (
 					<React.StrictMode>
 						<FlexBox>
-							{formattedDate.isValid() ? formattedDate.format("DD.MM.YYYY") : ""}
+							{formattedDate.isValid()
+								? moment.utc(formattedDate).local().format("DD.MM.YYYY")
+								: ""}
 						</FlexBox>
 					</React.StrictMode>
 				);
@@ -90,13 +100,15 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 		},
 		{
 			Header: $localize`Progress`,
-			accessor: "status",
+			accessor: "progress",
 			disableFilters: false,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 			hAlign: "Right",
 			width: 100,
+			dataType: GridTableColumnDataType.Number,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -110,10 +122,11 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 		{
 			Header: $localize`Description`,
 			accessor: "description",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
+			autoResizable: true,
 			width: 120,
 			hAlign: "Center",
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
@@ -140,7 +153,11 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 			id: "implementAction",
 			text: "Implement Actions",
 			onClick: this.implementActionClick.bind(this),
-			disable: () => !this.eightDReportId || this.isSavingTask || !this.data.length,
+			disable: () =>
+				!this.eightDReportId ||
+				this.isSavingTask ||
+				!this.data.length ||
+				!this.isRowSelected,
 		},
 	];
 
@@ -175,6 +192,8 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 
 	deleteId: number | null = null;
 	selectedRowIds: Record<int, boolean> = {};
+	isRowSelected: boolean = false;
+	toastMessage: string = "";
 
 	constructor(private qualiVisuService: QualiVisuService) {}
 
@@ -197,17 +216,6 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 
 	processData(data: EightDReportAction[], recentData: any[]) {
 		this.data = data;
-		let selectedRowIds: Record<int, boolean> = {};
-
-		data.forEach((d, i) => {
-			if (d.action_type == EightDReportTabType.IMPLEMENTED) {
-				selectedRowIds[i] = true;
-			}
-		});
-
-		if (this.correctiveActionGrid) {
-			this.correctiveActionGrid.selectedRowsId = selectedRowIds;
-		}
 	}
 
 	newButtonClick() {
@@ -227,9 +235,7 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 				let rowIndex = Number(selectedRow[0]);
 				let rowData = this.data[rowIndex];
 
-				let newActionType = selectedRow[1]
-					? EightDReportTabType.IMPLEMENTED
-					: EightDReportTabType.CORRECTIVE;
+				let newActionType = EightDReportTabType.IMPLEMENTED;
 
 				let payload: EightDReportAction = {
 					action_type: newActionType,
@@ -270,9 +276,10 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 			payload = { ...returnChanges(this.initialTask, data) };
 		}
 
-		if (Object.keys(payload).length === 0) {
-			this.isTaskSaveDialogOpen = false;
-			return;
+		if (payload.end_date) {
+			payload.end_date = moment(payload.end_date, "DD.MM.YYYY", true)
+				.endOf("day")
+				.toISOString();
 		}
 
 		this.isSavingTask = true;
@@ -283,12 +290,16 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 				this.saveMode = "patch";
 				this.isSavingTask = false;
 				this.isTaskSaveDialogOpen = false;
+				this.toastMessage = this.localization.recordSavedSuccessfully;
+				this.toast!.open = true;
 			},
 			error => {
 				this.correctiveActionGrid?.onFilterAndSorting();
 				this.saveMode = "patch";
 				this.isSavingTask = false;
 				this.isTaskSaveDialogOpen = false;
+				this.toastMessage = this.localization.failedToSaveData;
+				this.toast!.open = true;
 			}
 		);
 	}
@@ -308,7 +319,7 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 
 		let data = { ...event };
 
-		data.end_date = data.end_date ? moment(data.end_date).format("DD.MM.YYYY") : "";
+		data.end_date = data.end_date ? moment.utc(data.end_date).local().format("DD.MM.YYYY") : "";
 
 		this.initialTask = { ...data };
 		this.selectedTask = { ...data };
@@ -319,11 +330,13 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 	}
 
 	correctiveRowClick(event: any) {
-		this.selectedRowIds = event.detail.selectedRowIds;
-
-		if (!this.selectedRowIds[event.detail.row.index]) {
-			this.selectedRowIds[event.detail.row.index] = false;
+		if (Object.entries(event.detail.selectedRowIds as Record<int, boolean>).length) {
+			this.isRowSelected = true;
+		} else {
+			this.isRowSelected = false;
 		}
+
+		this.selectedRowIds = event.detail.selectedRowIds;
 	}
 
 	implementActionClick() {
@@ -356,10 +369,14 @@ export class CorrectiveActionComponent implements OnInit, OnChanges {
 		this.qualiVisuService.post("$batch", { requests }).subscribe({
 			next: (response: any) => {
 				this.isSavingTask = false;
+				this.isRowSelected = false;
+				this.selectedRowIds = {};
 				this.correctiveActionGrid?.onFilterAndSorting();
 			},
 			error: e => {
 				this.isSavingTask = false;
+				this.isRowSelected = false;
+				this.selectedRowIds = {};
 				this.correctiveActionGrid?.onFilterAndSorting();
 			},
 		});

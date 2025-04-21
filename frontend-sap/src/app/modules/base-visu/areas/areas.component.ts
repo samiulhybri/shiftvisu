@@ -188,7 +188,7 @@ export class AreasComponent {
       next: () => {
         this.closeDialogDelete();
         this.isLoading = false;
-        this.childComponent?.onFilterAndSortingForEdit(this.selectedArea, null);
+        this.childComponent?.onFilterAndSortingForEdit(this.selectedId, null);
         this.disableButtonDuringRequest = false;
         this._toasterSrv.showToast(recordDeleted, "success");
       },
@@ -231,7 +231,7 @@ export class AreasComponent {
   }
 
   refreshEditData() {
-		const url = `Areas?$filter=is_active eq true and id eq ${this.selectedArea?.id}&$expand=users`;
+		const url = `Areas?$filter=id eq ${this.selectedArea?.id}&$expand=users`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);

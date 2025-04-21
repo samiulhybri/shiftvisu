@@ -4,7 +4,6 @@
 	align-items: center;
 	text-align: start;
 	background: white;
-	border-radius: 4px;
 	overflow: hidden;
 }
 
@@ -53,4 +52,9 @@ ui5-dialog::part(content) {
 #orderDialog.ui5-dialog::part(content) {
 	margin: 0;
 	padding: 0;
+}
+
+::ng-deep .custom-datetime-width {
+	min-width: auto;
+	width: 100%;
 }

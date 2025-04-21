@@ -136,7 +136,7 @@ export class RevenueClassificationsComponent implements OnInit {
 	}
 
 	refreshEditData() {
-		const url = `RevenueClassifications?$filter=is_active eq true and id eq ${this.selectedRevenueClassifications?.id}&$orderby=id asc`;
+		const url = `RevenueClassifications?$filter=id eq ${this.selectedRevenueClassifications?.id}&$orderby=id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -251,7 +251,7 @@ export class RevenueClassificationsComponent implements OnInit {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedRevenueClassifications, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

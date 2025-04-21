@@ -152,7 +152,7 @@
 				</div>
 			
 				<div class="flex items-center space-x-2">
-					@if (selectedSegment === "notification" && !isMachineBoardActive) {
+					@if (selectedSegment === "notification" && !isMachineBoardActive && authService.isPermissionValid(permissionEnums.DOCVISU_FILE_NOTE_ADD)) {
 						<ui5-button
 							design="Emphasized"
 							id="saveButtonUserGroup"

@@ -25,6 +25,8 @@ import { PlantsService } from "@app/shared/services/plants.service";
 import { DocVisuService } from "@doc-visu/doc-visu.service";
 import { DocVisuDirectoryViewComponent } from "@doc-visu/doc-visu-directory-view/doc-visu-directory-view.component";
 import { DocVisuFilePreviewComponent } from "@doc-visu/doc-visu-file-preview/doc-visu-file-preview.component";
+import { AuthService } from "@app/shared/services/auth.service";
+import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
 
 @Component({
 	selector: "app-doc-visu-process-details",
@@ -111,6 +113,7 @@ export class DocVisuProcessDetailsComponent implements OnDestroy {
 	documentSectionName: string = "";
 	directoryStructure: string = "";
 	createDocuments: boolean = false;
+	permissionEnums = PermissionEnum;
 	docSection?: any;
 	public itemName: string = "";
 	public endPoint: string = "";
@@ -143,57 +146,82 @@ export class DocVisuProcessDetailsComponent implements OnDestroy {
 				// 	icon: "write-new-document",
 				// 	onClick: () => this.handleCreateDocument(),
 				// },
-				{
-					id: "add-document",
-					name: $localize`Add File`,
-					icon: "add-document",
-					disable: (rowData: any) => rowData.type === "LinkedDocVisuDirectory",
-					onClick: (rowData: any, tableId: string) => {
-						if (rowData.type === "DocVisuDirectory") {
-							this.handleAddFile(rowData, tableId);
-						}
-					},
-				},
-				{
-					id: "add-folder",
-					name: $localize`New Folder`,
-					icon: "add-folder",
-					disable: (rowData: any) => rowData.type === "LinkedDocVisuDirectory",
-					onClick: (rowData: any, tableId: string) => {
-						this.isLoadingLink = false;
-						if (rowData.type === "DocVisuDirectory") {
-							this.handleNewFolder(rowData, tableId);
-						}
-					},
-				},
-				{
-					id: "chain-link",
-					name: $localize`Link`,
-					icon: "chain-link",
-					disable: (rowData: any) => rowData.type === "LinkedDocVisuDirectory",
-					onClick: (rowData: any, tableId: string) => {
-						if (rowData.type === "DocVisuDirectory") {
-							this.handleLink(rowData, tableId);
-						}
-					},
-				},
-				{
-					id: "edit",
-					name: $localize`Rename`,
-					icon: "request",
-					disable: (rowData: any) => rowData.type === "LinkedDocVisuDirectory",
-					onClick: (rowData: any, tableId: string) => {
-						if (rowData.type === "DocVisuDirectory") {
-							this.handleRename(rowData, tableId);
-						}
-					},
-				},
-				{
-					id: "delete",
-					name: $localize`Delete`,
-					icon: "delete",
-					onClick: (rowData: any, tableId: string) => this.handleDelete(rowData, tableId),
-				},
+				...(this.authService.isPermissionValid("DOCVISU_DOCUMENTS_ADD")
+					? [
+							{
+								id: "add-document",
+								name: $localize`Add File`,
+								icon: "add-document",
+								disable: (rowData: any) =>
+									rowData.type === "LinkedDocVisuDirectory",
+								onClick: (rowData: any, tableId: string) => {
+									if (rowData.type === "DocVisuDirectory") {
+										this.handleAddFile(rowData, tableId);
+									}
+								},
+							},
+						]
+					: []),
+				...(this.authService.isPermissionValid("DOCVISU_FOLDER_ADD")
+					? [
+							{
+								id: "add-folder",
+								name: $localize`New Folder`,
+								icon: "add-folder",
+								disable: (rowData: any) =>
+									rowData.type === "LinkedDocVisuDirectory",
+								onClick: (rowData: any, tableId: string) => {
+									this.isLoadingLink = false;
+									if (rowData.type === "DocVisuDirectory") {
+										this.handleNewFolder(rowData, tableId);
+									}
+								},
+							},
+						]
+					: []),
+				...(this.authService.isPermissionValid("DOCVISU_LINK_DOCUMENTS_ADD")
+					? [
+							{
+								id: "chain-link",
+								name: $localize`Link`,
+								icon: "chain-link",
+								disable: (rowData: any) =>
+									rowData.type === "LinkedDocVisuDirectory",
+								onClick: (rowData: any, tableId: string) => {
+									if (rowData.type === "DocVisuDirectory") {
+										this.handleLink(rowData, tableId);
+									}
+								},
+							},
+						]
+					: []),
+				...(this.authService.isPermissionValid("DOCVISU_FOLDER_EDIT")
+					? [
+							{
+								id: "edit",
+								name: $localize`Rename`,
+								icon: "request",
+								disable: (rowData: any) =>
+									rowData.type === "LinkedDocVisuDirectory",
+								onClick: (rowData: any, tableId: string) => {
+									if (rowData.type === "DocVisuDirectory") {
+										this.handleRename(rowData, tableId);
+									}
+								},
+							},
+						]
+					: []),
+				...(this.authService.isPermissionValid("DOCVISU_FOLDER_DELETE")
+					? [
+							{
+								id: "delete",
+								name: $localize`Delete`,
+								icon: "delete",
+								onClick: (rowData: any, tableId: string) =>
+									this.handleDelete(rowData, tableId),
+							},
+						]
+					: []),
 				{
 					id: "cancel",
 					name: $localize`Cancel`,
@@ -203,7 +231,7 @@ export class DocVisuProcessDetailsComponent implements OnDestroy {
 			],
 		},
 	];
- 
+
 	fileOptions: any = [
 		{
 			id: "more",
@@ -220,40 +248,52 @@ export class DocVisuProcessDetailsComponent implements OnDestroy {
 							? this.downloadFile(rowData.versions[0])
 							: null,
 				},
-				{
-					id: "edit-version",
-					name: $localize`Add New Version`,
-					icon: "create",
-					disable: (rowData: any) => rowData.type === "LinkedDocVisuFile",
-					onClick: (rowData: any, tableId: string) => {
-						if (rowData.type === "DocVisuFile") {
-							this.handleNewVersion(rowData, tableId);
-						}
+				...(this.authService.isPermissionValid("DOCVISU_DOCUMENTS_VERSION") ? [
+
+					{
+						id: "edit-version",
+						name: $localize`Add New Version`,
+						icon: "create",
+						disable: (rowData: any) => rowData.type === "LinkedDocVisuFile",
+						onClick: (rowData: any, tableId: string) => {
+							if (rowData.type === "DocVisuFile") {
+								this.handleNewVersion(rowData, tableId);
+							}
+						},
 					},
-				},
-				{
-					id: "edit",
-					name: $localize`Rename`,
-					icon: "request",
-					disable: (rowData: any) => rowData.type === "LinkedDocVisuFile",
-					onClick: (rowData: any, tableId: string) => {
-						if (rowData.type === "DocVisuFile") {
-							this.handleFileRename(rowData);
-						}
-					},
-				},
+				] : []),
+				...(this.authService.isPermissionValid("DOCVISU_DOCUMENTS_EDIT")
+					? [
+							{
+								id: "edit",
+								name: $localize`Rename`,
+								icon: "request",
+								disable: (rowData: any) => rowData.type === "LinkedDocVisuFile",
+								onClick: (rowData: any, tableId: string) => {
+									if (rowData.type === "DocVisuFile") {
+										this.handleFileRename(rowData);
+									}
+								},
+							},
+						]
+					: []),
 				// {
 				// 	id: "permission",
 				// 	name: "Release Options",
 				// 	icon: "permission",
 				// 	onClick: (rowData: any, tableId: string) => this.handleRename(rowData, tableId),
 				// },
-				{
-					id: "delete",
-					name: $localize`Delete`,
-					icon: "delete",
-					onClick: (rowData: any, tableId: string) => this.handleDelete(rowData, tableId),
-				},
+				...(this.authService.isPermissionValid("DOCVISU_DOCUMENTS_DELETE")
+					? [
+							{
+								id: "delete",
+								name: $localize`Delete`,
+								icon: "delete",
+								onClick: (rowData: any, tableId: string) =>
+									this.handleDelete(rowData, tableId),
+							},
+						]
+					: []),
 				{
 					id: "cancel",
 					name: $localize`Cancel`,
@@ -271,19 +311,28 @@ export class DocVisuProcessDetailsComponent implements OnDestroy {
 			icon: "overflow",
 			type: "MenuButton",
 			items: [
-				{
-					id: "add-folder",
-					name: $localize`New Folder`,
-					icon: "add-folder",
-					onClick: (rowData: any, tableId: string) =>
-						this.handleNewFolder(rowData, tableId),
-				},
-				{
-					id: "chain-link",
-					name: $localize`Link`,
-					icon: "chain-link",
-					onClick: (rowData: any, tableId: string) => this.handleLink(rowData, tableId),
-				},
+				...(this.authService.isPermissionValid("DOCVISU_FOLDER_ADD")
+					? [
+							{
+								id: "add-folder",
+								name: $localize`New Folder`,
+								icon: "add-folder",
+								onClick: (rowData: any, tableId: string) =>
+									this.handleNewFolder(rowData, tableId),
+							},
+						]
+					: []),
+				...(this.authService.isPermissionValid("DOCVISU_LINK_DOCUMENTS_ADD")
+					? [
+							{
+								id: "chain-link",
+								name: $localize`Link`,
+								icon: "chain-link",
+								onClick: (rowData: any, tableId: string) =>
+									this.handleLink(rowData, tableId),
+							},
+						]
+					: []),
 				{
 					id: "cancel",
 					name: $localize`Cancel`,
@@ -302,6 +351,7 @@ export class DocVisuProcessDetailsComponent implements OnDestroy {
 	constructor(
 		private route: ActivatedRoute,
 		private location: Location,
+		public authService: AuthService,
 		private _toasterSrv: ToastService,
 		private docVisuService: DocVisuService,
 		private plantsService: PlantsService,
@@ -712,8 +762,8 @@ export class DocVisuProcessDetailsComponent implements OnDestroy {
 	async onSave() {
 		this.disableButtonDuringRequest = true;
 	}
-	
-	customClose(){
+
+	customClose() {
 		this.isConfirmationModalOpen = true;
 	}
 

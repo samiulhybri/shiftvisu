@@ -256,7 +256,7 @@ export class ShiftComponent {
 	}
 
 	refreshEditData() {
-		const url = `Shifts?$expand=hasShiftModels&$filter=is_active eq true and id eq ${this.selectedShift?.id}`;
+		const url = `Shifts?$expand=hasShiftModels&$filter=id eq ${this.selectedShift?.id}`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -375,7 +375,7 @@ export class ShiftComponent {
 				this.disableButtonDuringRequest = false;
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedShift, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedShift.id, null);
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},
 			error: err => {

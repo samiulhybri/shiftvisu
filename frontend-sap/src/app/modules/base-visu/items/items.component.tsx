@@ -382,7 +382,7 @@ export class ItemsComponent {
 	}
 
 	refreshEditData() {
-		const url = `Plants(${this.plantId})/items?$filter=is_active eq true and id eq '${this.selectedItem.id}' and (is_tool ne true or is_tool eq null)&$orderby=custom_id%20asc&$expand=itemGroup,media,itemType,customers&$count=true`;
+		const url = `Plants(${this.plantId})/items?$filter=id eq '${this.selectedItem.id}' and (is_tool ne true or is_tool eq null)&$orderby=custom_id%20asc&$expand=itemGroup,media,itemType,customers&$count=true`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -399,7 +399,7 @@ export class ItemsComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedItem, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedItem.id, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

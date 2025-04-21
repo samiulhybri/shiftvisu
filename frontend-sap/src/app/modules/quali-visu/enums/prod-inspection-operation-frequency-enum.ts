@@ -13,7 +13,7 @@ export enum ProdInspectionOperationFrequencyEnum {
 export class ProdInspectionOperationFrequencyClass {
 	constructor() {}
 
-	static getTypeTranslate(type: any) {
+	static getTypeTranslate(type: ProdInspectionOperationFrequencyEnum | undefined) {
 		switch (type) {
 			case ProdInspectionOperationFrequencyEnum.COMPONENT_SCANNED:
 				return $localize`Entry accepted`;
@@ -33,6 +33,30 @@ export class ProdInspectionOperationFrequencyClass {
 				return $localize`Handling unit created`;
 			case ProdInspectionOperationFrequencyEnum.TIME_FREQUENCY:
 				return $localize`Time Frequency`;
+			default:
+				return "";
+		}
+	}
+	static getTypeTranslateShortCode(type: ProdInspectionOperationFrequencyEnum | undefined) {
+		switch (type) {
+			case ProdInspectionOperationFrequencyEnum.COMPONENT_SCANNED:
+				return $localize`QAPR`;
+			case ProdInspectionOperationFrequencyEnum.OPERATION_IN_SETUP:
+				return $localize`QSET`;
+			case ProdInspectionOperationFrequencyEnum.OPERATION_IN_PRODUCTION:
+				return $localize`QIPR`;
+			case ProdInspectionOperationFrequencyEnum.OPERATION_CLOSED:
+				return $localize`QFPR`;
+			case ProdInspectionOperationFrequencyEnum.MACHINE_STATE_QUALITY_RELEVANT:
+				return $localize`QRST`;
+			case ProdInspectionOperationFrequencyEnum.CYCLE_FREQUENCY:
+				return $localize`QFRQ`;
+			case ProdInspectionOperationFrequencyEnum.MACHINE_SHIFT:
+				return $localize`QTUR`;
+			case ProdInspectionOperationFrequencyEnum.HANDLING_UNIT_CREATED:
+				return $localize`QUMV`;
+			case ProdInspectionOperationFrequencyEnum.TIME_FREQUENCY:
+				return $localize`QFRQ`;
 			default:
 				return "";
 		}

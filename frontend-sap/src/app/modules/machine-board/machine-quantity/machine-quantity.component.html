@@ -334,6 +334,14 @@
 										{{ remainingQuantity }}</span
 									></ui5-message-strip
 								>
+								@if (isIOT) {
+									<ui5-button
+										i18n
+										class="w-full"
+										(ui5Click)="refreshQuantityPopup()"
+										>Refresh</ui5-button
+									>
+								}
 
 								<ui5-checkbox
 									id="final-quantity"
@@ -628,6 +636,14 @@
 		placement="BottomCenter"
 		>{{ toasterStatus }}
 	</ui5-toast>
+
+	<ui5-toast
+		#clockinNotEnabledRef
+		id="isClockinEnabled"
+		placement="BottomCenter"
+		i18n
+		>No Clock In enabled user group found for the user</ui5-toast
+	>
 </app-dialog>
 <app-dialog
 	[isDialogOpen]="showLoadingPage"
@@ -1080,7 +1096,7 @@
 	header-text="Information"
 	i18n-header-text
 	state="Information">
-	<p i18n>Please select a clocked In User</p>
+	<p i18n>Choose operator</p>
 	<div class="grid grid-cols-3 gap-4 w-full">
 		<ng-container *ngFor="let clockedInUser of clockedInUsers">
 			<ui5-radio-button
@@ -1091,13 +1107,12 @@
 			</ui5-radio-button>
 		</ng-container>
 	</div>
-	
+
 	<div
 		slot="footer"
 		class="footer-style gap-8">
 		<ui5-button
 			id="add-row-btn"
-			icon="save"
 			design="Emphasized"
 			[disabled]="!selectedClockedInUser"
 			(click)="onSaveQuantity(closeDialogAfterSave)"
@@ -1106,8 +1121,51 @@
 		</ui5-button>
 		<ui5-button
 			design="Transparent"
-			(click)="isClockedDialogOpen = false"
+			(click)="isClockedDialogOpen = false; selectedClockedInUser = undefined"
 			>{{ localization.close }}</ui5-button
 		>
 	</div>
 </ui5-dialog>
+
+<app-dialog
+	[isDialogOpen]="showClockedInDialog"
+	title="User"
+	i18n-title>
+	<ui5-busy-indicator
+		style="margin-top: 12px"
+		[active]="isLoadingUserId"
+		size="M">
+		<ui5-input
+			#inputRef
+			style="margin-top: 0px"
+			id="name"
+			name="name"
+			class="input-class my-4"
+			[value]="dialerButtonValue"
+			[valueState]="isErrorMessage ? 'Negative' : 'None'"
+			[(ngModel)]="dialerButtonValue"
+			(input)="setInputValue($event)"
+			i18n-placeholder
+			placeholder="Enter User Id or Chip Number">
+			<div slot="valueStateMessage">
+				{{ customIdValueStateText }}
+			</div>
+		</ui5-input>
+	</ui5-busy-indicator>
+
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			id="add-row-btn"
+			design="Emphasized"
+			[disabled]="!selectedClockedInUser?.user_id"
+			(click)="onSaveClockedInUser()"
+			i18n>Save</ui5-button>
+		<ui5-button
+			design="Transparent"
+			(click)="showClockedInDialog = false; selectedClockedInUser = undefined"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</app-dialog>

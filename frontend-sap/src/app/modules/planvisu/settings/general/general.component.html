@@ -1,9 +1,47 @@
+<ui5-busy-indicator *ngIf="isLoading" [active]="isLoading" size="L" class="w-full"></ui5-busy-indicator>
 <div *ngIf="divHeight !== 'hide'" [ngStyle]="{'height': divHeight}">
-    <ui5-checkbox 
-        text="Customer" 
-        i18n-text 
-        [checked]="switchValue" 
-        (change)="toggleSwitch()"
-        >
-    </ui5-checkbox>
+    <ui5-panel [collapsed]="true">
+        <div slot="header" class="header">
+            <ui5-title level="H4" i18n>Working Days</ui5-title>
+            <div class="mr-[10px]">
+                <ui5-button design="Emphasized" (click)="saveWeekDays()" [disabled]="isLoading" i18n>Save</ui5-button>
+            </div>
+        </div>
+
+        <div *ngFor="let day of weekDays; let i = index">
+            <ui5-checkbox [text]="day.day" i18n-text [checked]="day.is_working_day"
+                (change)="toggleSwitch('working_days', i, $event)">
+            </ui5-checkbox>
+        </div>
+    </ui5-panel>
+
+    <ui5-panel [collapsed]="true">
+        <div slot="header" class="header">
+            <ui5-title level="H4" i18n>Gantt Chart Filters</ui5-title>
+            <div class="mr-[10px]">
+                <ui5-button design="Emphasized" (click)="saveFilters()" [disabled]="isLoading" i18n>Save</ui5-button>
+            </div>
+        </div>
+
+        <div *ngFor="let filter of filterList; let i = index">
+            <ui5-checkbox [text]="filter.text" [checked]="filter.is_selected"
+                (change)="toggleSwitch('filters', i, $event)">
+            </ui5-checkbox>
+        </div>
+    </ui5-panel>
+
+    <ui5-panel [collapsed]="true">
+        <div slot="header" class="header">
+            <ui5-title level="H4" i18n>Operation Details Options</ui5-title>
+            <div class="mr-[10px]">
+                <ui5-button design="Emphasized" (click)="saveOpDetailsOptions()" [disabled]="isLoading" i18n>Save</ui5-button>
+            </div>
+        </div>
+
+        <div *ngFor="let field of operationFieldsList; let i = index">
+            <ui5-checkbox [text]="field.text" [checked]="field.is_selected"
+                (change)="toggleSwitch('operation_details', i, $event)">
+            </ui5-checkbox>
+        </div>
+    </ui5-panel>
 </div>

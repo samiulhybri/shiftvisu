@@ -422,7 +422,7 @@ export class PlantComponent {
 	}
 
 	refreshEditData() {
-		const url = `Plants?$filter=is_active eq true and id eq ${this.selectedPlant?.id}&$orderby=custom_id asc&$expand=itemPackagingRework,itemPackagingScrap,storageLocationRework,storageLocationScrap,prodOrderPosOperationIndirect($expand=prodOrderPos($expand=prodOrder))`;
+		const url = `Plants?$filter=id eq ${this.selectedPlant?.id}&$orderby=custom_id asc&$expand=itemPackagingRework,itemPackagingScrap,storageLocationRework,storageLocationScrap,prodOrderPosOperationIndirect($expand=prodOrderPos($expand=prodOrder))`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -444,7 +444,7 @@ export class PlantComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedPlant, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 				this.plantsService.refreshPlants();
 				this._toasterSrv.showToast(recordDeleted, "success");
@@ -649,7 +649,7 @@ export class PlantComponent {
 
 		this.commonService
 			.get(
-				`ProdOrderPos?$expand=item($select=id,custom_id,name),prodOrderPosOperations($select=id,prod_order_pos_id,machine_id,pos,name,start,end,status;$expand=machine($select=id,custom_id,name);$filter=status ne '${ProdOrderPosOperationStatus.DELETED}' and status_plan ne '${ProdOrderPosOperationStatus.DELETED}' and status ne '${ProdOrderPosOperationStatus.CLOSED}' and status_plan ne '${ProdOrderPosOperationStatus.CLOSED}')&$filter=prod_order_id eq ${this.selectedProdOrder?.id}&$select=id,prod_order_id,item_id,pos,start,end`
+				`ProdOrderPos?$expand=item($select=id,custom_id,name),prodOrderPosOperations($select=id,prod_order_pos_id,machine_id,pos,name,start,end,status;$expand=machine($select=id,custom_id,name);$filter=status ne '${ProdOrderPosOperationStatus.DELETED}' and status ne '${ProdOrderPosOperationStatus.CLOSED}')&$filter=prod_order_id eq ${this.selectedProdOrder?.id}&$select=id,prod_order_id,item_id,pos,start,end`
 			)
 			.subscribe({
 				next: (response: any) => {

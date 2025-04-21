@@ -39,7 +39,7 @@
 					<div class="content">
 						<ui5-label class="sapTextColor">
 							{{ data.user?.name }}  
-							@if(data.qualified_clockin_user_ids.length && data.qualified_clockin_user_ids.includes(data.user.id)){
+							@if(data && data.isQualified){
 								<span i18n >(Qualified)</span>
 							}
 							@else{

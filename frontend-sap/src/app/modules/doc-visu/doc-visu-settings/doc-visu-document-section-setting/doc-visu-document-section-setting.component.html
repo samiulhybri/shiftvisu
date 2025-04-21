@@ -23,6 +23,7 @@
 				[isBaseVisu]="true"
 				[showTableSettingBtn]="true"
 				keyForCacheCustomDataTableColumns="docVisuDocSectionSettings"
+				[editPermission]="authService.isPermissionValid('DOCVISU_DOCUMENT_SECTION_EDIT')"
 				expandQuery="$expand=directoryStructure"
 				[enableServerSideFiltering]="true"
 				(newButtonClick)="newButtonClick()"

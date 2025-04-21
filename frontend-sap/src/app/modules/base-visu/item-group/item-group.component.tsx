@@ -230,7 +230,7 @@ export class ItemGroupComponent {
 	}
 	
 	refreshEditData() {
-		const url = `ItemGroups?$filter=is_active eq true and id eq ${this.selectedRowValue?.id}&$orderby=custom_id asc`;
+		const url = `ItemGroups?$filter=id eq ${this.selectedRowValue?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -246,7 +246,7 @@ export class ItemGroupComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedRowValue.id, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

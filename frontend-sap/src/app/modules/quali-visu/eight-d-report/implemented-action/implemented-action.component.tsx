@@ -4,7 +4,7 @@ import { FlexBox, Button } from "@ui5/webcomponents-react";
 import React from "react";
 import moment from "moment";
 
-import { CustomReactGridTable } from "@app/shared/components/CustomGridTable";
+import { CustomReactGridTable, GridTableColumnDataType } from "@app/shared/components/CustomGridTable";
 import { Localization } from "@app/shared/utils/common-localize";
 import { EightDReportTabType } from "@app/shared/enums/EightDReportTabType";
 import { EightDReportAction } from "@app/shared/models/eight-d-report-action.model";
@@ -39,6 +39,7 @@ export class ImplementedActionComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Responsible Person`,
@@ -47,6 +48,8 @@ export class ImplementedActionComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
+			dataType: GridTableColumnDataType.NestedString,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -67,7 +70,9 @@ export class ImplementedActionComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 			hAlign: "Right",
+			dataType: GridTableColumnDataType.Date,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { cell, row, webComponentsReactProperties } = instance;
 				const rowData = row.original;
@@ -76,7 +81,9 @@ export class ImplementedActionComponent {
 				return (
 					<React.StrictMode>
 						<FlexBox>
-							{formattedDate.isValid() ? formattedDate.format("DD.MM.YYYY") : ""}
+							{formattedDate.isValid()
+								? moment.utc(formattedDate).local().format("DD.MM.YYYY")
+								: ""}
 						</FlexBox>
 					</React.StrictMode>
 				);
@@ -84,23 +91,21 @@ export class ImplementedActionComponent {
 		},
 		{
 			Header: $localize`Progress`,
-			accessor: "status",
+			accessor: "progress",
 			disableFilters: false,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 			hAlign: "Right",
 			width: 100,
+			dataType: GridTableColumnDataType.Number,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
 				return (
 					<React.StrictMode>
-						<>
-							{rowData.progress && rowData.progress >= 0
-								? rowData.progress + "%"
-								: ""}
-						</>
+						<>{(rowData.progress ?? 0) >= 0 ? rowData.progress + "%" : ""}</>
 					</React.StrictMode>
 				);
 			},
@@ -108,10 +113,11 @@ export class ImplementedActionComponent {
 		{
 			Header: $localize`Description`,
 			accessor: "description",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
+			autoResizable: true,
 			width: 120,
 			hAlign: "Center",
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
@@ -155,10 +161,7 @@ export class ImplementedActionComponent {
 	isDeletingImplementedTask: boolean = false;
 	baseUrl: string = "/EightDReportActions";
 
-	constructor(
-		private qualiVisuService: QualiVisuService,
-		private toast: ToastService
-	) {}
+	constructor(private qualiVisuService: QualiVisuService) {}
 
 	ngOnInit(): void {
 		this.qualiVisuService.teamMembersBehaviorObservable().subscribe(members => {

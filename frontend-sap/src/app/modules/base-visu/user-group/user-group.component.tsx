@@ -113,7 +113,7 @@ export class UserGroupComponent {
 	}
 
 	refreshEditData() {
-		const url = `UserGroups?$filter=is_active eq true and id eq ${this.selectedUserGroup?.id}&$orderby=custom_id asc`;
+		const url = `UserGroups?$filter=id eq ${this.selectedUserGroup?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -135,7 +135,7 @@ export class UserGroupComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedUserGroup, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

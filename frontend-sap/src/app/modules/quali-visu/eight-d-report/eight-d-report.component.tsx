@@ -3,7 +3,8 @@ import { ChangeDetectorRef, Component, ViewChild } from "@angular/core";
 import moment from "moment";
 import { lastValueFrom } from "rxjs";
 import React from "react";
-import { Button } from "@ui5/webcomponents-react";
+import { Button, Text } from "@ui5/webcomponents-react";
+import { ToastComponent } from "@ui5/webcomponents-ngx";
 
 import {
 	CustomReactGridTable,
@@ -53,6 +54,11 @@ export class EightDReportComponent {
 		| CustomReactGridTable
 		| undefined;
 
+	@ViewChild("toast") toast?: ToastComponent;
+
+	initialDatePickerValue: string = moment().format("YYYY-MM-DD");
+	datePickerValue: string = moment().endOf("day").format("YYYY-MM-DD HH:mm:ss");
+
 	public fileCount: number = 0;
 
 	localization = Localization;
@@ -76,6 +82,8 @@ export class EightDReportComponent {
 	public filePreviewHeight = 629;
 	isDownloadingFile: boolean = false;
 
+	toastMessage: string = "";
+
 	get permissionEnum() {
 		return PermissionEnum;
 	}
@@ -90,6 +98,7 @@ export class EightDReportComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Supplier Name`,
@@ -98,16 +107,33 @@ export class EightDReportComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Opening Date`,
 			accessor: "complaint_opening_date",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
 			hAlign: "Right",
+			autoResizable: true,
 			dataType: GridTableColumnDataType.Date,
+			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+				const { row } = instance;
+				const rowData = row.original.complaint_opening_date;
+				let formattedDate = moment(rowData);
+
+				return (
+					<React.StrictMode>
+						<Text>
+							{formattedDate.isValid()
+								? moment.utc(formattedDate).local().format("DD.MM.YYYY")
+								: ""}
+						</Text>
+					</React.StrictMode>
+				);
+			},
 		},
 		{
 			Header: $localize`Revision`,
@@ -117,27 +143,45 @@ export class EightDReportComponent {
 			disableSortBy: false,
 			isSelected: true,
 			hAlign: "Right",
+			autoResizable: true,
+			dataType: GridTableColumnDataType.Number,
 		},
 		{
 			Header: $localize`Revision Date`,
 			accessor: "revision_date",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
 			dataType: GridTableColumnDataType.Date,
 			hAlign: "Right",
+			autoResizable: true,
+			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+				const { row } = instance;
+				const rowData = row.original.revision_date;
+				let formattedDate = moment(rowData);
+				return (
+					<React.StrictMode>
+						<Text>
+							{formattedDate.isValid()
+								? moment.utc(formattedDate).local().format("DD.MM.YYYY")
+								: ""}
+						</Text>
+					</React.StrictMode>
+				);
+			},
 		},
 		/**
 		 * ToDo: Add this field when the requirement for this is confirmed.
 		 */
 		{
 			Header: $localize`Production Site`,
-			accessor: "...",
-			disableFilters: false,
+			accessor: "....",
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Parts Name`,
@@ -146,6 +190,7 @@ export class EightDReportComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Drawing No.`,
@@ -155,6 +200,8 @@ export class EightDReportComponent {
 			disableSortBy: false,
 			isSelected: true,
 			hAlign: "Right",
+			autoResizable: true,
+			dataType: GridTableColumnDataType.Number,
 		},
 		{
 			Header: $localize`Drawing Revision`,
@@ -163,50 +210,58 @@ export class EightDReportComponent {
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
-			Header: $localize`Q. Delivery`,
+			Header: $localize`Quantity Delivery`,
 			accessor: "quantity_delivered",
 			disableFilters: false,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
 			hAlign: "Right",
+			autoResizable: true,
+			dataType: GridTableColumnDataType.Number,
 		},
 		{
-			Header: $localize`Q. Claimed`,
+			Header: $localize`Quantity Claimed`,
 			accessor: "quantity_claimed",
 			disableFilters: false,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
 			hAlign: "Right",
+			autoResizable: true,
+			dataType: GridTableColumnDataType.Number,
 		},
 		{
 			Header: $localize`Plant`,
 			accessor: "plant.name",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Team`,
-			disableFilters: false,
+			disableFilters: true,
 			accessor: "team.name",
 			disableGroupBy: true,
 			disableSortBy: false,
 			isSelected: true,
+			autoResizable: true,
 		},
 		{
 			Header: $localize`Attachment`,
 			accessor: "...",
-			disableFilters: false,
+			disableFilters: true,
 			disableGroupBy: true,
-			disableSortBy: false,
+			disableSortBy: true,
 			hAlign: "Left",
 			maxWidth: 120,
 			autoResizable: true,
+			isSelected: true,
 			Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
 				const { row } = instance;
 				const rowData = row.original;
@@ -257,7 +312,7 @@ export class EightDReportComponent {
 		supplier_id: 0,
 		description: "",
 		complaint_no: "",
-		complaint_opening_date: "",
+		complaint_opening_date: moment.utc().local().format("DD.MM.YYYY"),
 		revision: 0,
 		revision_date: "",
 		production_site: "",
@@ -292,6 +347,18 @@ export class EightDReportComponent {
 		private cdr: ChangeDetectorRef
 	) {}
 
+	onChangeDatePicker(event: any) {
+		if (moment(event.detail.value, "DD.MM.YYYY").isValid()) {
+			this.datePickerValue = moment(event.detail.value, "DD.MM.YYYY")
+				.endOf("day")
+				.format("YYYY-MM-DD HH:mm:ss");
+		} else {
+			this.datePickerValue = "";
+		}
+		this.cdr.detectChanges();
+		this.eightDReportRefGrid?.onFilterAndSorting();
+	}
+
 	processData(allData: any[], recentData: any[]) {
 		this.data = allData;
 	}
@@ -309,7 +376,7 @@ export class EightDReportComponent {
 			supplier: new Suppliers().deserialize({}),
 			description: "",
 			complaint_no: "",
-			complaint_opening_date: "",
+			complaint_opening_date: moment.utc().local().format("DD.MM.YYYY"),
 			revision: 0,
 			revision_date: "",
 			production_site: "",
@@ -357,6 +424,7 @@ export class EightDReportComponent {
 
 		let payload = {
 			reportIds: reportIds,
+			clientSideDate: new Date().toLocaleString(),
 		};
 		this.isDownloadingFile = true;
 		this.qualiVisuService
@@ -377,7 +445,13 @@ export class EightDReportComponent {
 					if (reportIds.length > 1) {
 						fileLink.download = "Reports";
 					} else {
-						fileLink.download = "Report";
+						let report = { ...this.data[Number(rowIdArray[0][0])] };
+
+						fileLink.download = (
+							report?.title?.slice(0, 25).replaceAll(" ", "_") +
+							"_" +
+							moment.utc(report?.created_at).unix()
+						).toString();
 					}
 
 					fileLink.click();
@@ -397,6 +471,7 @@ export class EightDReportComponent {
 
 		let payload = {
 			reportIds: reportIds,
+			clientSideDate: new Date().toLocaleString(),
 		};
 		this.isDownloadingFile = true;
 		this.qualiVisuService
@@ -443,16 +518,16 @@ export class EightDReportComponent {
 		event = {
 			...event,
 			complaint_opening_date: event.complaint_opening_date
-				? moment(event.complaint_opening_date).format("DD.MM.YYYY")
+				? moment.utc(event.complaint_opening_date).local().format("DD.MM.YYYY")
 				: "",
 			revision_date: event.revision_date
-				? moment(event.revision_date).format("DD.MM.YYYY")
+				? moment.utc(event.revision_date).local().format("DD.MM.YYYY")
 				: "",
 			author_closing_date: event.author_closing_date
-				? moment(event.author_closing_date).format("DD.MM.YYYY")
+				? moment.utc(event.author_closing_date).local().format("DD.MM.YYYY")
 				: "",
 			client_closing_date: event.client_closing_date
-				? moment(event.client_closing_date).format("DD.MM.YYYY")
+				? moment.utc(event.client_closing_date).local().format("DD.MM.YYYY")
 				: "",
 		};
 
@@ -499,7 +574,7 @@ export class EightDReportComponent {
 		if (
 			!moment(this.selectedEightDReport.complaint_opening_date, "DD.MM.YYYY", true).isValid()
 		) {
-			updatedEightDReport.complaint_opening_date = null;
+			updatedEightDReport.complaint_opening_date = "";
 		}
 
 		if (!moment(this.selectedEightDReport.revision_date, "DD.MM.YYYY", true).isValid()) {
@@ -548,6 +623,34 @@ export class EightDReportComponent {
 			return;
 		}
 
+		if (payload.complaint_opening_date) {
+			payload.complaint_opening_date = moment(
+				payload.complaint_opening_date,
+				"DD.MM.YYYY",
+				true
+			)
+				.endOf("day")
+				.toISOString();
+		}
+
+		if (payload.revision_date) {
+			payload.revision_date = moment(payload.revision_date, "DD.MM.YYYY", true)
+				.endOf("day")
+				.toISOString();
+		}
+
+		if (payload.author_closing_date) {
+			payload.author_closing_date = moment(payload.author_closing_date, "DD.MM.YYYY", true)
+				.endOf("day")
+				.toISOString();
+		}
+
+		if (payload.client_closing_date) {
+			payload.client_closing_date = moment(payload.client_closing_date, "DD.MM.YYYY", true)
+				.endOf("day")
+				.toISOString();
+		}
+
 		this.saveMode = null;
 		try {
 			if (payload) {
@@ -561,16 +664,16 @@ export class EightDReportComponent {
 				let resultEightDReport = {
 					...r,
 					complaint_opening_date: r.complaint_opening_date
-						? moment(r.complaint_opening_date).format("DD.MM.YYYY")
+						? moment.utc(r.complaint_opening_date).local().format("DD.MM.YYYY")
 						: "",
 					revision_date: r.revision_date
-						? moment(r.revision_date).format("DD.MM.YYYY")
+						? moment.utc(r.revision_date).local().format("DD.MM.YYYY")
 						: "",
 					author_closing_date: r.author_closing_date
-						? moment(r.author_closing_date).format("DD.MM.YYYY")
+						? moment.utc(r.author_closing_date).local().format("DD.MM.YYYY")
 						: "",
 					client_closing_date: r.client_closing_date
-						? moment(r.client_closing_date).format("DD.MM.YYYY")
+						? moment.utc(r.client_closing_date).local().format("DD.MM.YYYY")
 						: "",
 					team: this.selectedEightDReport.team,
 				};
@@ -579,10 +682,12 @@ export class EightDReportComponent {
 				this.selectedEightDReport = { ...resultEightDReport };
 			}
 
+			let userIds = [...new Set(team.map(m => m.id))];
+
 			(await lastValueFrom(
 				this.qualiVisuService.post(
 					`quali-visu/${this.selectedEightDReportId}/team-members`,
-					{ userIds: team.map(m => m.id) },
+					{ userIds: userIds },
 					false
 				)
 			)) as any;
@@ -610,9 +715,15 @@ export class EightDReportComponent {
 			this.eightDReportRefGrid?.onFilterAndSorting();
 
 			this.initialEightDReport = { ...this.selectedEightDReport };
+
+			if (!openNext) {
+				this.toastMessage = this.localization.recordSavedSuccessfully;
+				this.toast!.open = true;
+			}
 		} catch {
 			this.is8DReportPopupOpen = false;
-			this._toasterSrv.showToast(this.localization.failedToSaveData, "error");
+			this.toastMessage = this.localization.failedToSaveData;
+			this.toast!.open = true;
 		}
 	}
 
@@ -657,6 +768,11 @@ export class EightDReportComponent {
 	checkIfSaveable() {
 		return (
 			this.selectedEightDReport.title &&
+			moment(
+				this.selectedEightDReport.complaint_opening_date,
+				"DD.MM.YYYY",
+				true
+			).isValid() &&
 			this.selectedEightDReport.team?.length &&
 			this.selectedEightDReport?.team.every(m => m.id)
 		);

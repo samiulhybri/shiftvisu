@@ -6,3 +6,8 @@ ui5-tabcontainer::part(content) {
 ui5-tabcontainer::part(tabstrip) {
 	padding: 0;
 }
+
+.label-style {
+	font-size: var(--title-text-font-size);
+	color: var(--list-description-text-color);
+}

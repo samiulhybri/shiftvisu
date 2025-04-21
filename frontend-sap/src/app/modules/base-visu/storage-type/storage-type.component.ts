@@ -201,7 +201,7 @@ export class StorageTypeComponent {
 	}
 
 	refreshEditData() {
-		const url = `StorageTypes?$filter=is_active eq true and id eq ${this.selectedStorageType?.id}&$orderby=custom_id asc`;
+		const url = `StorageTypes?$filter=id eq ${this.selectedStorageType?.id}&$orderby=custom_id asc`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -224,7 +224,7 @@ export class StorageTypeComponent {
 				const { recordDeleted } = Localization;
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedStorageType, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

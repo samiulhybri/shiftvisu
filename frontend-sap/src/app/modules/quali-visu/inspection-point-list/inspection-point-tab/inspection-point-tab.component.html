@@ -17,6 +17,7 @@
 	expandQuery="$expand=creator"
 	selectionMode="None"
 	(editClick)="editClick($event)"
+    [showDeleteButton]="false"
 	(deleteClick)="deleteClick($event)"
 	[isBusy]="childComponent?.isBusy || isGridLoader"
 	[useOdataStyles]="false"
@@ -26,22 +27,22 @@
 	(onLoadMoreForCustomAPI)="handlePaginationFunctionality()"
 	(processData)="processInspectionPoints($event)"
 	#childComponentRef>
+<!--    Temporarily added [showDeleteButton]="false" to be replaced with permission based approach -->
 </app-grid-table>
 
 <ui5-dialog
 	*ngIf="isEditDialogOpen"
 	class="w-[calc(90vw-60px)]"
 	[open]="isEditDialogOpen"
-	(beforeClose)="closeDialog('edit')"
-	[headerText]="'Update'"
+	(before-close)="closeDialog('edit')"
+	headerText="Update"
 	i18n-headerText>
 	<div class="h-[calc(90vh-135px)]">
 		<app-inspection-update-tab
 			#insertionTab
-			[selectedInspectionOperation]="selectedOperation"
-			[allInspectionPoints]="allInspectionPoints"
+			[selectedInspectionOperation]="selectedInspectionOperation"
 			[userGroupsAvailable]="availableUserGroups"
-			[setInspectionPoint]="selectedInspectionPoint"
+			[inspectionPoint]="selectedInspectionPoint"
 			(allConfirmationsFilled)="isAllConfirmationsFilled($event)"
 			(allRequiredFieldNoteFilled)="isAllRequiredFieldNoteFilled($event)"
 			(allCharacteristicsValuesInRange)="isShowConfiramationPopUp($event)">
@@ -142,3 +143,40 @@
 	placement="BottomCenter"
 	>{{ toastMessage }}</ui5-toast
 >
+
+<ui5-dialog
+	#clockedInUsersDialog
+	id="clockedInUsers"
+	[open]="isClockedDialogOpen"
+	header-text="Information"
+	i18n-header-text
+	state="Information">
+	<p i18n>Choose operator</p>
+	<div class="grid grid-cols-3 gap-4 w-full">
+		<ng-container *ngFor="let clockedInUser of clockedInUsers">
+			<ui5-radio-button
+				[checked]="selectedClockedInUser?.user_id === clockedInUser?.user_id"
+				(click)="selectedClockedInUser = clockedInUser"
+				name="checkStateStatus"
+				[text]="clockedInUser?.user?.name || ''">
+			</ui5-radio-button>
+		</ng-container>
+	</div>
+
+	<div
+		slot="footer"
+		class="footer-style gap-8">
+		<ui5-button
+			id="add-row-btn"
+			design="Emphasized"
+			[disabled]="!selectedClockedInUser"
+			(click)="editInspectionPoint(saveAndOpenNext)"
+			i18n
+			>Save</ui5-button>
+		<ui5-button
+			design="Transparent"
+			(click)="isClockedDialogOpen = false; selectedClockedInUser = undefined"
+			>{{ localization.close }}</ui5-button
+		>
+	</div>
+</ui5-dialog>

@@ -16,6 +16,7 @@ import { Suppliers } from '@app/shared/models/suppliers.model';
 import OperationPlan from '@app/shared/models/operation-plan.model';
 import { ODataBatchCall } from '@app/shared/models/odata-batch-call';
 import { PermissionEnum } from '@app/shared/enums/PermissionEnum';
+import { ProdOrderPosOperation } from '@app/shared/models/prod-order-pos-operation.model';
 
 @Component({
     selector: 'app-order-history',
@@ -29,9 +30,9 @@ export class OrderHistoryComponent implements OnInit {
     isLoading = false;
     itemId?: number;
     localization = Localization;
-	public filePreviewHeight = 629;
+    public filePreviewHeight = 629;
     public fileCount: number = 0;
-    public selectedOrder= new ProdOrderPos().deserialize({});
+    public selectedOrder = new ProdOrderPos().deserialize({});
     public authUser!: User;
     public hasAuth: boolean = false;
     public userList: User[] = [];
@@ -46,15 +47,40 @@ export class OrderHistoryComponent implements OnInit {
         xl: '(min-width: 1537px) and (max-width: 2000px)'
     };
 
-    expandQuery = `$select=id,end,is_sampling_required,is_sampling_done,item_id,actual_time,cost,prod_order_id,user_id_creator,status&$expand=media($select=id),userCreator($select=id,name,custom_id),item($select=id,name,custom_id,is_active,is_tool),prodOrder($select=id,custom_id,order_type)`;
-    filterQuery = `((status ne '${ProdOrderPosStatus.CLOSED}' and status ne '${ProdOrderPosStatus.DELETED}') or (status_plan ne '${ProdOrderPosStatus.CLOSED}' and status_plan ne '${ProdOrderPosStatus.DELETED}')) and prodOrder/any(s:s/order_type eq '${ProdOrderType.MAINTENANCE}') and (item/any(b:b/is_tool eq true) and item/any(b:b/is_active eq true))`
+    expandQuery = `$select=id,end,is_sampling_required,is_sampling_done,item_id,actual_time,cost,prod_order_id,user_id_creator,status&$expand=media($select=id),userCreator($select=id,name,custom_id),item($select=id,name,custom_id,is_active,is_tool),prodOrder($select=id,custom_id,order_type),prodOrderPosOperations($select=id,is_automatic_created_repair)`;
+    filterQuery = `((status ne '${ProdOrderPosStatus.CLOSED}' and status ne '${ProdOrderPosStatus.DELETED}') or (status_plan ne '${ProdOrderPosStatus.CLOSED}' and status_plan ne '${ProdOrderPosStatus.DELETED}')) and prodOrder/any(s:s/order_type eq '${ProdOrderType.MAINTENANCE}') and (item/any(b:b/is_tool eq true) and item/any(b:b/is_active eq true))`;
     @ViewChild("childComponentRef", { static: false }) childComponent: CustomReactGridTable | undefined;
 
     columns: any = [
         {
+            Header: $localize`Auto Repair`,
+            accessor: "is_automatic_created_repair",
+            hAlign: "Center",
+            isSelected: true,
+            dataType: GridTableColumnDataType.Boolean,
+            disableFilters: true,
+            disableGroupBy: true,
+            disableSortBy: true,
+            minWidth: 150,
+            Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
+                const { cell, row, webComponentsReactProperties } = instance;
+                const rowData = row.original;
+                const operations = rowData.prodOrderPosOperations;
+                let isAutoRepairFound: boolean = operations ? operations.find((elm: ProdOrderPosOperation) => elm.is_automatic_created_repair == true) : false;
+
+                return (
+                    <React.StrictMode>
+                        <FlexBox>
+                            <Icon name={isAutoRepairFound ? "accept" : "decline"} />
+                        </FlexBox>
+                    </React.StrictMode>
+                );
+            },
+        },
+        {
             Header: $localize`Order Id`,
             accessor: "prodOrder.custom_id",
-            disableFilters: true,
+            disableFilters: false,
             disableGroupBy: true,
             disableSortBy: true,
             isSelected: true,
@@ -64,7 +90,7 @@ export class OrderHistoryComponent implements OnInit {
         {
             Header: $localize`No.`,
             accessor: "item.custom_id",
-            disableFilters: true,
+            disableFilters: false,
             disableGroupBy: true,
             disableSortBy: true,
             isSelected: true,
@@ -74,11 +100,12 @@ export class OrderHistoryComponent implements OnInit {
         {
             Header: $localize`Name`,
             accessor: "item.name",
-            disableFilters: true,
+            disableFilters: false,
             disableGroupBy: true,
             isSelected: true,
             dataType: GridTableColumnDataType.NestedString,
             disableSortBy: true,
+            minWidth: 200,
         },
         {
             Header: $localize`Actual Time`,
@@ -113,19 +140,19 @@ export class OrderHistoryComponent implements OnInit {
             dataType: GridTableColumnDataType.Boolean,
             hAlign: 'Center',
             Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
-              const { row } = instance;
-              const rowData = row.original;
-              return (
-                <React.StrictMode>
-                  <FlexBox alignItems='Stretch'>
-                     {rowData?.is_sampling_required ? <Icon name={rowData?.is_sampling_required ? "accept": "decline"}/> : null}
-      
-                  </FlexBox>
-                </React.StrictMode>
-              );
+                const { row } = instance;
+                const rowData = row.original;
+                return (
+                    <React.StrictMode>
+                        <FlexBox alignItems='Stretch'>
+                            {rowData?.is_sampling_required ? <Icon name={rowData?.is_sampling_required ? "accept" : "decline"} /> : null}
+
+                        </FlexBox>
+                    </React.StrictMode>
+                );
             },
-          },
-          {
+        },
+        {
             Header: $localize`Sampling done`,
             accessor: "is_sampling_done",
             width: 120,
@@ -136,24 +163,24 @@ export class OrderHistoryComponent implements OnInit {
             dataType: GridTableColumnDataType.Boolean,
             hAlign: 'Center',
             Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
-              const { row } = instance;
-              const rowData = row.original;
-              return (
-                <React.StrictMode>
-                  <FlexBox alignItems='Stretch'>
-                    {rowData?.is_sampling_required ? <Icon name={rowData?.is_sampling_done ? "accept": "decline"}/>: null}
-      
-                  </FlexBox>
-                </React.StrictMode>
-              );
+                const { row } = instance;
+                const rowData = row.original;
+                return (
+                    <React.StrictMode>
+                        <FlexBox alignItems='Stretch'>
+                            {rowData?.is_sampling_required ? <Icon name={rowData?.is_sampling_done ? "accept" : "decline"} /> : null}
+
+                        </FlexBox>
+                    </React.StrictMode>
+                );
             },
-          },
+        },
         {
             Header: $localize`Completion Date`,
             accessor: "end",
             disableFilters: true,
             disableGroupBy: true,
-            disableSortBy: true, 
+            disableSortBy: true,
             isSelected: true,
             dataType: GridTableColumnDataType.Date,
             hAlign: 'End',
@@ -161,7 +188,7 @@ export class OrderHistoryComponent implements OnInit {
             Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
                 const { row } = instance;
                 const rowData = row.original;
-                if(rowData.end !== null) {
+                if (rowData.end !== null) {
                     return (
                         <React.StrictMode>
                             <FlexBox alignItems='End'>
@@ -221,7 +248,7 @@ export class OrderHistoryComponent implements OnInit {
             Cell: (instance: { cell: any; row: any; webComponentsReactProperties: any }) => {
                 const { row } = instance;
                 const rowData = row.original;
-                if(this.hasAuth) {
+                if (this.hasAuth) {
                     return (
                         <React.StrictMode>
                             <FlexBox alignItems='Stretch'>
@@ -266,10 +293,10 @@ export class OrderHistoryComponent implements OnInit {
         this.loadLists();
     }
 
-    public handleRowDoubleClick = (rowData: any): void => {	
-      this.openViewModal(rowData); 
+    public handleRowDoubleClick = (rowData: any): void => {
+        this.openViewModal(rowData);
     };
-    
+
     openViewModal(data: any) {
         this.itemId = data.id;
         this.isViewDialogOpen = true;
@@ -278,9 +305,9 @@ export class OrderHistoryComponent implements OnInit {
     closeViewDialog() {
         this.isViewDialogOpen = false;
     }
-    isSavedModal(){
+    isSavedModal() {
         this.isViewDialogOpen = false;
-        this.childComponent!.onFilterAndSorting('','','Contain')
+        this.childComponent!.onFilterAndSorting('', '', 'Contain')
     }
     showPreview(id: number, count: number) {
         this.itemId = id;
@@ -290,7 +317,7 @@ export class OrderHistoryComponent implements OnInit {
 
     segmentButtonChange(event: any) {
         this.hasAuth = false;
-        if(this.childComponent?.globalSearchFieldValue){
+        if (this.childComponent?.globalSearchFieldValue) {
             this.childComponent.globalSearchFieldValue = ''
             this.childComponent.additionalFilterQuery = ''
         }
@@ -299,10 +326,10 @@ export class OrderHistoryComponent implements OnInit {
             this.filterQuery = `((status ne '${ProdOrderPosStatus.CLOSED}' and status ne '${ProdOrderPosStatus.DELETED}') or (status_plan ne '${ProdOrderPosStatus.CLOSED}' and status_plan ne '${ProdOrderPosStatus.DELETED}')) and prodOrder/any(s:s/order_type eq '${ProdOrderType.MAINTENANCE}') and (item/any(b:b/is_tool eq true) and item/any(b:b/is_active eq true))`
         } else {
             const checkAuth = this._authSrv.isPermissionValid(PermissionEnum.TOOLVISU_ORDER_HISTORY_EDIT);
-            if(checkAuth) this.hasAuth = true;
+            if (checkAuth) this.hasAuth = true;
 
-            this.expandQuery  =`$select=id,end,is_sampling_required,is_sampling_done,actual_time,cost,item_id,prod_order_id,user_id_creator,status&$expand=media($select=id),userCreator($select=id,name,custom_id),item($select=id,name,custom_id,is_active,is_tool),prodOrder($select=id,custom_id,order_type)`
-            this.filterQuery =`(status eq '${ProdOrderPosStatus.CLOSED}' or status_plan eq '${ProdOrderPosStatus.CLOSED}') and prodOrder/any(s:s/order_type eq '${ProdOrderType.MAINTENANCE}') and (item/any(b:b/is_tool eq true) and item/any(b:b/is_active eq true))`
+            this.expandQuery = `$select=id,end,is_sampling_required,is_sampling_done,actual_time,cost,item_id,prod_order_id,user_id_creator,status&$expand=media($select=id),userCreator($select=id,name,custom_id),item($select=id,name,custom_id,is_active,is_tool),prodOrder($select=id,custom_id,order_type)`
+            this.filterQuery = `(status eq '${ProdOrderPosStatus.CLOSED}' or status_plan eq '${ProdOrderPosStatus.CLOSED}') and prodOrder/any(s:s/order_type eq '${ProdOrderType.MAINTENANCE}') and (item/any(b:b/is_tool eq true) and item/any(b:b/is_active eq true))`
         }
 
         setTimeout(() => {
@@ -319,24 +346,24 @@ export class OrderHistoryComponent implements OnInit {
         requests.push(new ODataBatchCall(0, "get", `Users?$select=id,custom_id,name,is_active&$filter=is_active eq true&$top=100000`));
         requests.push(new ODataBatchCall(1, "get", `OperationPlans?$select=id,custom_id, is_imported&$filter=custom_id ne null and is_imported eq false&$expand=operationPlanPos($select=id,name,operation_plan_id)&$top=100000`));
         requests.push(new ODataBatchCall(2, "get", `Suppliers?$select=id,custom_id,name,is_active&$filter=is_active eq true&$top=100000`));
-    
+
         this._commonSrv.post("$batch", { requests }).subscribe({
             next: (response: any) => {
                 this.userList = [];
                 this.operationPlanList = [];
                 this.supplierList = [];
-    
+
                 if (response.responses[0]?.body?.value) {
                     this.userList = response.responses[0]?.body?.value
                         .map((elm: User) => new User().deserialize(elm));
                 }
-    
+
                 if (response.responses[1]?.body?.value) {
                     this.operationPlanList = response.responses[1]?.body?.value?.map((elm: OperationPlan) =>
                         new OperationPlan().deserialize(elm)
                     );
                 }
-    
+
                 if (response.responses[2]?.body?.value) {
                     this.supplierList = response.responses[2]?.body?.value
                         .map((elm: Suppliers) => new Suppliers().deserialize(elm));

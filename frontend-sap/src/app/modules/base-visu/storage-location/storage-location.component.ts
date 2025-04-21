@@ -22,6 +22,7 @@ import { Warehouse } from "@app/shared/models/warehouse.model";
 import { ODataBatchCall } from "@app/shared/models/odata-batch-call";
 import { PlantsService } from "@app/shared/services/plants.service";
 import { HandleRowClickService } from "@app/shared/services/handle-row-click.service";
+import { TransportOrderType } from "@app/shared/models/transport-order-type";
 
 @Component({
 	selector: "app-storage-location",
@@ -53,6 +54,7 @@ export class StorageLocationComponent {
 	@ViewChild("deleteErrorDialogStorageLocation", { static: false })
 	deleteErrorDialogStorageLocation: any;
 	wareHouses: Warehouse[] = [];
+	transportOrderTypes: TransportOrderType[] = [];
 	plantId?: number;
 	isLoadingBatchCall: boolean = false;
 
@@ -97,6 +99,18 @@ export class StorageLocationComponent {
 			accessorArray: ["warehouse.name", "warehouse.custom_id"],
 			isSelected: true,
 			comboBoxValues: this.wareHouses,
+			autoResizable: true,
+		},
+		{
+			Header: $localize`Transport Order Type`,
+			accessor: "transportOrderType.custom_id",
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: false,
+			dataType: GridTableColumnDataType.NestedString,
+			accessorArray: ["transportOrderType.name", "transportOrderType.custom_id"],
+			isSelected: true,
+			comboBoxValues: this.transportOrderTypes,
 			autoResizable: true,
 		},
 	];
@@ -240,7 +254,7 @@ export class StorageLocationComponent {
 	}
 
 	refreshEditData() {
-		const url = `StorageLocations?$filter=is_active eq true and plant_id eq ${this.plantId} and id eq ${this.selectedStorageLocation?.id}&$orderby=custom_id asc&$expand=warehouse`;
+		const url = `StorageLocations?$filter=is_active eq true and plant_id eq ${this.plantId} and id eq ${this.selectedStorageLocation?.id}&$orderby=custom_id asc&$expand=warehouse,transportOrderType`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -267,12 +281,32 @@ export class StorageLocationComponent {
 				custom_id: event.detail.item.additionalText || "",
 			});
 	}
+	
+	onChangeTransportOrder(event: any) {
+		if (this.selectedStorageLocation)
+			this.selectedStorageLocation.transportOrderType = new TransportOrderType().deserialize({
+				id: parseInt(event.detail.item.id) || 0,
+				name: event.detail.item.text || "",
+				custom_id: event.detail.item.additionalText || "",
+			});
+	}
 
 	onWareHousenputChange(event: any) {
 		const inputValue = event.target.value;
 		const matchWarehouseData = this.wareHouses.find(warehouse => warehouse.name === inputValue);
 		if (!matchWarehouseData && this.selectedStorageLocation?.warehouse) {
 			this.selectedStorageLocation.warehouse = new Warehouse().deserialize({
+				id: null,
+				name: "",
+			});
+		}
+	}
+	
+	onTransportOrderPosInputChange(event: any) {
+		const inputValue = event.target.value;
+		const matchWarehouseData = this.transportOrderTypes.find(transportOrderType => transportOrderType.name === inputValue);
+		if (!matchWarehouseData && this.selectedStorageLocation?.transportOrderType) {
+			this.selectedStorageLocation.transportOrderType = new TransportOrderType().deserialize({
 				id: null,
 				name: "",
 			});
@@ -291,11 +325,17 @@ export class StorageLocationComponent {
 		let requests: ODataBatchCall[] = [];
 
 		requests.push(new ODataBatchCall(0, "get", `\/odata\/Warehouses?$orderby=custom_id asc`));
+		requests.push(new ODataBatchCall(1, "get", `\/odata\/TransportOrderTypes?$orderby=custom_id asc`));
+
 		this.isLoadingBatchCall = true;
 		this.commonService.post("$batch", { requests }).subscribe({
 			next: (response: any) => {
 				response.responses[0]?.body?.value?.map((warehouse: Warehouse) => {
 					this.wareHouses?.push(new Warehouse().deserialize(warehouse));
+				});
+				
+				response.responses[1]?.body?.value?.map((transportOrderType: TransportOrderType) => {
+					this.transportOrderTypes?.push(new TransportOrderType().deserialize(transportOrderType));
 				});
 				this.isLoadingBatchCall = false;
 			},
@@ -312,7 +352,7 @@ export class StorageLocationComponent {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedStorageLocation, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.deletItemId, null);
 				this.disableButtonDuringRequest = false;
 
 				this._toasterSrv.showToast(recordDeleted, "success");

@@ -161,7 +161,7 @@
 								[style.background-color]="'#' + selectedColorSchemeSorting.color"
 								class="h-[26px] w-[26px] mt-[3px] rounded"
 								id="colorPalette"
-								(click)="openColorPicker()"></div>
+								(click)="openColorPicker('background')"></div>
 							<ui5-input
 								id="valueHelpInput"
 								class="w-full"
@@ -176,6 +176,35 @@
 								placeholder="Enter Color"
 								[(ngModel)]="selectedColorSchemeSorting.color"
 								name="color">
+							</ui5-input>
+						</div>
+					</div>
+					<div class="grid h-full">
+						<ui5-label show-colon i18n>Border</ui5-label>
+						<ui5-switch id="hasBorderSwitch" name="has_border" [checked]="selectedColorSchemeSorting.has_border" (change)="toggleSwitch()"></ui5-switch>
+					</div>
+					<div class="grid h-full">
+						<ui5-label i18n show-colon>Color</ui5-label>
+						<div class="flex gap-1">
+							<div
+								[style.background-color]="selectedColorSchemeSorting.border_color ? '#' + selectedColorSchemeSorting.border_color : '#ffffff'"
+								class="h-[26px] w-[26px] mt-[3px] rounded"
+								id="colorPalette"
+								(click)="openColorPicker('border')"></div>
+							<ui5-input
+								id="valueHelpInput"
+								class="w-full"
+								#borderColorInput="ngModel"
+								[required]="selectedColorSchemeSorting.has_border ? true : false"
+								[valueState]="
+									borderColorInput.valid == false &&
+									(borderColorInput.touched || create0rUpdateForm.submitted)
+										? 'Negative'
+										: 'None'
+								"
+								placeholder="Enter Border Color"
+								[(ngModel)]="selectedColorSchemeSorting.border_color"
+								name="border_color">
 							</ui5-input>
 						</div>
 					</div>

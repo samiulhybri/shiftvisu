@@ -12,6 +12,7 @@ import { ToastService } from "@app/shared/services/toaster.service";
 import { Localization } from "@app/shared/utils/common-localize";
 
 import { DocVisuService } from "@doc-visu/doc-visu.service";
+import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
 
 @Component({
 	selector: "app-doc-visu-directory-structure",
@@ -47,6 +48,7 @@ export class DocVisuDirectoryStructureComponent implements OnDestroy {
 	previousActiveStatus: boolean = false;
 	valueState: "Negative" | "None" = "None";
 	apiUrl: string = "/doc-visu/directory-structures";
+	permissionEnums = PermissionEnum;
 
 	columns: any = [
 		{

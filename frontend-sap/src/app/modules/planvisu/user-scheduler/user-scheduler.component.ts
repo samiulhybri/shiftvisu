@@ -24,7 +24,7 @@ import { PlanVisuService } from "../services/plan-visu.service";
 	selector: "app-user-scheduler",
 	templateUrl: "./user-scheduler.component.html",
 	styleUrl: "./user-scheduler.component.scss",
-	encapsulation: ViewEncapsulation.Emulated,
+	encapsulation: ViewEncapsulation.None,
 })
 export class UserSchedulerComponent {
 	halls: Hall[] = [];
@@ -81,6 +81,7 @@ export class UserSchedulerComponent {
 	}
 
 	saveChanges$ = new Subject();
+	searchUser$ = new Subject();
 	eventMenuFeature = {
 		items: {
 			splitTime: {
@@ -312,13 +313,9 @@ export class UserSchedulerComponent {
 					}
 				},
 				onChange: (data: any) => {
+					this.isEverythingLoaded = false;
 					this.unPlannedUserSearch = data.value || null;
-					if (this.unPlannedUserSearch) {
-						this.schedulerPro.events = this.users?.filter((user: any) => (user.name.toLowerCase().includes(this.unPlannedUserSearch?.toLowerCase() ) || user.machine_id));
-					} else {
-						this.schedulerPro.events = this.users || [];
-					}
-					this.setAssignments();
+					this.searchUser$.next(1)
 				}
 
 			},
@@ -330,6 +327,7 @@ export class UserSchedulerComponent {
 	ngOnInit() {
 		this.updateSavechanges();
 		this.checkProjectOn();
+		this.updateSchedulerProEvents();
 	}
     checkProjectOn(){
 		this.projectOn$.pipe(debounceTime(500)).subscribe(next=>{
@@ -372,17 +370,17 @@ export class UserSchedulerComponent {
 			if(event?.config?.viewPreset) this.dateChange(event);
 		});
 		this.project.calendars = this.calendars;
+		this.onScroll();
 	}
 	/**
 	 * add horijontal scroll event 
 	 * if any of componet hotijontal event accur then it iffect direclty of other
 	 */
 	onScroll() {
-
-		const elements = document.querySelectorAll('.b-virtual-scroller.b-widget-scroller.b-resize-monitored.b-horizontal-overflow');
+		const elements = document.querySelectorAll('.b-virtual-scroller.b-widget-scroller.b-resize-monitored');
 		if (elements.length >= 2) {
-			const firstElement = elements[0];
-			const secondElement = elements[1];
+			const firstElement = elements[1];
+			const secondElement = elements[3];
 			firstElement.addEventListener('scroll', (event: any) => {
 				const scrollLeftPosition = event.target.scrollLeft;
 				secondElement.scrollLeft = scrollLeftPosition;
@@ -409,6 +407,9 @@ export class UserSchedulerComponent {
 		const capacity:any = await lastValueFrom(this.commonService.post('plan_visu/user-scheduler/calendar', payload, false))
 		this.capacity = capacity.calendars
 		this.planvisuService.machineCapacities = capacity.machineCapacities
+		this.setCalendar();
+	}
+    setCalendar(){
 		this.calendars = [
 			this.calendarData,
 			...this.capacity
@@ -533,7 +534,7 @@ export class UserSchedulerComponent {
 
 	updateSavechanges() {
 		
-		this.saveChanges$.pipe(debounceTime(3000)).subscribe(response => {
+		this.saveChanges$.pipe(debounceTime(1000)).subscribe(response => {
 			this.isBusy = true;
 			this.commonService.post('$batch', { requests: this.requests })
 
@@ -541,7 +542,7 @@ export class UserSchedulerComponent {
 					next: async (resonse: any) => {
 						this.isEverythingLoaded = false;
 						this.schedulerPro.assignments = []
-						await this.getCalendarData();
+						this.setCalendar();
 						this.setUserData()
 						this.requests = [];
 						this.saveChangesCall = false;
@@ -672,7 +673,6 @@ export class UserSchedulerComponent {
 							});
 						if (this.drag) this.drag.machines = this.machines;
 						this.setResources();
-
 						resolve();
 					},
 				});
@@ -705,22 +705,42 @@ export class UserSchedulerComponent {
 			v.endDate = endMoment.toISOString()
 			v.duration = this.getDuration(startMoment, endMoment);
 			v.resizable = false;
+			v.ignoreResourceCalendar = true;
+			v.manuallyScheduled = true;
 			v.durationUnit = "minute";
 			return v;
 		});
-		this.updateSchedulerProEvents();
-		this.isBusy = false;
-
+	   this.setUserAssign()
 	}
-	updateSchedulerProEvents() {
-		this.schedulerPro.assignments = [];
-		if (this.unPlannedUserSearch) {
-			this.schedulerPro.events = this.users?.filter((user: any) => (user.name.toLowerCase().includes(this.unPlannedUserSearch?.toLowerCase() ) || user.machine_id ));
-		} else {
-			this.schedulerPro.events = this.users;
-		}
+
+	setUserAssign(){
 		this.isEverythingLoaded = false;
-		this.setAssignments();
+		this.searchUser$.next(this.init)
+		this.isBusy = false;
+	}
+    init:number = 0;
+	updateSchedulerProEvents() {
+		this.searchUser$.pipe(
+			debounceTime(300)
+		  ).subscribe((res) => {
+			this.schedulerPro.assignments = [];
+			this.schedulerPro.events = [];
+			const searchTerm = this.unPlannedUserSearch?.toLowerCase() || null;
+			let filteredUsers = this.users;
+			if (searchTerm) {
+			  filteredUsers = this.users?.filter((user: any) => 
+				user.name.toLowerCase().includes(searchTerm) || 
+				user.machine_id
+			  );
+			}
+			this.schedulerPro.events = filteredUsers;
+			this.setAssignments();
+			if(res==0){
+				this.searchUser$.next(1)
+				this.init +=1;
+			}
+		  });
+		  
 	}
 
 	getDuration(startDate: Moment, endDate: Moment) {
@@ -728,7 +748,7 @@ export class UserSchedulerComponent {
 	}
 	setAssignments() {
 		
-		const assignments = this.users.filter(user => user?.machine_id).map(d => {
+		this.schedulerPro.assignments  = this.users.filter((user:any) => user?.machine_id).map((d:any) => {
 			this.updateCapacity(d)
 			return {
 				id: d.machine_user_plan_time_id,
@@ -736,8 +756,6 @@ export class UserSchedulerComponent {
 				resource: d.machine_id
 			}
 		});
-		
-		setTimeout(()=> this.schedulerPro.assignments = assignments, 0)
 		setTimeout(()=> this.isEverythingLoaded = true, 300)
 	}
 	updateCapacity(user:any){
@@ -836,14 +854,9 @@ export class UserSchedulerComponent {
 			}
 			await this.getCalendarData();
 			await this.setUserData();
-			setTimeout(() => this.onScroll(), 100);
 		}
 		if (event.zoom) {
 			(this.schedulerPro.viewPreset as any) = event.zoom
-			this.getPrest = event.zoom
-		}else{
-			(this.schedulerPro.viewPreset as any) = this.getPrest;
-	
 		}
 	}
 	eventDrag(event:any){
@@ -870,7 +883,10 @@ export class UserSchedulerComponent {
 		dialog.open = false;
 		this.machineUserPlanTimes = [];
 		if (from == 'capacityWarning' || from == 'hallWarning') {
-			if(!this.isBusy)this.updateSchedulerProEvents()
+			if(!this.isBusy){
+				this.isEverythingLoaded = false;
+				this.searchUser$.next(1)
+			}
 		}
 	}
 	deleteTimePlan(id: number) {
@@ -880,7 +896,7 @@ export class UserSchedulerComponent {
 				next: async (res: any) => {
 					this.isEverythingLoaded = false;
 					this.schedulerPro.assignments = [];
-					await this.getCalendarData();
+					this.setCalendar();
 					this.setUserData();
 				},
 				error: (e) => {
@@ -1089,8 +1105,8 @@ export class UserSchedulerComponent {
 		this.users?.some((u: any) => {
 			if (u.id == event.eventRecord.originalData.id) {
 				user.name = u.name;
-				user.capacityStart = moment.utc(`${u.date} ${u.capacity_start_time}`);
-				user.capacityEnd = moment.utc(`${u.date} ${u.capacity_end_time}`);
+				user.capacityStart = moment.utc(`${u.start_time}`);
+				user.capacityEnd = moment.utc(`${u.end_time}`);
 				const duration = this.getDuration(user.capacityStart, user.capacityEnd);
 				if (duration < 0) user.capacityEnd.add(1, 'day')
 				return 1;

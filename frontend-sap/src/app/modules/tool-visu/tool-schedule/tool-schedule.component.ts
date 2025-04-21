@@ -133,7 +133,7 @@ export class ToolScheduleComponent {
 			new ODataBatchCall(
 				0,
 				"get",
-                	`\/odata\/Items?$select=id,custom_id,name,is_tool,is_active&$filter=is_tool eq true and is_active eq true and prodOrderPos/any(a:a/id ge 0)&$expand=prodOrderPos($expand=prodOrder($select=id,custom_id,order_type);filter=((status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}')) and prodOrder/any(x:x/order_type eq '${ProdOrderType.MAINTENANCE}');select=id,prod_order_id,item_id,start,status,release_date,status_plan,estimated_hours,is_production_possible)`
+                	`\/odata\/Items?$select=id,custom_id,name,is_tool,is_active,repair_req_percentage&$filter=is_tool eq true and is_active eq true and prodOrderPos/any(a:a/id ge 0)&$expand=prodOrderPos($expand=prodOrder($select=id,custom_id,order_type);filter=((status ne '${ProdOrderPosStatus.DELETED}' and status ne '${ProdOrderPosStatus.CLOSED}') or (status_plan ne '${ProdOrderPosStatus.DELETED}' and status_plan ne '${ProdOrderPosStatus.CLOSED}')) and prodOrder/any(x:x/order_type eq '${ProdOrderType.MAINTENANCE}');select=id,prod_order_id,item_id,start,status,release_date,status_plan,estimated_hours,is_production_possible)`
 			)
 		);
 		this.commonService.post("$batch", { requests }).subscribe({

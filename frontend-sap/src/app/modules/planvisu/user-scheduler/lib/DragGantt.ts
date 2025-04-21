@@ -130,7 +130,6 @@ export class DragGantt extends DragHelper {
 	}
 	const custom_id = doctor.originalData.custom_id
 	const intervals = this.planvisuSrc.machineCapacities[custom_id].length || 0
-	console.log(intervals,custom_id)
 	// Only allow drops on the timeaxis
 	context.valid = Boolean(intervals && newStartDate &&
 		// Require a resource with matching role
@@ -152,10 +151,9 @@ export class DragGantt extends DragHelper {
 		try{
 			const { schedule } = this;
 			const { doctor, element } = context;
-		    const custom_id = doctor.originalData.custom_id
+		    const custom_id = doctor?.originalData?.custom_id
 			//const intervals = this.planvisuSrc.machineCapacities[custom_id].length || 0
 			const intervals = this.planvisuSrc.machineCapacities[custom_id] || null
-			console.log(intervals,custom_id)
 			const 
 			coordinate = DomHelper.getTranslateX(element),
 			dropDate = schedule.getDateFromCoordinate(coordinate, "round", false),
@@ -195,7 +193,7 @@ export class DragGantt extends DragHelper {
 
 	checkValidity = (intervals:string[], dropDate:string)=>{
 		let isvalid = false;
-		intervals.some((interval:any)=>{
+		intervals?.some((interval:any)=>{
 			if(interval.startDate.substring(0, 10) === dropDate || 
 				interval.endDate.substring(0, 10) === dropDate
 			){

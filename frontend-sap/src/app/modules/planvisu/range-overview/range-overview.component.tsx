@@ -109,29 +109,33 @@ export class RangeOverviewComponent {
 	constructor(private commonService: CommonService) {}
 
 	ngAfterViewInit(): void {
-		this.setBacklogs();
+		const backLogs = this.setBacklogs();
 		this.gridTable!.customUrl = `/range-overview/range?$top=${this.top}&$skip=${this.skip}&hall_id=${JSON.parse(localStorage.getItem("Hall") || "[]")}&$status=1&$inIt=1&$backlog=''`;
-		this.getComboBoxData().then(() => {
-			this.renderTableColumns();
-		});
+		const comboBoxData = this.getComboBoxData();
+
+		Promise.all([backLogs, comboBoxData]).then(x => this.renderTableColumns());
 	}
 
 	setBacklogs() {
-		this.commonService
-			.get(
-				`range-overview/range?$top=1&$skip=0&hall_id=&$status=&$inIt=1&$backlog=''`,
-				false,
-				true
-			)
-			.subscribe({
-				next: (res: any) => {
-					if (res.length) this.backlogs = res[0].backlogs;
-				},
-				error: err => {
-					console.error(err);
-					this.backlogs = [];
-				},
-			});
+		return new Promise((resolve, reject) => {
+			this.commonService
+				.get(
+					`range-overview/range?$top=1&$skip=0&hall_id=&$status=&$inIt=1&$backlog=''`,
+					false,
+					true
+				)
+				.subscribe({
+					next: (res: any) => {
+						if (res.length) this.backlogs = res[0].backlogs;
+						resolve(true);
+					},
+					error: err => {
+						console.error(err);
+						this.backlogs = [];
+						reject(err);
+					},
+				});
+		});
 	}
 
 	renderTableColumns() {

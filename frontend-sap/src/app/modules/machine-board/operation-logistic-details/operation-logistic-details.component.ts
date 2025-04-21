@@ -14,6 +14,7 @@ import { OrderDetails } from "@app/shared/interfaces/OrderDetails";
 import { ProdOrderPosOperationHandlingUnitType } from "@app/shared/enums/ProdOrderPosOperationHandlingUnitType";
 import Stock from "@app/shared/models/stock.models";
 import { MachineboardService } from "@app/modules/machine-board/services/machineboard.service";
+import { formatNumber } from "@app/shared/utils/number-formatter";
 
 @Component({
 	selector: "app-operation-logistic-details",
@@ -21,12 +22,12 @@ import { MachineboardService } from "@app/modules/machine-board/services/machine
 	styleUrl: "./operation-logistic-details.component.css",
 })
 export class OperationLogisticDetailsComponent implements OnInit, OnDestroy {
-	public quantityProposed: number = 0;
-	public quantityPerHu: number = 0;
-	public quantityInHu: number = 0;
-	public nextStop: number = 0;
-	public quantityPerParentHU: number = 0;
-	public quantityInParentHU: number = 0;
+	public quantityProposed: any = 0;
+	public quantityPerHu: any = 0;
+	public quantityInHu: any = 0;
+	public nextStop: any = 0;
+	public quantityPerParentHU: any = 0;
+	public quantityInParentHU: any = 0;
 
 	private destroy$ = new Subject<void>();
 
@@ -46,7 +47,7 @@ export class OperationLogisticDetailsComponent implements OnInit, OnDestroy {
 	packagingPositionData: Stock[] = [];
 	private inProgress: boolean = true;
 
-	logisticsData = {
+	logisticsData: any = {
 		quantityProposed: 0,
 		quantityPerHu: 0,
 		quantityInHu: 0,
@@ -62,6 +63,16 @@ export class OperationLogisticDetailsComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
+		this.onChangeOperations();
+		this.startPolling();
+	}
+
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
+	startPolling() {
 		const polling = timer(0, 3000).pipe(
 			takeUntil(this.destroy$),
 			debounce(() => of(this.inProgress)),
@@ -109,9 +120,32 @@ export class OperationLogisticDetailsComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	ngOnDestroy(): void {
+	restartPolling() {
 		this.destroy$.next();
 		this.destroy$.complete();
+
+		setTimeout(() => {
+			this.destroy$ = new Subject<void>();
+		}, 300);
+	}
+
+	onChangeOperations() {
+		this.dataService.selectedOrderDetails$.subscribe(data => {
+			if (data) {
+				this.quantityProposed = "-";
+				this.quantityPerHu = "-";
+				this.quantityInHu = "-";
+				this.nextStop = "-";
+				this.quantityPerParentHU = "-";
+				this.quantityInParentHU = "-";
+			}
+
+			this.restartPolling();
+		});
+	}
+
+	format(value: any) {
+		return formatNumber(Number(value) ?? 0);
 	}
 
 	getQuantityProposed() {
@@ -129,7 +163,11 @@ export class OperationLogisticDetailsComponent implements OnInit, OnDestroy {
 
 						this.logisticsData.quantityProposed = this.quantityProposed;
 						this.machineboardService.sendLogisticsData(this.logisticsData);
+					} else {
+						this.quantityProposed = 0;
 					}
+				} else {
+					this.quantityProposed = 0;
 				}
 			})
 		);
@@ -264,7 +302,13 @@ export class OperationLogisticDetailsComponent implements OnInit, OnDestroy {
 					this.logisticsData.quantityInHu = this.quantityInHu;
 					this.machineboardService.sendLogisticsData(this.logisticsData);
 
-					this.getStockDataForParent();
+					if (this.selectedHandlingUnitForParent?.id) {
+						this.getStockDataForParent();
+					} else {
+						this.quantityInParentHU = 0;
+						this.logisticsData.quantityInParentHU = this.quantityInParentHU;
+						this.machineboardService.sendLogisticsData(this.logisticsData);
+					}
 				})
 			);
 	}
@@ -318,7 +362,17 @@ export class OperationLogisticDetailsComponent implements OnInit, OnDestroy {
 					this.selectedHandlingUnit = HUForProdGood?.handlingUnit;
 					this.selectedHandlingUnitForParent = ParentHUForProdGood?.handlingUnit;
 
-					return this.getStockPosData();
+					if (this.selectedHandlingUnit?.id) {
+						return this.getStockPosData();
+					} else {
+						this.selectedHandlingUnit = {};
+						this.selectedHandlingUnitForParent = {};
+						this.quantityInHu = 0;
+						this.quantityInParentHU = 0;
+
+						this.logisticsData.quantityInHu = this.quantityInHu;
+						this.machineboardService.sendLogisticsData(this.logisticsData);
+					}
 				} else {
 					this.selectedHandlingUnit = {};
 					this.selectedHandlingUnitForParent = {};
@@ -327,15 +381,15 @@ export class OperationLogisticDetailsComponent implements OnInit, OnDestroy {
 
 					this.logisticsData.quantityInHu = this.quantityInHu;
 					this.machineboardService.sendLogisticsData(this.logisticsData);
-					return of(null);
 				}
+				return of(null);
 			})
 		);
 	}
 
 	getNextStop() {
 		this.nextStop = this.quantityPerHu - this.quantityInHu - this.quantityProposed;
-		if (this.nextStop < 0) {
+		if (this.nextStop < 0 || !this.nextStop) {
 			this.nextStop = 0;
 		}
 

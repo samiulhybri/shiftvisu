@@ -160,16 +160,16 @@ export class MachineStateHistoryComponent {
 		const parameter = url.substring(basevisuIndex + "/machine-board/".length);
 		this.machineId = parameter.split("/")[0];
 
+		this.checkAuthorized();
+		this.isLoading = true;
+		this.dateValue = this.machineMachineStateTime?.setRangeDatePickerValue() || "";
+		this.batchCall();
+
 		const editPermission =
 			this.authService.isPermissionValid("MACHINEBOARD_MACHINE_STATE_HISTORY_EDIT") ||
 			this.isAuthorized;
 		if (editPermission) this.columns.push(this.actionColumn);
 		else this.columns[3].width = 450;
-
-		this.isLoading = true;
-		this.dateValue = this.machineMachineStateTime?.setRangeDatePickerValue() || "";
-		this.batchCall();
-		this.checkAuthorized(parseInt(this.machineId));
 	}
 
 	refreshHistoy() {
@@ -290,11 +290,15 @@ export class MachineStateHistoryComponent {
 		this.stateDialogOpen = false;
 	}
 
-	checkAuthorized(machineId: number) {
-		if (machineId) {
-			this.commonService
-				.get(`machine/${machineId}/qualification`, false)
-				.subscribe((status: any) => (this.isAuthorized = status ? true : false));
-		}
+	checkAuthorized() {
+		if (
+			(this.authService.isQualified() &&
+				this.authService.isPermissionValid(
+					"MACHINEBOARD_MACHINE_STATE_HISTORY_EDIT_IF_QUALIFIED"
+				)) ||
+			this.authService.isPermissionValid("MACHINEBOARD_MACHINE_STATE_HISTORY_EDIT")
+		) {
+			this.isAuthorized = true;
+		} else this.isAuthorized = false;
 	}
 }

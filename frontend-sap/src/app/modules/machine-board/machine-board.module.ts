@@ -1,5 +1,5 @@
 import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { CommonModule, DecimalPipe } from "@angular/common";
 import { MachineBoardComponent } from "./machine-board.component";
 import { SharedModule } from "@app/shared/shared.module";
 import { MachineBoardRoutingModule } from "@app/modules/machine-board/machine-board-routing.module";
@@ -105,5 +105,6 @@ import { DocVisuModule } from "@app/modules/doc-visu/doc-visu.module";
 		BillOfMaterialComponent,
 		MaterialConsumptionComponent,
 	],
+	providers: [DecimalPipe]
 })
 export class MachineBoardModule {}

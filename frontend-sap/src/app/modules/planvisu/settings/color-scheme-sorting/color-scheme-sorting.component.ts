@@ -46,6 +46,7 @@ export class ColorSchemeSortingComponent {
 	deleteErrorDialogColorSchemeSorting: any;
 	@ViewChild("popover", { static: false }) popover: any;
 	@ViewChild("colorSchemeCombobox") colorSchemeCombobox!: ComboBoxComponent;
+	public isBackgroundColor: boolean = true;
 
 	columns: any = [
 		{
@@ -99,6 +100,16 @@ export class ColorSchemeSortingComponent {
 		{
 			Header: $localize`Color`,
 			accessor: "color",
+			disableFilters: false,
+			disableGroupBy: true,
+			disableSortBy: false,
+			isSelected: true,
+			dataType: GridTableColumnDataType.Color,
+			autoResizable: true,
+		},
+		{
+			Header: $localize`Border`,
+			accessor: "border_color",
 			disableFilters: false,
 			disableGroupBy: true,
 			disableSortBy: false,
@@ -211,6 +222,10 @@ export class ColorSchemeSortingComponent {
 		}
 	}
 
+	toggleSwitch() {
+		this.selectedColorSchemeSorting.has_border = !this.selectedColorSchemeSorting.has_border;
+	}
+
 	async onCreateOrUpdate() {
 		this.isLoading = true;
 		const payload = this.selectedColorSchemeSorting?.toOdata();
@@ -289,13 +304,15 @@ export class ColorSchemeSortingComponent {
 			});
 	}
 
-	openColorPicker() {
+	openColorPicker(type: string) {
+		this.isBackgroundColor = type == 'background' ? true : false;
 		this.popover.elementRef.nativeElement.open = true;
 	}
 
 	itemclicked(color: string): void {
 		this.selectedStateColor = color;
-		this.selectedColorSchemeSorting.color = this.selectedStateColor;
+		if(this.isBackgroundColor) this.selectedColorSchemeSorting.color = this.selectedStateColor;
+		else this.selectedColorSchemeSorting.border_color = this.selectedStateColor;
 	}
 
 	closeResponsiveDialog() {

@@ -1,4 +1,4 @@
-<ui5-dialog (beforeClose)="closeDialog($event)" [open]="isDialogOpen">
+<ui5-dialog (before-close)="closeDialog($event)" [open]="isDialogOpen">
 	<ui5-bar
 		slot="header"
 		design="Header">
@@ -6,19 +6,17 @@
 			level="H5"
 			i18n
 			slot="startContent">
-			{{ qualiVisuPage }}
+			{{ this.selectedInspectionOperation?.name ? (this.baseTitle + " - " + this.selectedInspectionOperation?.name) : this.baseTitle }}
 		</ui5-title>
 	</ui5-bar>
 	<div>
-		<app-inspection-point-list
-			[operationIds]="operationIds"
-			(onSelectedInspectionOperationChange)="updateTitle($event)"></app-inspection-point-list>
+		<app-inspection-point-list [operationIds]="operationIds" (selectedInspectionOperationChanged)="setSelectedInspectionOperation($event)"></app-inspection-point-list>
 	</div>
 	<div
 		slot="footer"
 		class="footer-style gap-8">
 
-		@if(!isUserBlocked) {
+		@if(!isUserBlocked || noOpenPointsAvailable) {
 			<ui5-button
 				design="Transparent"
 				(click)="closeDialog($event)"

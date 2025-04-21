@@ -67,7 +67,8 @@
 	header-text="Warning"
 	state="Critical"
 	[open]="deleteId != null">
-	<p i18n>Do you really want to delete this task?</p>
+	<p class="w-full" i18n>Do you really want to delete this task?</p>
+	<ui5-busy-indicator [active]="isSavingTask" class="w-full"></ui5-busy-indicator>
 	<div
 		slot="footer"
 		class="footer-style gap-8">
@@ -86,3 +87,5 @@
 		>
 	</div>
 </ui5-dialog>
+
+<ui5-toast #toast>{{ toastMessage }}</ui5-toast>

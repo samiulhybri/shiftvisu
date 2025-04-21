@@ -6,6 +6,8 @@ import MachineUserTime from "@app/shared/models/machine-user-time.model";
 import { CommonService } from "@app/shared/services/common.service";
 import { forkJoin } from 'rxjs';
 import { MachineboardService } from "@app/modules/machine-board/services/machineboard.service";
+import { User } from '@app/shared/models/user.model';
+import { DataService } from '@app/shared/services/data.service';
 
 
 @Component({
@@ -22,6 +24,8 @@ export class MachineBoardHeaderComponent implements AfterViewInit {
 	@ViewChild("hoverText") hoverText?: any;
 	selectedLanguage: any = new LanguageState().deserialize({});
 	clockInSubscription?:any;
+	qualifiedClockinUsers?:any;
+	selectedOrderDetails?:any;
 
 	selectedMachineUserTimes: any = new MachineUserTime().deserialize({});
 	constructor(
@@ -29,7 +33,8 @@ export class MachineBoardHeaderComponent implements AfterViewInit {
 		public router: Router,
 		public route: ActivatedRoute,
 		private machineBoardEventService: MachineBoardEventHandleService,
-		private machineBoardService: MachineboardService
+		private machineBoardService: MachineboardService,
+		private dataService: DataService
 	) {
 		this.selectedMachineUserTimes = new MachineUserTime().deserialize({});
 	}
@@ -52,6 +57,8 @@ export class MachineBoardHeaderComponent implements AfterViewInit {
 		this.loadMachineUserTimes();
 		this.loadLanguage();
 		this.checkRoute();
+
+		this.onChangeOperations();
 	}
 
 	checkRoute() {
@@ -68,21 +75,56 @@ export class MachineBoardHeaderComponent implements AfterViewInit {
 		this.isBusy = true;
 		const id = this.route.snapshot.params["id"];
 		const machineUserTimes$ = this.getMachineUserTimesByMachineId(id);
-		const qualifiedClockinUserIds$ = this.getQualifiedClockinUsersByMId(id);
+		const qualifiedClockinUsers$ = this.getQualifiedClockinUsersByMId(id);
 
-		forkJoin([machineUserTimes$, qualifiedClockinUserIds$]).subscribe({
+		forkJoin([machineUserTimes$, qualifiedClockinUsers$]).subscribe({
 			next: (data:any) => {
-				const [machineUserTimes, qualifiedClockinUserIds] = data;
+				const [machineUserTimes, qualifiedClockinUsers] = data;
+
+				this.qualifiedClockinUsers = qualifiedClockinUsers;
+
 				this.isBusy = false;
 				this.selectedMachineUserTimes = [];
+
+				let qualifiedByOperations = qualifiedClockinUsers?.qualifiedByOperations?.[0];
+
+				if(this.selectedOrderDetails){
+					qualifiedByOperations = this.qualifiedClockinUsers.qualifiedByOperations?.find((qualificationData:any)=> qualificationData.operation_id == this.selectedOrderDetails?.id)
+				}
+
 				this.selectedMachineUserTimes = machineUserTimes.value.map((machineUserTime: any) =>{
 					const mUserTime = new MachineUserTime().deserialize(machineUserTime);
-					mUserTime.qualified_clockin_user_ids = qualifiedClockinUserIds.success ? qualifiedClockinUserIds.qualified_clockin_user_ids : [];
+
+					if(qualifiedClockinUsers){
+						(mUserTime as any).isQualified = qualifiedByOperations?.qualifiedUsers?.find((user:User)=> user.id == machineUserTime?.user_id)
+					}
 					return mUserTime
 				});
 
 				this.machineBoardService.sendClockedInData(this.selectedMachineUserTimes);
 			}
+		})
+	}
+
+	onChangeOperations(){
+		this.dataService.selectedOrderDetails$.subscribe(data=>{
+			this.selectedOrderDetails = data;
+
+			if(data){
+				const qualifiedByOperations = this.qualifiedClockinUsers?.qualifiedByOperations?.find((qualificationData:any)=> qualificationData.operation_id == data?.id)
+
+				if(qualifiedByOperations){
+					this.selectedMachineUserTimes = this.selectedMachineUserTimes.map((machineUserTime: any) =>{						
+						(machineUserTime as any).isQualified = qualifiedByOperations?.qualifiedUsers?.find((user:User)=> user.id == machineUserTime?.user_id)
+						return machineUserTime
+					});
+				} else {
+					this.loadMachineUserTimes();
+				}
+			} else {
+				this.loadMachineUserTimes();
+			}
+			
 		})
 	}
 
@@ -117,7 +159,7 @@ export class MachineBoardHeaderComponent implements AfterViewInit {
 		}
 		const firstTwoMachines = this.selectedMachineUserTimes
 			.slice(0, 2)
-			.map((data: any) => `${data.user.name} - ${data.qualified_clockin_user_ids.includes(data.user.id) ? "Q" : "NQ"}`);
+			.map((data: any) => `${data.user.name} - ${data.isQualified ? "Q" : "NQ"}`);
 
 		return firstTwoMachines.join(", ");
 	}

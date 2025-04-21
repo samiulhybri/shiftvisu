@@ -137,7 +137,7 @@ export class MachineClassificationComponent implements OnInit {
 	}
 
 	refreshEditData() {
-		const url = `MachineClassifications?$filter=is_active eq true and id eq ${this.selectedMachineClassifications?.id}`;
+		const url = `MachineClassifications?$filter=id eq ${this.selectedMachineClassifications?.id}`;
 		this.commonService.get(url).subscribe({
 			next: (response: any) => {
 				this.childComponent?.onFilterAndSortingForEdit(null, response?.value[0]);
@@ -252,7 +252,7 @@ export class MachineClassificationComponent implements OnInit {
 			next: () => {
 				this.closeDialogDelete();
 				this.isLoading = false;
-				this.childComponent?.onFilterAndSortingForEdit(this.selectedMachineClassifications, null);
+				this.childComponent?.onFilterAndSortingForEdit(this.selectedId, null);
 				this.disableButtonDuringRequest = false;
 				this._toasterSrv.showToast(recordDeleted, "success");
 			},

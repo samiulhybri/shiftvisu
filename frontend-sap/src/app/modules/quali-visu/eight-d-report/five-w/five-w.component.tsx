@@ -62,7 +62,7 @@ export class FiveWComponent implements OnChanges {
 
 				return (
 					<React.StrictMode>
-						<div className={"w-full text-center"}>{index + 1}W</div>
+						<div>{index + 1}W</div>
 					</React.StrictMode>
 				);
 			},
@@ -118,6 +118,10 @@ export class FiveWComponent implements OnChanges {
 	}
 
 	newButtonClick() {
+		if(this.fiveWhyRefGrid?.isBusy) {
+			return;
+		}
+		
 		this.data.push({
 			question: "",
 			answer: "",
