@@ -435,7 +435,7 @@ class QuantityController extends Controller
             $prodOrderPosOperationId = $request->prodOrderPosOperation_id;
 
             foreach ($scannedValues as $scannedValue) {
-                $handlingUnit = HandlingUnit::query()->where('custom_id', $scannedValue)->first();
+                $handlingUnit = HandlingUnit::query()->where('custom_id', ltrim($scannedValue, '0'))->first();
 
                 $operation = null;
     

@@ -30,6 +30,9 @@ use App\Http\Controllers\ProdOrderPosOperationController;
 use App\Http\Controllers\QualiVisuController;
 use App\Http\Controllers\QuantityController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SapFlowMonitorImportController;
+use App\Http\Controllers\SAPIdocImportController;
+use App\Http\Controllers\SerialReportController;
 use App\Http\Controllers\ShiftVisu\ShiftVisuController;
 use App\Http\Controllers\TransportOrderController;
 use App\Http\Controllers\UserController;
@@ -132,16 +135,20 @@ Route::get('/plan_visu/get_furnace_trip_pdf/{hall}', [FurnaceTripPdfController::
 
 Route::apiResource('call_off_simulations', CallOffSimulationController::class);
 
-Route::controller(\App\Http\Controllers\SAPIdocImportController::class)->group(function () {
+Route::controller(SAPIdocImportController::class)->group(function () {
     Route::post('/import/sap/ecc', 'store')->withoutMiddleware("throttle:api");
-    Route::post('/import/sap/dergasd/flow-monitor/handling-units', 'storeBen')->withoutMiddleware("throttle:api");
-    Route::post('/import/sap/dergasd/flow-monitor/batches', 'storeBen')->withoutMiddleware("throttle:api");
-    Route::post('/import/sap/dergasd/flow-monitor/production-orders', 'storeBen')->withoutMiddleware("throttle:api");
-    Route::post('/import/sap/dergasd/flow-monitor/packaging-instructions', 'storeBen')->withoutMiddleware("throttle:api");
-    Route::post('/import/sap/dergasd/flow-monitor/default-packaging-instructions', 'storeBen')->withoutMiddleware("throttle:api");
-    Route::post('/import/sap/dergasd/flow-monitor/users', 'storeBen')->withoutMiddleware("throttle:api");
-    Route::post('/import/sap/dergasd/flow-monitor/items', 'storeBen')->withoutMiddleware("throttle:api");
 });
+Route::withoutMiddleware("throttle:api")
+    ->controller(SapFlowMonitorImportController::class)
+    ->group(function () {
+        Route::post('/import/sap/dergasd/flow-monitor/handling-units', 'storeHandlingUnit');
+        Route::post('/import/sap/dergasd/flow-monitor/batches', 'storeStock');
+        Route::post('/import/sap/dergasd/flow-monitor/production-orders', 'storeProductionOrder');
+        Route::post('/import/sap/dergasd/flow-monitor/packaging-instructions', 'storePackagingInstruction');
+        Route::post('/import/sap/dergasd/flow-monitor/default-packaging-instructions', 'storeDefaultPackagingInstructions');
+        Route::post('/import/sap/dergasd/flow-monitor/users', 'storeUsers');
+        Route::post('/import/sap/dergasd/flow-monitor/items', 'storeItems');
+    });
 
 Route::controller(\App\Http\Controllers\CRMDataController::class)->group(function () {
     Route::get('/import/sales-opportunity', 'importSalesOpportunities');
@@ -261,7 +268,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('machines/{machine}/machine-machine-state-time', 'syncMachineMachineStateTime');
         Route::get('machines/{machineId}/machine-machine-state-time', 'getLastMachineStateTime');
         Route::get('machines/{machine}/machine-state-times', 'getCurrentMachineStates');
-        Route::get('machine/{machine}/machine-current-state/{requestFrom?}', 'getMachineCurrentState');
+        Route::get('machine/{machine}/machine-current-state', 'getMachineWithCurrentState');
         Route::get('machine/{machine}/qualification', 'getQualificationForChangingState');
         Route::get('machine/{machine}/machine-current-states', 'getCurrentStates');
         Route::get('machine/{machine}/start/{start}/end/{end}/machine-state-time-history', 'filterMachineStateTimesByDate');
@@ -550,7 +557,7 @@ Route::prefix('stock')
         Route::put('/update-stock', 'storeOrUpdateStocks');
         Route::get('/get-handling-unit-hierarchy/{handlingUnit}', 'getHandlingUnitHierarchy');
         Route::get('/{machineId}/stocks', 'getStocksMachineSpecific');
-        Route::get('/{itemPlantId}/get-stocks-for-item-plant', 'getStocksForItemPlant');
+        Route::get('/{type}/{id}/get-stocks-by-type', 'getStocksByType');
         Route::post('/{machine}/{operation}/scanned-handling-unit-for-exit', 'scanHandlingUnitForExit');
         Route::get('/{machine}/check-bom-for-scanned-text', 'checkBomForScannedText');
         Route::get('/{machine}/check-exit-for-operations', 'checkExitForOperations');
@@ -612,7 +619,6 @@ Route::post("/commands/run/calculate-workload", [CommandController::class, 'calc
 Route::post("/commands/run/{command}", [CommandController::class, 'runCommand']);
 
 
-
 Route::post("/operations/{operation}/plan/{isUnRelesedOperation?}", function (ProdOrderPosOperation $operation, $isUnRelesedOperation = 1) {
     $prodOrder = $operation->prodOrderPos->prodOrder;
 
@@ -648,7 +654,7 @@ Route::post("/operations/{operation}/plan/{isUnRelesedOperation?}", function (Pr
                 'status' => $prodOrderPosOperation->status,
                 'status_erp' => $prodOrderPosOperation->status_erp,
                 'machine_custom_id' => $prodOrderPosOperation->machine->custom_id ?? '',
-                'is_enabled_plan_visu' => (bool) ($prodOrderPosOperation->machine?->sectionActivatables()->where('section', 'PLANVISU')->get()->first()?->is_active ?? false),
+                'is_enabled_plan_visu' => (bool)($prodOrderPosOperation->machine?->sectionActivatables()->where('section', 'PLANVISU')->get()->first()?->is_active ?? false),
                 'tool_custom_id' => $prodOrderPosOperation->tool->custom_id ?? '',
                 'hall_custom_id' => $prodOrderPosOperation->machine->hall->custom_id ?? '',
                 'tool_reference_nr' => $prodOrderPosOperation->tool_reference_nr ?? null,
@@ -725,14 +731,16 @@ Route::prefix('shift-visu')->controller(ShiftVisuController::class)->group(funct
     Route::get('/issue-types-data', 'getShiftVisuIssueTypesData');
     Route::get('/hall-list', 'getShiftVisuHallList');
     Route::get('/get-components', 'getComponents');
+    Route::post('/hall-failure-issue-submit', 'failureIssueSubmit');
 });
 
 Route::prefix('quali-visu')->controller(QualiVisuController::class)->group(function () {
+    Route::get('/{userId}/open-inspection-points', 'getOpenInspectionPoints');
     Route::post('/prod-inspection-operation/{prodInspectionOperation}/create-inspection-point', 'createInspectionPoint');
     Route::post('/get-inspections-by-operations', 'getInspectionsByOperation');
     Route::get('/get-inspection-operation-characteristic-details/{prodInspectionOperation}', 'getInspectionOperationCharacteristicDetails');
-    Route::get('/get-quali-events/{machineId}/{prodOrderPosOperationId}','getQualiEvents');
-    Route::post('/{reportId}/team-members','updateTeamMembers');
+    Route::get('/get-quali-events/{machineId}/{prodOrderPosOperationId}', 'getQualiEvents');
+    Route::post('/{reportId}/team-members', 'updateTeamMembers');
     Route::post('/{reportId}/upload-signature', 'uploadSignature');
     Route::post('/eight-d-report/download', 'downloadEightDReports');
 });
@@ -745,5 +753,9 @@ Route::prefix('inspection-point')->controller(InspectionPointController::class)-
 });
 
 Route::prefix('time-visu')->controller(TimeVisuController::class)->group(function () {
-    Route::get('/report/tool-visu-hour/{start}/{end}/{lang}/{client}', "generateToolVisuReport");
+    Route::get('/report/tool-visu-hour/{start}/{end}/{lang}', "generateToolVisuReport");
+});
+
+Route::prefix('report-visu')->group(function () {
+    Route::get('/serial-report/{plant}', [SerialReportController::class, 'getSerialReport']);
 });

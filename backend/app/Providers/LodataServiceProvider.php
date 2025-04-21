@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Providers;
+
 use App\Models\Area;
 use App\Models\CalculationDeformation;
 use App\Models\CalculationDocumentation;
@@ -243,10 +244,12 @@ use App\Models\ProdOrderPosOperationUnloadedQuantity;
 use App\Models\ShiftVisu\ShiftVisuIssueType;
 use App\Models\ShiftVisu\ShiftVisuComponent;
 use App\Models\ShiftVisu\ShiftVisuComponentOption;
+use App\Models\ShiftVisu\ShiftVisuOverviewDetail;
 
 // PlanVisu
 use App\Models\PlanVisuColorSchemeSorting;
 use App\Models\PlanVisuColorScheme;
+use App\Models\PlanVisuWorkingDaysSettings;
 
 class LodataServiceProvider extends ServiceProvider
 {
@@ -320,6 +323,7 @@ class LodataServiceProvider extends ServiceProvider
             Lodata::discover(ShiftVisuIssueType::class);
             Lodata::discover(ShiftVisuComponent::class);
             Lodata::discover(ShiftVisuComponentOption::class);
+            Lodata::discover(ShiftVisuOverviewDetail::class);
 
             Lodata::discover(Department::class);
             Lodata::discover(Deformation::class);
@@ -512,6 +516,7 @@ class LodataServiceProvider extends ServiceProvider
             Lodata::discover(InspectionPointCharacteristicOption::class);
             Lodata::discover(PlanVisuColorScheme::class);
             Lodata::discover(PlanVisuColorSchemeSorting::class);
+            Lodata::discover(PlanVisuWorkingDaysSettings::class);
         }
     }
 }

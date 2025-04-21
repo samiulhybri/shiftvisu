@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\StatusBoardCardType;
-
 use App\Enums\MachineBoardStateType;
 use App\Events\MachineStateChanged;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use App\Enums\MachineStateStateType;
 use App\Enums\ProdOrderPosOperationStatus;
@@ -16,7 +15,6 @@ use Illuminate\Http\Request;
 use Exception;
 use App\Models\SectionActivatable;
 use App\Enums\SectionActivatableTypes;
-use App\Models\MachineProdOrderPosOperationTime;
 use App\Models\Plant;
 use App\Models\ProdOrderPosOperation;
 use App\Traits\ProdOrderPosOperations;
@@ -37,25 +35,37 @@ class MachineController extends Controller
 
     function getMachinesForStatusboard(Plant $plant)
     {
-        $user = \auth()->user();
-        $machines = Machine::with('machineUserRestrictions', 'hall', 'machineGroup', 'standardValueKey.standardValueKeyActivityTypes', 'sectionActivatables');
-        if ($plant->id) {
-            $machines = $machines->where('is_active', '=', true)->where('plant_id', $plant->id);
-        }
-        $machines = $machines->get();
+        $user = \auth()->user() ?? User::find(1);
+        $machines = Machine::with([
+            'hall',
+            'machineGroup',
+            'standardValueKey.standardValueKeyActivityTypes',
+            'currentProdOrderPosOperationTimes',
+            'currentProdOrderPosOperationTimes.prodOrderPosOperation.prodOrderPos.item',
+            'currentProdOrderPosOperationTimes.prodOrderPosOperation.prodOrderPos.prodOrder',
+            'currentMachineMachineStateTimes',
+            'currentMachineMachineStateTimes.machineState.machineStateGroup',
+        ])
+            ->select('machines.*')
+            ->join('section_activatables', function ($join) {
+                $join->on('section_activatables.activatable_id', '=', 'machines.id')
+                    ->where('section_activatables.activatable_type', Machine::class)
+                    ->where('section_activatables.section', SectionActivatableTypes::STATUSBOARD())
+                    ->where('section_activatables.is_active', true);
+            })
+            ->join('machine_user_restrictions', function ($join) use ($user) {
+                $join->on('machine_user_restrictions.machine_id', '=', 'machines.id')
+                    ->where('machine_user_restrictions.user_id', $user->id);
+            })
+            ->where('machines.is_active', '=', true)
+            ->when($plant->id, fn($query) => $query->where('plant_id', $plant->id))
+            ->orderBy('machines.sort_order')
+            ->get();
+
         $allowedMachines = collect();
         foreach ($machines as $machine) {
-            if (!($machine->machineVisibleForUser($user->id))) {
-                continue;
-            }
-
-            // Rename standard_value_key to standardValueKey
             $machineCurrentStateData = $this->getMachineWithCurrentState($machine)->toArray();
-
-            $machineCurrentStateData['operationDetails'] =
-                $machineCurrentStateData['status_board_card_type'] == StatusBoardCardType::VIEW_2()
-                    ? $this->getMachineWithOrderDetails($machine)
-                    : new \stdClass();
+            $machineCurrentStateData['operationDetails'] = $this->getMachineWithOrderDetails($machine);
 
             if (isset($machineCurrentStateData['standard_value_key'])) {
                 $machineCurrentStateData['standardValueKey'] = $machineCurrentStateData['standard_value_key'];
@@ -64,52 +74,28 @@ class MachineController extends Controller
                 $machineCurrentStateData['standardValueKey'] = null;
             }
 
-
-            if (isset($machineCurrentStateData['section_activatables'])) {
-                $machineCurrentStateData['sectionActivatables'] = $machineCurrentStateData['section_activatables'];
-                unset($machineCurrentStateData['section_activatables']);
-            }
-
             // Rename standard_value_key_activity_types to standardValueKeyActivityTypes
             if (isset($machineCurrentStateData['standardValueKey']['standard_value_key_activity_types'])) {
                 $machineCurrentStateData['standardValueKey']['standardValueKeyActivityTypes'] = $machineCurrentStateData['standardValueKey']['standard_value_key_activity_types'];
                 unset($machineCurrentStateData['standardValueKey']['standard_value_key_activity_types']);
             }
-            if (count($machineCurrentStateData['sectionActivatables'])) {
-                $found = false;
-                foreach ($machineCurrentStateData['sectionActivatables'] as $sectionActivatable) {
-                    if ($sectionActivatable['section'] == SectionActivatableTypes::STATUSBOARD() && $sectionActivatable['is_active']) {
-                        $found = true;
-                        break;
-                    }
-                }
-                if ($found) {
-                    $allowedMachines->push($machineCurrentStateData);
-                }
-            }
-        }
 
-        $allowedMachines = collect($allowedMachines)->sortBy(function ($machine) {
-            return $machine['sort_order'] ?? PHP_INT_MAX;
-        })->values();
+            $allowedMachines->push($machineCurrentStateData);
+        }
 
         return $allowedMachines;
     }
 
     function getMachineWithOrderDetails($machine)
     {
-        $operationIds = $machine->prodOrderPosOperationTimes()
-            ->where(function ($query) {
-                $query->where('status', '=', ProdOrderPosOperationStatus::IN_PRODUCTION())
-                    ->orWhere('status', '=', ProdOrderPosOperationStatus::IN_SETUP())
-                    ->orWhere('status', '=', ProdOrderPosOperationStatus::IN_TEARDOWN());
-            })
+        $operationIds = $machine->currentProdOrderPosOperationTimes
+            ->whereIn('status', [ProdOrderPosOperationStatus::IN_PRODUCTION(), ProdOrderPosOperationStatus::IN_SETUP(), ProdOrderPosOperationStatus::IN_TEARDOWN()])
             ->whereNull('end')
             ->pluck('prod_order_pos_operation_id')
             ->toArray();
 
         if (empty($operationIds)) {
-            return new \stdClass(); // Return an empty object if no operation IDs are found
+            return []; // Return an empty object if no operation IDs are found
         }
 
         $allDetails = $this->prodOrderPosOperationController->getOperationDetails(new Request([
@@ -118,7 +104,7 @@ class MachineController extends Controller
         $allDetails = $allDetails->getData();
 
         if (empty($allDetails)) {
-            return new \stdClass(); // Return an empty object if no details are found
+            return [];
         }
 
         // Determine whether a linked order exists or use the first operation as default
@@ -134,7 +120,7 @@ class MachineController extends Controller
 
         if ($orderDetail) {
             // Extract details safely
-            return (object)[
+            return [
                 "orderQuantity" => optional($orderDetail)->orderQuantity ?? '',
                 "residualQuantity" => optional($orderDetail)->residualQuantity ?? '',
                 "goodItemsCount" => optional($orderDetail)->goodItemsCount ?? '',
@@ -147,86 +133,33 @@ class MachineController extends Controller
         }
 
         // Return an empty object if no details are found
-        return new \stdClass();
+        return [];
     }
 
-    function getMachineCurrentState(Machine $machine, $requestFrom = "statusBoard")
+    public function getMachineWithCurrentState(Machine $machine)
     {
-        return $this->getMachineWithCurrentState($machine, $requestFrom);
-    }
+        $currentOperations = $machine->currentProdOrderPosOperationTimes
+            ->whereIn('status', [ProdOrderPosOperationStatus::IN_PRODUCTION(), ProdOrderPosOperationStatus::IN_SETUP(), ProdOrderPosOperationStatus::IN_TEARDOWN()])
+            ->whereNull('end');
 
-    private function getMachineWithCurrentState($machine, $requestFrom = "statusBoard")
-    {
-        $currentOperation = $machine->prodOrderPosOperationTimes()
-            ->with(['prodOrderPosOperation.prodOrderPos.item', 'prodOrderPosOperation.prodOrderPos.prodOrder'])
-            ->where(function ($query) {
-                $query->where('status', '=', ProdOrderPosOperationStatus::IN_PRODUCTION())
-                    ->orWhere('status', '=', ProdOrderPosOperationStatus::IN_SETUP());
-            })
-            ->whereNull('end')
-            ->first();
-
-        $totalOperations = $machine->prodOrderPosOperationTimes()
-            ->where(function ($query) {
-                $query->where('status', '=', ProdOrderPosOperationStatus::IN_PRODUCTION())
-                    ->orWhere('status', '=', ProdOrderPosOperationStatus::IN_SETUP());
-            })
+        $totalOperations = $machine->currentProdOrderPosOperationTimes
+            ->whereIn('status', [ProdOrderPosOperationStatus::IN_PRODUCTION(), ProdOrderPosOperationStatus::IN_SETUP(), ProdOrderPosOperationStatus::IN_TEARDOWN()])
             ->whereNull('end')
             ->count();
 
-        $currentStateTime = $machine->machineMachineStateTimes()->with('machineState.machineStateGroup')->where('end', '=', null)->first();
+        $currentStateTime = $machine->currentMachineMachineStateTimes->whereNull('end')->first();
         if ($machine->machine_board_state_type == MachineBoardStateType::OPERATION_STATE->value) {
             # Need to show the machineboard machine status as per first operation of this specific machine.
-            $machineProdOrderPosOperationTimes = MachineProdOrderPosOperationTime::query()
-                ->where("machine_id", $machine->id)
-                ->where("end", null)
-                ->whereIn("status", [ProdOrderPosOperationStatus::IN_PRODUCTION(), ProdOrderPosOperationStatus::IN_SETUP(), ProdOrderPosOperationStatus::IN_TEARDOWN()])
-                ->get();
-
-            $ids = [];
-            $machineProdOrderPosOperationTimes->filter(function ($query) use (&$ids) {
-                array_push($ids, $query->prod_order_pos_operation_id);
-            });
-
-            # Set Card Status according to the first operation.
-            $firstOperation = $this->getProdOrderPosOperations(request()->merge([
-                'prodOrderPosOperationIds' => $ids,
-            ]))->first();
-
-            if (isset($firstOperation)) {
-                $firstOperationOfProdOrderPosOperationTimes = $firstOperation->prodOrderPosOperationTimes->where('end', null)->first();
-
-                if (isset($firstOperationOfProdOrderPosOperationTimes)) {
-                    if ($firstOperationOfProdOrderPosOperationTimes->status == ProdOrderPosOperationStatus::IN_SETUP()->value) {
-                        $machine['status'] = ProdOrderPosOperationStatus::IN_SETUP();
-                    } elseif ($firstOperationOfProdOrderPosOperationTimes->status == ProdOrderPosOperationStatus::IN_PRODUCTION()->value) {
-                        $machine['status'] = ProdOrderPosOperationStatus::IN_PRODUCTION();
-                    } elseif ($firstOperationOfProdOrderPosOperationTimes->status == ProdOrderPosOperationStatus::IN_TEARDOWN()->value) {
-                        $machine['status'] = ProdOrderPosOperationStatus::IN_TEARDOWN();
-                    } else {
-                        $machine['status'] = MachineStateStateType::OFF();
-                    }
-                } else {
-                    $machine['status'] = MachineStateStateType::OFF();
-                }
-            } else {
-                $machine['status'] = MachineStateStateType::OFF();
-            }
+            $machine['status'] = collect([
+                ProdOrderPosOperationStatus::IN_PRODUCTION(),
+                ProdOrderPosOperationStatus::IN_SETUP(),
+                ProdOrderPosOperationStatus::IN_TEARDOWN()
+            ])->contains($currentOperations?->first()?->status) ? $currentOperations->first()->status : MachineStateStateType::OFF();
         } else {
-            if ($currentStateTime?->machineState?->state_type == MachineStateStateType::OFF()) {
-                $machine['status'] = MachineStateStateType::OFF();
-            } else if ($currentStateTime?->machineState?->state_type == MachineStateStateType::SETUP()) {
-                $machine['status'] = MachineStateStateType::SETUP();
-            } else if ($currentStateTime?->machineState?->state_type == MachineStateStateType::PRODUCTION()) {
-                $machine['status'] = MachineStateStateType::PRODUCTION();
-            } else if ($currentStateTime?->machineState?->state_type == MachineStateStateType::READY()) {
-                $machine['status'] = MachineStateStateType::READY();
-            } else {
-                $machine['status'] = MachineStateStateType::STANDSTILL();
-            }
+            $machine['status'] = $currentStateTime?->machineState?->state_type ?? MachineStateStateType::OFF();
         }
 
-        $machine['current_operation_times'] = $currentOperation;
+        $machine['current_operation_times'] = $currentOperations->first();
         $machine['machine_machine_state_time'] = $currentStateTime;
         $machine['total_operations'] = $totalOperations;
 

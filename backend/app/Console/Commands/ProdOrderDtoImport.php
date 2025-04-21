@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Enums\ComponentPreparationState;
+use App\Enums\MachineQualificationImportType;
 use App\Enums\ProdOrderPosOperationStatus;
 use App\Enums\ProdOrderPosStatus;
 use App\Enums\ProdOrderType;
@@ -20,6 +21,7 @@ use App\Models\ProdInspectionOperationResource;
 use App\Models\ProdLot;
 use App\Models\ProdOrderPosOperationAltMachine;
 use App\Models\ProdOrderPosOperationResource;
+use App\Models\Qualification;
 use App\Models\StorageBin;
 use App\Models\StorageLocation;
 use App\Models\UserGroup;
@@ -89,7 +91,13 @@ class ProdOrderDtoImport extends Command
 
         $toolEquipments = Equipment::query()->whereNull('item_id')->select("id", "custom_id")->lazyById()->pluck("id", "custom_id")->collect();
 
-        $machines = Machine::all(['id', 'custom_id'])->mapWithKeys(function ($machine) {
+        $machines = Machine::all([
+            'id',
+            'custom_id',
+            'qualification_import_type',
+            'default_qualification_hours',
+            'default_qualification_operations'
+        ])->mapWithKeys(function ($machine) {
             return [$machine->custom_id => $machine];
         })->collect();
 
@@ -202,7 +210,6 @@ class ProdOrderDtoImport extends Command
                 }
 
                 $importedPosIds = [];
-
                 foreach ($prodOrderDto->positions as $prodOrderPosDto) {
                     $prodOrderPos = ProdOrderPos::where(
                         'prod_order_id',
@@ -217,6 +224,7 @@ class ProdOrderDtoImport extends Command
                         $prodOrderPos->pos = $prodOrderPosDto->pos;
                         $prodOrderPos->prod_order_id = $prodOrder->id;
                     }
+                    $releaseDate = $prodOrderPos->release_date;
                     $prodOrderPos->item_id = $items->get($prodOrderPosDto->item_id_custom);
                     //In benacchio we need to import orders without item (for example for cleaning)
                     if ($prodOrderPos->item_id == null && env('EXTERNAL_DS_TARGET') != 'benacchio') {
@@ -227,7 +235,6 @@ class ProdOrderDtoImport extends Command
                     $prodOrderPos->release_date = $prodOrderPosDto->release_date ?? $prodOrderPos->release_date;
                     $prodOrderPos->due_date = $prodOrderPosDto->due_date ?? $prodOrderPos->due_date;
                     $prodOrderPos->status_erp = $prodOrderPosDto->status;
-
                     $hasOperationInProduction = $prodOrderPos->prodOrderPosOperations()
                         ->where('status', ProdOrderPosOperationStatus::IN_PRODUCTION())
                         ->exists();
@@ -240,9 +247,12 @@ class ProdOrderDtoImport extends Command
                         )
                     ) {
                         $prodOrderPos->status = $prodOrderPos->status_erp;
+                    }else if ($prodOrderPos->status != ProdOrderPosStatus::CLOSED()) {
+                        $prodOrderPos->status = $prodOrderPos->status_erp;
+                        $prodOrderPos->status_plan = null;
                     } else if ($prodOrderPos->status != ProdOrderPosStatus::IN_PRODUCTION()) {
                         $prodOrderPos->status = $prodOrderPos->status_plan ?? $prodOrderPos->status_erp;
-                    }
+                    } 
 
                     $prodOrderPos->sales_order_pos_id = $sop->get($prodOrderPosDto->sales_order_id_custom)?->get($prodOrderPosDto->sales_order_pos_custom);
 
@@ -318,7 +328,7 @@ class ProdOrderDtoImport extends Command
 
                         $operation->erp_machine_id = $machines->get($operationDto->machine_id_custom)?->id;
 
-                        if(env('EXTERNAL_DS_TARGET') == 'sct') {
+                        if (env('EXTERNAL_DS_TARGET') == 'sct') {
                             $operation->machine_id = $operation->erp_machine_id;
                         } else {
                             $operation->machine_id = $operation->plan_machine_id ?? $operation->erp_machine_id;
@@ -340,6 +350,11 @@ class ProdOrderDtoImport extends Command
                                 $operation->status_erp == ProdOrderPosOperationStatus::CLOSED()
                             ) {
                                 $operation->status = $operation->status_erp;
+                            }
+
+                            if($operation->status != ProdOrderPosOperationStatus::CLOSED() ) {
+                                $operation->status = $operation->status_erp;
+                                $operation->status_plan = null;
                             }
 
                             // Set status from pos
@@ -364,7 +379,14 @@ class ProdOrderDtoImport extends Command
                         }
 
                         if (env('EXTERNAL_DS_TARGET') == 'sct') {
-                            $operation->status = $operationDto->status ?? $operation->status_erp;
+                            if (
+                                $operation->status_erp == ProdOrderPosOperationStatus::DELETED() ||
+                                $operation->status_erp == ProdOrderPosOperationStatus::CLOSED()
+                            ) {
+                                $operation->status = $operation->status_erp;
+                            } else {
+                                $operation->status = $operation->status_plan ?? $operation->status_erp;
+                            }
                         }
 
                         //SKIP to next operation if it was already closed
@@ -375,18 +397,27 @@ class ProdOrderDtoImport extends Command
                         }
 
                         $operation->erp_te = $operationDto->te;
-                        $operation->tr = $operationDto->tr;
                         $operation->registered_quantity = $operationDto->registered_quantity;
-                        $operation->cavity = $operationDto->cavity;
                         $operation->operator_usage_factor = $operationDto->operator_usage_factor;
                         $operation->user_group_id = $userGroups->get($operationDto->user_group_id_custom);
                         $operation->operation_code_erp = $operationDto->operation_code;
                         $operation->send_ahead_quantity = $operationDto->send_ahead_quantity ?? $prodOrderPos->quantity;
-                        $operation->teardown_time = $operationDto->teardown_time;
                         $operation->transfer_time = $operationDto->transfer_time;
-                        $operation->component_availability = $operationDto->component_availability;
+
+                        $operation->erp_component_availability = $operationDto->component_availability;
+                        $operation->component_availability = $operation->plan_component_availability ?? $operation->erp_component_availability;
+
                         $operation->resource_group_id_erp = $resourceGroups->get($operationDto->resource_group_id_custom);
                         $operation->tool_reference_nr_erp = $operationDto->tool_reference_nr ?? null;
+
+                        $operation->erp_tr = $operationDto->tr;
+                        $operation->tr = $operation->plan_tr ?? $operation->erp_tr;
+
+                        $operation->erp_teardown_time = $operationDto->teardown_time;
+                        $operation->teardown_time = $operation->plan_teardown_time ?? $operation->erp_teardown_time;
+
+                        $operation->erp_cavity = $operationDto->cavity ? $operationDto->cavity : 1;
+                        $operation->cavity = $operation->plan_cavity ?? $operation->erp_cavity;
 
                         $machine_group = $machine_groups->get($operationDto->machine_group_id_custom);
                         if ($machine_group) {
@@ -433,8 +464,19 @@ class ProdOrderDtoImport extends Command
                             $operation->erp_end = $operationDto->end;
                         }
 
-                        $operation->start = $operation->plan_start ?? $operation->erp_start;
-                        $operation->end = $operation->plan_end ?? $operation->erp_end;
+                        if( env('EXTERNAL_DS_TARGET') == 'ict' || env('EXTERNAL_DS_TARGET') == 'ict_test') {
+                            if($releaseDate == $prodOrderPos->release_date){
+                                $operation->start = $operation->plan_start ?? $operation->erp_start;
+                                $operation->end = $operation->plan_end ?? $operation->erp_end;
+                            }else{
+                                $operation->start =  $operation->erp_start;
+                                $operation->end = $operation->erp_end;
+                            }
+                            
+                        }else {
+                            $operation->start = $operation->plan_start ?? $operation->erp_start;
+                            $operation->end = $operation->plan_end ?? $operation->erp_end;
+                        }
                         $operation->plant_id_production = $plants->get($operationDto->plant_id_production_custom);
 
                         if ($operationDto->operation_control_profile_id_custom && !$operationControlProfiles->has($operationDto->operation_control_profile_id_custom)) {
@@ -460,7 +502,39 @@ class ProdOrderDtoImport extends Command
                         if ($operation->status == ProdOrderPosOperationStatus::CLOSED() || $operation->status == ProdOrderPosOperationStatus::DELETED())
                             $operation->operation_close_date_v10 = $operation->operation_close_date_v10 ?? now();
 
+
                         $operation->save();
+
+                        $qualificationImportType = MachineQualificationImportType::tryFrom($machines->get($operationDto->machine_id_custom)?->qualification_import_type) ?? MachineQualificationImportType::NONE;
+                        $itemId = null;
+                        $machineId = null;
+                        $operationCode = null;
+
+                        if ($qualificationImportType === MachineQualificationImportType::MACHINE_ITEM_QUALIFICATION) {
+                            $machineId = $machines->get($operationDto->machine_id_custom)?->id;
+                            $itemId = $items->get($prodOrderPosDto->item_id_custom);
+                            if(!$itemId) {
+                                $qualificationImportType = MachineQualificationImportType::NONE;
+                            }
+                        }
+
+                        if ($qualificationImportType !== MachineQualificationImportType::NONE) {
+                            $now = now();
+                            Qualification::query()->firstOrCreate(
+                                [
+                                    'item_id' => $itemId,
+                                    'machine_id' => $machineId,
+                                    'operation_code' => $operationCode,
+                                ],
+                                [
+                                    'min_qualification_hours' => $machines->get($operationDto->machine_id_custom)?->default_qualification_hours,
+                                    'min_qualification_operations' => $machines->get($operationDto->machine_id_custom)?->default_qualification_operations,
+                                    'created_at' => $now,
+                                    'updated_at' => $now,
+                                    'is_imported_from_erp' => true
+                                ]
+                            );
+                        }
 
                         $importedOperations[] = $operation;
 

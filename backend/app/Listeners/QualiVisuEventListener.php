@@ -55,7 +55,7 @@ class QualiVisuEventListener
                                  ->where('frequency', ProdInspectionOperationFrequency::CYCLE_FREQUENCY)
                                  ->get() as $prodInspectionOperation) {
 
-                        if(!$prodInspectionOperation->interval_cycles)
+                        if (!$prodInspectionOperation->interval_cycles)
                             continue;
 
                         $latestInspectionPoint = $prodInspectionOperation->inspectionPoints()->latest('registered_datetime')->first();
@@ -94,7 +94,7 @@ class QualiVisuEventListener
                         $totalQuantity = $query->total_quantity;
                         $maxCycleId = $query->max_cycle_id;
 
-                        if($totalQuantity >= $prodInspectionOperation->interval_cycles)
+                        if ($totalQuantity >= $prodInspectionOperation->interval_cycles)
                             $prodInspectionOperation->createInspectionPoint($maxCycleId);
                     }
                 }
@@ -138,7 +138,7 @@ class QualiVisuEventListener
                             [$latestEndTime])
                         ->first();
 
-                    if($stateWithDuration) {
+                    if ($stateWithDuration) {
                         foreach ($event->machine->prodOrderPosOperationTimes()
                                      ->with(['prodOrderPosOperation', 'prodOrderPosOperation.prodInspectionOperations'])
                                      ->whereNull('end')
@@ -160,10 +160,12 @@ class QualiVisuEventListener
             } elseif ($event instanceof MachineShiftStarted) {
                 Log::info('EVENT::MachineShiftStarted has just called & listened by QualiVisuEventListener.');
             } elseif ($event instanceof HandlingUnitCreated) {
-                $this->createQualiEvent($event->machine, QualiEventType::HANDLING_UNIT_CREATED, $event->operation);
+                if ($event->handlingUnit->packaging_instruction_id) {
+                    $this->createQualiEvent($event->machine, QualiEventType::HANDLING_UNIT_CREATED, $event->operation);
 
-                foreach ($event->operation?->prodInspectionOperations()->where('frequency', ProdInspectionOperationFrequency::HANDLING_UNIT_CREATED)->get() as $prodInspectionOperation) {
-                    $prodInspectionOperation->createInspectionPoint();
+                    foreach ($event->operation?->prodInspectionOperations()->where('frequency', ProdInspectionOperationFrequency::HANDLING_UNIT_CREATED)->get() as $prodInspectionOperation) {
+                        $prodInspectionOperation->createInspectionPoint();
+                    }
                 }
             }
         } catch (Exception $exception) {

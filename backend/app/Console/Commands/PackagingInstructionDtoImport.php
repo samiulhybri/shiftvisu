@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\ExternalDataSource\Dto\PackagingInstructionDto;
 use App\Http\Controllers\ExternalDataSourceController;
 use App\Models\Item;
 use App\Models\PackagingInstruction;
@@ -25,6 +26,66 @@ class PackagingInstructionDtoImport extends Command
      */
     protected $description = 'Command description';
 
+    public static function importPackagingInstruction(PackagingInstructionDto $instructionDto)
+    {
+        $instruction = PackagingInstruction::updateOrCreate(
+            [
+                'custom_id' => $instructionDto->custom_id,
+            ],
+            [
+                'is_active' => $instructionDto->is_active,
+                'uuid' => $instructionDto->uuid,
+                'machine_stop_type' => $instructionDto->machineStopType,
+            ]
+        );
+
+        $importedPos = [];
+
+        foreach ($instructionDto->positions as $posDto) {
+            if ($posDto->subordinate_packaging_instruction_uuid) {
+                $packable_id = PackagingInstruction::query()->where('uuid', $posDto->subordinate_packaging_instruction_uuid)
+                    ->first()?->id;
+                $packable_type = PackagingInstruction::class;
+            } else {
+                $packable_id = Item::query()->where('custom_id', $posDto->packed_item_id_custom)->first()->id;
+                $packable_type = Item::class;
+            }
+
+            if (!$packable_id) {
+                continue;
+            }
+
+            if (isset($importedPos[$posDto->pos]) && $importedPos[$posDto->pos]->is_active) {
+                // We've already imported a pos with this pos, because it was active it takes precedence
+                continue;
+            }
+            $importedPos[$posDto->pos] = $posDto;
+
+            if ($posDto->unit_of_measure_id_custom && !isset($unitsOfMeasure[$posDto->unit_of_measure_id_custom])) {
+                $unitOfMeasure = new UnitOfMeasure();
+                $unitOfMeasure->custom_id = $posDto->unit_of_measure_id_custom;
+                $unitOfMeasure->name = $posDto->unit_of_measure_id_custom;
+                $unitOfMeasure->is_active = true;
+                $unitOfMeasure->save();
+                $unitsOfMeasure[$posDto->unit_of_measure_id_custom] = $unitOfMeasure->id;
+            }
+
+            PackagingInstructionPos::query()->updateOrCreate(
+                [
+                    'packaging_instruction_id' => $instruction->id,
+                    'pos' => $posDto->pos,
+                ],
+                [
+                    'packable_type' => $packable_type,
+                    'packable_id' => $packable_id,
+                    'is_container' => $posDto->is_container,
+                    'target_quantity' => $posDto->target_quantity,
+                    'unit_of_measure_id' => $unitsOfMeasure[$posDto->unit_of_measure_id_custom] ?? null,
+                ]
+            );
+        }
+    }
+
     /**
      * Execute the console command.
      */
@@ -42,61 +103,7 @@ class PackagingInstructionDtoImport extends Command
         while ($instructionChunk = $ds->packagingInstructionDtos($skip, $take)) {
             $skip += $take;
             foreach ($instructionChunk as $instructionDto) {
-                $instruction = PackagingInstruction::updateOrCreate(
-                    [
-                        'custom_id' => $instructionDto->custom_id,
-                    ],
-                    [
-                        'is_active' => $instructionDto->is_active,
-                        'uuid' => $instructionDto->uuid,
-                    ]
-                );
-
-                $importedPos = [];
-
-                foreach ($instructionDto->positions as $posDto) {
-                    if ($posDto->subordinate_packaging_instruction_uuid) {
-                        $packable_id = PackagingInstruction::where('uuid', $posDto->subordinate_packaging_instruction_uuid)
-                            ->first()?->id;
-                        $packable_type = PackagingInstruction::class;
-                    } else {
-                        $packable_id = Item::where('custom_id', $posDto->packed_item_id_custom)->first()->id;
-                        $packable_type = Item::class;
-                    }
-
-                    if (!$packable_id) {
-                        continue;
-                    }
-
-                    if (isset($importedPos[$posDto->pos]) && $importedPos[$posDto->pos]->is_active) {
-                        // We've already imported a pos with this pos, because it was active it takes precedence
-                        continue;
-                    }
-                    $importedPos[$posDto->pos] = $posDto;
-
-                    if ($posDto->unit_of_measure_id_custom && !isset($unitsOfMeasure[$posDto->unit_of_measure_id_custom])) {
-                        $unitOfMeasure = new UnitOfMeasure();
-                        $unitOfMeasure->custom_id = $posDto->unit_of_measure_id_custom;
-                        $unitOfMeasure->name = $posDto->unit_of_measure_id_custom;
-                        $unitOfMeasure->is_active = true;
-                        $unitOfMeasure->save();
-                        $unitsOfMeasure[$posDto->unit_of_measure_id_custom] = $unitOfMeasure->id;
-                    }
-
-                    PackagingInstructionPos::updateOrCreate(
-                        [
-                            'packaging_instruction_id' => $instruction->id,
-                            'pos' => $posDto->pos,
-                        ],
-                        [
-                            'packable_type' => $packable_type,
-                            'packable_id' => $packable_id,
-                            'is_container' => $posDto->is_container,
-                            'target_quantity' => $posDto->target_quantity,
-                            'unit_of_measure_id' => $unitsOfMeasure[$posDto->unit_of_measure_id_custom] ?? null,
-                        ]
-                    );
-                }
+                PackagingInstructionDtoImport::importPackagingInstruction($instructionDto);
             }
         }
     }

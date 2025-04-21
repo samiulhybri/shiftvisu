@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\HandlingUnit;
 use App\Models\Machine;
 use App\Models\ProdOrderPosOperation;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -15,13 +16,15 @@ class HandlingUnitCreated
 
     public Machine $machine;
     public ?ProdOrderPosOperation $operation;
+    public ?HandlingUnit $handlingUnit;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Machine $machine, ?ProdOrderPosOperation $operation = null)
+    public function __construct(Machine $machine, HandlingUnit $handlingUnit, ?ProdOrderPosOperation $operation = null)
     {
         $this->machine = $machine;
+        $this->handlingUnit = $handlingUnit;
         $this->operation = $operation;
     }
 

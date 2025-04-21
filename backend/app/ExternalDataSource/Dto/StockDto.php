@@ -2,6 +2,8 @@
 
 namespace App\ExternalDataSource\Dto;
 
+use stdClass;
+
 class StockDto
 {
     public ?string $item_id_custom;
@@ -29,5 +31,17 @@ class StockDto
         $this->item_state_id_custom = $item_state_id_custom;
         $this->batch = $batch;
         $this->serial = $serial;
+    }
+
+    public static function fromStdClass(stdClass $obj): self {
+        return new self(
+            $obj->item_id_custom,
+            $obj->plant_id_custom,
+            $obj->storage_location_id_custom,
+            $obj->quantity,
+            $obj->item_state_id_custom ?? null,
+            $obj->batch ?? null,
+            $obj->serial ?? null,
+        );
     }
 }

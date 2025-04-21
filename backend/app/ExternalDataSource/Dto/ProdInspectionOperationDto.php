@@ -3,6 +3,7 @@
 namespace App\ExternalDataSource\Dto;
 
 use App\Enums\ProdInspectionOperationFrequency;
+use stdClass;
 
 class ProdInspectionOperationDto
 {
@@ -54,5 +55,29 @@ class ProdInspectionOperationDto
         $this->prodInspectionOperationResourceDtos = $prodInspectionOperationResourceDtos;
         $this->interval_cycles = $interval_cycles;
         $this->interval_seconds = $interval_seconds;
+    }
+
+    public static function fromStdClass(stdClass $obj): ProdInspectionOperationDto
+    {
+        $inspectionOperationCharacteristicDtos = collect($obj->inspectionOperationCharacteristicDtos ?? [])->map(function ($inspectionOperationCharacteristicDto) {
+            return InspectionOperationCharacteristicDto::fromStdClass($inspectionOperationCharacteristicDto);
+        });
+        $prodInspectionOperationResourceDtos = collect($obj->prodInspectionOperationResourceDtos ?? [])->map(function ($prodInspectionOperationResourceDto) {
+            return ProdInspectionOperationResourceDto::fromStdClass($prodInspectionOperationResourceDto);
+        });
+        return new self(
+            $obj->pos ?? null,
+            $obj->inspection_lot ?? null,
+            $obj->internal_id ?? null,
+            ProdInspectionOperationFrequency::tryFrom($obj->frequency) ?? null,
+            $obj->is_active ?? null,
+            $obj->is_blocking ?? null,
+            $obj->name ?? null,
+            $inspectionOperationCharacteristicDtos->toArray(),
+            $prodInspectionOperationResourceDtos->toArray(),
+            $obj->interval_cycles ?? null,
+            $obj->interval_seconds ?? null,
+            $obj->xml_id ?? null,
+        );
     }
 }

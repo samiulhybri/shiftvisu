@@ -52,9 +52,9 @@ class BaseDataImportController extends Controller
 
     public function toolsSync()
     {
-        if(env('EXTERNAL_DS_TARGET') == 'vop') {
+        if (env('EXTERNAL_DS_TARGET') == 'vop' || env('EXTERNAL_DS_TARGET') == 'ict' || env('EXTERNAL_DS_TARGET') == 'ict_test') {
             (new ToolDtoImport())->handle();
-        }else {
+        } else {
             (new ToolImport())->handle();
         }
     }

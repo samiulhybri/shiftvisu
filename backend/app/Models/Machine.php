@@ -5,6 +5,7 @@ namespace App\Models;
 use App\DTO\ConsumptionData;
 use App\DTO\QuantityData;
 use App\Enums\ItemStateType;
+use App\Enums\MachineStateType;
 use App\Enums\ProdOrderPosOperationHandlingUnitType;
 use App\Enums\ProdOrderPosOperationStatus;
 use App\Enums\ProductionPlanType;
@@ -12,6 +13,7 @@ use App\Enums\QuantityErrorType;
 use App\Enums\StockOperationType;
 use App\Events\HandlingUnitCreated;
 use App\Http\Controllers\HandlingUnitController;
+use App\Http\Controllers\MachineMachineStateTimeController;
 use App\Http\Controllers\StockController;
 use App\Models\Model\JpiResource;
 use Exception;
@@ -24,7 +26,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -33,25 +34,7 @@ class Machine extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'custom_id',
-        'name',
-        'hall_id',
-        'machine_group_id',
-        'tpm_sub_group_id',
-        'usage_factor',
-        'tr',
-        'is_furnace',
-        'is_casting_machine',
-        'price',
-        'is_active'
-    ];
-
+    protected $guarded = [];
     static public $snakeAttributes = false;
 
     #[LodataRelationship]
@@ -101,6 +84,12 @@ class Machine extends Model
     }
 
     #[LodataRelationship]
+    public function currentProdOrderPosOperationTimes(): HasMany
+    {
+        return $this->hasMany(MachineProdOrderPosOperationTime::class)->whereNull('end')->orderBy('start');
+    }
+
+    #[LodataRelationship]
     public function materialConsumptions(): BelongsToMany
     {
         return $this->belongsToMany(MaterialConsumption::class, "material_consumption_machines");
@@ -142,6 +131,11 @@ class Machine extends Model
         return $this->morphMany(Capacity::class, 'capacitable');
     }
 
+    public function currentCapacities(): MorphMany
+    {
+        return $this->morphMany(Capacity::class, 'capacitable')->where('date', now())->where('start_time', '<=', now()->toTimeString())->where('end_time', '>', now()->toTimeString());
+    }
+
     #[LodataRelationship]
     public function sectionActivatables(): MorphMany
     {
@@ -164,6 +158,12 @@ class Machine extends Model
     public function machineMachineStateTimes(): HasMany
     {
         return $this->hasMany(MachineMachineStateTime::class);
+    }
+
+    #[LodataRelationship]
+    public function currentMachineMachineStateTimes(): HasMany
+    {
+        return $this->hasMany(MachineMachineStateTime::class)->whereNull('end')->orderBy('start');
     }
 
     #[LodataRelationship]
@@ -305,11 +305,13 @@ class Machine extends Model
                 })->get();
 
             foreach ($requiredQualifications as $qualification) {
-                if($qualification->min_qualification_hours || $qualification->min_qualification_operations) {
+                if ($qualification->min_qualification_hours || $qualification->min_qualification_operations) {
                     $qualifiedUsers = $qualification->qualifiedUsers()->select("qualification_users.user_id")->get();
-                    $intersection = $clockedInUsers->intersect($qualifiedUsers);
-                }
-                else {
+
+                    // Use `pluck('user_id')` to compare only user_id values and 
+                    $intersection = $clockedInUsers->pluck('user_id')->intersect($qualifiedUsers->pluck('user_id'));
+                    $intersection = $clockedInUsers->whereIn('user_id', $intersection->values()); // Convert intersection back to user objects as needed
+                } else {
                     $intersection = $clockedInUsers;
                 }
 
@@ -338,7 +340,7 @@ class Machine extends Model
     }
 
     public function getClockinUsers(): \Illuminate\Database\Eloquent\Collection
-    {    
+    {
         return $this
             ->machineUserTime()
             ->whereNull("end")
@@ -379,6 +381,18 @@ class Machine extends Model
     }
 
     #[LodataRelationship]
+    public function machineStateSetup(): BelongsTo
+    {
+        return $this->belongsTo(MachineState::class, 'machine_state_id_default_setup');
+    }
+
+    #[LodataRelationship]
+    public function machineStateAvailable(): BelongsTo
+    {
+        return $this->belongsTo(MachineState::class, 'machine_state_id_default_available');
+    }
+
+    #[LodataRelationship]
     public function machineComponentSerialNumberProfilesPivot(): BelongsToMany
     {
         return $this->belongsToMany(SerialNumberProfile::class, 'machine_component_serial_number_profiles');
@@ -389,7 +403,7 @@ class Machine extends Model
     {
         return $this->hasMany(MachineComponentSerialNumberProfile::class);
     }
-    
+
     #[LodataRelationship]
     public function machineLastSerialNumberProfilesPivot(): BelongsToMany
     {
@@ -401,7 +415,7 @@ class Machine extends Model
     {
         return $this->hasMany(MachineLastSerialNumberProfile::class);
     }
-    
+
     #[LodataRelationship]
     public function machineMiddleSerialNumberProfilesPivot(): BelongsToMany
     {
@@ -465,7 +479,7 @@ class Machine extends Model
             if (count($duplicateSerials) > 0) {
                 throw new Exception(json_encode([
                     "type" => QuantityErrorType::DUPLICATE_SERIAL,
-                    "values"=> $duplicateSerials
+                    "values" => $duplicateSerials
                 ]));
             }
         }
@@ -540,7 +554,7 @@ class Machine extends Model
                     ) {
                         throw new Exception(json_encode([
                             "type" => QuantityErrorType::SERIAL_REQUIRED_FOR_FINAL_ITEM,
-                            "values"=> [$operation?->prodOrderPos?->itemPlant()?->item?->custom_id]
+                            "values" => [$operation?->prodOrderPos?->itemPlant()?->item?->custom_id]
                         ]));
                     }
 
@@ -551,7 +565,7 @@ class Machine extends Model
                     ) {
                         throw new Exception(json_encode([
                             "type" => QuantityErrorType::BATCH_REQUIRED_FOR_FINAL_ITEM,
-                            "values"=> [$operation?->prodOrderPos?->itemPlant()?->item?->custom_id]
+                            "values" => [$operation?->prodOrderPos?->itemPlant()?->item?->custom_id]
                         ]));
                     }
                 }
@@ -590,6 +604,7 @@ class Machine extends Model
                     $operationConsumption->warehouse_id = $consumption->warehouse_id;
                     $operationConsumption->storage_bin_id = $consumption->storage_bin_id;
                     $operationConsumption->production_supply_area_id = $consumption->production_supply_area_id;
+                    $operationConsumption->note = $consumption->note;
                     $operationConsumption->prod_order_pos_operation_confirmation_id = $confirmation->id;
 
                     $operationConsumptions->push($operationConsumption);
@@ -604,7 +619,7 @@ class Machine extends Model
                     ) {
                         throw new Exception(json_encode([
                             "type" => QuantityErrorType::SERIAL_REQUIRED_FOR_COMPONENT,
-                            "values"=> [$operationConsumption?->itemPlant?->item?->custom_id]
+                            "values" => [$operationConsumption?->itemPlant?->item?->custom_id]
                         ]));
                     }
 
@@ -615,8 +630,8 @@ class Machine extends Model
                     ) {
                         throw new Exception(json_encode([
                             "type" => QuantityErrorType::BATCH_REQUIRED_FOR_COMPONENT,
-                            "values"=> [$operationConsumption?->itemPlant?->item?->custom_id],
-                            "quantity"=> $operationConsumption?->quantity
+                            "values" => [$operationConsumption?->itemPlant?->item?->custom_id],
+                            "quantity" => $operationConsumption?->quantity
                         ]));
                     }
                 }
@@ -846,7 +861,9 @@ class Machine extends Model
     {
         $handlingUnit = HandlingUnitController::createHandlingUnit($packaging_instruction_id, $item_id_packaging);
 
-        event(new HandlingUnitCreated($this, $operation));
+        ['positionable_id' => $machinePositionableId, 'positionable_type' => $machinePositionableType] = $this->getPositionable();
+
+        event(new HandlingUnitCreated($this, $handlingUnit, $operation));
 
         ProdOrderPosOperationHandlingUnit::query()->create([
             'prod_order_pos_operation_id' => $operation->id ?? null,
@@ -855,9 +872,33 @@ class Machine extends Model
             'type' => $handlingUnitType
         ]);
 
-        //TODO: Consume stock for empty Packaging Item
+        $inputs = [];
+        $packagingInstructionPoses = PackagingInstructionPos::query()
+            ->where('packaging_instruction_id', $packaging_instruction_id)
+            ->whereHasMorph('packable', [Item::class], function ($query) {
+                $query->where('is_packaging_item', true)
+                    ->whereHas('itemPlants', function ($subQuery) {
+                        $subQuery->where('plant_id', $this->plant_id);
+                    });
+            })
+            ->with(['packable' => function ($query) {
+                $query->with('itemPlants');
+            }])
+            ->get();
 
-        StockController::updateStockQuantity([
+        foreach ($packagingInstructionPoses as $packagingInstructionPos) {
+            if (($packagingInstructionPos->packable?->itemPlants?->where('plant_id', $this->plant_id)?->count() ?? 0) > 0) {
+                $inputs[] = [
+                    "quantity" => -$packagingInstructionPos->target_quantity,
+                    "stockable_type" => ItemPlant::class,
+                    "stockable_id" => $packagingInstructionPos->packable->itemPlants->where('plant_id', $this->plant_id)->first()->id,
+                    "positionable_type" => $machinePositionableType,
+                    "positionable_id" => $machinePositionableId,
+                    "item_state_id" => $this->plant->item_state_id_default,
+                ];
+            }
+        }
+        $outputs = [
             [
                 "quantity" => 1,
                 "stockable_type" => HandlingUnit::class,
@@ -866,7 +907,10 @@ class Machine extends Model
                 "positionable_id" => $positionable_id,
                 "item_state_id" => $this->plant->item_state_id_default,
             ]
-        ]);
+        ];
+
+        StockController::moveStocks($inputs, $outputs, StockOperationType::HANDLING_UNIT_CREATION(), $handlingUnit);
+
         return $handlingUnit;
     }
 
@@ -1028,6 +1072,33 @@ class Machine extends Model
             ->where('prod_order_pos_operation_id', $operationId)
             ->whereNull('end')
             ->first();
+    }
+
+    public function checkAndUpdateMachineStatus() {
+        $machineStateType = MachineStateType::tryFrom($this->machine_state_type);
+        if($machineStateType === MachineStateType::BASED_ON_OPERATION()) {
+            $currentProdOrderPosOperationTimes = $this->currentProdOrderPosOperationTimes()
+                ->whereIn('status', [
+                    ProdOrderPosOperationStatus::IN_SETUP(),
+                    ProdOrderPosOperationStatus::IN_PRODUCTION(),
+                    ProdOrderPosOperationStatus::IN_TEARDOWN()
+                ])->get();
+
+            if($currentProdOrderPosOperationTimes
+                ->whereIn('status', [ProdOrderPosOperationStatus::IN_SETUP(), ProdOrderPosOperationStatus::IN_TEARDOWN()])
+                ->count()) {
+                MachineMachineStateTimeController::saveMachineState($this->id, $this->machine_state_id_default_setup, now());
+            } else if ($currentProdOrderPosOperationTimes
+                ->where('status', ProdOrderPosOperationStatus::IN_PRODUCTION())
+                ->count()) {
+                MachineMachineStateTimeController::saveMachineState($this->id, $this->machine_state_id_default_production, now());
+            }
+            else {
+                MachineMachineStateTimeController::saveMachineState($this->id, $this->machine_state_id_default_off, now());
+            }
+        } else if($machineStateType === MachineStateType::IIOT()) {
+            //TODO: This needs to be done
+        }
     }
 }
     

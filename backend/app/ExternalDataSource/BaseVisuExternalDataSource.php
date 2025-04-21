@@ -1070,4 +1070,14 @@ class BaseVisuExternalDataSource extends Controller implements ExternalDataSourc
     {
         return false;
     }
+
+    /**
+     * @param int $skip
+     * @param int $take
+     * @return DocVisuItemFileDto[]|false
+     */
+    public function docVisuItemFileDtos(int $skip, int $take, ?string $onlyCustomId): array|false
+    {
+        return false;
+    }
 }

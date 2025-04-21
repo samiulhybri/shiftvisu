@@ -17,7 +17,7 @@
 	"ADDITIONAL_PREPROCESS_CMDS": [
 		"php artisan migrate",
 		"php artisan db:seed --class=ShopfloorSuiteIdGeneratorSeeder",
-		"php artisan db:seed --class=PermissionSeeder",
+		"php artisan db:seed --class=PermissionSeederDerga",
 		"php artisan db:seed --class=RoleSeeder",
 		"php artisan db:seed --class=ScheduleSeeder",
 		"php artisan optimize:clear"

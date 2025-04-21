@@ -109,7 +109,9 @@ class ItemController extends Controller
      */
     public function updateRepairProductionDate(Request $request, $id) {
         try {
-            $date = Carbon::parse($request->input('start_date'))->format('Y-m-d H:i:s'); 
+            // return $request->input('start_date');
+            $date = Carbon::parse($request->input('start_date'));
+            $startDateInput = $request->input('start_date');
             $tool = Item::where('is_tool', true)
                 ->where('is_active', true)
                 ->find($id);
@@ -117,11 +119,12 @@ class ItemController extends Controller
             if($tool) {
                 $tool->prodOrderPos()
                     ->whereNotIn('status_plan', [ProdOrderPosStatus::CLOSED(), ProdOrderPosStatus::DELETED()])
-                    ->update(['release_date' => $date]);
+                    ->update(['release_date' => $date->clone(), 'is_prod_date_manual' => 0]);
                 
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Repairs production dates updated successfully.',
+                    'date' => $date->clone()
                 ]);
             } else {
                 return response()->json([

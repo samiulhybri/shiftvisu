@@ -151,7 +151,7 @@ class BacklogCalculation implements ShouldQueue
             $stock += $stockWiseItemQty->where('item_id', $backlog_item->item_id)->sum('total_quantity') ?? 0;
 
             $backlog_item->qty_stock = $stock;
-            $backlog_item->qty_backlog = $backlog_item->qty_stock - $backlog_item->qty_call_off;
+            $backlog_item->qty_backlog = $backlog_item->qty_stock - $backlog_item->qty_call_off + $backlog_item->qty_prod_order;
 
             # Calculate plan quantities
             $yearFirstWeekDate = $this->getFirstDateOfFirstISOWeekOfCurrentYear();
@@ -186,7 +186,7 @@ class BacklogCalculation implements ShouldQueue
                 ->where('section_activatables.activatable_type', 'App\\Models\\Machine')
                 ->where('section_activatables.section', 'PLANVISU')
                 ->where('section_activatables.is_active', true)
-                ->groupBy('prod_order_pos.id')
+                ->groupBy('prod_order_pos_operations.id')
                 ->get();
 
             foreach ($prod_orders_pos as $prod_orders_po) {

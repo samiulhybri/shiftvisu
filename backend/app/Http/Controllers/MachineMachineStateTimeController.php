@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\MachineStateChanged;
 use App\Models\Machine;
 use App\Models\MachineMachineStateTime;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
@@ -19,37 +20,10 @@ class MachineMachineStateTimeController extends Controller {
         ]);
 
         $machineId = $request->get('machine_id');
-
-        $machineMachineStateTimeCurrent = MachineMachineStateTime::query()
-            ->where('machine_id', $machineId)
-            ->whereNull('end')
-            ->first();
-
-        $isNewState = false;
+        $machineStateId = $request->get('machine_state_id');
         $date = $request->get('start', now());
 
-        $machineStateId = $request->get('machine_state_id', null);
-
-        if ($machineMachineStateTimeCurrent) {
-            if ($machineMachineStateTimeCurrent->machine_state_id != $machineStateId) {
-                $isNewState = true;
-                $machineMachineStateTimeCurrent->end = $date;
-                $machineMachineStateTimeCurrent->save();
-            }
-        }
-        else {
-            $isNewState = true;
-        }
-
-        if ($isNewState) {
-            $machineMachineStateTimeCurrent = new MachineMachineStateTime();
-            $machineMachineStateTimeCurrent->machine_id = $machineId;
-            $machineMachineStateTimeCurrent->start = $date;
-            $machineMachineStateTimeCurrent->machine_state_id = $machineStateId;
-            $machineMachineStateTimeCurrent->save();
-
-            event(new MachineStateChanged(Machine::query()->findOrFail($machineId), $machineMachineStateTimeCurrent));
-        }
+        MachineMachineStateTimeController::saveMachineState($machineId, $machineStateId, $date);
     }
 
     /**
@@ -170,5 +144,41 @@ class MachineMachineStateTimeController extends Controller {
         event(new MachineStateChanged($machine, $machineStateTime));
 
         return response()->json($machineStateTime, 200);
+    }
+
+    /**
+     * @param int $machineId
+     * @param int|null $machineStateId
+     * @param Carbon|string $date
+     * @return void
+     */
+    public static function saveMachineState(int $machineId, int|null $machineStateId, Carbon|string $date): void
+    {
+        $machineMachineStateTimeCurrent = MachineMachineStateTime::query()
+            ->where('machine_id', $machineId)
+            ->whereNull('end')
+            ->first();
+
+        $isNewState = false;
+
+        if ($machineMachineStateTimeCurrent) {
+            if ($machineMachineStateTimeCurrent->machine_state_id != $machineStateId) {
+                $isNewState = true;
+                $machineMachineStateTimeCurrent->end = $date;
+                $machineMachineStateTimeCurrent->save();
+            }
+        } else {
+            $isNewState = true;
+        }
+
+        if ($isNewState) {
+            $machineMachineStateTimeCurrent = new MachineMachineStateTime();
+            $machineMachineStateTimeCurrent->machine_id = $machineId;
+            $machineMachineStateTimeCurrent->start = $date;
+            $machineMachineStateTimeCurrent->machine_state_id = $machineStateId;
+            $machineMachineStateTimeCurrent->save();
+
+            event(new MachineStateChanged(Machine::query()->findOrFail($machineId), $machineMachineStateTimeCurrent));
+        }
     }
 }

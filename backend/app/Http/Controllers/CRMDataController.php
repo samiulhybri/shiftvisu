@@ -234,6 +234,15 @@ class CRMDataController extends Controller
         $dateRangeType = ReportRangeGeneratorType::from($request->input('date_range_type', ReportRangeGeneratorType::DAY->value));
         $count = $request->input('count', 12);
 
+        if ($dateRangeType->value == ReportRangeGeneratorType::WEEK->value) {
+            $endDate = $endDate->copy()->addWeeks(6)->endOfWeek();
+            $count = $request->input('count', 18);
+        } elseif ($dateRangeType->value == ReportRangeGeneratorType::MONTH->value) {
+            $endDate = $endDate->copy()->addMonths(2)->endOfMonth();
+            $count = $request->input('count', 14);
+        } else {
+        }
+
         // Generate date ranges
         $dateRanges = $this->dateRangeService->generateDateRanges($endDate, $dateRangeType, $count);
         $startDate = $dateRanges[0] ?? null; // Ensure valid index

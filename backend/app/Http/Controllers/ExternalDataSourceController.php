@@ -627,4 +627,14 @@ class ExternalDataSourceController extends Controller
     {
         return $this->external_data_source->inspectionSpecificationDtos($skip, $take);
     }
+
+    /**
+     * @param int $skip
+     * @param int $take
+     * @return DocVisuItemFileDto[]|false
+     */
+    public function docVisuItemFileDtos(int $skip, int $take, ?string $onlyCustomId): array|false
+    {
+        return $this->external_data_source->docVisuItemFileDtos($skip, $take, $onlyCustomId);
+    }
 }

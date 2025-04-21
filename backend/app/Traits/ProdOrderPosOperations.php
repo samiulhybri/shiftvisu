@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use App\Enums\ProdOrderPosOperationStatus;
 use App\Models\ProdOrderPosOperation;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 trait ProdOrderPosOperations
@@ -15,8 +14,6 @@ trait ProdOrderPosOperations
     private function getProdOrderPosOperations(Request $request)
     {
         $status = [ProdOrderPosOperationStatus::IN_PRODUCTION(), ProdOrderPosOperationStatus::IN_SETUP(), ProdOrderPosOperationStatus::IN_TEARDOWN()];
-        $oneHourAgo = Carbon::now()->subHour();
-        $now = Carbon::now();
 
         return ProdOrderPosOperation::with([
             'prodOrderPosOperationTimes' => function ($query) use ($status) {
@@ -40,14 +37,6 @@ trait ProdOrderPosOperations
             },
             'prodOrderPosOperationQuantities' => function ($query) {
                 $query->with(['itemState'])->select('id', 'item_state_id', 'quantity', 'confirmed_datetime', 'prod_order_pos_operation_id')->orderBy('quantity', 'desc');
-            },
-            'machine' => function ($query) use ($oneHourAgo, $now) {
-                $query->select('id', 'name')->with([
-                    'machineCycles' => function ($query) use ($oneHourAgo, $now) {
-                        $query->where('registered_datetime', '>=', $oneHourAgo)->where('registered_datetime', '<=', $now)->orderBy('registered_datetime', 'desc')
-                            ->select('id', 'machine_id', 'registered_datetime', 'quantity');
-                    }
-                ]);
             },
             'unitOfMeasure',
             'prodOrderPosOperationLoadedQuantities'

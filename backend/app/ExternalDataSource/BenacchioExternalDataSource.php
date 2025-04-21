@@ -42,7 +42,7 @@ class BenacchioExternalDataSource extends SapApiExternalDataSource
             $dto = new HandlingUnitDto(
                 custom_id: $handlingUnit['HandlingUnitExternalID'],
                 handling_unit_item_id_custom: $handlingUnit['PackagingMaterial'],
-                is_complete: $handlingUnit['HandlingUnitIsComplete'],
+                is_complete: ($handlingUnit['UserStatus'] ?? null) === 'PN',
                 storage_location_id_custom: $handlingUnit['StorageLocation'],
                 plant_id_custom: $handlingUnit['Plant'],
             );

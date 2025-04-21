@@ -133,6 +133,7 @@ class UserDtoImport extends Command
                 }
 
                 try {
+                    $record->is_imported_from_erp = true;
                     $record->save();
 
                     if ($user->userGroupDtos) {

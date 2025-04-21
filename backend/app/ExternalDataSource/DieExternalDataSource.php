@@ -10,6 +10,10 @@ use App\ExternalDataSource\Dto\ItemStateDto;
 use App\ExternalDataSource\Dto\MachineDto;
 use App\ExternalDataSource\Dto\OperationPlanDto;
 use App\ExternalDataSource\Dto\OperationPlanPosDto;
+use App\ExternalDataSource\Dto\StockDto;
+use App\Models\Item;
+use App\Models\Plant;
+use App\Models\StorageLocation;
 use PDO;
 
 class DieExternalDataSource extends BaseVisuExternalDataSource
@@ -84,15 +88,15 @@ class DieExternalDataSource extends BaseVisuExternalDataSource
     public function itemDtos(int $skip, int $take): array|false
     {
         $sql = "SELECT DISTINCT
-                AuftrNr AS custom_id,
-                ModellBez AS name,
-                KundenNr AS customer_id_custom,
-                ZeichNr AS name2,
-                TeileNr AS name3
-            FROM Auftraege
-            ORDER BY AuftrNr
-            OFFSET $skip ROWS
-            FETCH NEXT $take ROWS ONLY";
+                    TeileNr AS custom_id,
+                    ModellBez AS name,
+                    KundenNr AS customer_id_custom,
+                    ZeichNr AS name2
+                FROM Teile
+                WHERE TeileNr IS NOT NULL AND ModellBez IS NOT NULL
+                ORDER BY TeileNr 
+                OFFSET $skip ROWS
+                FETCH NEXT $take ROWS ONLY";
 
         $stmt = $this->erp_db->prepare($sql);
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
@@ -103,7 +107,6 @@ class DieExternalDataSource extends BaseVisuExternalDataSource
             ->map(function ($result) {
                 return new ItemDto(
                     custom_id: $result['custom_id'],
-                    name3: $result['name3'],
                     name: $result['name'],
                     custom_operation_plan_id: $result['custom_id'],
                     plants: [
@@ -333,6 +336,49 @@ class DieExternalDataSource extends BaseVisuExternalDataSource
                     custom_id: $result['CUSTOM_ID'],
                     name: $result['NAME'],
                     is_active: $result['IS_ACTIVE']
+                );
+            }
+        }
+
+        return $dtos;
+    }
+
+    /**
+     * @param int $skip
+     * @param int $take
+     * @return StockDto[]|false
+     */
+    public function stockDtos(int $skip, int $take): array|false
+    {
+        $sql = "SELECT 
+                    TeileNr AS ITEM_CUSTOM_ID,
+                    SUM(LagerHFSt) AS QUANTITY
+                FROM Teile
+                WHERE TeileNr IS NOT NULL AND ModellBez IS NOT NULL
+                GROUP BY TeileNr 
+                ORDER BY TeileNr 
+                OFFSET $skip ROWS
+                FETCH NEXT $take ROWS ONLY";
+
+        $stmt = $this->erp_db->prepare($sql);
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        $stmt->execute();
+        $results = $stmt->fetchAll();
+
+        $dtos = [];
+
+        $plant = Plant::with('itemStateDefault')->first();
+        $storageLocation = StorageLocation::first();
+        $items = Item::where('is_tool', null)->pluck('custom_id')->toArray();
+
+        foreach ($results as $result) {
+            if (in_array($result['ITEM_CUSTOM_ID'], $items)) {
+                $dtos[] = new StockDto(
+                    item_id_custom: $result['ITEM_CUSTOM_ID'],
+                    plant_id_custom: $plant->custom_id,
+                    item_state_id_custom: $plant->itemStateDefault->custom_id,
+                    storage_location_id_custom: $storageLocation->custom_id,
+                    quantity: (float) $result['QUANTITY']
                 );
             }
         }

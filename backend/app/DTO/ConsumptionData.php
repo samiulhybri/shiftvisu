@@ -17,7 +17,8 @@ class ConsumptionData
         public ?int $item_plant_id = null,
         public ?int $warehouse_id = null,
         public ?int $storage_bin_id = null,
-        public ?int $production_supply_area_id = null
+        public ?int $production_supply_area_id = null,
+        public ?string $note = null
     ) {}
 
     public static function fromArray(array $data): self
@@ -33,7 +34,8 @@ class ConsumptionData
             $data['item_plant_id'] ?? null,
             $data['warehouse_id'] ?? null,
             $data['storage_bin_id'] ?? null,
-            $data['production_supply_area_id'] ?? null
+            $data['production_supply_area_id'] ?? null,
+            $data['note'] ?? null,
         );
     }
 
@@ -50,7 +52,8 @@ class ConsumptionData
             $consumption->item_plant_id,
             $consumption->warehouse_id,
             $consumption->storage_bin_id,
-            $consumption->production_supply_area_id
+            $consumption->production_supply_area_id,
+            $consumption->note
         );
     }
 
@@ -67,7 +70,8 @@ class ConsumptionData
             $this->item_plant_id,
             $this->warehouse_id,
             $this->storage_bin_id,
-            $this->production_supply_area_id
+            $this->production_supply_area_id,
+            $this->note,
         );
     }
 }

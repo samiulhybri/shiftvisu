@@ -13,9 +13,8 @@ class ShiftVisuComponent extends Model
         'view_in',
         'measure_options',
     ];
-
     use HasFactory;
-
+    
     #[LodataRelationship]
     public function shiftVisuComponentOptions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

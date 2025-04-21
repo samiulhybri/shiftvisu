@@ -14,6 +14,7 @@ class Qualification extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
     #[LodataRelationship]
     public function item(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -56,9 +57,9 @@ class Qualification extends Model
     public function requiredForOperationsIgnoreMachineBuilder(): Builder
     {
         $query = ProdOrderPosOperation::query();
-//        if ($this->machine_id) {
-//            $query->where('machine_id', $this->machine_id);
-//        }
+        if ($this->machine_id) {
+            $query->where('machine_id', $this->machine_id);
+        }
         if ($this->operation_code) {
             $query->where('operation_code', $this->operation_code);
         }

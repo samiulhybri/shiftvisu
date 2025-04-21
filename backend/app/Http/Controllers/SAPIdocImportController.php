@@ -36,11 +36,4 @@ class SAPIdocImportController extends Controller
 
         return response()->json(['message' => $responseMessage, 'data' => []], $statusCode);
     }
-
-    public function storeBen(Request $request)
-    {
-        Log::info($request->getContent());
-
-        return response()->json();
-    }
 }

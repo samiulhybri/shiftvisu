@@ -37,12 +37,13 @@ class UserTimeExport extends Command
             ->leftJoin('machine_states', 'machine_states.id', '=', 'user_registered_times.machine_state_id')
             ->leftJoin('machine_state_groups', 'machine_states.machine_state_group_id', '=', 'machine_state_groups.id')
             ->where('user_registered_times.is_exported', false)
-            ->groupBy('prod_orders.custom_id', 'prod_order_pos.pos', 'prod_order_pos_operations.pos', 'users.custom_id', 'machines.custom_id', 'machine_states.custom_id', 'machine_state_groups.custom_id', 'machine_state_groups.is_productive', 'user_registered_times.status_operation')
+            ->groupBy('prod_orders.custom_id', 'prod_order_pos.pos', 'prod_order_pos_operations.pos', 'users.custom_id', 'users.is_imported_from_erp', 'machines.custom_id', 'machine_states.custom_id', 'machine_state_groups.custom_id', 'machine_state_groups.is_productive', 'user_registered_times.status_operation')
             ->select(
                 'prod_orders.custom_id as prod_order_custom_id',
                 'prod_order_pos.pos as pos',
                 'prod_order_pos_operations.pos as operation_pos',
                 'users.custom_id as user_custom_id',
+                'users.is_imported_from_erp as user_is_imported_from_erp',
                 'machines.custom_id as machine_custom_id',
                 'machine_states.custom_id as machine_state',
                 'machine_state_groups.custom_id as machine_state_group',
@@ -70,6 +71,7 @@ class UserTimeExport extends Command
                                 'times' => $operations->map(function ($time) {
                                     return [
                                         'user_custom_id' => $time->user_custom_id,
+                                        'user_is_imported_from_erp' => $time->user_is_imported_from_erp,
                                         'machine_custom_id' => $time->machine_custom_id,
                                         'machine_state' => $time->machine_state,
                                         'machine_state_group' => $time->machine_state_group,

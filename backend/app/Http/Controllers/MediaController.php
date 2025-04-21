@@ -45,6 +45,7 @@ class MediaController extends Controller
                 return response($media);
             case 'Message':
                 $media = Message::find($id)->addMediaFromRequest('media')->toMediaCollection();
+                $media['path'] = app(MediaController::class)->getMediaPath($media)->getData()->path ?? $media['original_url'];
                 return response($media);
             case 'EightDReport':
                 $media = EightDReport::find($id)->addMediaFromRequest('media')->toMediaCollection();
@@ -67,7 +68,7 @@ class MediaController extends Controller
             $parsedUrl = parse_url($temporaryLocalUrl);
 
             // Ensure the URL uses HTTPS if it doesn't already
-            if (($parsedUrl['scheme'] ?? 'http') === 'http') {
+            if (env('APP_ENV') != "local" && ($parsedUrl['scheme'] ?? 'http') === 'http') {
                 $temporaryLocalUrl = str_replace('http://', 'https://', $temporaryLocalUrl);
             }
             return response()->json(['id' => $media->id, 'path' => $temporaryLocalUrl]);

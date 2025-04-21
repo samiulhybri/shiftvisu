@@ -2,6 +2,8 @@
 
 namespace App\ExternalDataSource\Dto;
 
+use stdClass;
+
 class PackagingInstructionPosDto
 {
     public string $pos;
@@ -29,5 +31,18 @@ class PackagingInstructionPosDto
         $this->target_quantity = $target_quantity;
         $this->unit_of_measure_id_custom = $unit_of_measure_id_custom;
         $this->is_active = $is_active;
+    }
+
+    public static function fromStdClass(stdClass $obj) : PackagingInstructionPosDto
+    {
+        return new PackagingInstructionPosDto(
+            $obj->pos,
+            $obj->is_container = false,
+            $obj->packed_item_id_custom = null,
+            $obj->subordinate_packaging_instruction_uuid = null,
+            $obj->target_quantity = 0,
+            $obj->unit_of_measure_id_custom = null,
+            $obj->is_active = true,
+        );
     }
 }

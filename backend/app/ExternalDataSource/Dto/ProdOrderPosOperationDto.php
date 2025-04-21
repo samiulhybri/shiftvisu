@@ -1,7 +1,9 @@
 <?php
 
 namespace App\ExternalDataSource\Dto;
+
 use App\Enums\ProdOrderPosOperationStatus;
+use stdClass;
 
 class ProdOrderPosOperationDto
 {
@@ -55,7 +57,7 @@ class ProdOrderPosOperationDto
     public array $inspectionOperations;
 
     public function __construct(
-        string                          $pos,
+        string                       $pos,
         string                       $name,
         ?string                      $start = null,
         ?string                      $end = null,
@@ -123,5 +125,56 @@ class ProdOrderPosOperationDto
         $this->alt_machines = $alt_machines;
         $this->classifications = $classifications;
         $this->inspectionOperations = $inspectionOperations;
+    }
+
+    public static function fromStdClass(stdClass $obj): ProdOrderPosOperationDto
+    {
+        $resources = collect($obj->resources ?? [])->map(function ($resource) {
+            return ProdOrderPosOperationResourceDto::fromStdClass($resource);
+        });
+        $alt_machines = collect($obj->alt_machines ?? [])->map(function ($alt_machine) {
+            return ProdOrderPosOperationAltMachineDto::fromStdClass($alt_machine);
+        });
+        $classifications = collect($obj->classifications ?? [])->map(function ($classification) {
+            return ClassificationDto::fromStdClass($classification);
+        });
+        $inspectionOperations = collect($obj->inspectionOperations ?? [])->map(function ($inspectionOperation) {
+            return ProdInspectionOperationDto::fromStdClass($inspectionOperation);
+        });
+        return new ProdOrderPosOperationDto(
+            $obj->pos,
+            $obj->name,
+            $obj->start ?? null,
+            $obj->end ?? null,
+            $obj->te ?? 0.0,
+            $obj->tr ?? 0.0,
+            $obj->cavity ?? 1,
+            $obj->machine_id_custom ?? null,
+            $obj->tool_id_custom ?? null,
+            $obj->tool_insert_id_custom ?? null,
+            $obj->user_group_id_custom ?? null,
+            $obj->resource_group_id_custom ?? null,
+            $obj->machine_group_id_custom ?? null,
+            $obj->operation_code ?? null,
+            ProdOrderPosOperationStatus::tryFrom($obj->status) ?? null,
+            $obj->note ?? null,
+            $obj->component_availability ?? null,
+            $obj->teardown_time ?? 0,
+            $obj->transfer_time ?? 0,
+            $obj->has_labels_prepared ?? false,
+            $obj->registered_quantity ?? 0,
+            $obj->tool_reference_nr ?? null,
+            $obj->operator_usage_factor ?? 1,
+            $obj->send_ahead_quantity ?? null,
+            $obj->plant_id_production_custom ?? null,
+            $obj->operation_control_profile_id_custom ?? null,
+            $obj->quantity ?? 0,
+            $obj->unit_of_measure_id_custom ?? null,
+            $obj->prod_lot_id_custom ?? null,
+            $resources->toArray(),
+            $alt_machines->toArray(),
+            $classifications->toArray(),
+            $inspectionOperations->toArray(),
+        );
     }
 }

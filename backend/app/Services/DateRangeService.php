@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ReportRangeGeneratorType;
 use Carbon\Carbon;
 use DateTime;
+use DateTimeImmutable;
 
 class DateRangeService
 {
@@ -37,11 +38,14 @@ class DateRangeService
                 break;
 
             case ReportRangeGeneratorType::MONTH:
-                for ($i = $count - 1; $i >= 0; $i--) {
-                    $date = clone $startDate;
-                    $date->modify("-$i months");
-                    $dates[] = $date->format('m.Y'); // year-month format
-                }
+                // Ensure $startDate is immutable and set to the first day of the month
+                $startDate = new DateTimeImmutable($startDate->format('Y-m-01'));
+
+                for ($i = 0; $i < $count; $i++) {
+                    $date = $startDate->modify("-$i months"); // Go back one month at a time
+                    $dates[] = $date->format('m.Y'); // Format as month.year
+                }                
+                $dates = array_reverse($dates);
                 break;
 
             default:

@@ -26,9 +26,9 @@ use App\Models\DataImport;
 use App\Models\ProdOrderPosSerial;
 use App\Services\CapacityPlanService;
 use App\Services\ItemService;
-use DB;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ProdOrderImport extends Command
@@ -143,7 +143,6 @@ class ProdOrderImport extends Command
                 FieldChecker::setField('production_register', $record, $prod_order, $record->production_register);
                 $record->save();
                 $importedOrderIds[] = $record->id;
-
                 if ($items->has($prod_order['custom_item_id'])) {
 
                     if (isset($prod_order['pos'])) {
@@ -162,6 +161,7 @@ class ProdOrderImport extends Command
                             $pos->pos = $prod_order['custom_pos'];
                         }
                     }
+                    $releaseDate = $pos->release_date;
                     $pos->item_id = $items[$prod_order['custom_item_id']];
                     $pos->batch = $prod_order['batch'] ?? null;
                     FieldChecker::setField('raw_material', $pos, $prod_order, $pos->raw_material);
@@ -268,16 +268,16 @@ class ProdOrderImport extends Command
                         $cavityFound = $prod_order['op_plan_pos_cavity'][$i] ?? 1;
 
                         $op_pos->erp_te = $prod_order['op_plan_pos_te'][$i] ?? 0;
-                        $op_pos->tr = $prod_order['op_plan_pos_tr'][$i] ?? 0;
                         $op_pos->registered_quantity = $prod_order['op_plan_pos_registered_quantity'][$i] ?? 0;
                         $op_pos->cavity = $cavityFound ? $cavityFound : 1;
                         $op_pos->operator_usage_factor = isset($prod_order['operator_usage_factor']) ? ($prod_order['operator_usage_factor'][$i] ?? 1) : 1;
                         $op_pos->user_group_id = isset($prod_order['op_user_group_custom_id']) ? ($userGroups[$prod_order['op_user_group_custom_id'][$i]] ?? null) : null;
                         $op_pos->operation_code = isset($prod_order['op_operation_code']) ? ($prod_order['op_operation_code'][$i] ?? '') : '';
                         $op_pos->send_ahead_quantity = isset($prod_order['op_plan_send_ahead_quantity']) ? ($prod_order['op_plan_send_ahead_quantity'][$i] ?? ($prod_order['quantity'] ?? 0)) : 0;
-                        $op_pos->teardown_time = isset($prod_order['teardown_time']) ? ($prod_order['teardown_time'][$i] ?? 0) : 0;
                         $op_pos->transfer_time = isset($prod_order['transfer_time']) ? ($prod_order['transfer_time'][$i] ?? 0) : 0;
-                        $op_pos->component_availability = isset($prod_order['op_plan_pos_component_availability']) ? ($prod_order['op_plan_pos_component_availability'][$i] ?? null) : null;
+
+                        $op_pos->erp_component_availability = isset($prod_order['op_plan_pos_component_availability']) ? ($prod_order['op_plan_pos_component_availability'][$i] ?? null) : null;
+                        $op_pos->component_availability = $op_pos->plan_component_availability ?? $op_pos->erp_component_availability;
 
                         // we will store row id in op plan pos
                         // data source is giving us the custom id.
@@ -318,6 +318,15 @@ class ProdOrderImport extends Command
                             }
                         }
 
+                        $op_pos->erp_tr = $prod_order['op_plan_pos_tr'][$i] ?? 0;
+                        $op_pos->tr = $op_pos->plan_tr ?? $op_pos->erp_tr ?? 0;
+
+                        $op_pos->erp_teardown_time = isset($prod_order['teardown_time']) ? ($prod_order['teardown_time'][$i] ?? 0) : 0;
+                        $op_pos->teardown_time = $op_pos->plan_teardown_time ?? $op_pos->erp_teardown_time;
+
+                        $op_pos->erp_cavity = $op_pos->cavity;
+                        $op_pos->cavity = $op_pos->plan_cavity ?? $op_pos->erp_cavity;
+
                         $op_pos->resource_group_id = $op_pos->resource_group_id_plan ?? $op_pos->resource_group_id_erp;
                         $op_pos->te = ($op_pos->plan_te ?? $op_pos->erp_te) ?? 0;
                         $cavity         = $op_pos->cavity ? $op_pos->cavity : 1;
@@ -336,14 +345,25 @@ class ProdOrderImport extends Command
                             }
 
                             if(isset($op_pos->plan_start) && isset($op_pos->machine_id)) {
-                                $op_pos->plan_end = $end_date = $this->capacityPlanService->calculateEndTime($op_pos->plan_start, $duration, $op_pos->machine_id)['end'];
+                                $op_pos->plan_end  = $this->capacityPlanService->calculateEndTime($op_pos->plan_start, $duration, $op_pos->machine_id)['end'];
                             }
                         }else {
                             $op_pos->erp_end = $prod_order['op_plan_pos_end'][$i];
                         }
-                       
-                        $op_pos->start = $op_pos->plan_start ?? $op_pos->erp_start;
-                        $op_pos->end = $op_pos->plan_end ?? $op_pos->erp_end;
+                        if( env('EXTERNAL_DS_TARGET') == 'ict' || env('EXTERNAL_DS_TARGET') == 'ict_test') {
+                            if($releaseDate == $pos->release_date){
+                                $op_pos->start = $op_pos->plan_start ?? $op_pos->erp_start;
+                                $op_pos->end = $op_pos->plan_end ?? $op_pos->erp_end;
+                            }else{
+                                $op_pos->start =  $op_pos->erp_start;
+                                $op_pos->end = $op_pos->erp_end;
+                            }
+                            
+                        }else {
+                            $op_pos->start = $op_pos->plan_start ?? $op_pos->erp_start;
+                            $op_pos->end = $op_pos->plan_end ?? $op_pos->erp_end;
+                        }
+                        
                         $op_pos->operation_control_profile_id = $controlProfileId;
 
                         if($op_pos->status == ProdOrderPosOperationStatus::CLOSED() || $op_pos->status == ProdOrderPosOperationStatus::DELETED())

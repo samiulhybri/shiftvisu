@@ -33,7 +33,7 @@ class EightDReport extends Model implements HasMedia
     #[LodataRelationship]
     public function team()
     {
-        return $this->belongsToMany(User::class, 'eight_d_report_teams');
+        return $this->belongsToMany(User::class, 'eight_d_report_teams')->orderBy('eight_d_report_teams.id');
     }
 
     #[LodataRelationship()]

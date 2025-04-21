@@ -159,13 +159,16 @@ class ItemDtoImport extends Command
                     //If image is present via Datasource and not added yet add it to the media DB plus the original file needs to be preserved(otherwise addMedia would delete the image on file share for example)
                     if ($item->image_exists && $hasNotImportedImage) {
                         if (isset($item->image_blob)) {
-                            $record->addMediaFromString($item->image_blob)
+                            $media = $record->addMediaFromString($item->image_blob)
                                    ->usingFileName($item->custom_id . $item->file_extension)
                                    ->usingName($item->custom_id)
                                    ->toMediaCollection();
                         } else {
-                            $record->addMedia($item->path_for_image)->preservingOriginal()->toMediaCollection();
+                            $media = $record->addMedia($item->path_for_image)->preservingOriginal()->toMediaCollection();
                         }
+                        # Set the media as the standard image
+                        $media->is_selected = true;
+                        $media->save();
                     }
                 }
 

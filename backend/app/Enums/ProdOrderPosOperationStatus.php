@@ -15,6 +15,8 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self IN_SETUP()
  * @method static self IN_TEARDOWN()
  * @method static self IN_PRODUCTION()
+ * @method static self RELEASED()
+ * @method static self RESTRICTRED()
  * @method static self CLOSED()
  * @method static self DELETED()
  * @method static self CANCELLED()

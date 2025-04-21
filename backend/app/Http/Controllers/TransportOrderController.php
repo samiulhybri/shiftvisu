@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProdOrderPosOperationStatus;
 use App\Enums\StockOperationType;
 use App\Models\Equipment;
 use App\Models\HandlingUnit;
@@ -88,7 +89,7 @@ class TransportOrderController extends Controller
 
                 $data = null;
                 $res = null;
-                if (!$isIdUsed) {
+                if (!$isIdUsed && $payload['id']) {
                     $res = TransportOrderPosDeliveries::query()->findOrFail($payload['id']);
 
                     $userId = $res['user_id'];
@@ -163,14 +164,14 @@ class TransportOrderController extends Controller
                             'positionable_type' => $payload['destination_type'],
                         ]
                     ];
-                    
+
                     StockController::moveStocks($inputs, $outputs, StockOperationType::TRANSPORT_ORDER(), $transportOrderDelivery ?? $res);
                 }
             }
 
             return response()->json(true);
         } catch (Throwable $th) {
-            return response()->json($th, 500);
+            return response()->json($th->getMessage(), 500);
         }
     }
 
@@ -193,10 +194,10 @@ class TransportOrderController extends Controller
                 $query->select('id', 'custom_id', 'name');
             },
             'transportOrder',
-            'source'=> function ($query) {
+            'source' => function ($query) {
                 $query->select('id', 'custom_id', 'name');
             },
-            'destination'=> function ($query) {
+            'destination' => function ($query) {
                 $query->select('id', 'custom_id', 'name');
             },
             'item:id,custom_id,name',
@@ -235,13 +236,13 @@ class TransportOrderController extends Controller
             'perPage' => ['nullable', 'integer', 'min:1'],
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
-        
+
         $transportOrderType = $validatedData['transportOrderType'] ?? [];
         $transportOrderType = is_array($transportOrderType) ? $transportOrderType : explode(',', $transportOrderType);
         $search = $validatedData['search'] ?? '';
         $isDone = filter_var($validatedData['isDone'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $perPage = $validatedData['perPage'] ?? 15;
-        $page = $validatedData['page'] ?? 1;        
+        $page = $validatedData['page'] ?? 1;
 
         $data = TransportOrderPos::query()
             ->when(count($transportOrderType) > 0, function ($query) use ($transportOrderType) {
@@ -249,10 +250,10 @@ class TransportOrderController extends Controller
             })
             ->with([
                 'transportOrderType',
-                'source'=> function ($query) {
+                'source' => function ($query) {
                     $query->select('id', 'custom_id', 'name');
                 },
-                'destination'=> function ($query) {
+                'destination' => function ($query) {
                     $query->select('id', 'custom_id', 'name');
                 },
                 'transportable.item' => function ($query) {
@@ -350,13 +351,13 @@ class TransportOrderController extends Controller
                 'created_at' => $transportOrderPos->created_at,
                 'updated_at' => $transportOrderPos->updated_at,
                 'transportable_type' => $transportOrderPos->transportable_type,
-                'transportable_id' => $transportOrderPos->transportable_id,                
+                'transportable_id' => $transportOrderPos->transportable_id,
                 'source_type' => $transportOrderPos->source_type,
                 'source_id' => $transportOrderPos->source_id,
                 'destination_type' => $transportOrderPos->destination_type,
                 'destination_id' => $transportOrderPos->destination_id,
-                'source'=> $transportOrderPos->source,
-                'destination'=> $transportOrderPos->destination,
+                'source' => $transportOrderPos->source,
+                'destination' => $transportOrderPos->destination,
                 'prodOrderPosBomPos' => [
                     'id' => $transportOrderPos->prodOrderPosBomPos?->id ?? null,
                     'quantity_total' => $transportOrderPos->prodOrderPosBomPos?->quantity_total ?? null,
@@ -414,11 +415,11 @@ class TransportOrderController extends Controller
             'search' => ['nullable', 'string'],
             'isDone' => ['nullable', 'boolean'],
         ]);
-        
+
         $transportOrderType = $validatedData['transportOrderType'] ?? [];
         $transportOrderType = is_array($transportOrderType) ? $transportOrderType : explode(',', $transportOrderType);
         $search = $validatedData['search'] ?? '';
-        $isDone = filter_var($validatedData['isDone'] ?? false, FILTER_VALIDATE_BOOLEAN); 
+        $isDone = filter_var($validatedData['isDone'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
         $data = TransportOrderPos::query()
             ->when(count($transportOrderType) > 0, function ($query) use ($transportOrderType) {
@@ -496,77 +497,58 @@ class TransportOrderController extends Controller
         ['positionable_id' => $positionableId, 'positionable_type' => $positionableType] = $machine->getPositionable();
         $itemStateId = $machine?->plant?->item_state_id_default;
 
-        $totalAndPSAStocks = $this->stockController->getTotalStocksQuantity($operation)->original;
+        if ($operation->prod_lot_id) {
+            $operations = ProdOrderPosOperation::query()
+                ->where('prod_lot_id', $operation->prod_lot_id)
+                ->whereNotIn('status', [ProdOrderPosOperationStatus::DELETED(), ProdOrderPosOperationStatus::CLOSED()])
+                ->get();
+        } else {
+            $operations = [$operation];
+        }
 
         $processedData = collect();
 
-        ProdOrderPosBomPos::with([
-            'prodOrderPos.prodOrder',
-            'unitOfMeasure:id,name,custom_id',
-            'item.itemPlants',
-            'prodOrderPosOperation',
-            'warehouse'
-        ])
-            ->where('prod_order_pos_operation_id', $operation->id)
-            ->orderBy('pos')
-            ->get()
-            ->map(function ($bomPos) use ($positionableType, $positionableId, &$processedData, $totalAndPSAStocks, $itemStateId) {
-                $processedData[] = [
-                    'source_id' => $bomPos->storage_location_id,
-                    'source_type' => $bomPos->storage_location_id ? StorageLocation::class : null,
-                    'destination_id' => $positionableId,
-                    'destination_type' => $positionableType,
-                    'prodOrderPosOperation' => null,
-                    'unitOfMeasure' => $bomPos->unitOfMeasure,
-                    'prodOrderPos' => null,
-                    'prod_order_pos_operation' => null,
-                    'prod_order_pos' => null,
-                    'unit_of_measure' => null,
-                    'item_type' => $bomPos->item_type,
-                    'item_state_id' => $itemStateId,
-                    'total_stock_quantity' => $totalAndPSAStocks['total_stock_quantity'],
-                    'total_psa_quantity' => $totalAndPSAStocks['total_psa_quantity'],
-                    'totalQuantity' => (float)$bomPos->qty_for_one_parent * (float)$bomPos->prodOrderPosOperation->prodOrderPos->quantity,
-                    'transportable_type' => ItemPlant::class,
-                    'transportable_custom_id' => $bomPos->item?->custom_id,
-                    'transportable_name' => $bomPos->item?->name,
-                    'transportable_id' => $bomPos->item->itemPlants?->filter(function ($itemPlant) use ($bomPos) {
-                        return $itemPlant->plant_id == $bomPos->prodOrderPosOperation->prodOrderPos->prodOrder->plant_id;
-                    })?->pluck('id')?->first()
-                ];
-            });
+        foreach ($operations as $singleOperation) {
+            $totalAndPSAStocks = $this->stockController->getTotalStocksQuantity($singleOperation)->original;
+
+            ProdOrderPosBomPos::with([
+                'prodOrderPos.prodOrder',
+                'unitOfMeasure:id,name,custom_id',
+                'item.itemPlants',
+                'prodOrderPosOperation',
+                'warehouse'
+            ])
+                ->where('prod_order_pos_operation_id', $singleOperation->id)
+                ->orderBy('pos')
+                ->get()
+                ->map(function ($bomPos) use ($positionableType, $positionableId, &$processedData, $totalAndPSAStocks, $itemStateId) {
+                    $processedData[] = [
+                        'source_id' => $bomPos->storage_location_id,
+                        'source_type' => $bomPos->storage_location_id ? StorageLocation::class : null,
+                        'destination_id' => $positionableId,
+                        'destination_type' => $positionableType,
+                        'prodOrderPosOperation' => null,
+                        'unitOfMeasure' => $bomPos->unitOfMeasure,
+                        'prodOrderPos' => null,
+                        'prod_order_pos_operation' => null,
+                        'prod_order_pos' => null,
+                        'unit_of_measure' => null,
+                        'item_type' => $bomPos->item_type,
+                        'item_state_id' => $itemStateId,
+                        'total_stock_quantity' => $totalAndPSAStocks['total_stock_quantity'],
+                        'total_psa_quantity' => $totalAndPSAStocks['total_psa_quantity'],
+                        'totalQuantity' => (float)$bomPos->qty_for_one_parent * (float)$bomPos->prodOrderPosOperation->prodOrderPos->quantity,
+                        'transportable_type' => ItemPlant::class,
+                        'transportable_custom_id' => $bomPos->item?->custom_id,
+                        'transportable_name' => $bomPos->item?->name,
+                        'transportable_id' => $bomPos->item->itemPlants?->filter(function ($itemPlant) use ($bomPos) {
+                            return $itemPlant->plant_id == $bomPos->prodOrderPosOperation->prodOrderPos->prodOrder->plant_id;
+                        })?->pluck('id')?->first()
+                    ];
+                });
 
 
-        foreach ($operation->prodOrderPosOperationResources()->with('equipment')->get() as $resource) {
-            if ($resource->equipment?->is_transport_possible) {
-                $processedData[] = [
-                    'source_id' => null,
-                    'source_type' => null,
-                    'destination_id' => $positionableId,
-                    'destination_type' => $positionableType,
-                    'item_state_id' => $itemStateId,
-                    'prodOrderPosOperation' => null,
-                    'unitOfMeasure' => null,
-                    'prodOrderPos' => null,
-                    'prod_order_pos_operation' => null,
-                    'prod_order_pos' => null,
-                    'unit_of_measure' => null,
-                    'item_type' => null,
-                    'total_stock_quantity' => null,
-                    'total_psa_quantity' => null,
-                    'totalQuantity' => 1,
-                    'transportable_type' => Equipment::class,
-                    'transportable_custom_id' => $resource->equipment->custom_id,
-                    'transportable_name' => $resource->equipment->name,
-                    'transportable_id' => $resource->equipment_id,
-                ];
-            }
-        }
-
-        $processedData = $processedData->merge($operation->getTransportOrderPosForPackaging($machine));
-
-        foreach ($operation->prodInspectionOperations()->with(['prodInspectionOperationResources', 'prodInspectionOperationResources.equipment'])->get() as $prodInspectionOperation) {
-            foreach ($prodInspectionOperation->prodInspectionOperationResources as $resource) {
+            foreach ($singleOperation->prodOrderPosOperationResources()->with('equipment')->get() as $resource) {
                 if ($resource->equipment?->is_transport_possible) {
                     $processedData[] = [
                         'source_id' => null,
@@ -591,8 +573,79 @@ class TransportOrderController extends Controller
                     ];
                 }
             }
+
+            $processedData = $processedData->merge($singleOperation->getTransportOrderPosForPackaging($machine));
+
+            foreach ($singleOperation->prodInspectionOperations()->with(['prodInspectionOperationResources', 'prodInspectionOperationResources.equipment'])->get() as $prodInspectionOperation) {
+                foreach ($prodInspectionOperation->prodInspectionOperationResources as $resource) {
+                    if ($resource->equipment?->is_transport_possible) {
+                        $processedData[] = [
+                            'source_id' => null,
+                            'source_type' => null,
+                            'destination_id' => $positionableId,
+                            'destination_type' => $positionableType,
+                            'item_state_id' => $itemStateId,
+                            'prodOrderPosOperation' => null,
+                            'unitOfMeasure' => null,
+                            'prodOrderPos' => null,
+                            'prod_order_pos_operation' => null,
+                            'prod_order_pos' => null,
+                            'unit_of_measure' => null,
+                            'item_type' => null,
+                            'total_stock_quantity' => null,
+                            'total_psa_quantity' => null,
+                            'totalQuantity' => 1,
+                            'transportable_type' => Equipment::class,
+                            'transportable_custom_id' => $resource->equipment->custom_id,
+                            'transportable_name' => $resource->equipment->name,
+                            'transportable_id' => $resource->equipment_id,
+                        ];
+                    }
+                }
+            }
+
+
+            $results = HandlingUnit::query()
+                ->where('is_complete', false)
+                ->whereHas('childStocks', function ($query) use ($singleOperation) {
+                    $query->where('stockable_type', ItemPlant::class)
+                        ->where('stockable_id', $singleOperation->prodOrderPos->itemPlant()->id);
+                })->whereHas('parentStock', function ($query) use ($singleOperation) {
+                    $query->where('positionable_type', StorageLocation::class)
+                        ->where('positionable_id', $singleOperation->prodOrderPos->storage_location_id);
+                })
+                ->with(['parentStock'])
+                ->distinct()
+                ->get(['id', 'custom_id']);
+
+            foreach ($results as $result) {
+                if ($result->parentStock && $result->parentStock->positionable_type != HandlingUnit::class) {
+                    $processedData[] = [
+                        'source_id' => $result->parentStock->positionable_id,
+                        'source_type' => $result->parentStock->positionable_type,
+                        'destination_id' => $positionableId,
+                        'destination_type' => $positionableType,
+                        'item_state_id' => $result->parentStock->item_state_id,
+                        'prodOrderPosOperation' => null,
+                        'unitOfMeasure' => null,
+                        'prodOrderPos' => null,
+                        'prod_order_pos_operation' => null,
+                        'prod_order_pos' => null,
+                        'unit_of_measure' => null,
+                        'item_type' => null,
+                        'total_stock_quantity' => null,
+                        'total_psa_quantity' => null,
+                        'totalQuantity' => 1,
+                        'transportable_type' => HandlingUnit::class,
+                        'transportable_custom_id' => $result->custom_id,
+                        'transportable_name' => null,
+                        'transportable_id' => $result->id,
+                    ];
+                }
+            }
         }
 
+        //TODO: Make better sums instead of unique
         return response()->json($processedData->unique()->values());
     }
 
@@ -603,6 +656,6 @@ class TransportOrderController extends Controller
      */
     public function getTransportOrderPosForPackaging(Machine $machine, ProdOrderPosOperation $operation, PackagingInstruction $packagingInstruction): JsonResponse
     {
-        return response()->json($operation->getTransportOrderPosForPackaging($machine,  $packagingInstruction));
+        return response()->json($operation->getTransportOrderPosForPackaging($machine, $packagingInstruction));
     }
 }

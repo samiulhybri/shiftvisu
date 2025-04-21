@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MachineStateType;
+use App\Enums\ProdOrderPosOperationStatus;
 use App\Models\Machine;
 use App\Models\MachineProdOrderPosOperationTime;
 use App\Models\MachineUserTime;
@@ -119,7 +120,30 @@ class MachineClockInController extends Controller
                 $machine->needs_operator_for_production == true &&
                 $machine->machineUserTime()->whereNull('end')->count() == 1
             ) {
-                array_push($machinesClockOutError, $machineToClockOut->machine);
+                $totalOperation = MachineProdOrderPosOperationTime::whereNull("end")
+                    ->where("machine_id", $machine->id)
+                    ->whereIn("status", [ProdOrderPosOperationStatus::IN_TEARDOWN(), ProdOrderPosOperationStatus::IN_SETUP(), ProdOrderPosOperationStatus::IN_PRODUCTION()])
+                    ->count();
+
+
+                if ($totalOperation > 0) {
+                    array_push($machinesClockOutError, $machineToClockOut->machine);
+                } else {
+                    $machineToClockOut->end = now();
+                    $machineToClockOut->save();
+        
+                    if (
+                        $machine->machine_state_type == MachineStateType::MANUAL() &&
+                        $machine->machineUserTime()->whereNull('end')->count() == 0
+                    ) {
+                        $defaultOffState = $machine->machine_state_id_default_off;
+                        if ($defaultOffState) {
+                            $this->machineMachineStateTimeController->updateMachineState($defaultOffState, $machine->id);
+                        }
+                    }
+                    array_push($machinesClockOut, $machineToClockOut->machine_id);
+                }
+
             } else {
                 $machineToClockOut->end = now();
                 $machineToClockOut->save();

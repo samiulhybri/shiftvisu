@@ -184,7 +184,7 @@ class StockController extends Controller
                     'item_state_id' => $input['item_state_id'],
                     'quantity' => $input['quantity'],
                     'serial' => $input['serial'] ?? null,
-                    'batch' => $input['batch'],
+                    'batch' => $input['batch'] ?? null,
                 ]);
             }
         }
@@ -201,7 +201,7 @@ class StockController extends Controller
                         'item_state_id' => $output['item_state_id'],
                         'quantity' => 1,
                         'serial' => $serial,
-                        'batch' => $output['batch'],
+                        'batch' => $output['batch'] ?? null,
                     ]);
                 }
             } else {
@@ -213,7 +213,7 @@ class StockController extends Controller
                     'item_state_id' => $output['item_state_id'],
                     'quantity' => $output['quantity'],
                     'serial' => $output['serial'] ?? null,
-                    'batch' => $output['batch'],
+                    'batch' => $output['batch'] ?? null,
                 ]);
             }
         }
@@ -335,10 +335,14 @@ class StockController extends Controller
             })
             ->where(function ($query) use ($handlingUnits) {
                 $query->whereIn('stocks.stockable_id', collect($handlingUnits)->pluck('positionable_id'))
-                        ->where('stocks.stockable_type', HandlingUnit::class);
+                    ->where('stocks.stockable_type', HandlingUnit::class);
             })
             ->distinct()
-            ->get();
+            ->get()
+            ->map(function ($data) {
+                $data->custom_id = $data->custom_id . '-p'; // Symbol of Parent HU
+                return $data;
+            });
 
         $response = collect([...$handlingUnits, ...$parentHandlingUnits])
             ->pluck('custom_id')
@@ -586,6 +590,7 @@ class StockController extends Controller
                     return Stock::with(['itemState'])
                         ->where('positionable_type', HandlingUnit::class)
                         ->where('positionable_id', $stockableId)
+                        ->where('quantity', '>', 0)
                         ->get()
                         ->map(function ($subRow) use (&$processStock, $stockableIds, $batches, $isFromEntry) {
                             $subRowArray = array_merge(
@@ -772,7 +777,7 @@ class StockController extends Controller
         try {
             $scannedText = $request->query('scannedText');
 
-            $handlingUnit = HandlingUnit::query()->where('custom_id', $scannedText)->first();
+            $handlingUnit = HandlingUnit::query()->where('custom_id', ltrim($scannedText, '0'))->first();
 
             if ($handlingUnit) {
                 $request = new Request([
@@ -851,7 +856,10 @@ class StockController extends Controller
         DB::beginTransaction();
         try {
             foreach ($request->scannedIds as $scannedId) {
-                $handlingUnit = HandlingUnit::query()->where('custom_id', $scannedId)->first();
+                $handlingUnit = HandlingUnit::query()
+                    ->where('custom_id', ltrim($scannedId, '0'))
+                    ->with('parentStock')
+                    ->first();
 
                 if (!$handlingUnit) {
                     return response()->json([
@@ -859,43 +867,48 @@ class StockController extends Controller
                         "message" => "Handling unit not found."
                     ], 404);
                 }
-    
+
+                //Check if hu storage location matches prod_order_pos storage location
+                if ($handlingUnit->parentStock->positionable_type === StorageLocation::class && $handlingUnit->parentStock->positionable_id != $operation->prodOrderPos->storage_location_id) {
+                    return response()->json(['type' => 'WRONG_STORAGE_LOCATION'], 410);
+                }
+
                 $isExist = ProdOrderPosOperationHandlingUnit::where('machine_id', $machine->id)->where('handling_unit_id', $handlingUnit->id)->whereNot('type', ProdOrderPosOperationHandlingUnitType::CONSUMPTION())->first();
                 if ($isExist) {
                     return response()->json(['type' => 'EXISTS'], 409);
                 }
-    
+
                 $incompleteChildHu = null;
                 $itemStateType = null;
                 $hasChildHU = false;
-    
+
                 foreach ($handlingUnit->childStocks()->where('stockable_type', HandlingUnit::class)->get() as $childHuStock) {
                     $hasChildHU = true;
                     $childHU = $childHuStock->stockable;
                     $itemStateType = $childHU->childStocks()->whereIn('stockable_type', [ItemPlant::class, ProdOrderPosOperation::class])->first()->itemState->item_state_type ?? ItemStateType::GOOD();
-    
+
                     if (!$childHU->isFullWithWipAndItemPlant()) {
                         $incompleteChildHu = $childHU;
                     }
                 }
-    
+
                 if (!$itemStateType) {
                     $itemStateType = ItemStateType::from($handlingUnit->childStocks()->whereIn('stockable_type', [ItemPlant::class, ProdOrderPosOperation::class])->first()->itemState->item_state_type) ?? ItemStateType::GOOD();
                 }
-    
+
                 $huType = match ($itemStateType) {
                     ItemStateType::SCRAP() => ProdOrderPosOperationHandlingUnitType::PROD_SCRAP(),
                     ItemStateType::REWORK() => ProdOrderPosOperationHandlingUnitType::PROD_REWORK(),
                     default => ProdOrderPosOperationHandlingUnitType::PROD_GOOD(),
                 };
-    
+
                 $huTypeLevel2 = match ($itemStateType) {
                     ItemStateType::SCRAP() => ProdOrderPosOperationHandlingUnitType::PROD_SCRAP_LEVEL_2(),
                     ItemStateType::REWORK() => ProdOrderPosOperationHandlingUnitType::PROD_REWORK_LEVEL_2(),
                     default => ProdOrderPosOperationHandlingUnitType::PROD_GOOD_LEVEL_2(),
                 };
-    
-    
+
+
                 if ($incompleteChildHu) {
                     ProdOrderPosOperationHandlingUnit::query()->create([
                         "type" => $huType,
@@ -904,7 +917,7 @@ class StockController extends Controller
                         "machine_id" => $machine->id,
                     ]);
                 }
-    
+
                 if ($hasChildHU) {
                     ProdOrderPosOperationHandlingUnit::query()->create([
                         "type" => $huTypeLevel2,
@@ -919,7 +932,7 @@ class StockController extends Controller
                         "prod_order_pos_operation_id" => $operation->id,
                         "machine_id" => $machine->id,
                     ]);
-                }   
+                }
             }
 
             DB::commit();
@@ -989,11 +1002,38 @@ class StockController extends Controller
     {
         try {
             if ($stock->stockable_type == HandlingUnit::class) {
-                ProdOrderPosOperationHandlingUnit::query()->where('handling_unit_id', $stock->stockable_id)
+                $popoHu = ProdOrderPosOperationHandlingUnit::query()->where('handling_unit_id', $stock->stockable_id)
+                    ->where('machine_id', $machine->id)
                     ->whereNot('type', ProdOrderPosOperationHandlingUnitType::CONSUMPTION())
-                    ->delete();
+                    ->with(['prodOrderPosOperation', 'handlingUnit'])
+                    ->first();
 
-                HandlingUnit::query()->findOrFail($stock->stockable_id)->createGoodsReceipt($operation);
+                $linkedHus = collect();
+
+                if ($popoHu->prodOrderPosOperation->prod_lot_id) {
+                    $results = ProdOrderPosOperationHandlingUnit::query()
+                        ->select('prod_order_pos_operation_handling_units.*')
+                        ->join('prod_order_pos_operations', 'prod_order_pos_operations.id', '=', 'prod_order_pos_operation_handling_units.prod_order_pos_operation_id')
+                        ->where('prod_order_pos_operations.prod_lot_id', $popoHu->prodOrderPosOperation->prod_lot_id)
+                        ->where('prod_order_pos_operation_handling_units.machine_id', $popoHu->machine_id)
+                        ->where('prod_order_pos_operation_handling_units.type', $popoHu->type)
+                        ->with(['prodOrderPosOperation', 'handlingUnit'])
+                        ->get();
+
+                    foreach ($results as $result) {
+                        if ($result->handlingUnit?->getCurrentWipAndItemPlant() == $popoHu->handlingUnit?->getCurrentWipAndItemPlant()) {
+                            $linkedHus->push($result);
+                        }
+                    }
+
+                } else {
+                    $linkedHus->push($popoHu);
+                }
+
+                foreach ($linkedHus as $linkedHu) {
+                    $linkedHu->handlingUnit?->createGoodsReceipt($linkedHu->prodOrderPosOperation);
+                    $linkedHu->delete();
+                }
             }
 
             return response()->json(['success' => true]);
@@ -1015,7 +1055,7 @@ class StockController extends Controller
 
             foreach ($customIds as $customId) {
                 if ($customId) {
-                    $handlingUnit = HandlingUnit::query()->where('custom_id', $customId)->first();
+                    $handlingUnit = HandlingUnit::query()->where('custom_id', ltrim($customId, '0'))->first();
 
                     if ($handlingUnit) {
                         $stockableIds[] = $handlingUnit->id;
@@ -1051,9 +1091,9 @@ class StockController extends Controller
                     foreach ($filteredUniqueData as $stock) {
                         $data[] = [
                             "id" => $stock['id'],
-                            "quantity" => $stock['stockable_type'] == ItemPlant::class 
-                                        ? $stock['quantity'] 
-                                        : ($stock['quantity'] == 0 ? 0 : 1),
+                            "quantity" => $stock['stockable_type'] == ItemPlant::class
+                                ? $stock['quantity']
+                                : ($stock['quantity'] == 0 ? 0 : 1),
                             "batch" => $stock['batch'],
                             "stockable_type" => $stock['stockable_type'],
                             "item_state_id" => $stock['item_state_id'],
@@ -1074,15 +1114,33 @@ class StockController extends Controller
         }
     }
 
-    public function getStocksForItemPlant(Request $request, $itemPlantId){
-        $stocks = Stock::with(['stockable.item', 'positionable'])->where('stockable_id', $itemPlantId)->where('stockable_type', ItemPlant::class)->get();
+    public function getStocksByType($type, $id)
+    {
+        // Map type strings to class names
+        $typeClassMap = [
+            'itemPlant' => ItemPlant::class,
+            'handlingUnit' => HandlingUnit::class,
+            'equipment' => Equipment::class,
+        ];
+
+        $stocks = Stock::with(['stockable.item', 'positionable'])
+            ->where('stockable_id', $id)
+            ->where('stockable_type', $typeClassMap[$type])
+            ->where('quantity', '>', 0)
+            ->get();
 
         foreach ($stocks as $stock) {
-            if($stock->positionable_type == HandlingUnit::class){
-                $parent = Stock::with(['positionable'])->where('stockable_type', HandlingUnit::class)->where('stockable_id', $stock->positionable_id)->first();
+            if ($stock->positionable_type == HandlingUnit::class) {
+                $parent = Stock::with(['positionable'])
+                    ->where('stockable_type', HandlingUnit::class)
+                    ->where('stockable_id', $stock->positionable_id)
+                    ->first();
 
-                if($parent->positionable_type == HandlingUnit::class){
-                    $parent->parentL2 = Stock::with(['positionable'])->where('stockable_type', HandlingUnit::class)->where('stockable_id', $parent->positionable_id)->first();
+                if ($parent->positionable_type == HandlingUnit::class) {
+                    $parent->parentL2 = Stock::with(['positionable'])
+                        ->where('stockable_type', HandlingUnit::class)
+                        ->where('stockable_id', $parent->positionable_id)
+                        ->first();
                 }
 
                 $stock->parent = $parent;
@@ -1096,16 +1154,16 @@ class StockController extends Controller
                 "id" => $stock->id,
                 "quantity" => $stock->quantity,
                 "batch" => $stock->batch,
-                "item" => $stock->stockable->item->only(['id', 'custom_id', 'name']),
-                'stockable_type'=> $stock->stockable_type,
-                'stockable_id'=> $stock->stockable_id,
-                'position'=> $stock->positionable,
-                'positionable_type'=> $stock->positionable_type,
-                'positionable_id'=> $stock->positionable_id,
-                'parentPosition'=> $stock->parent,
+                "item" => $typeClassMap[$type] == ItemPlant::class ? $stock->stockable?->item?->only(['id', 'custom_id', 'name']) : $stock->stockable,
+                'stockable_type' => $stock->stockable_type,
+                'stockable_id' => $stock->stockable_id,
+                'position' => $stock->positionable,
+                'positionable_type' => $stock->positionable_type,
+                'positionable_id' => $stock->positionable_id,
+                'parentPosition' => $stock->parent,
             ];
 
-            $processedData[]=$data;
+            $processedData[] = $data;
         }
 
         return $processedData;

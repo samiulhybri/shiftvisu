@@ -84,6 +84,7 @@ class ProdOrderPosOperationConfirmation extends Model
                     'id' => $this->id,
                     'custom_id' => $this->custom_id,
                     'user_id_custom' => $quantity->user?->custom_id,
+                    'user_is_imported_from_erp' => $quantity->user?->is_imported_from_erp,
                     'machine_id_custom' => $quantity->machine?->custom_id,
                     'item_id_custom' => $quantity->prodOrderPosOperation?->prodOrderPos?->item?->custom_id,
                     'item_state_id_custom' => $quantity->itemState?->custom_id,

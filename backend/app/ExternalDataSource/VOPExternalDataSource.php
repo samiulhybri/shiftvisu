@@ -203,7 +203,7 @@ class VOPExternalDataSource extends BaseVisuExternalDataSource
 
 		$compareDate = new \DateTime('2024-01-01 00:00:00');
 		$formatedCompareDate = $compareDate->format('Y-m-d');
-		$dateto = date('Y-m-d', strtotime('+13 Weeks'));
+		$dateto = date('Y-m-d', strtotime('+18 Weeks'));
 		
 		$query_proposed = "SELECT CONCAT('DE-',TRIM(header.ANr)) as CUSTOM_ID,header.ANr,
 		10 as CUSTOM_POS,

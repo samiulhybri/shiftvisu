@@ -115,7 +115,8 @@ class ProdOrderPosOperationQuantity extends Model
             }
 
             if($handlingUnit->isFullWithWipAndItemPlant()) {
-                $handlingUnit->is_complete = 1;
+                $handlingUnit->is_complete = true;
+                $handlingUnit->created_at = now();
                 $handlingUnit->save();
             }
         }

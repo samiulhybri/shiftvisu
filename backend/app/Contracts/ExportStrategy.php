@@ -121,4 +121,14 @@ class ExportStrategy
     {
         return ExportResult::SUCCESS();
     }
+
+    public function exportOrderStart(DataExport $dataExport): ExportResult
+    {
+        return ExportResult::SUCCESS();
+    }
+
+    public function exportLogin(DataExport $dataExport): ExportResult
+    {
+        return ExportResult::SUCCESS();
+    }
 }

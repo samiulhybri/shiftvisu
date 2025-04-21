@@ -9,16 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 class DataImport extends Model
 {
     use HasFactory;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'data', 
-        'name', 
-        'is_imported'
-    ];
+
+    protected $guarded = [];
 
     protected function data(): Attribute
     {

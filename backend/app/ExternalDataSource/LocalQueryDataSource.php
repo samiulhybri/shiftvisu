@@ -25,6 +25,7 @@ use App\Models\TpmSubGroup;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class LocalQueryDataSource
 {
@@ -262,11 +263,21 @@ class LocalQueryDataSource
                                 $plan_pos_status = 10;
                             }
 
+                            // Convert UTC to local timezone(Europe/Berlin) for ICT
+                            $convertedTimeZone = 'Europe/Berlin';
+                            if (env('EXTERNAL_DS_TARGET') == 'ict' || env('EXTERNAL_DS_TARGET') == 'ict_test') {
+                                $start = $order_pos_op_plan_pos['start'] ? Carbon::parse($order_pos_op_plan_pos['start'], 'UTC')->setTimezone($convertedTimeZone) : new \DateTime();
+                                $end = $order_pos_op_plan_pos['end'] ? Carbon::parse($order_pos_op_plan_pos['end'], 'UTC')->setTimezone($convertedTimeZone) : new \DateTime();
+                            }else {
+                                $start = $order_pos_op_plan_pos['start'] ?? new \DateTime();
+                                $end = $order_pos_op_plan_pos['end'] ?? new \DateTime();
+                            }
+
                             $field = [
                                 "auf_nr" => $order['custom_id'] . "|" . $order_pos_op_plan_pos['pos'],
                                 "auf_nr_alt" => $order['custom_id'],
-                                "ende" => $order_pos_op_plan_pos['end'] ?? new \DateTime(),
-                                "start_date" => $order_pos_op_plan_pos['start'] ?? new \DateTime(),
+                                "ende" => $end,
+                                "start_date" => $start,
                                 "total" => $order_pos_op_plan_pos['quantity'] ?: $order_pos['quantity'],
                                 "pro_per_sec" => $order_pos_op_plan_pos['te'],
                                 "setup_time" => $order_pos_op_plan_pos['tr'],

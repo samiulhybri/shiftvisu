@@ -4,6 +4,7 @@ namespace App\ExternalDataSource;
 
 use App\Contracts\ExternalDataSource;
 use App\Enums\ComponentPreparationState;
+use App\Enums\PackagingInstructionMachineStopType;
 use App\Enums\ProdInspectionOperationFrequency;
 use App\Enums\ProdInspectionOperationResourceType;
 use App\Enums\ProdOrderPosOperationStatus;
@@ -225,7 +226,8 @@ class SapApiExternalDataSource implements ExternalDataSource
                 packaging_instruction_id_2_custom: $packagingInstructions[$product['Product']]['packaging_instruction_id_2_custom'] ?? null,
                 packaging_instruction_id_3_custom: $packagingInstructions[$product['Product']]['packaging_instruction_id_3_custom'] ?? null,
                 packaging_instruction_id_4_custom: $packagingInstructions[$product['Product']]['packaging_instruction_id_4_custom'] ?? null,
-                note: $product['ZRicetta'] ?? null,
+                note: $product['ZRicetta'] ?? $product['ProductionOrInspectionMemoTxt'] ?? null,
+                is_packaging_item: $product['ProductType'] === 'ZIMQ' || $product['ProductType'] === 'ZIMV',
             );
 
             foreach ($product['to_ProductUnitsOfMeasure']['results'] as $unitOfMeasure) {
@@ -414,8 +416,22 @@ class SapApiExternalDataSource implements ExternalDataSource
         $serials = $this->getSerials($prodOrderCustomIds);
         $bomDocuments = $this->getBomDocuments($prodOrderCustomIds);
 
+        $productionOrders = collect($res['d']['results']);
+
+        // Loop through each production order and sort its operations
+        $sortedOrders = $productionOrders->map(function ($order) {
+            // Sort the expanded 'to_ProductionOrderOperation.results' by 'ManufacturingOrderOperation'
+            if (isset($order['to_ProductionOrderOperation']['results'])) {
+                $order['to_ProductionOrderOperation']['results'] = collect($order['to_ProductionOrderOperation']['results'])
+                    ->sortBy('ManufacturingOrderOperation')
+                    ->values()
+                    ->toArray();
+            }
+            return $order;
+        });
+
         $prodOrders = [];
-        foreach ($res['d']['results'] as $prodOrder) {
+        foreach ($sortedOrders as $prodOrder) {
             $order = new ProdOrderDto(
                 custom_id: $prodOrder['ManufacturingOrder'],
                 document_date: $this->parseDateTimeString($prodOrder['MfgOrderCreationDate'], $prodOrder['MfgOrderCreationTime']),
@@ -649,8 +665,9 @@ class SapApiExternalDataSource implements ExternalDataSource
         foreach ($res['d']['results'] as $packagingInstruction) {
             $packagingDto = new PackagingInstructionDto(
                 custom_id: $packagingInstruction['PackingInstructionNumber'],
-                uuid: $packagingInstruction['PackingInstructionSystemUUID'],
-                is_active: !$packagingInstruction['PackingInstructionIsDeleted']
+                uuid: $packagingInstruction['PackingInstructionID'],
+                is_active: !$packagingInstruction['PackingInstructionIsDeleted'],
+                machineStopType: $packagingInstruction['vegr2'] == '1' ? PackagingInstructionMachineStopType::HU_FULL : PackagingInstructionMachineStopType::NO_STOP
             );
 
             foreach ($packagingInstruction['to_PackingInstructionComponent']['results'] as $packagingInstructionPos) {
@@ -658,7 +675,7 @@ class SapApiExternalDataSource implements ExternalDataSource
                     pos: $packagingInstructionPos['PackingInstructionItem'],
                     is_container: $packagingInstructionPos['PackingInstructionItem'] == 10,
                     packed_item_id_custom: $packagingInstructionPos['Material'] ?: null,
-                    subordinate_packaging_instruction_uuid: $packagingInstructionPos['ItemPackingInstructionSystUUID'] ?: null,
+                    subordinate_packaging_instruction_uuid: $packagingInstructionPos['PackingInstructionID'] ?: null,
                     target_quantity: $packagingInstructionPos['PackingInstructionItmTargetQty'],
                     unit_of_measure_id_custom: $packagingInstructionPos['UnitOfMeasure'],
                     is_active: $packagingInstructionPos['PackingInstructionItemIsDel'],
@@ -1485,6 +1502,11 @@ class SapApiExternalDataSource implements ExternalDataSource
      * @return InspectionSpecificationDto[]|false
      */
     public function inspectionSpecificationDtos(int $skip, int $take): array|false
+    {
+        return false;
+    }
+
+    public function docVisuItemFileDtos(int $skip, int $take, ?string $onlyCustomId): array|false
     {
         return false;
     }

@@ -29,7 +29,7 @@ class ItemService
                 $plannedDate = $data['start_date'];
 
                 try {
-                    $date = Carbon::parse($plannedDate)->format('Y-m-d H:i:s'); 
+                    $date = Carbon::parse($plannedDate);
                     $tool = Item::where('is_tool', true)
                         ->where('is_active', true)
                         ->find($id);
@@ -37,7 +37,7 @@ class ItemService
                     if ($tool) {
                         $tool->prodOrderPos()
                             ->whereNotIn('status_plan', [ProdOrderPosStatus::CLOSED(), ProdOrderPosStatus::DELETED()])
-                            ->update(['release_date' => $date]);
+                            ->update(['release_date' => $date->clone(), 'is_prod_date_manual' => 0]);
 
                         $successCount++;
                     } else {

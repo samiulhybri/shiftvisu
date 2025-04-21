@@ -109,6 +109,10 @@ class BenacchioExportStrategy extends SapExportStrategy
                 $processingTimes = collect();
                 $users = collect();
                 foreach ($prod_order_pos_operation->times as $time) {
+                    //If user is not erp user do not send back times
+                    if(!$time->user_is_imported_from_erp)
+                        continue;
+
                     $users->push($time->user_custom_id);
                     if ($time->status == ProdOrderPosOperationStatus::IN_PRODUCTION()->value) {
                         $processingTimes->put($time->user_custom_id, $processingTimes->get($time->user_custom_id, 0) + $time->time);
@@ -364,6 +368,14 @@ class BenacchioExportStrategy extends SapExportStrategy
 
             $url = "sap/opu/odata/sap/API_INSPECTIONLOT_SRV/A_InspectionCharacteristic(InspectionLot='" . $data->inspection_lot_id_custom . "',InspPlanOperationInternalID='" . $data->prod_inspection_operation_internal_id . "',InspectionCharacteristic='" . $characteristic->inspection_operation_characteristic_pos . "')/to_InspSmplResult?sap-client=" . env('SAP_CLIENT', 100);
 
+            $valuation = AttributeSetOptionValuation::tryFrom($characteristic->valuation_result) ?? AttributeSetOptionValuation::REJECT;
+
+            $valStr = match ($valuation) {
+                AttributeSetOptionValuation::ACCEPT => 'A',
+                AttributeSetOptionValuation::SKIP => 'S',
+                default => 'R',
+            };
+
             $payload = array_filter([
                 "InspectionLot" => $data->inspection_lot_id_custom,
                 "InspectionCharacteristic" => $characteristic->inspection_operation_characteristic_pos,
@@ -372,21 +384,15 @@ class BenacchioExportStrategy extends SapExportStrategy
                 "InspRsltFreeDefinedTestEquip" => (string)$characteristic->confirmation_number ?? null, //InspCharcConfirmationNumber is readonly in api
                 "Inspector" => $characteristic->user_id_inspector_custom ?? null,
                 "InspectionResultText" => $characteristic->note ?? null,
+                "InspectionValuationResult" => $valStr,
+                "InspResultValidValuesNumber" => 1,
+                "InspResultNmbrOfRecordedRslts" => 1,
+                "InspectionResultStatus" => "5",
             ], fn($value) => ($value !== null) && ($value !== '')) ;
 
             if ($characteristic->is_quantitative) {
-                $valuation = AttributeSetOptionValuation::tryFrom($characteristic->valuation_result) ?? AttributeSetOptionValuation::REJECT;
 
-                $valStr = match ($valuation) {
-                    AttributeSetOptionValuation::ACCEPT => 'A',
-                    AttributeSetOptionValuation::SKIP => 'S',
-                    default => 'R',
-                };
-
-                $payload["InspectionResultStatus"] = "5";
                 $payload["InspResultFrmtdMeanValue"] = $characteristic->value;
-                $payload["InspResultValidValuesNumber"] = 1;
-                $payload["InspectionValuationResult"] = $valStr;
             } else {
                 //Currently only single result supported
                 $attributeCode = $characteristic->options[0]->custom_id ?? null;
@@ -397,6 +403,7 @@ class BenacchioExportStrategy extends SapExportStrategy
 
                 $payload["CharacteristicAttributeCode"] = $attributeCode;
                 $payload["CharacteristicAttributeCodeGrp"] = $attributeCodeGroup;
+                $payload["CharacteristicAttributeCatalog"] = "1";
             }
 
             $res = $this->apiService->executeHttpRequestInBtp($url, env('BTP_DESTINATION', 'ODATA_API'), $method = 'POST', $payload);

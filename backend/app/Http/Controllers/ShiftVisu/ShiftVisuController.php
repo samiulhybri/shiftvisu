@@ -5,9 +5,12 @@ namespace App\Http\Controllers\ShiftVisu;
 use App\Http\Controllers\Controller;
 use App\Models\ShiftVisu\ShiftVisuIssueType;
 use App\Models\ShiftVisu\ShiftVisuIssueTypeShiftVisuComponent;
+use App\Models\ShiftVisu\ShiftVisuOverviewDetail;
+use App\Models\ShiftVisu\ShiftVisuOverviewComponentOption;
 use Exception;
 use Illuminate\Http\Request;
 use DB;
+use Carbon\Carbon;
 
 class ShiftVisuController extends Controller
 {
@@ -146,7 +149,6 @@ class ShiftVisuController extends Controller
         return response()->json($halls);
     }
 
-
     public function getComponents(Request $request)
     {
         $issueTypeId = $request->input('shift_visu_issue_type_id');
@@ -155,55 +157,179 @@ class ShiftVisuController extends Controller
             ->where('shift_visu_issue_type_id', $issueTypeId)
             ->get()
             ->pluck('component');
-            // ->filter(function ($component) {
-            // return strtoupper($component->component_type) !== 'MEASURE';
-        //     });
 
         $grouped = [];
+        $measureGrouped = [];
 
         foreach ($components as $component) {
-            $viewIn = strtoupper($component->view_in);
-            $componentType = strtoupper($component->component_type);
+            $viewIn = strtoupper($component->view_in ?? '');
+            $componentType = strtoupper($component->component_type ?? '');
+
+            $viewKey = $viewIn !== '' ? $viewIn : 'UNKNOWN';
 
             $componentData = [
-                'name' => $component->name,
+                'id' => $component->id ?? null,
+                'name' => $component->name ?? null,
                 'is_required' => $component->is_required,
+                'is_corrective' => $component->is_corrective,
                 'model_type' => $component->model_type,
                 'component_type' => $component->component_type,
-                'view_in' => $component->view_in,
-                'measure_options' => \json_decode($component->measure_options),
-                'option' => $component->options->map(function ($option) {
-                return [
-                    'shift_visu_component_id' => $option->shift_visu_component_id,
-                    'option' => $option->option
-                   ];
+                'measure_options' => json_decode($component->measure_options, true),
+                'options' => $component->options->map(function ($option) {
+                    return [
+                        'id' => $option->id,
+                        'shift_visu_component_id' => $option->shift_visu_component_id,
+                        'option' => $option->option
+                    ];
                 })->toArray()
             ];
 
-        if (!isset($grouped[$viewIn])) {
-            $grouped[$viewIn] = [
-                'view_in' => $viewIn,
-                'component_type' => []
-            ];
-        }
+            if ($componentType === 'MEASURE') {
+                if (!isset($measureGrouped[$viewKey])) {
+                    $measureGrouped[$viewKey] = [
+                        'component_types' => []
+                    ];
+                }
 
-        $found = false;
-        foreach ($grouped[$viewIn]['component_type'] as &$typeGroup) {
-            if ($typeGroup['type'] === $componentType) {
-                $typeGroup['components'][] = $componentData;
-                $found = true;
-                break;
+            $found = false;
+            foreach ($measureGrouped[$viewKey]['component_types'] as &$typeGroup) {
+                if ($typeGroup['type'] === $componentType) {
+                    $typeGroup['components'][] = $componentData;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $measureGrouped[$viewKey]['component_types'][] = [
+                    'type' => $componentType,
+                    'components' => [$componentData],
+                ];
+            }
+
+            } else {
+                if (!isset($grouped[$viewKey])) {
+                    $grouped[$viewKey] = [
+                        'component_types' => []
+                    ];
+                }
+
+            $found = false;
+            foreach ($grouped[$viewKey]['component_types'] as &$typeGroup) {
+                if ($typeGroup['type'] === $componentType) {
+                    $typeGroup['components'][] = $componentData;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $grouped[$viewKey]['component_types'][] = [
+                    'type' => $componentType,
+                    'components' => [$componentData],
+                ];
             }
         }
-
-        if (!$found) {
-            $grouped[$viewIn]['component_type'][] = [
-                'type' => $componentType,
-                'components' => [$componentData],
-              ];
-            }
         }
 
-        return response()->json(array_values($grouped));
+        if (!empty($measureGrouped)) {
+            $grouped['MEASURE'] = $measureGrouped;
+        }
+
+        return response()->json($grouped);
     }
+
+    public function failureIssueSubmit(Request $request) {
+        $failureInfo = $request->input('failure_info');
+
+        if (!isset($failureInfo['hall_id'])) {
+            return response()->json(['message' => 'Hall id is required.'], 400);
+        }
+
+        if (!isset($failureInfo['creator_id'])) {
+            return response()->json(['message' => 'Creator id is required.'], 400);
+        }   
+
+        if (!isset($failureInfo['error_id'])) {
+            return response()->json(['message' => 'Error id is required.'], 400);
+        }
+
+        $detail = new ShiftVisuOverviewDetail();
+        $detail->hall_id = $failureInfo['hall_id'];
+        $detail->creator_id = $failureInfo['creator_id'];
+        $detail->error_id = $failureInfo['error_id'];
+        $detail->error_type = $failureInfo['error_type'] ?? null;
+        $detail->description = $failureInfo['failure_description'] ?? null;
+        $detail->save();
+
+        $componentsByView = $request->input('component_info') ?? [];
+        foreach ($componentsByView as $viewIn => $components) {
+            foreach ($components as $component) {
+            $componentType = $component['component_type'] ?? null;
+            $componentId = $component['component_id'] ?? null;
+
+            if (!$componentType || !$componentId) {
+                continue;
+            }
+
+            $isMulti = in_array($componentType, ['DROPDOWN_MULTI', 'COMBOBOX']);
+            $rawValue = $component['value'] ?? null;
+            $values = ($isMulti && is_array($rawValue)) ? $rawValue : [$rawValue];
+
+            foreach ($values as $value) {
+                $option = new ShiftVisuOverviewComponentOption();
+                $option->overview_details_id = $detail->id;
+                $option->component_id = $componentId;
+                $option->component_type = $componentType;
+                $option->view_in = $viewIn;
+
+                if (is_array($value) && isset($value['id'], $value['text'])) {
+                    $option->option_id = $value['id'];
+                    $value = $value['text'];
+                } elseif (!is_array($value)) {
+                } else {
+                    continue 2;
+                }
+
+                switch ($componentType) {
+                    case 'SWITCH':
+                        $option->option_value_is_checked = $value ?? false;
+                        break;
+                    case 'TEXTFIELD':
+                        $option->option_value = $value ?? null;
+                        break;
+
+                    case 'DATETIME':
+                    case 'DATE':
+                        $formattedDateTime = Carbon::parse($value)->format('Y-m-d H:i:s');
+                        $option->option_value_date = $formattedDateTime;
+
+                        break;
+
+                    case 'TEXTAREA':
+                        $option->option_value_text = $value ?? null;
+                        break;
+
+                    case 'DROPDOWN_SINGLE':
+                    case 'DROPDOWN_MULTI':
+                    case 'CHECKBOX':
+                    case 'RADIO':
+                    case 'COMBOBOX':
+                        $option->option_value = $value;
+                        break;
+
+                    default:
+                        continue 2;
+                }
+
+                $option->save();
+            }
+        }
+        }
+        return response()->json([
+                'message' => 'Overview detail saved successfully',
+                'data' => $detail
+            ], 201);
+    }
+    
 }

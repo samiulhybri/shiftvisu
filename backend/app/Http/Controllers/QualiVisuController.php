@@ -18,11 +18,14 @@ use App\Models\ProdInspectionOperation;
 use App\Models\ProdOrder;
 use App\Models\ProdOrderPosOperation;
 use App\Models\QualiEvent;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use ZipArchive;
 use Exception;
+use Storage;
 
 class QualiVisuController extends Controller
 {
@@ -33,7 +36,7 @@ class QualiVisuController extends Controller
 
     public function getInspectionsByOperation(Request $request)
     {
-        $inspectionOperations = ProdInspectionOperation::with('inspectionPoints.inspectionPointCharacteristics.inspectionPointCharacteristicOptions', 'inspectionOperationCharacteristics','prodInspectionOperationResources.equipment')
+        $inspectionOperations = ProdInspectionOperation::with('inspectionPoints.inspectionPointCharacteristics.inspectionPointCharacteristicOptions', 'inspectionPoints.inspectionPointCharacteristics.lastModifiedBy','inspectionOperationCharacteristics','prodInspectionOperationResources.equipment')
                                 ->whereHas('prodOrderPosOperation', function($query) {
                                     return $query->whereIn('status', [ProdOrderPosOperationStatus::IN_PRODUCTION(), ProdOrderPosOperationStatus::IN_SETUP(), ProdOrderPosOperationStatus::IN_TEARDOWN()]);
                                 })
@@ -91,6 +94,7 @@ class QualiVisuController extends Controller
             }
 
             if ($request->has('userIds')) {
+                $eightDReport->team()->sync([]);
                 $userIds = $request->userIds;
                 $eightDReport->team()->sync($userIds);
             }
@@ -112,9 +116,12 @@ class QualiVisuController extends Controller
             return response("No Id provided");
         }
 
+        $clientSideDateString = $request['clientSideDate'] ?? "";
+        $clientSideDate = Carbon::parse($clientSideDateString)->format("M j, Y, g:i A");
+
         if (count($reportIds) == 1) {
 
-            $data = $this->data8DReport($reportIds[0]);
+            $data = $this->data8DReport($reportIds[0], $clientSideDate);
 
             if ($request->has('preview')) {
 
@@ -125,28 +132,27 @@ class QualiVisuController extends Controller
 
             $pdf->setOption('isPhpEnabled', true);
 
-            return $pdf->stream($data['report']->title . "_" . $data['report']->created_at . ".pdf");
+            return $pdf->stream(preg_replace('/[^a-zA-Z0-9.-]/', '_', substr($data['report']->title, 0, 25) . "_" . Carbon::parse($data['report']->created_at)->timestamp . ".pdf"));
         } else if (count($reportIds) > 1) {
             $zip = new ZipArchive();
             $zipFileName = 'Reports.zip';
-
-            if ($zip->open(public_path($zipFileName), ZipArchive::CREATE)) {
+            if ($zip->open(storage_path($zipFileName), ZipArchive::CREATE)) {
                 foreach ($reportIds as $id) {
-                    $data = $this->data8DReport($id);
+                    $data = $this->data8DReport($id, $clientSideDate);
                     $pdf = PDF::loadView("quali-visu.eight-d-report", $data)->setOption('isPhpEnabled', true)->output();
 
-                    $zip->addFromString(preg_replace('/[^a-zA-Z0-9.-]/', '_',$data['report']->title . " " . $data['report']->created_at . ".pdf"), $pdf);
+                    $zip->addFromString(preg_replace('/[^a-zA-Z0-9.-]/', '_', substr($data['report']->title, 0, 25) . "_" . Carbon::parse($data['report']->created_at)->timestamp . ".pdf"), $pdf);
                 }
                 $zip->close();
             }
 
-            return response()->download(public_path($zipFileName))->deleteFileAfterSend(true);
+            return response()->download(storage_path($zipFileName))->deleteFileAfterSend(true);
 
         }
 
     }
 
-    public function data8DReport(int $reportId)
+    public function data8DReport(int $reportId, string $clientSideDate)
     {
 
         $report = EightDReport::with([
@@ -174,7 +180,11 @@ class QualiVisuController extends Controller
         $manpower = $ishikawa->where('category', EightDReportIshikawaType::MANPOWER());
         $methods = $ishikawa->where('category', EightDReportIshikawaType::METHODS());
         $attachments = $report->media;
-        
+
+        foreach ($attachments as $attachment) {
+            $attachment['path'] = app(MediaController::class)->getMediaPath($attachment)->getData()->path ?? $attachment['original_url'];
+        }
+
         $data = [
             "report" => $report,
             "immediate" => $immediate,
@@ -190,6 +200,7 @@ class QualiVisuController extends Controller
             "manpower" => $manpower,
             "methods" => $methods,
             "attachments" => $attachments,
+            "clientSideDate" => $clientSideDate
         ];
 
         return $data;
@@ -200,6 +211,165 @@ class QualiVisuController extends Controller
         $reportId = $request->get('reportId');
 
         $media = EightDReport::find($reportId)->addMediaFromRequest('media')->toMediaCollection('signature');
+        $media['path'] = app(MediaController::class)->getMediaPath($media)->getData()->path ?? $media['original_url'];
         return response($media);
     }
+
+    public function getOpenInspectionPoints(Request $request, $userId)
+    {
+        $user = User::findOrFail($userId)->load('machines:id');
+        $userAccessedMachineIds = $user->machines->pluck('id')->toArray() ?? [];
+        $machineIds = $request->query('machineId') ? explode(',', $request->query('machineId')) : [];
+
+        $mergedMachineIds = array_unique(array_merge($userAccessedMachineIds, $machineIds));
+
+        $page = (int) $request->query('page', 1);
+        $perPage = (int) $request->query('perPage', 40);
+        $userGroupIds = $request->query('userGroupId') ? explode(',', $request->query('userGroupId')) : [];
+        $itemIds = $request->query('itemId') ? explode(',', $request->query('itemId')) : [];
+        $search = $request->query('search');
+        $isAll = $request->query('isAll', false);
+
+        $inspectionPoints = InspectionPoint::with([
+            'inspectable' => function ($query) {
+                $query->with([
+                    'prodOrderPosOperation.prodOrderPos.prodOrder' => fn($q) => $q->select('id', 'custom_id'),
+                    'prodOrderPosOperation' => fn($q) => $q->select('id', 'prod_order_pos_id', 'machine_id', 'pos'),
+                    'prodOrderPosOperation.prodOrderPos' => fn($q) => $q->select('id', 'item_id', 'prod_order_id'),
+                    'prodOrderPosOperation.prodOrderPos.item' => fn($q) => $q->select('id', 'custom_id', 'name'),
+                    'prodOrderPosOperation.machine' => fn($q) => $q->select('id', 'custom_id', 'name'),
+                ])->select('id', 'prod_order_pos_operation_id', 'pos', 'is_active', 'frequency', 'name');
+            },
+            'inspectionPointCharacteristics' => fn($q) =>
+                $q->select('id', 'inspection_point_id', 'inspection_operation_characteristic_id', 'value', 'user_id'),
+
+            'inspectionPointCharacteristics.inspectionOperationCharacteristic' => fn($q) =>
+                $q->select('id', 'characteristicable_type', 'characteristicable_id', 'pos', 'name', 'user_group_id', 'is_required', 'is_quantitative'),
+
+            'inspectionPointCharacteristics.inspectionOperationCharacteristic.userGroup' => fn($q) =>
+                $q->select('id', 'custom_id', 'name'),
+
+            'inspectionPointCharacteristics.inspectionPointCharacteristicOptions'
+        ])
+            ->get()
+            ->filter(function ($inspectionPoint) use($isAll) {
+                return $isAll ? true :!$inspectionPoint->isCompleted();
+            })
+            ->filter(function ($inspectionPoint) use ($userGroupIds, $itemIds, $mergedMachineIds) {
+                $operation = $inspectionPoint->inspectable->prodOrderPosOperation ?? null;
+                $pos = $operation->prodOrderPos ?? null;
+
+                // Filter by userGroupIds
+                if (!empty($userGroupIds)) {
+                    $matched = collect($inspectionPoint->inspectionPointCharacteristics)
+                        ->pluck('inspectionOperationCharacteristic.user_group_id')
+                        ->filter()
+                        ->contains(fn($id) => in_array($id, $userGroupIds));
+
+                    if (!$matched)
+                        return false;
+                }
+
+                // Filter by itemIds
+                if (!empty($itemIds) && !in_array($pos?->item_id, $itemIds))
+                    return false;
+
+                // Filter by machineIds
+                if (!empty($mergedMachineIds) && !in_array($operation?->machine_id, $mergedMachineIds))
+                    return false;
+
+                return true;
+            })
+            ->filter(function ($inspectionPoint) use ($search) {
+                if ($search) {
+                    $searchTerm = strtolower($search);
+
+                    $operation = $inspectionPoint?->inspectable?->prodOrderPosOperation ?? null;
+                    $pos = $operation?->prodOrderPos ?? null;
+
+                    $machine = $operation?->machine;
+                    $item = $pos?->item;
+                    $prodOrder = $pos?->prodOrder;
+
+                    // Check for search term in the relevant fields
+                    $matches = false;
+                    if ($machine && (strpos(strtolower($machine->name), $searchTerm) !== false || strpos(strtolower($machine->custom_id), $searchTerm) !== false)) {
+                        return true;
+                    }
+
+                    if ($item && (strpos(strtolower($item->name), $searchTerm) !== false || strpos(strtolower($item->custom_id), $searchTerm) !== false)) {
+                        return true;
+                    }
+                    if ($prodOrder && (strpos(strtolower($prodOrder->custom_id), $searchTerm) !== false)) {
+                        return true;
+                    }
+                    if ($operation && (strpos(strtolower($operation->pos), $searchTerm) !== false)) {
+                        return true;
+                    }
+
+                    // Handle date parsing (DD.MM.YYYY or DD.MM.YYYY HH:MM)
+                    $searchDate = null;
+                    if (preg_match('/^\d{2}\.\d{2}\.\d{4}( \d{2}:\d{2})?$/', $search)) {
+                        $dateTime = DateTime::createFromFormat('d.m.Y H:i', $search);
+                        if (!$dateTime) {
+                            $dateTime = DateTime::createFromFormat('d.m.Y', $search);
+                        }
+
+                        if ($dateTime) {
+                            $searchDate = $dateTime->format(strlen($search) > 10 ? 'Y-m-d H:i' : 'Y-m-d');
+                        }
+                    }
+
+                    if ($searchDate) {
+                        $registered = $inspectionPoint->registered_datetime;
+                        $registeredFormatted = Carbon::parse($registered)->format(strlen($searchDate) > 10 ? 'Y-m-d H:i' : 'Y-m-d');
+
+                        if (strpos($registeredFormatted, $searchDate) === 0) {
+                            return true;
+                        }
+                    }
+
+                    // Check userGroup in inspectionPointCharacteristics (multiple items)
+                    if ($inspectionPoint->inspectionPointCharacteristics) {
+                        $matches = collect($inspectionPoint->inspectionPointCharacteristics)
+                            ->contains(function ($characteristic) use ($searchTerm) {
+                                $userGroup = $characteristic->inspectionOperationCharacteristic?->userGroup;
+                                if ($userGroup) {
+                                    return strpos(strtolower($userGroup->name), $searchTerm) !== false
+                                        || strpos(strtolower($userGroup->custom_id), $searchTerm) !== false;
+                                }
+                                return false;
+                            });
+                    }
+
+                    if ($matches)
+                        return true;
+
+                    return $matches;
+                }
+
+                return true; // If no search term, return true (no filtering by search)
+            })
+            ->values()
+            ->sortBy('registered_datetime')
+            ->map(function ($inspectionPoint) {
+                $data = $inspectionPoint->toArray();
+                $inspectable = $inspectionPoint->inspectable?->toArray() ?? [];
+
+                return array_merge($data, [
+                    'is_complete' => $inspectionPoint->isCompleted(),
+                    'inspectable' => array_merge($inspectable, [
+                        'inspection_points' => null,
+                    ]),
+                    'inspectionPointCharacteristics' => $data['inspection_point_characteristics'],
+                    'inspection_point_characteristics' => null,
+                ]);
+            });
+
+        // Paginate after filtering
+        $result = $inspectionPoints->forPage($page, $perPage)->values();
+
+        return response($result);
+    }
+
 }

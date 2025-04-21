@@ -37,7 +37,7 @@ class PlanVisuController extends Controller
 
     public function calculateBacklog()
     {
-        if(env('EXTERNAL_DS_TARGET') == 'vop') {
+        if (env('EXTERNAL_DS_TARGET') == 'vop') {
             $this->dispatch(new BacklogCalculation());
         } else {
             $this->dispatch(new BacklogCalculationController());
@@ -470,7 +470,8 @@ class PlanVisuController extends Controller
             ->where('section_activatables.is_active', true)
             ->where('halls.is_enabled_plan_visu', '=', true)
             ->where('capacities.date', '>=', $start_date->toDateString())
-            ->where('capacities.date', '<=', $end_date->toDateString());
+            ->where('capacities.date', '<=', $end_date->toDateString())
+            ->orderBy('machines.sort_order', 'asc');
 
         if (sizeof($hall_filter_query) > 0) {
             $capacities->whereIn('halls.id', $hall_filter_query);
@@ -1073,7 +1074,8 @@ class PlanVisuController extends Controller
                 ->join('halls', 'halls.id', '=', 'machines.hall_id');
 
             $demand->where('machine_daily_expected_quantities.workloadable_type', ProdOrderPosOperation::class);
-            $demand->where('machine_daily_expected_quantities.date', '>=', $start_date->format('Y-m-d'));
+            $demand->where('machine_daily_expected_quantities.date', '>=', $start_date->format('Y-m-d'))
+                ->orderBy('machines.sort_order', 'asc');;
 
             if (sizeof($hall_filter_query) > 0) {
                 $demand->whereIn('halls.id', $hall_filter_query);
@@ -1130,7 +1132,8 @@ class PlanVisuController extends Controller
                 ->join('halls', 'halls.id', '=', 'machines.hall_id');
 
             $demand->where('machine_daily_expected_quantities.workloadable_type', ProdOrderPosOperation::class);
-            $demand->where('machine_daily_expected_quantities.date', '>=', $start_date->format('Y-m-d'));
+            $demand->where('machine_daily_expected_quantities.date', '>=', $start_date->format('Y-m-d'))
+                ->orderBy('machines.sort_order', 'asc');
 
             if (sizeof($hall_filter_query) > 0) {
                 $demand->whereIn('halls.id', $hall_filter_query);
@@ -1157,7 +1160,6 @@ class PlanVisuController extends Controller
                 $result->actual_hours_demand = $group->sum('actual_hours_demand');
                 return $result; // Return the object
             })->values();
-
         }
 
         $capacitySettings = DB::table('hall_capacity_settings')
@@ -1210,7 +1212,7 @@ class PlanVisuController extends Controller
             foreach ($mainData as $data) {
                 $prodOrderId = DB::table('prod_orders')->insertGetId([
                     'custom_id' => $data['custom_id'],
-                    'call_off_id'=>$data['call_off_id'] ?? null,
+                    'call_off_id' => $data['call_off_id'] ?? null,
                     'created_at' => now(),
                     'updated_at' => now(),
                     'order_type' => ProdOrderType::PRODUCTION(),
@@ -1301,14 +1303,14 @@ class PlanVisuController extends Controller
     public function userSchedulerCalendar(Request $request)
     {
 
-        try{
+        try {
             $calendars = collect([]);
             $machineCapacities = [];
             $machines =  Machine::where('is_active', true)
-                ->when(!empty($request->hallIds), function($q) use ($request){
+                ->when(!empty($request->hallIds), function ($q) use ($request) {
                     $q->whereIn('hall_id', $request->hallIds);
                 })
-                ->when(!empty($request->machineIds), function($q) use ($request){
+                ->when(!empty($request->machineIds), function ($q) use ($request) {
                     $q->whereIn('id', $request->machineIds);
                 })
                 ->with(['capacities' => function ($query) use ($request) {
@@ -1325,14 +1327,14 @@ class PlanVisuController extends Controller
                 $calendar['unspecifiedTimeIsWorking'] = false;
                 $calendar['intervals'] = [];
                 $capacities = $machine->capacities;
-    
+
                 $capacityCount = $capacities->count() ?? 0;
                 for ($i = 0; $i < $capacityCount; $i++) {
                     $interval = collect([]);
                     $isMultiPleCapacity = true;
                     $date = $capacities[$i]->date;
                     $start_time = $capacities[$i]->start_time;
-    
+
                     $startDateTime = Carbon::parse("$date $start_time", 'UTC')->setTimezone($timezone);
                     while ($isMultiPleCapacity) {
                         if (
@@ -1362,8 +1364,8 @@ class PlanVisuController extends Controller
                 $machineCapacities[$machine->custom_id] = $calendar['intervals'];
                 $calendars->push($calendar);
             }
-          return response()->json(compact('calendars', 'machineCapacities'));
-        }catch(Exeption $e){
+            return response()->json(compact('calendars', 'machineCapacities'));
+        } catch (Exeption $e) {
             return response(json($e->getMessage()), 500);
         }
     }
@@ -1444,7 +1446,7 @@ class PlanVisuController extends Controller
             'item.operationPlan.operationPlanPos',
             'item.operationPlan.operationPlanPos.machine',
             'prodOrders'
-        ])  
+        ])
             ->whereBetween('date', [$startDate, $endDate])
             ->where(function ($query) use ($search) {
                 $query->where('custom_id', 'LIKE', "%{$search}%")
@@ -1458,39 +1460,42 @@ class PlanVisuController extends Controller
                         $query->where('name', 'LIKE', "%{$search}%");
                     });
             });
-            if ($callOfType === 'used') {
-                $callOffs->whereHas('prodOrders'); // Only fetch callOffs that have related prodOrders
-            }else{
-                $callOffs->whereDoesntHave('prodOrders');
-            }
+        if ($callOfType === 'used') {
+            $callOffs->whereHas('prodOrders'); // Only fetch callOffs that have related prodOrders
+        } else {
+            $callOffs->whereDoesntHave('prodOrders');
+        }
 
-            if ($internalFilterType === 'internal') {
-                $callOffs->where('is_internal', true);
-            } elseif ($internalFilterType === 'not_internal') {
-                $callOffs->where('is_internal', false);
-            }
-        
-            $callOffs = $callOffs->orderBy($sortBy, $sortOrder)
-                ->skip(($page - 1) * $perPage)
-                ->take($perPage)
-                ->get();
+        if ($internalFilterType === 'internal') {
+            $callOffs->where('is_internal', true);
+        } elseif ($internalFilterType === 'not_internal') {
+            $callOffs->where('is_internal', false);
+        }
+
+        $callOffs = $callOffs->orderBy($sortBy, $sortOrder)
+            ->skip(($page - 1) * $perPage)
+            ->take($perPage)
+            ->get();
 
         return response()->json($callOffs);
     }
 
-    public function getCurrentRunningTasks() {
+    public function getCurrentRunningTasks()
+    {
         return Http::get('https://app.schertech.com/task_visu_dev/php/task_time_data_service.php?service=get_all_user_status_angular');
     }
 
-    public function getMachineUserPlanTimes(Request $request) {
+    public function getMachineUserPlanTimes(Request $request)
+    {
         $start = Carbon::parse($request->start);
         $end = Carbon::parse($request->end);
         $hallIds = $request->hall_ids;
         $userIds = $request->user_ids;
         $machineIds = $request->machine_ids;
+        $userName = $request->userName;
 
         $query = User::where(function ($query) use ($hallIds, $userIds) {
-            $query->when(!empty($hallIds),function($q) use ($hallIds){
+            $query->when(!empty($hallIds), function ($q) use ($hallIds) {
                 return $q->whereIn('hall_id', $hallIds);
             });
 
@@ -1498,10 +1503,16 @@ class PlanVisuController extends Controller
                 return $q->whereIn('id', $userIds);
             });
         })
+        ->when($userName, function($q) use($userName){
+            return $q->where('name', 'like', "%$userName%");
+        })
         ->with(['machineUserPlanTimes' => function ($query) use ($start, $end, $machineIds) {
             $query->where('start_time', '>=',$start)
                   ->where('end_time', '<=', $end)
-                  ->with(['machine', 'capacity'])
+                  ->whereNotNull('capacity_id')
+                  ->with(['machine' => function ($machineQuery) {
+                        $machineQuery->select('id', 'name', 'custom_id');
+                  }])
                   ->when(!empty($machineIds),function($q) use ($machineIds){
                      return $q->whereIn('machine_id', $machineIds);
                   });

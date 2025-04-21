@@ -42,4 +42,8 @@ return [
     'benacchio' => [
         'class' => \App\ExportStrategies\BenacchioExportStrategy::class,
     ],
+
+    'agvs' => [
+        'class' => \App\ExportStrategies\AGVSExportStrategy::class,
+    ],
 ];

@@ -30,7 +30,7 @@ class CapacityPlanService
 
         $end = $start->copy();
         $end = $end->addSeconds($duration);
-        $end = $end->add(30, 'days');
+        $end = $end->add(100, 'days');
 
         $capacities = $machine->capacities()
             ->orderBy("date", "asc")
@@ -222,7 +222,7 @@ class CapacityPlanService
 
         $start = $end->copy();
         $start = $start->subSeconds($duration);
-        $start = $start->sub(30, 'days');
+        $start = $start->sub(100, 'days');
 
         $capacities = $machine->capacities()
             ->orderBy("date", "desc")

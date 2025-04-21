@@ -1058,5 +1058,17 @@
   "attachments": "Allegati",
   "yes": "Si",
   "no": "No"
+  },
+  "report_visu" : {
+    "serial_report" : {
+      "prod_order" : "Ordine di produzione",
+      "operation_pos" : "Posizione Operazione",
+      "item_id_custom" : "ID articolo",
+      "serial" : "Seriale",
+      "component_id_custom" : "ID componente",
+      "component_serial" : "Seriale componente",
+      "component_note" : "Nota componente",
+      "confirmed_datetime" : "Data conferma"
+    }
   }
 }

@@ -29,6 +29,10 @@ class CustomerController extends Controller
                         ['model_type', '=', Message::class],
                     ])->first();
 
+                    if($image) {
+                        $image['path'] = app(MediaController::class)->getMediaPath($image)->getData()->path ?? $image['original_url'];
+                    }
+
                     return [
                         'id' => $message->id,
                         'chat_id' => $message->chat_id,

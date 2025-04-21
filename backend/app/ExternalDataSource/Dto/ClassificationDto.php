@@ -2,6 +2,8 @@
 
 namespace App\ExternalDataSource\Dto;
 
+use stdClass;
+
 class ClassificationDto
 {
     public ?string $model_type;
@@ -29,5 +31,18 @@ class ClassificationDto
         $this->value_string = substr($value_string, 0, 255);
         $this->value_double = $value_double;
         $this->xml_id = $xml_id;
+    }
+
+    public static function fromStdClass(stdClass $obj): ClassificationDto
+    {
+        return new self(
+            $obj->class,
+            $obj->attribute,
+            $obj->model_type ?? null,
+            $obj->model_id_custom ?? null,
+            $obj->value_string ?? null,
+            $obj->value_double ?? null,
+            $obj->xml_id ?? null
+        );
     }
 }

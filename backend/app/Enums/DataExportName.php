@@ -28,6 +28,8 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self PRINT_PRODUCTION_ORDER()
  * @method static self PRINT_GOODS_MOVEMENT()
  * @method static self INSPECTION_POINT()
+ * @method static self ORDER_START()
+ * @method static self LOGIN()
  */
 final class DataExportName extends Enum
 {

@@ -32,16 +32,18 @@ class ImportFromBTPController extends Controller
     {
         $url = "sap/opu/odata/SAP/ZAPI_READ_DMS_IMAGE_SRV/DMSSet(DocType='ZFI',ObjKey='{$itemIdCustom}')/\$value?sap-client=" . env('SAP_CLIENT', 100);
 
-        return $this->apiService->executeHttpRequestInBtp($url, env('BTP_DESTINATION', 'ODATA_API'));
+        return response($this->apiService->executeHttpRequestInBtp($url, env('BTP_DESTINATION', 'ODATA_API')))
+            ->header('Content-Type', 'application/pdf');
     }
 
     public function getAttachmentFromBTP(ProdInspectionOperationResource $prodInspectionOperationResource)
     {
         $json = json_decode($prodInspectionOperationResource->external_id);
-        if($json->doc_type && $json->doc_nr && $json->doc_version && $json->doc_part) {
+        if ($json->doc_type && $json->doc_nr && $json->doc_version && $json->doc_part) {
             $url = "sap/opu/odata/SAP/ZAPI_GET_IMG_QM_SRV/QMImageSet(DocType='$json->doc_type',DocNr='$json->doc_nr',DocVersion='$json->doc_version',DocPart='$json->doc_part')/\$value?sap-client=" . env('SAP_CLIENT', 100);
 
-            return $this->apiService->executeHttpRequestInBtp($url, env('BTP_DESTINATION', 'ODATA_API'));
+            return response($this->apiService->executeHttpRequestInBtp($url, env('BTP_DESTINATION', 'ODATA_API')))
+                ->header('Content-Type', 'application/pdf');
 
         }
         return response();

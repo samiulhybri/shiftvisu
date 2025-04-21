@@ -20,17 +20,27 @@
         table {
             width: 100%;
             border-spacing: 0;
+            border-collapse: collapse;
         }
 
         td {
-            padding-left: 10px;
-            padding-bottom: 10px;
-            padding-right: 10px;
+            padding-left: 5px;
+            padding-bottom: 5px;
+            padding-right: 5px;
             color: #005981;
+            font-size: 12px;
+        }
+
+        td>div {
+            line-height: 10px;
         }
 
         .black {
             color: #1D2D3E;
+        }
+
+        .black-border {
+            border: 1px solid #1D2D3E8F;
         }
 
         footer {
@@ -43,14 +53,14 @@
 
         @page {
             margin: 0;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             size: A4;
         }
     </style>
 </head>
 
 <body
-    style="background: url({{ asset('images/eight-d-report-background.png') }}) no-repeat;   background-position: left top; background-size: 70%; padding: 20px">
+    style="background: url({{ public_path('images/eight-d-report-background.png') }}) no-repeat;   background-position: left top; background-size: 70%; padding: 20px">
     <table>
         <tr>
             <td class="w-half" style="width: 100%">
@@ -59,7 +69,7 @@
                 </div>
             </td>
             <td style="text-align: right, width: 50%">
-                <img src="{{ asset('images/company-blue-logo.jpg') }}" alt="schertech-logo" width="200" />
+                <img src="{{ public_path('images/company-blue-logo.jpg') }}" alt="schertech-logo" width="200" />
             </td>
         </tr>
     </table>
@@ -72,7 +82,7 @@
             <table style="width: 100%" border="1">
                 <tr>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.concernTitle')}}
                         </div>
                         <div>
@@ -80,20 +90,20 @@
                         </div>
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.complainNumber')}}
                         </div>
 
                         <div>{{ $report->complaint_no }}</div>
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.supplier')}}
                         </div>
                         <div>{{ $report->supplier?->name }}</div>
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.productionSite')}}
                         </div>
                         <div>{{ $report->production?->name }}</div>
@@ -103,21 +113,21 @@
 
                 <tr>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.drawingNo')}}
                         </div>
 
                         <div>{{ $report->drawing_no }}</div>
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.drawingRevision')}}
                         </div>
 
                         <div>{{ $report->drawing_revision }}</div>
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.plants')}}
                         </div>
 
@@ -125,7 +135,7 @@
 
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.quantityDelivery')}}
                         </div>
 
@@ -135,7 +145,7 @@
 
                 <tr>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.partName')}}
                         </div>
                         @if ($report->drawing_no)
@@ -145,62 +155,72 @@
                         @endif
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.revision')}}
                         </div>
                         <div>{{ $report->revision }}</div>
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.openingDate')}}
                         </div>
-                        <div>{{ $report->complaint_opening_date }}</div>
+                        @if ($report->complaint_opening_date)
+                            <div>{{date('d.m.Y', strtotime($report->complaint_opening_date))}}</div>
+                        @endif
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div style="font-weight: 600" class="black">
+                        <div style="font-weight: 600;" class="black">
                             {{__('messages.eightDReport.revisionDate')}}
                         </div>
-                        <div>{{ $report->revision_date }}</div>
+                        @if ($report->revision_date)
+                            <div>{{date('d.m.Y', strtotime($report->revision_date))}}</div>
+                        @endif
                     </td>
                 </tr>
             </table>
         </div>
     </div>
 
-    <div>
+    <div style="page-break-inside: avoid;">
         <div style="font-size: larger; font-weight: 700;" class="black">{{__('messages.eightDReport.team')}}</div>
         <div>
-            <table style="width: 100%" border="1">
+            <table style="width: 100%; vertical-align: top;" border="1">
                 <tr>
-                    <td style="width: 50%">
+                    <td style="width: 50%; margin: 0; vertical-align: top;">
                         <table border="0">
                             <tr>
-                                <td style="width: 33%; font-weight: 600;" class="black" class="black">
-                                    {{__('messages.eightDReport.members')}}
+                                <td style="width: 115px; font-weight: 600; font-size: 14px; padding-left: 0; padding-bottom: 5px; padding-top: 0; vertical-align: top;"
+                                    class="black">
+                                    <div>{{__('messages.eightDReport.members')}}</div>
                                 </td>
 
-                                <td style="width: 33%; font-weight: 600;" class="black">
-                                    {{__('messages.eightDReport.department')}}
+                                <td style="width: 115px; font-weight: 600; font-size: 14px; padding-left: 0; padding-bottom: 5px; padding-top: 0; vertical-align: top;"
+                                    class="black">
+                                    <div>{{__('messages.eightDReport.department')}}</div>
                                 </td>
 
-                                <td style="width: 33%; font-weight: 600;" class="black">
-                                    {{__('messages.eightDReport.email')}}
+                                <td style="width: 115px; font-weight: 600; font-size: 14px; padding-left: 0; padding-right: 0; padding-bottom: 5px; padding-top: 0; vertical-align: top;"
+                                    class="black">
+                                    <div>{{__('messages.eightDReport.email')}}</div>
                                 </td>
                             </tr>
                             @foreach ($report->team as $index => $member)
                                 @if($index > 0)
                                     <tr>
-                                        <td style="width: 33%;">
-                                            {{ $member->name }}
+                                        <td
+                                            style="width: 115px; word-wrap: break-word; padding-left: 0; padding-bottom: 5px; vertical-align: top;">
+                                            <div>{{ $member->name }}</div>
                                         </td>
-                                        <td style="width: 33%;">
+                                        <td
+                                            style="width: 115px; word-wrap: break-word; padding-left: 0; padding-bottom: 5px; vertical-align: top;">
                                             @if ($member->userGroup->count())
-                                                {{ $member->userGroup[0]->name }}
+                                                <div>{{ $member->userGroup[0]->name }}</div>
                                             @endif
-                                        </td style="width: 33%;">
+                                        </td>
 
-                                        <td style="width: 33%;">
-                                            {{ $member->email }}
+                                        <td
+                                            style="width: 115px; word-wrap: break-word; padding-left: 0; padding-right: 0; padding-bottom: 5px; vertical-align: top;">
+                                            <div>{{ $member->email }}</div>
                                         </td>
                                     </tr>
                                 @endif
@@ -209,22 +229,28 @@
 
                             @if($report->team->count())
                                 <tr>
-                                    <td style="width: 33%; font-weight: 600;" class="black">
+                                    <td style="width: 115px; font-weight: 600; font-size: 14px; padding-left: 0; padding-bottom: 5px; vertical-align: top;"
+                                        class="black">
                                         {{__('messages.eightDReport.teamLeader')}}
                                     </td>
                                 </tr>
 
                                 <tr>
-                                    <td style="width: 33%;">
-                                        {{$report->team[0]->name}}
+                                    <td
+                                        style="width: 115px; word-wrap: break-word; padding-left: 0; padding-bottom: 5px; vertical-align: top;">
+                                        <div>{{$report->team[0]->name}}</div>
                                     </td>
 
-                                    <td style="width: 33%;">
-                                        Temp
+                                    <td
+                                        style="width: 115px; word-wrap: break-word; padding-left: 0; padding-bottom: 5px; vertical-align: top;">
+                                        @if ($report->team[0]->userGroup->count())
+                                            <div>{{ $report->team[0]->userGroup[0]->name }}</div>
+                                        @endif
                                     </td>
 
-                                    <td style="width: 33%;">
-                                        {{$report->team[0]->email}}
+                                    <td
+                                        style="width: 115px; word-wrap: break-word; padding-left: 0; padding-right: 0; padding-bottom: 5px; vertical-align: top;">
+                                        <div>{{$report->team[0]->email}}</div>
                                     </td>
                                 </tr>
                             @endif
@@ -232,7 +258,8 @@
                     </td>
 
                     <td style="width: 50%; vertical-align: top;">
-                        <div style="vertical-align: top; font-size: larger; font-weight: 700;" class="black">
+                        <div style="vertical-align: top; font-size: 16px; font-weight: 700; padding-bottom: 5px;"
+                            class="black">
                             2. {{__('messages.eightDReport.problemDescription')}}
                         </div>
                         <div style="vertical-align: top;">
@@ -250,7 +277,7 @@
             {{__('messages.eightDReport.immediateActions')}}
         </div>
         <div>
-            <table style="width: 100%" border="1">
+            <table style="width: 100%;" border="0" class="black-border">
                 <tr>
                     <td style="width: 60%; vertical-align: top">
                         <div style="font-weight: 600" class="black">
@@ -284,9 +311,11 @@
                             </div>
                         </td>
                         <td style="width: 20%; vertical-align: top">
-                            <div>
-                                {{$task->responsible?->end_date}}
-                            </div>
+                            @if ($task->end_date)
+                                <div>
+                                    {{date('d.m.Y', strtotime($task->end_date))}}
+                                </div>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -294,12 +323,12 @@
         </div>
     </div>
 
-    <div>
+    <div style="page-break-inside: avoid;">
         <div style="font-size: larger; font-weight: 700;" class="black">4.
             {{__('messages.eightDReport.correctiveActions')}}
         </div>
         <div>
-            <table style="width: 100%" border="1">
+            <table style="width: 100%" border="0" class="black-border">
                 <tr>
                     <td style="width: 60%; vertical-align: top">
                         <div style="font-weight: 600" class="black">
@@ -333,9 +362,11 @@
                             </div>
                         </td>
                         <td style="width: 20%; vertical-align: top">
-                            <div>
-                                {{$task->end_date}}
-                            </div>
+                            @if ($task->end_date)
+                                <div>
+                                    {{date('d.m.Y', strtotime($task->end_date))}}
+                                </div>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -343,12 +374,12 @@
         </div>
     </div>
 
-    <div>
+    <div style="page-break-inside: avoid;">
         <div style="font-size: larger; font-weight: 700;" class="black">5.
             {{__('messages.eightDReport.implmentedActions')}}
         </div>
         <div>
-            <table style="width: 100%" border="1">
+            <table style="width: 100%" border="0" class="black-border">
                 <tr>
                     <td style="width: 60%; vertical-align: top">
                         <div style="font-weight: 600" class="black">
@@ -382,9 +413,11 @@
                             </div>
                         </td>
                         <td style="width: 20%; vertical-align: top">
-                            <div>
-                                {{$task->end_date}}
-                            </div>
+                            @if ($task->end_date)
+                                <div>
+                                    {{date('d.m.Y', strtotime($task->end_date))}}
+                                </div>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -392,12 +425,12 @@
         </div>
     </div>
 
-    <div>
+    <div style="page-break-inside: avoid;">
         <div style="font-size: larger; font-weight: 700;" class="black">6.
             {{__('messages.eightDReport.preventRecurrence')}}
         </div>
         <div>
-            <table style="width: 100%" border="1">
+            <table style="width: 100%" border="0" class="black-border">
                 <tr>
                     <td style="width: 60%; vertical-align: top">
                         <div style="font-weight: 600" class="black">
@@ -431,9 +464,11 @@
                             </div>
                         </td>
                         <td style="width: 20%; vertical-align: top">
-                            <div>
-                                {{$task->end_date}}
-                            </div>
+                            @if ($task->end_date)
+                                <div>
+                                    {{date('d.m.Y', strtotime($task->end_date))}}
+                                </div>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -441,7 +476,7 @@
         </div>
     </div>
 
-    <div>
+    <div style="page-break-inside: avoid;">
         <div style="font-size: larger; font-weight: 700;" class="black">7.
             {{__('messages.eightDReport.congratulations')}}
         </div>
@@ -480,15 +515,16 @@
                         <div style="font-weight: 600" class="black">
                             {{__('messages.eightDReport.closingDate')}}
                         </div>
-
-                        <div>
-                            {{$report->author_closing_date}}
-                        </div>
+                        @if ($report->author_closing_date)
+                            <div>
+                                {{date('d.m.Y', strtotime($report->author_closing_date))}}
+                            </div>
+                        @endif
                     </td>
                 </tr>
             </table>
             <br>
-            <table border="1">
+            <table border="0" class="black-border">
                 <tr>
                     <td style="width: 25%; vertical-align: top">
                         <div style="font-weight: 600" class="black">
@@ -507,19 +543,21 @@
                         </div>
                     </td>
                     <td style="width: 25%; vertical-align: top">
-                        <div>
-                            {{$report->client_closing_date}}
-                        </div>
+                        @if ($report->client_closing_date)
+                            <div>
+                                {{date('d.m.Y', strtotime($report->client_closing_date))}}
+                            </div>
+                        @endif
                     </td>
                 </tr>
             </table>
         </div>
     </div>
 
-    <div>
+    <div style="page-break-inside: avoid;">
         <div style="font-size: larger; font-weight: 700;" class="black">8. {{__('messages.eightDReport.fiveW')}}</div>
         <div>
-            <table style="width: 100%" border="1">
+            <table style="width: 100%" border="0" class="black-border">
                 <tr>
                     <td style="width: 50%; vertical-align: top">
                         <div style="font-weight: 600" class="black">
@@ -552,7 +590,7 @@
         </div>
     </div>
 
-    <div>
+    <div style="page-break-inside: avoid;">
         <div style="font-size: larger; font-weight: 700;" class="black">9. {{__('messages.eightDReport.ishikawa')}}
         </div>
         <div>
@@ -626,14 +664,14 @@
         </div>
     </div>
 
-    <div>
+    <div style="page-break-inside: avoid;">
         <div style="font-size: larger; font-weight: 700;" class="black">10. {{__('messages.eightDReport.attachments')}}
             ({{ $attachments->count() }})
         </div>
         <br>
         <div>
             @foreach ($attachments as $index => $photo)
-                <img style="margin-right: 4.3px; padding-bottom: 10px;" src="{{ $photo->original_url }}" width="24%">
+                <img style="margin-right: 4.3px; padding-bottom: 10px;" src="{{ $photo->path }}" width="24%">
             @endforeach
         </div>
     </div>
@@ -642,13 +680,23 @@
     if (isset($pdf)) {
         $text = "Page {PAGE_NUM} / {PAGE_COUNT}";
         $size = 10;
-        $font = $fontMetrics->getFont("Verdana");
+        $font = $fontMetrics->getFont("Poppins");
         $width = $fontMetrics->get_text_width($text, $font, $size) / 2;
-        $x = ($pdf->get_width() - $width) / 2;
+        $x = ($pdf->get_width() - $width) / 2 + 10;
         $y = $pdf->get_height() - 35;
         $pdf->page_text($x, $y, $text, $font, $size);
     }
-</script>
+
+    if (isset($pdf)) {
+        $text_date = '{{$clientSideDate}}';
+        $size = 10;
+        $font = $fontMetrics->getFont("Poppins");
+        $width = $fontMetrics->get_text_width($text, $font, $size) / 2;
+        $x = 15;
+        $y = $pdf->get_height() - 35;
+        $pdf->page_text($x, $y, $text_date, $font, $size);
+    }
+    </script>
 </body>
 
 </html>

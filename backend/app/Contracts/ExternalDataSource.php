@@ -410,4 +410,11 @@ interface ExternalDataSource
      * @return InspectionSpecificationDto[]|false
      */
     public function inspectionSpecificationDtos(int $skip, int $take): array|false;
+
+    /**
+     * @param int $skip
+     * @param int $take
+     * @return DocVisuItemFileDto[]|false
+     */
+    public function docVisuItemFileDtos(int $skip, int $take, ?string $onlyCustomId): array|false;
 }

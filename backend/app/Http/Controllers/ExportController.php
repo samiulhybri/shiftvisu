@@ -117,6 +117,12 @@ class ExportController extends Controller
                 case DataExportName::OPERATION_MACHINE_TIMES():
                     $result = $this->exportStrategy?->exportOperationMachineTimes($dataExport);
                     break;
+                case DataExportName::ORDER_START():
+                    $result = $this->exportStrategy?->exportOrderStart($dataExport);
+                    break;
+                case DataExportName::LOGIN():
+                    $result = $this->exportStrategy?->exportLogin($dataExport);
+                    break;
                 case DataExportName::OPERATION_CLOSED():
                     $result = $this->exportStrategy?->exportOperationClosed($dataExport);
                     break;

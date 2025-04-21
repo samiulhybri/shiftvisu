@@ -3,6 +3,9 @@
 namespace App\ExternalDataSource\Dto;
 
 use App\Enums\ProdOrderPosStatus;
+use App\Models\ProdOrderPosBomPos;
+use App\Models\ProdOrderPosSerial;
+use stdClass;
 
 class ProdOrderPosDto
 {
@@ -85,5 +88,40 @@ class ProdOrderPosDto
         $this->notes = $notes;
         $this->classifications = $classifications;
         $this->batch = $batch;
+    }
+
+    public static function fromStdClass(stdClass $obj): ProdOrderPosDto
+    {
+        $operations = collect($obj->operations ?? [])->map(function ($operation) {
+            return ProdOrderPosOperationDto::fromStdClass($operation);
+        });
+        $components = collect($obj->components ?? [])->map(function ($component) {
+            return ProdOrderPosBomPosDto::fromStdClass($component);
+        });
+        $classifications = collect($obj->classifications ?? [])->map(function ($classification) {
+            return ClassificationDto::fromStdClass($classification);
+        });
+
+        return new self(
+            $obj->pos,
+            $obj->item_id_custom ?? null,
+            $obj->start ?? null,
+            $obj->end ?? null,
+            $obj->release_date ?? null,
+            $obj->due_date ?? null,
+            $obj->raw_material ?? null,
+            ProdOrderPosStatus::tryFrom($obj->status) ?? null,
+            $obj->sales_order_id_custom ?? null,
+            $obj->sales_order_pos_custom ?? null,
+            $obj->quantity ?? 0,
+            $operations->toArray(),
+            $components->toArray(),
+            $obj->serials ?? [],
+            $obj->storage_location_id_custom ?? null,
+            $obj->unit_of_measure_id_custom ?? null,
+            $obj->notes ?? null,
+            $classifications->toArray(),
+            $obj->batch ?? null
+        );
     }
 }

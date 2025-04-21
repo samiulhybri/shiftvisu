@@ -77,10 +77,12 @@ class QualificationsUpdate extends Command
                         );
                 }
             )
-            ->groupBy(["qualifications.id", "users.id", "qualification_users.id"])
+            ->groupBy(["qualifications.id", "users.id", "qualification_users.id", "qualification_users.hours_imported", "qualification_users.operations_imported"])
             ->select([
                 "qualifications.id as qualification_id",
                 "users.id as user_id",
+                "qualification_users.hours_imported as hours_imported",
+                "qualification_users.operations_imported as operations_imported",
                 DB::raw("SUM(COALESCE(user_registered_times.hours_split, 0)) as total_hours"),
                 DB::raw("COUNT(DISTINCT user_registered_times.prod_order_pos_operation_id) as total_operations")
             ])
@@ -94,8 +96,8 @@ class QualificationsUpdate extends Command
             $insertionData[] = [
                 "qualification_id" => $record->qualification_id,
                 "user_id" => $record->user_id,
-                "total_hours" => $record->total_hours,
-                "total_operations" => $record->total_operations
+                "total_hours" => $record->hours_imported + $record->total_hours,
+                "total_operations" => $record->operations_imported + $record->total_operations
             ];
         }
 

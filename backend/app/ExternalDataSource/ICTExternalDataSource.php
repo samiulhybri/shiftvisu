@@ -9,11 +9,13 @@ use App\Enums\ComponentAvailability;
 use App\Enums\ProdOrderPosStatus;
 use App\ExternalDataSource\Dto\CallOffDto;
 use App\ExternalDataSource\Dto\ClassificationDto;
+use App\ExternalDataSource\Dto\DocVisuItemFileDto;
 use App\ExternalDataSource\Dto\ItemDto;
 use App\ExternalDataSource\Dto\MachineDto;
 use App\ExternalDataSource\Dto\OffDayDto;
 use App\ExternalDataSource\Dto\QualificationDto;
 use App\ExternalDataSource\Dto\ToolDto;
+use App\Models\Item;
 use App\Models\ProdOrderPos;
 use App\Models\ResourceGroup;
 use App\Models\ToolGroup;
@@ -717,5 +719,63 @@ class ICTExternalDataSource extends BaseVisuExternalDataSource
         }
 
         return $dtos;
+    }
+
+    public function docVisuItemFileDtos(int $skip, int $take, ?string $onlyCustomId): array|false
+    {
+        $params = [];
+        $itemCustomIds = [];
+
+        if($onlyCustomId) {
+            if ($skip) {
+                return false;
+            }
+            $itemCustomIds = Item::where('custom_id', $onlyCustomId)
+                            ->select('custom_id')
+                            ->pluck('custom_id')
+                            ->toArray();
+        }else {
+            $itemCustomIds = Item::select('custom_id')
+                        ->skip($skip)
+                        ->take($take)
+                        ->orderBy('id', 'asc')
+                        ->pluck('custom_id')
+                        ->toArray();
+        }
+
+        if (!empty($itemCustomIds)) {
+
+            $trimmedPlaceholders = [];
+            $params = [];
+            foreach ($itemCustomIds as $id) {
+                $trimmedPlaceholders[] = '?';
+                $params[] = $id;
+            }
+
+            $sql = "SELECT TRIM(ARTKODE) AS \"item_id_custom\",
+                    TRIM(ARTZEICHNUNG) AS \"drawing_code\"
+                    FROM ERP_TO_MES_DRAWING_MAPPING
+                    WHERE ARTZEICHNUNG IS NOT NULL AND TRIM(ARTKODE) IN (" . implode(',', $trimmedPlaceholders) . ")";
+
+            $sql = mb_convert_encoding($sql, "Windows-1252");
+            $stmt = $this->erp_db->prepare($sql);
+            $stmt->setFetchMode(\PDO::FETCH_ASSOC);
+            $stmt->execute($params);
+
+            $result = $stmt->fetchAll();
+
+            $fileExtension = '.pdf';
+            $dtos = [];
+            foreach ($result as $data) {
+                $dtos[] = new DocVisuItemFileDto(
+                    item_id_custom: $data['item_id_custom'],
+                    drawing_code: $data['drawing_code'],
+                    file_extension: $fileExtension
+                );
+            }
+            return $dtos;
+        } else {
+            return [];
+        }
     }
 }

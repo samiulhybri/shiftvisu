@@ -281,11 +281,13 @@ class HandlingUnit extends Model
                 }
             }
         }
+        $user = auth()->user();
 
         $docToExport = DataExport::query()->create([
             "name" => DataExportName::MATERIAL_DOCUMENT(),
             "data" => json_encode([
-                "user_id_custom" => auth()->user() ? auth()->user()->custom_id : null,
+                "user_id_custom" => $user?->custom_id ?? null,
+                "user_is_imported_from_erp" => $user?->is_imported_from_erp ?? null,
                 "prod_order_custom_id" => $operation->prodOrderPos->prodOrder->custom_id ?? null,
                 "posting_date" => now()->toDateTimeString(),
                 "handling_unit" => $this->createGoodsReceiptExportObject(),

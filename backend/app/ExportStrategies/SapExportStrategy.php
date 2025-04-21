@@ -64,7 +64,7 @@ class SapExportStrategy extends ExportStrategy
             'POST',
         );
 
-        if($proposedConf->failed())
+        if ($proposedConf->failed())
             return ExportResult::FAIL('Failed to retrieve conf proposal');
 
         $confBody = json_decode($proposedConf->body())->d->GetConfProposal;
@@ -97,7 +97,9 @@ class SapExportStrategy extends ExportStrategy
 
         $confBody->ConfirmationUnit = $data->unit_of_measure_id_custom;
 
-//            $confBody->Personnel = $data->user_id_custom;
+        if($data->user_is_imported_from_erp)
+            $confBody->Personnel = $data->user_id_custom;
+
         $confBody->WorkCenter = $data->machine_id_custom;
         $confBody->IsFinalConfirmation = $data->is_final_confirmation;
         if ($data->is_final_confirmation) {
@@ -226,11 +228,11 @@ class SapExportStrategy extends ExportStrategy
             return $item->item_state_type != ItemStateType::SCRAP();
         });
 
-        if($items->isEmpty())
+        if ($items->isEmpty())
             return ExportResult::SUCCESS('No Good or Rework in this material document');
 
 
-        if($items->first()->serial)
+        if ($items->first()->serial)
             $items = $this->groupSerials($items);
 
         $payload = [
@@ -306,17 +308,17 @@ class SapExportStrategy extends ExportStrategy
     {
         return $items->groupBy(function ($item) {
             // Convert stdClass to array before processing
-            return json_encode(collect((array) $item)->except('serial')->toArray());
+            return json_encode(collect((array)$item)->except('serial')->toArray());
         })->map(function ($group) {
             // Convert stdClass to array for manipulation
-            $base = (array) $group->first();
+            $base = (array)$group->first();
 
             // Collect serials and remove the single "serial" field
             $base['serials'] = $group->pluck('serial')->toArray();
             $base['quantity'] = $group->count();
             unset($base['serial']);
 
-            return (object) $base; // Convert back to object if needed
+            return (object)$base; // Convert back to object if needed
         })->values(); // Reset numeric keys
     }
 
@@ -329,7 +331,7 @@ class SapExportStrategy extends ExportStrategy
 
         $data = json_decode($dataExport->data);
 
-        if(!strlen($data->custom_id ?? ''))
+        if (!strlen($data->custom_id ?? ''))
             return ExportResult::SUCCESS('Component equipment id not found');
 
         $validity = new Carbon($data->validity_end);
@@ -453,7 +455,7 @@ class SapExportStrategy extends ExportStrategy
 
         $data = json_decode($dataExport->data);
 
-        if($data->printer_name) {
+        if ($data->printer_name) {
 
             $baseUrl = "sap/opu/odata/SAP/Z_PRINT_LABEL_VERSAMENTO_SRV/ImportDocVers";
             $queryParams = [
@@ -469,7 +471,7 @@ class SapExportStrategy extends ExportStrategy
             $res = $this->apiService->executeHttpRequestInBtp($url, env('BTP_DESTINATION', 'ODATA_API'), $method = 'POST', $payload);
 
             $result = false;
-            if($res->successful() && strlen(json_decode($res->body())->d->ImportDocVers->MESSAGE ?? '')) {
+            if ($res->successful() && strlen(json_decode($res->body())->d->ImportDocVers->MESSAGE ?? '')) {
                 $result = true;
             }
 

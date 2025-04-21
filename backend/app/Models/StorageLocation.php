@@ -14,4 +14,10 @@ class StorageLocation extends Model
     {
         return $this->belongsTo(Warehouse::class);
     }
+    
+    #[LodataRelationship]
+    public function transportOrderType()
+    {
+        return $this->belongsTo(TransportOrderType::class);
+    }
 }

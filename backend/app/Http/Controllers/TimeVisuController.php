@@ -18,10 +18,10 @@ class TimeVisuController extends Controller
     {
         $this->dateRangeService = $dateRangeService;
     }
-    public function generateToolVisuReport(Request $request, $start, $end, $lang, $client)
+    public function generateToolVisuReport(Request $request, $start, $end, $lang)
     {
         //TODO:: prod_orders->order_type->MAINTENANCE | Need to think about this one
-
+        $client = env('CLIENT_NAME');
         $current_year = Carbon::parse($start)->year;
         $startOfYear = Carbon::createFromDate($current_year, 1, 1)->startOfDay();
         $endOfYear = Carbon::createFromDate($current_year, 12, 31)->endOfDay();
@@ -30,6 +30,7 @@ class TimeVisuController extends Controller
         $filterDate = $this->dateRangeService->getFirstDateOfCurrentMonth(now());
 
         $yearHours = UserRegisteredTime::select(
+            'items.custom_id as tool_nr',
             'items.name as tool_name',
             \DB::raw('SUM(user_registered_times.hours_split) as total_hours')
         )
@@ -38,9 +39,9 @@ class TimeVisuController extends Controller
         ->join('prod_orders', 'prod_orders.id', '=', 'prod_order_pos.prod_order_id')
         ->join('items', 'items.id', '=', 'prod_order_pos.item_id')
         ->whereBetween('user_registered_times.date', [$startOfYear, $endOfYear])
-        ->groupBy('items.name')
+        ->groupBy('items.custom_id', 'items.name')
         ->get()
-        ->keyBy('tool_name')
+        ->keyBy('tool_nr')
         ->toArray();
         // dd($yearHours);
 
@@ -68,14 +69,15 @@ class TimeVisuController extends Controller
         // dd($response);
 
         $toolData = collect($response)
-        ->groupBy('tool_name')
+        ->groupBy('tool_nr')
         ->map(function ($items) use ($yearHours) {
+            $toolNr = $items->first()['tool_nr'];
             $toolName = $items->first()['tool_name'];
             return [
-                'tool_nr' => $items->first()['tool_nr'],
-                'tool_name' => $toolName,
+                'tool_nr' => $toolNr,
+                'tool_name' =>  $toolName,
                 'repair_names' => $items->pluck('repair_name')->unique()->filter()->implode(', '),
-                'year_total_hour' => $yearHours[$toolName]['total_hours'] ?? 0, // Map year total hours
+                'year_total_hour' => $yearHours[$toolNr]['total_hours'] ?? 0, // Map year total hours
                 'table_data' => [
                     'sub_total_hours' => 0,
                     'entries' => []
@@ -87,7 +89,7 @@ class TimeVisuController extends Controller
 
         foreach($response as $res) {
             foreach ($toolData as &$tool) {
-                if ($res['tool_name'] == $tool['tool_name']) {
+                if ($res['tool_nr'] == $tool['tool_nr']) {
                     $res['activity'] = null;
                     $res['date'] = (new DateTime($res['date']))->format('d.m.Y');
                     $tool['table_data']['entries'][] = $res;
@@ -134,7 +136,7 @@ class TimeVisuController extends Controller
                 'showWaterMark' => true,
                 'showScherTechLogo' => false,
                 'showClientLogo' => true,
-                'clientLogoUrl' => $client == 'schertech' ? '/images/schertech-logo.png' : '/images/derga_logo.png',
+                'clientLogoUrl' => $client != 'DERGA' ? '/images/schertech-logo.png' : '/images/derga_logo.png',
                 'showHeaderTitleTable' => false,
                 'isCustomFooter' => false,
                 'current_date' => $today,
@@ -142,7 +144,7 @@ class TimeVisuController extends Controller
                 'showFooterImage' => false,
                 'showFooterDetails' => false,
                 'showSimpleFooter' => true,
-                'showPoweredBy' => $client != 'schertech' ? true : false,
+                'showPoweredBy' => $client == 'DERGA' ? true : false,
                 'pdfCreatedBy' => '',
                 'pdfCheckedBy' => '',
                 'pdfReleasedBy' => '',

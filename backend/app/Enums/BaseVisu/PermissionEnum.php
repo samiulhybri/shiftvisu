@@ -286,6 +286,11 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self PLANVISU_ORDER_VIEW()
  * @method static self PLANVISU_ORDER_TREE_VIEW()
  * 
+ * @method static self PLANVISU_OPERATION_RESCHEDULE()
+ * @method static self PLANVISU_OPERATION_EDIT()
+ * 
+ * 
+ * 
  * @method static self PLANVISU_SET_UP_PLAN_VIEW()
  * @method static self PLANVISU_SET_UP_PLAN_EDIT()
  * 
@@ -409,6 +414,30 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self DOCVISU_EDIT()
  * @method static self MACHINEBOARD_DOCVISU_EDIT()
  * @method static self MACHINEBOARD_DOCVISU_EDIT_IF_QUALIFIED()
+ * @method static self DOCVISU_PROCESS_ADD()
+ * @method static self DOCVISU_PROCESS_EDIT()
+ * @method static self DOCVISU_PROCESS_DELETE()
+ * @method static self DOCVISU_FOLDER_ADD()
+ * @method static self DOCVISU_FOLDER_EDIT()
+ * @method static self DOCVISU_FOLDER_DELETE()
+ * @method static self DOCVISU_FOLDER_STRUCTURE_ADD()
+ * @method static self DOCVISU_FOLDER_STRUCTURE_EDIT()
+ * @method static self DOCVISU_FOLDER_STRUCTURE_DELETE()
+ * @method static self DOCVISU_DOCUMENTS_ADD()
+ * @method static self DOCVISU_DOCUMENTS_EDIT()
+ * @method static self DOCVISU_DOCUMENTS_DELETE()
+ * @method static self DOCVISU_DOCUMENTS_VERSION()
+ * @method static self DOCVISU_DOCUMENTS_RELEASE_ADD()
+ * @method static self DOCVISU_LINK_DOCUMENTS_ADD()
+ * @method static self DOCVISU_LINK_DOCUMENTS_EDIT()
+ * @method static self DOCVISU_LINK_DOCUMENTS_DELETE()
+ * @method static self DOCVISU_DOCUMENT_SECTION_ADD()
+ * @method static self DOCVISU_DOCUMENT_SECTION_EDIT()
+ * @method static self DOCVISU_DOCUMENT_SECTION_DELETE()
+ * @method static self DOCVISU_DIRECTORY_STRUCTURE_ADD()
+ * @method static self DOCVISU_DIRECTORY_STRUCTURE_EDIT()
+ * @method static self DOCVISU_DIRECTORY_STRUCTURE_DELETE()
+ * @method static self DOCVISU_FILE_NOTE_ADD()
  * 
  *   **** PERSONALVISU ****************
  * @method static self PERSONALVISU_VIEW()

@@ -162,14 +162,14 @@ class ProdOrderPosOperationController extends Controller
                 ->get();
 
 
-            $machine_id = optional($results->first())->machine_id;
+            $machine_id = $results->firstOrFail()->machine_id;
 
             // Capacity for a machine
             $machine = Machine::with([
                 'capacities' => function ($query) {
                     $query->with(['shift'])->where('date', '>=', Carbon::today())->orderBy('date', 'asc');
                 }
-            ])->find($machine_id)->select('id', 'custom_id', 'machine_board_hours')->first();
+            ])->where('id', $machine_id)->select('id', 'custom_id', 'machine_board_hours')->first();
 
             $formattedValues = [];
             foreach ($results as $operation) {
@@ -256,20 +256,15 @@ class ProdOrderPosOperationController extends Controller
                     }
                 }
 
-                $tearDownTime = [];
-                switch (optional($prodOrderPosOperationTime)->status) {
-                    case ProdOrderPosOperationStatus::IN_TEARDOWN():
-                    case ProdOrderPosOperationStatus::IN_SETUP():
-                        $tearDownTime = $operation->prodOrderPosOperationTimes()->whereIn('status', [ProdOrderPosOperationStatus::IN_TEARDOWN(), ProdOrderPosOperationStatus::IN_SETUP()])->select('id','start', 'end', 'machine_id', 'prod_order_pos_operation_id')->get();
-                        break;
-                
-                    default:
-                        $tearDownTime = [];
-                }
 
-                $standardVelocity = 60 / ($operation->te ?? 1) * ($operation->cavity ?? 1);
-                $currentCycle = ($sumTime ?? 1) / ($sumCycles ?? 1);
-                $currentVelocity = 60 / ($currentCycle ?? 1);
+                $tearDownTime = match (ProdOrderPosOperationStatus::tryFrom($prodOrderPosOperationTime?->status)) {
+                    ProdOrderPosOperationStatus::IN_TEARDOWN(), ProdOrderPosOperationStatus::IN_SETUP() => $operation->prodOrderPosOperationTimes()->whereIn('status', [ProdOrderPosOperationStatus::IN_TEARDOWN(), ProdOrderPosOperationStatus::IN_SETUP()])->select('id', 'start', 'end', 'machine_id', 'prod_order_pos_operation_id')->get(),
+                    default => [],
+                };
+
+                $standardVelocity = 60 / (($operation->te > 0 ? $operation->te : 1) * ($operation->cavity > 0 ? $operation->cavity : 1));
+                $currentCycle = ($sumCycles > 0 ? $sumTime / $sumCycles : 1);
+                $currentVelocity = ($currentCycle > 0 ? 60 / $currentCycle : 0);
 
                 $formattedValue = [
                     'id' => $operation->id,
@@ -287,7 +282,7 @@ class ProdOrderPosOperationController extends Controller
                     'reworkItemsCount' => $reworkItems,
                     'standardCycle' => $operation->prod_lot_id ? $this->getSumOfTE($operation->prod_lot_id, $operationsForLot) : $operation->te,
                     'setupTime' => $operation->prod_lot_id ? $this->getSumOfTR($operation->prod_lot_id, $operationsForLot) : $operation->tr,
-                    'standardVelocity'=> $standardVelocity,
+                    'standardVelocity' => $standardVelocity,
                     'currentCycle' => $currentCycle,
                     'currentVelocity' => $currentVelocity,
                     'isLinkedOrder' => $operation->prod_lot_id,
@@ -302,7 +297,7 @@ class ProdOrderPosOperationController extends Controller
                     'expectedEndTimeWithCapacityErrorCode' => $expectedEndDateResponse['errorCode'] ?? null,
                     'unitOfMeasureCustomId' => optional($operation->unitOfMeasure)->custom_id,
                     'status' => optional($prodOrderPosOperationTime)->status,
-                    'operationTimeStart' => optional($prodOrderPosOperationTime)->status == ProdOrderPosOperationStatus::IN_PRODUCTION() ? $lastStartProduction : optional($prodOrderPosOperationTime)->start,
+                    'operationTimeStart' => optional($prodOrderPosOperationTime)->status == ProdOrderPosOperationStatus::IN_PRODUCTION() ? ($lastStartProduction ?? optional($prodOrderPosOperationTime)->start) : optional($prodOrderPosOperationTime)->start,
                     'packagingInstructionId' => optional($operation->prodOrderPos->item)->packaging_instruction_id,
                     'packagingInstructionId1' => optional($operation->prodOrderPos->item)->packaging_instruction_id_1,
                     'packagingInstructionId2' => optional($operation->prodOrderPos->item)->packaging_instruction_id_2,
@@ -460,7 +455,7 @@ class ProdOrderPosOperationController extends Controller
 
         $operations = ProdOrderPosOperation::with([
             'prodOrderPos' => function ($query) {
-                $query->select('id', 'prod_order_id', 'pos', 'item_id', 'quantity', 'is_production_possible', 'due_date', 'release_date');
+                $query->select('id', 'prod_order_id', 'pos', 'item_id', 'quantity', 'is_production_possible', 'due_date', 'release_date', 'batch');
             },
             'prodOrderPos.item' => function ($query) {
                 $query->select('id', 'custom_id', 'name');
@@ -485,7 +480,7 @@ class ProdOrderPosOperationController extends Controller
                 $query->whereIn('customers.id', $customers);
             });
         }) 
-        ->select('id', 'has_labels_prepared', 'teardown_time', 'component_availability', 'te', 'tr', 'prod_order_pos_id', 'name', 'pos', 'start', 'end', 'plan_start', 'plan_end', 'machine_id', 'plan_machine_id', 'tool_id', 'tool_reference_nr', 'show_in_planvisu', 'machine_group_id', 'status', 'quantity', 'cavity', 'operation_code', 'lead_time_days', 'constraint_type', 'registered_quantity')
+        ->select('id', 'has_labels_prepared','has_components_prepared', 'teardown_time', 'component_availability', 'te', 'tr', 'prod_order_pos_id', 'name', 'pos', 'start', 'end', 'plan_start', 'plan_end', 'machine_id', 'plan_machine_id', 'tool_id', 'tool_reference_nr', 'show_in_planvisu', 'machine_group_id', 'status', 'quantity', 'cavity', 'operation_code', 'lead_time_days', 'constraint_type', 'registered_quantity')
             ->where('end', "!=", null)
             ->where('start', "!=", null)->where('machine_id', "!=", null)
             ->where('show_in_planvisu', '=', true)

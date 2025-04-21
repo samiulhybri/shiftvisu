@@ -50,10 +50,10 @@ class ProductionPlanController extends Controller
                 ProdOrderPosOperation::whereIn('id', $request->operationIds)
                     ->get()
                     ->map(function ($operation) use ($request, $machine) {
-                        $this->updateOperationAndTimes($operation, $request, true, false);
+                        $this->updateOperationAndTimes($operation, $request, true, false, $machine);
                         if ($operation->prod_lot_id) {
 
-                            $this->updateLinkedOperations($operation, $request);
+                            $this->updateLinkedOperations($operation, $request, $machine);
                         }
                         $operation->update([
                             'status' => $request->status,
@@ -94,35 +94,35 @@ class ProductionPlanController extends Controller
         }
     }
 
-    private function updateOperationAndTimes(ProdOrderPosOperation $operation, $request, $isNew, $isClosed)
+    private function updateOperationAndTimes(ProdOrderPosOperation $operation, $request, $isNew, $isClosed, Machine $machine)
     {
         $oldStatus = $operation->status;
         if ($isClosed && $oldStatus) {
                 $operation->prodOrderPosOperationTimes()
-                ->where('machine_id', $operation->machine_id)
+                ->where('machine_id', $machine->id)
                 ->where('end', null)
                 ->where('status', $oldStatus)
                 ->update(['end' => now()]);
         }
         if ($isNew) {
             $operation->prodOrderPosOperationTimes()->create([
-                'machine_id' => $operation->machine_id,
+                'machine_id' => $machine->id,
                 'status' => $request->status,
                 'start' => now(),
             ]);
         }
-
+        $machine->checkAndUpdateMachineStatus();
     }
 
-    private function updateLinkedOperations($operation, $request)
+    private function updateLinkedOperations($operation, $request, Machine $machine)
     {
         ProdOrderPosOperation::where('prod_lot_id', $operation->prod_lot_id)
             ->where('machine_id', $operation->machine_id)
             ->where('status', '!=', ProdOrderPosOperationStatus::CLOSED())
             ->whereNotIn('id', $request->operationIds)
             ->get()
-            ->each(function ($operation) use ($request) {
-                $this->updateOperationAndTimes($operation, $request, true, false);
+            ->each(function ($operation) use ($machine, $request) {
+                $this->updateOperationAndTimes($operation, $request, true, false, $machine);
                 $operation->update(['status' => $request->status, 'status_plan' => $request->status]);
                 if ($request->status == ProdOrderPosOperationStatus::IN_PRODUCTION())
                     $this->hostIotGatewayStart($operation->machine_id, $operation);
@@ -277,14 +277,15 @@ class ProductionPlanController extends Controller
 
     protected function updateOperationMachineTime($request)
     {
-        $machineId = $this->getMachineTimeIds(Machine::find($request->machineId));
+        $machine = Machine::find($request->machineId);
+        $machineIds = $this->getMachineTimeIds($machine);
         MachineProdOrderPosOperationTime::where('status', ProdOrderPosOperationStatus::IN_PRODUCTION())
             ->whereNull('end')
-            ->whereIn('machine_id', $machineId)
+            ->whereIn('machine_id', $machineIds)
             ->with('prodOrderPosOperation')
             ->get()
-            ->each(function ($machineProdOrderPosOperationTime) use ($request) {
-                $this->updateOperationAndTimes($machineProdOrderPosOperationTime->prodOrderPosOperation, $request, false, true);
+            ->each(function ($machineProdOrderPosOperationTime) use ($machine, $request) {
+                $this->updateOperationAndTimes($machineProdOrderPosOperationTime->prodOrderPosOperation, $request, false, true, $machine);
                 $machineProdOrderPosOperationTime->prodOrderPosOperation->update(['status' => $request->state_status, 'status_plan' => $request->state_status]);
                 if ($request->state_status == ProdOrderPosOperationStatus::CLOSED())
                     $this->hostIotGatewayEnd($machineProdOrderPosOperationTime->machine_id, $machineProdOrderPosOperationTime->prodOrderPosOperation);
@@ -364,8 +365,9 @@ class ProductionPlanController extends Controller
 
                         ##link operation check
                         if ($times->prodOrderPosOperation->prod_lot_id && !in_array($times->machine_id, $machineIds)) {
-                            $this->updateSameOperationLot($times, $request, $statusCheck);
+                            $this->updateSameOperationLot($times, $request, $statusCheck, $machine);
                         }
+                        $times->machine->checkAndUpdateMachineStatus();
                     });
             });
             return response()->json(['success' => true]);
@@ -374,15 +376,15 @@ class ProductionPlanController extends Controller
         }
     }
 
-    protected function updateSameOperationLot($times, $request, $statusCheck)
+    protected function updateSameOperationLot($times, $request, $statusCheck, Machine $machine)
     {
         ProdOrderPosOperation::where('prod_lot_id', $times->prodOrderPosOperation->prod_lot_id)
             ->where('machine_id', $times->machine_id)
             ->where('status', '!=', ProdOrderPosOperationStatus::CLOSED())
             ->whereNotIn('id', $request->operationIds)
             ->get()
-            ->each(function ($operation) use ($request, $statusCheck) {
-                $this->updateOperationAndTimes($operation, $request, !$statusCheck, true);
+            ->each(function ($operation) use ($machine, $request, $statusCheck) {
+                $this->updateOperationAndTimes($operation, $request, !$statusCheck, true, $machine);
                 $operation->update(['status' => $request->status, 'status_plan' => $request->status]);
             });
     }

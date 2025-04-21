@@ -2,6 +2,8 @@
 
 namespace App\ExternalDataSource\Dto;
 
+use stdClass;
+
 class InspectionOperationCharacteristicDto
 {
     public string $pos;
@@ -62,5 +64,29 @@ class InspectionOperationCharacteristicDto
         $this->importance_code_id_custom = $importance_code_id_custom;
         $this->is_required = $is_required;
         $this->is_note_required = $is_note_required;
+    }
+
+    public static function fromStdClass(stdClass $obj): InspectionOperationCharacteristicDto
+    {
+        return new InspectionOperationCharacteristicDto(
+            $obj->pos,
+            $obj->name ?? null,
+            $obj->is_quantitative ?? true,
+            $obj->value_target ?? null,
+            $obj->value_lower_limit ?? null,
+            $obj->value_upper_limit ?? null,
+            $obj->value_lower_limit_plausible ?? null,
+            $obj->value_upper_limit_plausible ?? null,
+            $obj->decimals ?? 1,
+            $obj->unit_of_measure_id_custom_value ?? null,
+            $obj->sample_size ?? 1,
+            $obj->unit_of_measure_id_custom_sample ?? null,
+            $obj->attribute_set_id_custom ?? null,
+            $obj->plant_id_custom ?? null,
+            $obj->user_group_id_custom ?? null,
+            $obj->importance_code_id_custom ?? null,
+            $obj->is_required ?? true,
+            $obj->is_note_required ?? false
+        );
     }
 }
