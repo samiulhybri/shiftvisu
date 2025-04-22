@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
+import { ShiftVisuOverview } from "@app/shared/models/shift-visu-overview.model";
 import { Button, CheckBox, Switch } from "@ui5/webcomponents-react";
 import React from "react";
 @Component({
@@ -18,11 +19,13 @@ export class ServerIssuesViewComponent implements OnInit {
 	@ViewChild("chatcontent", { static: false }) chatcontent!: any;
 	OpenView: boolean = false;
 	tabRefs: Record<string, any> = {};
-	DataList: any[] = [];
+	Overview : ShiftVisuOverview = new ShiftVisuOverview().deserialize({});
 
 	ngOnInit(): void {
 		
 		this.isOpenView.subscribe((items: any) => {
+			this.Overview.deserialize(items);
+			console.log(this.Overview);
 			this.OpenView = !this.OpenView;
 		});
 	}

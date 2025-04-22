@@ -15,6 +15,8 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5plugins_exporting from "@amcharts/amcharts5/plugins/exporting";
 import React from "react";
 import { Button, FlexBox, Icon } from "@ui5/webcomponents-react";
+import { CommonService } from "@app/shared/services/common.service";
+import { CustomReactGridTable } from "@app/shared/components/CustomGridTable";
 
 @Component({
 	selector: "app-shift-visu-overview",
@@ -24,33 +26,26 @@ import { Button, FlexBox, Icon } from "@ui5/webcomponents-react";
 export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 	@ViewChild("chartdiv", { static: true }) chartDiv!: ElementRef;
 	@ViewChild("stockchart", { static: true }) stockChart!: ElementRef;
-	@Output() openIssueViewer: EventEmitter<string> = new EventEmitter<string>();
+	@Output() openIssueViewer: EventEmitter<any> = new EventEmitter<any>();
+	@ViewChild("ShiftvisuOverviewdetails", { static: false }) ShiftvisuOverviewdetails:
+		| CustomReactGridTable
+		| undefined;
 	SelectedTab: string = "";
 	private pieRoot!: am5.Root;
 	private xyRoot!: am5.Root;
 
-	constructor(private zone: NgZone) {}
-
-	customdata: any = [
-		{
-			id: 12,
-			error: "new error",
-			creator: "shihab",
-			status: "Negative",
-		},
-		{
-			id: 13,
-			error: "new error",
-			creator: "shihab",
-			status: "Positive",
-		},
-	];
+	constructor(
+		private zone: NgZone,
+		public commonService: CommonService
+	) {}
 
 	ngOnInit(): void {
 		this.zone.runOutsideAngular(() => {
 			this.initPieChart();
 			this.initXYChart();
 		});
+
+		this.GetInitialData();
 	}
 
 	ngOnDestroy(): void {
@@ -60,6 +55,11 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		if (this.xyRoot) {
 			this.xyRoot.dispose();
 		}
+	}
+
+	async GetInitialData(): Promise<void> {
+		let data = await this.ShiftvisuOverviewdetails?.data;
+		console.log(data ,'grid data');
 	}
 
 	private initPieChart(): void {
@@ -237,7 +237,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		},
 		{
 			Header: $localize`Error`,
-			accessor: "error",
+			accessor: "error.name",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
@@ -246,7 +246,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		},
 		{
 			Header: $localize`Creator`,
-			accessor: "creator",
+			accessor: "creator.name",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
@@ -255,7 +255,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		},
 		{
 			Header: $localize`Start Date`,
-			accessor: "prodOrderPos.quantity",
+			accessor: "created_at",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
@@ -264,7 +264,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		},
 		{
 			Header: $localize`Descreption`,
-			accessor: "quantityDelivered",
+			accessor: "description",
 			disableFilters: true,
 			disableGroupBy: true,
 			disableSortBy: true,
@@ -317,12 +317,13 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			isSelected: true,
 			hAlign: "Center",
 			Cell: (instance: any) => {
+				const { row } = instance;
 				return (
 					<React.StrictMode>
 						<Button
 							icon="show"
 							onClick={e => {
-								this.openIssueViewer.emit(instance.original);
+								this.openIssueViewer.emit(row.original);
 								this.SelectedTab = "overview";
 							}}
 							design="Transparent"></Button>

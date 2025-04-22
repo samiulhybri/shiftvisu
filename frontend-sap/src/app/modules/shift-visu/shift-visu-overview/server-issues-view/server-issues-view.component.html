@@ -21,14 +21,14 @@
 				</div>
 				<div class="flex-col flex">
 					<ui5-label showColon required i18n>Creator</ui5-label>
-					<ui5-input readonly="true" value="shihab" i18n-placeholder class="w-full"></ui5-input>
+					<ui5-input readonly="true" [value]="Overview.creator.name || ''" i18n-placeholder class="w-full"></ui5-input>
 				</div>
 				<div class="flex-col flex">
 					<ui5-label showColon required i18n>Error</ui5-label>
 
 					<ui5-combobox id="viewTypeCombobox" readonly="true" class="w-full" name="view_type"
-						value="new error" i18n-placeholder placeholder="Select Error">
-						<ui5-cb-item [text]="'new error'" [id]="12">
+					[value]="Overview.error?.name || ''" i18n-placeholder placeholder="Select Error">
+						<ui5-cb-item [text]="Overview.error?.name || ''" [id]="Overview.error?.id">
 						</ui5-cb-item>
 					</ui5-combobox>
 				</div>
@@ -39,7 +39,7 @@
 			</div>
 			<div class="mt-3">
 				<ui5-label showColon required class="mb-2" i18n>Failure Description</ui5-label>
-				<app-text-editor i18n-placeholder [isReadOnly]="false">
+				<app-text-editor [isReadOnly]="true" i18n-placeholder [notes]="Overview.description || ''" [isReadOnly]="false">
 				</app-text-editor>
 			</div>
 
@@ -313,8 +313,7 @@
 			<section class="h-full w-[99%] m-auto">
 				<ui5-card class="-m-1 h-full">
 					<ui5-bar design="Header">
-						<ui5-title level="H5" slot="startContent" size="H5" i18n-tittle>Attachments({{ DataList.length
-							}})</ui5-title>
+						<ui5-title level="H5" slot="startContent" size="H5" i18n-tittle>Attachments(2)</ui5-title>
 
 						<div slot="endContent" class="flex items-center gap-2">
 							<ui5-button i18n design="Transparent">Download</ui5-button>
@@ -409,7 +408,7 @@
 			<section class="w-full h-ful text-center">
 				<app-chat [customClass]="
 						'h-[calc(100vh-260px)]  w-[85vw] max-w-[100%] flex flex-row gap-2'
-					" #chatcontent class="chat-data" [modelId]="2" [modelName]="'EightDReports'" [chat]="">
+					" #chatcontent class="chat-data" [modelId]="Overview.id ?? 0" [modelName]="'ShiftVisuOverviewDetails'" [chat]="Overview.chat">
 				</app-chat>
 			</section>
 		</ui5-tab>
