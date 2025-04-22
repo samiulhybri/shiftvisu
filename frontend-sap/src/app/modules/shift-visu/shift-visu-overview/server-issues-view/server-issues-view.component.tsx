@@ -19,7 +19,7 @@ export class ServerIssuesViewComponent implements OnInit {
 	OpenView: boolean = false;
 	tabRefs: Record<string, any> = {};
 	DataList: any[] = [];
-
+	isChat : boolean = false;
 	ngOnInit(): void {
 		
 		this.isOpenView.subscribe((items: any) => {
@@ -74,6 +74,13 @@ export class ServerIssuesViewComponent implements OnInit {
 		}
 		return "";
 	}
+
+	openChat(){
+		this.isChat = !this.isChat;
+	}
+closeChat(){
+	this.isChat = false;
+}
 
 	columns = [
 		{
