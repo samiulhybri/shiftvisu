@@ -33,6 +33,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 	private pieRoot!: am5.Root;
 	private xyRoot!: am5.Root;
 	DetailLists: any[] = [];
+	IsLoading :boolean = true;
 	constructor(
 		private zone: NgZone,
 		public commonService: CommonService
@@ -54,6 +55,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 	}
 
 	processData(data: any): any {
+		this.IsLoading = false;
 		this.DetailLists = data[0].map((item: any) => item);
 		this.initPieChart(this.DetailLists.length, 12, 6);
 	}
