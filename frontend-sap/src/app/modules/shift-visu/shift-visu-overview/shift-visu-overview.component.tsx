@@ -55,6 +55,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 	}
 
 	processData(data: any): any {
+		this.IsLoading = false;
 		this.DetailLists = data[0].map((item: any) => item);
 		this.initPieChart(this.DetailLists.length, 12, 6);
 	}
