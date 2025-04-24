@@ -8,8 +8,7 @@ import React from "react";
 	styleUrl: "./server-issues-view.component.css",
 })
 export class ServerIssuesViewComponent implements OnInit {
-	@Input() isOpenView: EventEmitter<string> = new EventEmitter<string>();
-	@Input() TabType: string = "";
+	@Input() isOpenView: EventEmitter<object> = new EventEmitter<object>();
 	@ViewChild("overview", { static: false }) overview!: any;
 	@ViewChild("emergency", { static: false }) emergency!: any;
 	@ViewChild("corrective", { static: false }) corrective!: any;
@@ -22,12 +21,11 @@ export class ServerIssuesViewComponent implements OnInit {
 	Overview: ShiftVisuOverview = new ShiftVisuOverview().deserialize({});
 	isOpenChat: boolean = false;
 	
-
 	ngOnInit(): void {
 		this.isOpenView.subscribe((items: any) => {
-			this.Overview.deserialize(items);
-			console.log(this.Overview);
+			this.Overview.deserialize(items.data);
 			this.OpenView = !this.OpenView;
+			this.openTab(items.tab);
 		});
 	}
 	imgname: string = "shihab.jpg";
@@ -44,7 +42,6 @@ export class ServerIssuesViewComponent implements OnInit {
 	}
 
 	openTab(tabType: string) {
-		this.TabType = tabType;
 		this.selectTab(tabType);
 	}
 
@@ -181,6 +178,6 @@ export class ServerIssuesViewComponent implements OnInit {
 
 	CloseDialog() {
 		this.OpenView = false;
-		this.TabType = "";
+
 	}
 }

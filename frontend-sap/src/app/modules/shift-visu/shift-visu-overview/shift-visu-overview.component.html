@@ -326,7 +326,7 @@
 			<app-grid-table
 				[headerTitle]="'All Issues'"
 				[url]="'/ShiftVisuOverviewDetails'"
-				expandQuery="$expand=halls,creator,error,componentOptions,chat($expand=messages($expand=sender))"
+				expandQuery="$expand=hall,creator,error,componentOptions,chat($expand=messages($expand=sender))"
 				[filterQuery]="''"
 				[model]=""
 				[columns]="columns"
@@ -354,5 +354,4 @@
 </div>
 
 <app-server-issues-view
-	[isOpenView]="openIssueViewer"
-	[TabType]="SelectedTab"></app-server-issues-view>
+	[isOpenView]="openIssueViewer"></app-server-issues-view>

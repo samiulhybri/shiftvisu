@@ -30,7 +30,6 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 	@ViewChild("ShiftvisuOverviewdetails", { static: false }) ShiftvisuOverviewdetails:
 		| CustomReactGridTable
 		| undefined;
-	SelectedTab: string = "";
 	private pieRoot!: am5.Root;
 	private xyRoot!: am5.Root;
 	DetailLists: any[] = [];
@@ -276,8 +275,10 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 						<Button
 							icon="message-information"
 							onClick={e => {
-								this.openIssueViewer.emit(instance.original);
-								this.SelectedTab = "details";
+								this.openIssueViewer.emit({
+									data: instance.row.original,
+									tab: "details",
+								});
 							}}
 							design="Transparent"></Button>
 					</React.StrictMode>
@@ -297,8 +298,10 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 					<React.StrictMode>
 						<Button
 							onClick={e => {
-								this.openIssueViewer.emit(instance.original);
-								this.SelectedTab = "attachment";
+								this.openIssueViewer.emit({
+									data: instance.row.original,
+									tab: "attachment",
+								});
 							}}
 							icon="attachment"
 							design="Transparent">
@@ -323,8 +326,10 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 						<Button
 							icon="show"
 							onClick={e => {
-								this.openIssueViewer.emit(row.original);
-								this.SelectedTab = "overview";
+								this.openIssueViewer.emit({
+									data: instance.row.original,
+									tab: "overview",
+								});
 							}}
 							design="Transparent"></Button>
 					</React.StrictMode>

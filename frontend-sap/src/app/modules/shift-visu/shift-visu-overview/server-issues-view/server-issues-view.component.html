@@ -12,7 +12,7 @@
 
 	<ui5-tabcontainer contentBackgroundDesign="Transparent"
 		class="ml-[-16px] mr-[-16px] mt-[-16px] mb-[-16px] w-[calc(100%+32px)]">
-		<ui5-tab #overview i18n-text design="Default" text="Overview" [selected]="TabType == 'overview'"
+		<ui5-tab #overview i18n-text design="Default" text="Overview"
 			class="h-[calc(100vh-250px)]">
 			<div class="grid grid-cols-3 gap-2 items-center w-full">
 				<div class="flex-col flex">
@@ -145,7 +145,7 @@
 			</div>
 		</ui5-tab>
 
-		<ui5-tab #emergency [selected]="TabType == 'emergency'" i18n-text design="Default" text="Emergency Measures"
+		<ui5-tab #emergency i18n-text design="Default" text="Emergency Measures"
 			class="h-[calc(100vh-250px)]">
 			<div class="grid grid-cols-3 gap-2 items-center w-full">
 				<div class="flex-col flex">
@@ -228,7 +228,7 @@
 				</div>
 			</div>
 		</ui5-tab>
-		<ui5-tab #corrective [selected]="TabType == 'corrective'" class="h-[calc(100vh-250px)]"
+		<ui5-tab #corrective class="h-[calc(100vh-250px)]"
 			text="Corrective  Measures">
 			<div class="w-[98%] rounded-lg shadow-lg overflow-hidden h-[98%] m-auto">
 				<app-grid-table [headerTitle]="'Corrective Measures'" [url]="'s'" [columns]="columns"
@@ -240,7 +240,7 @@
 			</div>
 		</ui5-tab>
 
-		<ui5-tab #details class="h-[calc(100vh-250px)]" [selected]="TabType == 'details'" text="Details">
+		<ui5-tab #details class="h-[calc(100vh-250px)]" text="Details">
 			<section class="grid h-full gap-2 grid-rows-[1fr_100px_1fr_1fr]">
 				<div>
 					<div class="flex flex-col">
@@ -311,7 +311,7 @@
 				</div>
 			</section>
 		</ui5-tab>
-		<ui5-tab #attachment [selected]="TabType == 'attachment'" class="h-[calc(100vh-250px)]"
+		<ui5-tab #attachment  class="h-[calc(100vh-250px)]"
 			[text]="'Attachment (' + 3 + ')'">
 			<section class="h-full w-[99%] m-auto">
 				<ui5-card class="-m-1 h-full">
