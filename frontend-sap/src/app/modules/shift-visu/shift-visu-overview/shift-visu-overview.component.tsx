@@ -33,7 +33,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 	private pieRoot!: am5.Root;
 	private xyRoot!: am5.Root;
 	DetailLists: any[] = [];
-	IsLoading : boolean = false;
+	IsLoading : boolean = true;
 	constructor(
 		private zone: NgZone,
 		public commonService: CommonService
