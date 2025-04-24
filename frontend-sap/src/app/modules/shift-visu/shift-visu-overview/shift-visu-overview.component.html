@@ -19,7 +19,7 @@
 						<span
 							i18n
 							class="text-blue-600 text-3xl"
-							>234</span
+							>{{DetailLists.length}}</span
 						>
 					</div>
 
@@ -326,7 +326,7 @@
 			<app-grid-table
 				[headerTitle]="'All Issues'"
 				[url]="'/ShiftVisuOverviewDetails'"
-				expandQuery="$expand=halls,creator,error,componentOptions"
+				expandQuery="$expand=halls,creator,error,componentOptions,chat($expand=messages($expand=sender))"
 				[filterQuery]="''"
 				[model]=""
 				[columns]="columns"
@@ -346,7 +346,9 @@
 				[enableServerSideFiltering]="true"
 				selectionMode="Single"
 				keyForCacheCustomDataTableColumns="ShiftvisuOverviewdetails"
-				#ShiftvisuOverviewdetails></app-grid-table>
+				#ShiftvisuOverviewdetails
+				(processData)="processData($event)"
+				></app-grid-table>
 		</div>
 	</div>
 </div>

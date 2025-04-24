@@ -7,7 +7,7 @@
 	" class="w-[90%]" [open]="OpenView">
 	<ui5-bar slot="header">
 		<ui5-title level="H6" slot="startContent" size="H6" i18n i18n-title>Server Issues</ui5-title>
-		<ui5-button slot="endContent" design="Emphasized" i18n (click)="openTab('chat')">Chat</ui5-button>
+		<ui5-button slot="endContent" design="Emphasized" i18n (click)="isOpenChat=!isOpenChat">Chat</ui5-button>
 	</ui5-bar>
 
 	<ui5-tabcontainer contentBackgroundDesign="Transparent"
@@ -16,18 +16,20 @@
 			class="h-[calc(100vh-250px)]">
 			<div class="grid grid-cols-3 gap-2 items-center w-full">
 				<div class="flex-col flex">
-					<ui5-label showColon i18n required>Department</ui5-label>
-					<ui5-input readonly="true" i18n-placeholder value="rakib" class="w-full"></ui5-input>
+					<ui5-label showColon i18n required>Hall</ui5-label>
+					<ui5-input readonly="true" i18n-placeholder [value]="Overview.hall.name || ''"
+						class="w-full"></ui5-input>
 				</div>
 				<div class="flex-col flex">
 					<ui5-label showColon required i18n>Creator</ui5-label>
-					<ui5-input readonly="true" [value]="Overview.creator.name || ''" i18n-placeholder class="w-full"></ui5-input>
+					<ui5-input readonly="true" [value]="Overview.creator.name || ''" i18n-placeholder
+						class="w-full"></ui5-input>
 				</div>
 				<div class="flex-col flex">
 					<ui5-label showColon required i18n>Error</ui5-label>
 
 					<ui5-combobox id="viewTypeCombobox" readonly="true" class="w-full" name="view_type"
-					[value]="Overview.error?.name || ''" i18n-placeholder placeholder="Select Error">
+						[value]="Overview.error?.name || ''" i18n-placeholder placeholder="Select Error">
 						<ui5-cb-item [text]="Overview.error?.name || ''" [id]="Overview.error?.id">
 						</ui5-cb-item>
 					</ui5-combobox>
@@ -39,7 +41,8 @@
 			</div>
 			<div class="mt-3">
 				<ui5-label showColon required class="mb-2" i18n>Failure Description</ui5-label>
-				<app-text-editor [isReadOnly]="true" i18n-placeholder [notes]="Overview.description || ''" [isReadOnly]="false">
+				<app-text-editor [isReadOnly]="true" i18n-placeholder [notes]="Overview.description || ''"
+					[isReadOnly]="false">
 				</app-text-editor>
 			</div>
 
@@ -355,7 +358,6 @@
 							<div class="flex items-center justify-between w-full">
 								<div class="flex items-center gap-4">
 									<div class="w-[70px]">
-
 										<ui5-icon *ngIf="imageType(imgname) === 'document'" design="Neutral"
 											class="h-full w-full" [name]="
 												imageExtension(imgname) === 'pdf'
@@ -404,16 +406,16 @@
 			</section>
 		</ui5-tab>
 
-		<ui5-tab #chat class="h-[calc(100vh-250px)]" [selected]="TabType == 'chat'">
-			<section class="w-full h-ful text-center">
-				<app-chat [customClass]="
-						'h-[calc(100vh-260px)]  w-[85vw] max-w-[100%] flex flex-row gap-2'
-					" #chatcontent class="chat-data" [modelId]="Overview.id ?? 0" [modelName]="'ShiftVisuOverviewDetails'" [chat]="Overview.chat">
-				</app-chat>
-			</section>
-		</ui5-tab>
 	</ui5-tabcontainer>
 	<ui5-bar slot="footer">
 		<ui5-button slot="endContent" design="Transparent" (click)="CloseDialog()" i18n>Cancel</ui5-button>
 	</ui5-bar>
+</ui5-dialog>
+
+
+<ui5-dialog id="chat" [open]="isOpenChat">
+	<div>
+		<app-chat [modelId]="Overview.id ?? 0" [modelName]="'ShiftVisuOverviewDetails'" [chat]="Overview.chat"
+			(closeDialog)="isOpenChat = false"></app-chat>
+	</div>
 </ui5-dialog>

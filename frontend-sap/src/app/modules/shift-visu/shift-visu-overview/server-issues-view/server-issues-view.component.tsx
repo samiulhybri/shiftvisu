@@ -19,10 +19,11 @@ export class ServerIssuesViewComponent implements OnInit {
 	@ViewChild("chatcontent", { static: false }) chatcontent!: any;
 	OpenView: boolean = false;
 	tabRefs: Record<string, any> = {};
-	Overview : ShiftVisuOverview = new ShiftVisuOverview().deserialize({});
+	Overview: ShiftVisuOverview = new ShiftVisuOverview().deserialize({});
+	isOpenChat: boolean = false;
+	
 
 	ngOnInit(): void {
-		
 		this.isOpenView.subscribe((items: any) => {
 			this.Overview.deserialize(items);
 			console.log(this.Overview);

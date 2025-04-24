@@ -33,7 +33,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 	SelectedTab: string = "";
 	private pieRoot!: am5.Root;
 	private xyRoot!: am5.Root;
-
+	DetailLists: any[] = [];
 	constructor(
 		private zone: NgZone,
 		public commonService: CommonService
@@ -41,11 +41,8 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 
 	ngOnInit(): void {
 		this.zone.runOutsideAngular(() => {
-			this.initPieChart();
 			this.initXYChart();
 		});
-
-		this.GetInitialData();
 	}
 
 	ngOnDestroy(): void {
@@ -57,12 +54,12 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	async GetInitialData(): Promise<void> {
-		let data = await this.ShiftvisuOverviewdetails?.data;
-		console.log(data ,'grid data');
+	processData(data: any): any {
+		this.DetailLists = data[0].map((item: any) => item);
+		this.initPieChart(this.DetailLists.length, 12, 6);
 	}
 
-	private initPieChart(): void {
+	private initPieChart(total: number, urgent: number, not_urgent: number): void {
 		this.pieRoot = am5.Root.new(this.chartDiv.nativeElement);
 
 		this.pieRoot.setThemes([am5themes_Animated.new(this.pieRoot)]);
@@ -71,6 +68,10 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			am5percent.PieChart.new(this.pieRoot, {
 				layout: this.pieRoot.verticalLayout,
 				innerRadius: am5.percent(50),
+				paddingBottom: 15,
+				paddingTop: 15,
+				paddingLeft: 15,
+				paddingRight: 15,
 			})
 		);
 
@@ -87,7 +88,7 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			if (!dataItem) return text;
 
 			const context = dataItem.dataContext as { category: string; value: number };
-			const evenValue = context.value % 2 === 0 ? context.value : context.value + 1;
+			const evenValue = context.value % 2 === 0 ? context.value : context.value;
 			return `${context.category}: ${evenValue}`;
 		});
 
@@ -101,26 +102,25 @@ export class ShiftVisuOverviewComponent implements OnInit, OnDestroy {
 			return data?.color ?? stroke;
 		});
 
-		series.data.setAll([
-			{ value: 22, category: "Urgent", color: am5.color(0xff0000) },
-			{ value: 12, category: "Total", color: am5.color(0x0000ff) },
-			{ value: 20, category: "Not Urgent", color: am5.color(0x07b00d) },
-		]);
+		const ChartData: any[] = [];
 
-		const legend = chart.children.push(
-			am5.Legend.new(this.pieRoot, {
-				centerX: am5.percent(50),
-				x: am5.percent(50),
-				marginTop: 20,
-				layout: am5.GridLayout.new(this.pieRoot, {
-					maxColumns: 3,
-					fixedWidthGrid: true,
-				}),
-			})
-		);
+		if (urgent > 0) {
+			ChartData.push({ value: urgent, category: "Urgent", color: am5.color(0xff0000) });
+		}
 
-		series.appear(1000, 100);
-		chart.appear(1000, 100);
+		if (total > 0) {
+			ChartData.push({ value: total, category: "Total", color: am5.color(0x0000ff) });
+		}
+
+		if (not_urgent > 0) {
+			ChartData.push({
+				value: not_urgent,
+				category: "Not Urgent",
+				color: am5.color(0x07b00d),
+			});
+		}
+
+		series.data.setAll(ChartData);
 	}
 
 	private initXYChart(): void {

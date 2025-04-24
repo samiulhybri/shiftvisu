@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Models\ShiftVisu;
 
+use App\Models\Chat;
 use App\Models\User;
 use App\Models\Hall;
 use App\Models\ShiftVisu\ShiftVisuIssueType;
@@ -14,27 +16,37 @@ class ShiftVisuOverviewDetail extends Model
         'creator_id',
         'error_id',
         'error_type',
-        'description'
+        'description',
+        'chat_id',
     ];
 
     #[LodataRelationship]
-    public function hall() {
+    public function hall()
+    {
         return $this->belongsTo(Hall::class, 'hall_id');
     }
 
     #[LodataRelationship]
-    public function creator() {
+    public function creator()
+    {
         return $this->belongsTo(User::class, 'creator_id');
     }
 
     #[LodataRelationship]
-    public function error() {
+    public function error()
+    {
         return $this->belongsTo(ShiftVisuIssueType::class, 'error_id');
     }
 
     #[LodataRelationship]
     public function componentOptions()
     {
-        return $this->hasMany(ShiftVisuOverviewComponentOption::class, 'overview_details_id','id');
+        return $this->hasMany(ShiftVisuOverviewComponentOption::class, 'overview_details_id', 'id');
+    }
+
+    #[LodataRelationship()]
+    public function chat()
+    {
+        return $this->belongsTo(Chat::class);
     }
 }

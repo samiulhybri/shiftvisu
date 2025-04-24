@@ -19,6 +19,7 @@ export class ShiftVisuOverview implements Deserializable {
 		new ShiftVisuComponentOptionModel().deserialize({});
 	error?: any;
 	chat?: Chat;
+	chat_id?: number;
 	created_at?: string;
 	updated_at?: string;
 

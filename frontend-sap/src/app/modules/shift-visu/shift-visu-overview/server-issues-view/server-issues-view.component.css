@@ -19,16 +19,20 @@
 }
 
 ui5-dialog::part(content) {
-   overflow: unset !important;
-   box-sizing: border-box;
- }
+	overflow: unset !important;
+	box-sizing: border-box;
+}
 
-  .chat-data{
+.chat-data {
 	max-width: 100% !important;
-	
-  }
+}
 
-
-  .attachment-list:hover .attachment-close-btn{
+.attachment-list:hover .attachment-close-btn {
 	display: block !important;
-  }
+}
+
+#chat::part(content) {
+	padding-inline: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}
