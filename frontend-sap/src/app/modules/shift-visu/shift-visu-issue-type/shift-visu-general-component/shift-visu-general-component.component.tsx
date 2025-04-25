@@ -70,7 +70,16 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 				return (
 					<React.StrictMode>
 						<CheckBox
-							checked={!row.isSelected ? false : true}
+							checked={
+								!row.isSelected
+									? false
+									: this.generalComponents
+												.filter((box: any) => box.is_mandatory)
+												.map((item: any) => item.id)
+												.includes(row.original.id)
+										? true
+										: false
+							}
 							indeterminate={false}
 							disabled={row.isSelected ? false : true}
 							onClick={event => {
@@ -112,9 +121,11 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 	) {}
 	ngOnInit(): void {
 		this.selectedIssue.subscribe((issue: any) => {
-			this.generalComponents = issue.components?.filter((component: any) => component.model_type === null || component.model_type === '');
+			this.generalComponents = issue.components?.filter(
+				(component: any) => component.model_type === null || component.model_type === ""
+			);
 			if (this.gridTable?.data?.length) {
-				this.selectedRowIds = {}; 
+				this.selectedRowIds = {};
 				const modelComponentIds = this.generalComponents.map((comp: any) => comp.id);
 				// Loop through gridTable data and check for matching IDs
 				this.gridTable.data.forEach((item: any, index: number) => {
@@ -132,7 +143,7 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 
 	processData(data: any[], recentData?: any[]) {
 		if (this.gridTable?.data?.length) {
-			this.selectedRowIds = {}; 
+			this.selectedRowIds = {};
 			const modelComponentIds = this.generalComponents.map((comp: any) => comp.id);
 			this.gridTable.data.forEach((item: any, index: number) => {
 				if (modelComponentIds.includes(item.id)) {
@@ -146,7 +157,7 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 		}
 	}
 	onCheckMandatory(event: any, selectRow: any) {
-		event.stopPropagation(); 
+		event.stopPropagation();
 		const isChecked = event.target.checked;
 		const row = selectRow.original;
 		const rowIndex = this.selectedOriginalData.findIndex(item => item.id === row.id);

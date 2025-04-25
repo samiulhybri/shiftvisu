@@ -50,7 +50,7 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 	@Output() selectedIssue = new EventEmitter<any>();
 	are_active_errors_displaying = true;
 
-	odataUrl = "/ShiftVisuIssueTypes";
+	odataUrl = "/shift-visu/issue-types-data";
 	filterQuery = "is_active eq true";
 	rightCardDefaultTitle = $localize`No Failure Selected`;
 
@@ -60,7 +60,6 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 	retrieveId: number = 0;
 
 	isSavingOrDeletingIssueType: boolean = false;
-
 	isBatchCallRunning = false;
 	settingsListName = "";
 	selectedIssueType: any = null;
@@ -187,6 +186,7 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 	processData(data: any, recentData: any) {
 		if (this.failureSettingsGrid) this.failureSettingsGrid.isBusy = false;
 		this.are_active_errors_displaying = this.filterQuery == "is_active eq true" ? true : false;
+		console.log("data", data);
 		if (
 			this.failureSettingsGrid &&
 			data?.length > 0 &&

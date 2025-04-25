@@ -61,6 +61,7 @@ export class ShiftVisuComponentComponent implements OnInit, AfterViewInit {
 	componentDefaultValue = new ShiftVisuComponentModel().deserialize({
 		name: "",
 		is_required: false,
+		is_corrective: false,
 		model_type: "",
 		view_in: shiftVisuComponentViewTypeEnum.OVERVIEW,
 		measure_options: [],

@@ -14,10 +14,9 @@
 			<div class="h-[calc(100vh-140px)] ">
 				<app-grid-table
 					[headerTitle]="settingsListName"
-					[url]="odataUrl"
 					[filterQuery]="filterQuery"
-					expandQuery="$expand=halls,components"
 					[columns]="columns"
+					[customUrl]="'/shift-visu/issue-types-data'"
 					[showAction]="true"
 					[showRowDataCount]="true"
 					[showSearch]="true"

@@ -135,7 +135,9 @@ class ShiftVisuController extends Controller
             });
         });
 
-        return response()->json($issueTypes);
+        return response()->json([
+            'value' => $issueTypes
+        ]);
     }
 
     public function getShiftVisuHallList()

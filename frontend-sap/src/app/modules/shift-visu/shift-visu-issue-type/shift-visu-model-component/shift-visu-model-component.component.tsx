@@ -86,11 +86,13 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 				return (
 					<React.StrictMode>
 						<CheckBox
-							checked={!row.isSelected ? false : true}
+							checked={this.modelComponents.filter((box: any)=>box.is_mandatory).map((item: any) => item.id).includes(row.original.id)? true: false}
 							indeterminate={false}
 							disabled={row.isSelected ? false : true}
 							onClick={event => {
 								this.onCheckMandatory(event, row);
+								console.log("Checkbox clicked:", row.original.id);
+								console.log(this.modelComponents.map((item: any) => item.id), "modelComponents");
 							}}
 						/>
 					</React.StrictMode>
@@ -127,9 +129,10 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 	) {}
 	ngOnInit(): void {
 		this.selectedIssue.subscribe((issue: any) => {
+		
 			this.modelComponents =
 				issue.components?.filter((component: any) => component.model_type) || [];
-
+				console.log("Selected issue  model component:", this.modelComponents);
 			if (this.gridTable?.data?.length) {
 				this.selectedRowIds = {}; // Reset selection
 
@@ -192,9 +195,11 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 	}
 
 	rowClick(event: any) {
+		
 		const selectedOriginalData = event.detail.selectedFlatRows.map(
 			(row: { original: any }) => row.original
 		);
+		console.log("Row clicked:", selectedOriginalData);
 		this.selectedOriginalData = selectedOriginalData.map((row: any) => {
 			row.is_mandatory = row.is_mandatory = true;
 			return row;
