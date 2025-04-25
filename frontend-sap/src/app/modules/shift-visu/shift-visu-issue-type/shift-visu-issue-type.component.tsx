@@ -186,7 +186,6 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 	processData(data: any, recentData: any) {
 		if (this.failureSettingsGrid) this.failureSettingsGrid.isBusy = false;
 		this.are_active_errors_displaying = this.filterQuery == "is_active eq true" ? true : false;
-		console.log("data", data);
 		if (
 			this.failureSettingsGrid &&
 			data?.length > 0 &&
@@ -245,6 +244,7 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 	}
 
 	onRowClicked(event: any) {
+
 		let unsavedFailureId = this.warnChildrenBeforeSwitch(event);
 		if (unsavedFailureId) {
 			for (let key in event.detail.selectedRowIds) {

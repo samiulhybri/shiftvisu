@@ -14,7 +14,6 @@ import { Text, CheckBox } from "@ui5/webcomponents-react";
 
 import {
 	CustomReactGridTable,
-	GridTableColumnDataType,
 } from "@app/shared/components/CustomGridTable";
 import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
 import { ShiftVisuComponentOptionTypeClass } from "@app/shared/enums/ShiftVisuComponentTypeEnum";
@@ -88,11 +87,11 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 						<CheckBox
 							checked={this.modelComponents.filter((box: any)=>box.is_mandatory).map((item: any) => item.id).includes(row.original.id)? true: false}
 							indeterminate={false}
+							name="is_mandatory"
 							disabled={row.isSelected ? false : true}
 							onClick={event => {
 								this.onCheckMandatory(event, row);
-								console.log("Checkbox clicked:", row.original.id);
-								console.log(this.modelComponents.map((item: any) => item.id), "modelComponents");
+								
 							}}
 						/>
 					</React.StrictMode>
@@ -129,10 +128,9 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 	) {}
 	ngOnInit(): void {
 		this.selectedIssue.subscribe((issue: any) => {
-		
+			console.log("Selected issue:", issue);
 			this.modelComponents =
 				issue.components?.filter((component: any) => component.model_type) || [];
-				console.log("Selected issue  model component:", this.modelComponents);
 			if (this.gridTable?.data?.length) {
 				this.selectedRowIds = {}; // Reset selection
 
@@ -195,15 +193,14 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 	}
 
 	rowClick(event: any) {
-		
+		console.log("Row clicked:", event.detail.row.original);
 		const selectedOriginalData = event.detail.selectedFlatRows.map(
 			(row: { original: any }) => row.original
 		);
-		console.log("Row clicked:", selectedOriginalData);
-		this.selectedOriginalData = selectedOriginalData.map((row: any) => {
-			row.is_mandatory = row.is_mandatory = true;
-			return row;
-		});
+		// this.selectedOriginalData = selectedOriginalData.map((row: any) => {
+		// 	row.is_mandatory = row.is_mandatory = true;
+		// 	return row;
+		// });
 	}
 
 	returnIdForUnsavedFailure() {
