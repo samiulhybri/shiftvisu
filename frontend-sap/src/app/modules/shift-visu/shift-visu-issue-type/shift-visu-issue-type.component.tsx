@@ -143,6 +143,7 @@ export class ShiftVisuIssueTypeComponent implements OnInit {
 		this.isSaveFailureLoading = true;
 		const url = "shift-visu/component-issue-type";
 		if (this.modelComponent && this.modelComponent.selectedOriginalData) {
+			console.log(this.modelComponent.selectedOriginalData  , 'this.modelComponent.selectedOriginalData');
 			this.selectedModelComponents = this.modelComponent.selectedOriginalData.map(
 				(data: any) => {
 					const model = new ShiftVisuComponentModel();

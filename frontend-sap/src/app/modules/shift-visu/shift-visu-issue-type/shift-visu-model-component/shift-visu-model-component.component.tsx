@@ -12,9 +12,7 @@ import {
 import React from "react";
 import { Text, CheckBox } from "@ui5/webcomponents-react";
 
-import {
-	CustomReactGridTable,
-} from "@app/shared/components/CustomGridTable";
+import { CustomReactGridTable } from "@app/shared/components/CustomGridTable";
 import { PermissionEnum } from "@app/shared/enums/PermissionEnum";
 import { ShiftVisuComponentOptionTypeClass } from "@app/shared/enums/ShiftVisuComponentTypeEnum";
 import { AuthService } from "@app/shared/services/auth.service";
@@ -85,13 +83,19 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 				return (
 					<React.StrictMode>
 						<CheckBox
-							checked={this.modelComponents.filter((box: any)=>box.is_mandatory).map((item: any) => item.id).includes(row.original.id)? true: false}
+							checked={
+								this.modelComponents
+									.filter((box: any) => box.is_mandatory)
+									.map((item: any) => item.id)
+									.includes(row.original.id)
+									? true
+									: false
+							}
 							indeterminate={false}
 							name="is_mandatory"
 							disabled={row.isSelected ? false : true}
 							onClick={event => {
 								this.onCheckMandatory(event, row);
-								
 							}}
 						/>
 					</React.StrictMode>
@@ -128,16 +132,15 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 	) {}
 	ngOnInit(): void {
 		this.selectedIssue.subscribe((issue: any) => {
-			console.log("Selected issue:", issue);
 			this.modelComponents =
 				issue.components?.filter((component: any) => component.model_type) || [];
+				console.log("modelComponents", this.modelComponents);
+				this.selectedOriginalData = this.modelComponents.map((item: any) => item);
 			if (this.gridTable?.data?.length) {
-				this.selectedRowIds = {}; // Reset selection
+				this.selectedRowIds = {};
 
-				// Get all model component IDs
 				const modelComponentIds = this.modelComponents.map((comp: any) => comp.id);
 
-				// Loop through gridTable data and check for matching IDs
 				this.gridTable.data.forEach((item: any, index: number) => {
 					if (modelComponentIds.includes(item.id)) {
 						this.selectedRowIds[index] = true;
@@ -159,7 +162,7 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 
 	processData(data: any, recentData: any) {
 		if (this.gridTable?.data?.length) {
-			this.selectedRowIds = {}; 
+			this.selectedRowIds = {};
 
 			const modelComponentIds = this.modelComponents.map((comp: any) => comp.id);
 			this.gridTable.data.forEach((item: any, index: number) => {
@@ -173,7 +176,7 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 		}
 	}
 	onCheckMandatory(event: any, selectRow: any) {
-		event.stopPropagation(); 
+		event.stopPropagation();
 		const isChecked = event.target.checked;
 		const row = selectRow.original;
 		const rowIndex = this.selectedOriginalData.findIndex(item => item.id === row.id);
@@ -193,14 +196,29 @@ export class ShiftVisuModelComponentComponent implements OnChanges, OnInit {
 	}
 
 	rowClick(event: any) {
-		console.log("Row clicked:", event.detail.row.original);
-		const selectedOriginalData = event.detail.selectedFlatRows.map(
+		const clickedRow = event.detail.row.original;
+		const selectedFlatRows = event.detail.selectedFlatRows.map(
 			(row: { original: any }) => row.original
 		);
-		// this.selectedOriginalData = selectedOriginalData.map((row: any) => {
-		// 	row.is_mandatory = row.is_mandatory = true;
-		// 	return row;
-		// });
+
+		if (!this.selectedOriginalData) {
+			this.selectedOriginalData = [];
+		}
+
+		const updatedSelectedData = selectedFlatRows.map((row: any) => {
+			const existingRow = this.selectedOriginalData.find((r: any) => r.id === row.id);
+			return {
+				...row,
+				is_mandatory: existingRow ? existingRow.is_mandatory : false,
+			};
+		});
+
+		const clickedIndex = updatedSelectedData.findIndex((r: any) => r.id === clickedRow.id);
+		if (clickedIndex !== -1) {
+			updatedSelectedData[clickedIndex].is_mandatory = false;
+		}
+
+		this.selectedOriginalData = updatedSelectedData;
 	}
 
 	returnIdForUnsavedFailure() {

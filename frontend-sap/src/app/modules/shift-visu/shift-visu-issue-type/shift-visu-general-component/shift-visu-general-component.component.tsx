@@ -124,6 +124,7 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 			this.generalComponents = issue.components?.filter(
 				(component: any) => component.model_type === null || component.model_type === ""
 			);
+			this.selectedOriginalData = this.generalComponents.map((items: any)=> items);
 			if (this.gridTable?.data?.length) {
 				this.selectedRowIds = {};
 				const modelComponentIds = this.generalComponents.map((comp: any) => comp.id);
@@ -195,12 +196,28 @@ export class ShiftVisuGeneralComponentComponent implements OnChanges, OnInit {
 	}
 
 	rowClick(event: any) {
-		const selectedOriginalData = event.detail.selectedFlatRows.map(
+		const clickedRow = event.detail.row.original;
+		const selectedFlatRows = event.detail.selectedFlatRows.map(
 			(row: { original: any }) => row.original
 		);
-		this.selectedOriginalData = selectedOriginalData.map((row: any) => {
-			row.is_mandatory = row.is_mandatory = true;
-			return row;
+
+		if (!this.selectedOriginalData) {
+			this.selectedOriginalData = [];
+		}
+
+		const updatedSelectedData = selectedFlatRows.map((row: any) => {
+			const existingRow = this.selectedOriginalData.find((r: any) => r.id === row.id);
+			return {
+				...row,
+				is_mandatory: existingRow ? existingRow.is_mandatory : false,
+			};
 		});
+
+		const clickedIndex = updatedSelectedData.findIndex((r: any) => r.id === clickedRow.id);
+		if (clickedIndex !== -1) {
+			updatedSelectedData[clickedIndex].is_mandatory = false;
+		}
+
+		this.selectedOriginalData = updatedSelectedData;
 	}
 }

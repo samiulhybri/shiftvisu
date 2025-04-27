@@ -9,6 +9,7 @@ export class ShiftVisuComponentModel implements Deserializable {
 	model_type?: string = "";
 	view_in?: string = "";
 	measure_options?: string = "";
+	is_mandetory?: boolean = false;
 	component_type?: ShiftVisuComponentTypeEnum;
 	shiftVisuComponentOptions?: ShiftVisuComponentOptionModel[] = [];
 
